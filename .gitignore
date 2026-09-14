@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (nunca se suben al repo)
+.env
+
+# Builds
+frontend/dist/
+backend/dist/
+
+# Logs
+npm-debug.log*
+*.log
+
+# Sistema operativo / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
