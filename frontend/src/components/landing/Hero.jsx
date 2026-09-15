@@ -52,7 +52,7 @@ export function Hero() {
         </div>
 
         <div className="absolute -bottom-4 -left-4 hidden items-center gap-2 rounded-xl bg-white px-4 py-3 shadow-lg ring-1 ring-slate-200 sm:flex">
-          <IconoReloj className="h-5 w-5 text-blue-600" />
+          <IconoReloj className="h-5 w-5 text-amber-500" />
           <span className="text-sm font-medium text-slate-700">Confirmación automática</span>
         </div>
       </div>
