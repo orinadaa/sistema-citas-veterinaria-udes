@@ -1,6 +1,7 @@
 // components/landing/CtaBanner.jsx
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { AccentBar } from '../AccentBar';
 
 export function CtaBanner() {
   const navegar = useNavigate();
@@ -16,6 +17,7 @@ export function CtaBanner() {
         <h2 className="max-w-xl text-3xl font-bold tracking-tight text-white">
           ¿Tu mascota necesita una cita?
         </h2>
+        <AccentBar sobreFondoAzul centrado />
         <p className="max-w-md text-blue-100">
           Regístrate o inicia sesión para agendar en la sede que prefieras.
         </p>

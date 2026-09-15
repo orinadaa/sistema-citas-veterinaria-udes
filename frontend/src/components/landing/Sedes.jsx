@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { obtenerSedes } from '../../api/client';
 import { IconoUbicacion, IconoReloj, IconoAlerta } from '../icons';
+import { AccentBar } from '../AccentBar';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
 
@@ -24,7 +25,8 @@ export function Sedes() {
     <section id="sedes" className="py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <h2 className="text-3xl font-bold tracking-tight text-slate-900">Nuestras sedes</h2>
-        <p className="mt-3 max-w-[60ch] text-slate-600">
+        <AccentBar />
+        <p className="mt-4 max-w-[60ch] text-slate-600">
           Atendemos en dos ciudades. Elige la que te quede más cerca al agendar tu cita.
         </p>
         <span id="horarios" className="relative -top-20 block" aria-hidden="true" />
