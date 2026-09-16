@@ -2,13 +2,14 @@
 import { Link, useNavigate } from 'react-router-dom';
 import logoAzul from '../../assets/logo-azul.png';
 import { useAuth } from '../../context/AuthContext';
+import { rutaAgendarCita } from '../../utils/rutas';
 
 export function Navbar() {
   const { estaAutenticado, usuario, cerrarSesion } = useAuth();
   const navegar = useNavigate();
 
   function irAAgendar() {
-    navegar(estaAutenticado ? '/panel' : '/iniciar-sesion?next=/panel');
+    navegar(rutaAgendarCita(estaAutenticado));
   }
 
   return (

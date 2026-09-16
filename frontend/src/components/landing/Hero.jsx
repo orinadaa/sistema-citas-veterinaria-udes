@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import logoBlanco from '../../assets/logo-blanco.png';
 import { IconoUbicacion, IconoReloj, IconoFlechaDerecha } from '../icons';
 import { useAuth } from '../../context/AuthContext';
+import { rutaAgendarCita } from '../../utils/rutas';
 
 export function Hero() {
   const navegar = useNavigate();
   const { estaAutenticado } = useAuth();
 
   function irAAgendar() {
-    navegar(estaAutenticado ? '/panel' : '/iniciar-sesion?next=/panel');
+    navegar(rutaAgendarCita(estaAutenticado));
   }
 
   return (
