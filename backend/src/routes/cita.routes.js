@@ -4,6 +4,7 @@
 const express = require('express');
 const {
   consultarDisponibilidad,
+  consultarMedicosDisponibles,
   crear,
   misCitas,
   reprogramarCita,
@@ -15,8 +16,11 @@ const router = express.Router();
 
 router.use(verificarToken, verificarRol('cliente'));
 
-// GET /api/citas/disponibilidad?sedeId=...&fecha=YYYY-MM-DD
+// GET /api/citas/disponibilidad?sedeId=...&servicioId=...&fecha=YYYY-MM-DD
 router.get('/disponibilidad', consultarDisponibilidad);
+
+// GET /api/citas/medicos-disponibles?sedeId=...&servicioId=...&fechaHora=ISO
+router.get('/medicos-disponibles', consultarMedicosDisponibles);
 
 // GET /api/citas/mias
 router.get('/mias', misCitas);
