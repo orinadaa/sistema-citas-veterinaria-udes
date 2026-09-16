@@ -2,13 +2,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { AccentBar } from '../AccentBar';
+import { rutaAgendarCita } from '../../utils/rutas';
 
 export function CtaBanner() {
   const navegar = useNavigate();
   const { estaAutenticado } = useAuth();
 
   function irAAgendar() {
-    navegar(estaAutenticado ? '/panel' : '/iniciar-sesion?next=/panel');
+    navegar(rutaAgendarCita(estaAutenticado));
   }
 
   return (

@@ -38,3 +38,24 @@ export function obtenerSedes() {
 export function obtenerPerfil(token) {
   return solicitar('/auth/perfil', { token });
 }
+
+export function obtenerDisponibilidad({ sedeId, fecha, token }) {
+  const parametros = new URLSearchParams({ sedeId, fecha });
+  return solicitar(`/citas/disponibilidad?${parametros}`, { token });
+}
+
+export function agendarCita(datos, token) {
+  return solicitar('/citas', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function obtenerMisCitas(token) {
+  return solicitar('/citas/mias', { token });
+}
+
+export function reprogramarCita(id, nuevaFechaHora, token) {
+  return solicitar(`/citas/${id}/reprogramar`, { metodo: 'PATCH', cuerpo: { nuevaFechaHora }, token });
+}
+
+export function cancelarCita(id, token) {
+  return solicitar(`/citas/${id}/cancelar`, { metodo: 'PATCH', token });
+}
