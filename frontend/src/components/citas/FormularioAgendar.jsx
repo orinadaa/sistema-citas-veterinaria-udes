@@ -1,16 +1,21 @@
 // components/citas/FormularioAgendar.jsx
-// RF-06: agendar una cita en línea indicando la sede.
+// RF-06: agendar una cita en línea indicando sede, servicio, franja y
+// médico.
 import { useEffect, useState } from 'react';
-import { obtenerSedes, agendarCita } from '../../api/client';
+import { obtenerSedes, obtenerServicios, agendarCita } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorFranjas } from './SelectorFranjas';
+import { SelectorMedico } from './SelectorMedico';
 
 export function FormularioAgendar({ onAgendada }) {
   const { token } = useAuth();
   const [sedes, setSedes] = useState([]);
+  const [servicios, setServicios] = useState([]);
   const [sedeId, setSedeId] = useState('');
+  const [servicioId, setServicioId] = useState('');
   const [franja, setFranja] = useState(null);
+  const [medicoId, setMedicoId] = useState('');
   const [nombreMascota, setNombreMascota] = useState('');
   const [motivo, setMotivo] = useState('');
   const [error, setError] = useState('');
@@ -18,22 +23,28 @@ export function FormularioAgendar({ onAgendada }) {
 
   useEffect(() => {
     obtenerSedes().then((datos) => setSedes(datos.sedes));
+    obtenerServicios().then((datos) => setServicios(datos.servicios));
   }, []);
 
   async function enviarFormulario(evento) {
     evento.preventDefault();
     setError('');
 
-    if (!sedeId || !franja || !nombreMascota) {
-      setError('Selecciona una sede, una franja y escribe el nombre de tu mascota.');
+    if (!sedeId || !servicioId || !franja || !medicoId || !nombreMascota) {
+      setError('Completa sede, servicio, franja, médico y el nombre de tu mascota.');
       return;
     }
 
     setEnviando(true);
     try {
-      await agendarCita({ sedeId, fechaHora: franja, nombreMascota, motivo }, token);
+      await agendarCita(
+        { sedeId, servicioId, medicoId, fechaHora: franja, nombreMascota, motivo },
+        token
+      );
       setSedeId('');
+      setServicioId('');
       setFranja(null);
+      setMedicoId('');
       setNombreMascota('');
       setMotivo('');
       onAgendada();
@@ -46,29 +57,71 @@ export function FormularioAgendar({ onAgendada }) {
 
   return (
     <form onSubmit={enviarFormulario} className="flex flex-col gap-5">
-      <div>
-        <label htmlFor="sede-cita" className="text-sm font-medium text-slate-700">
-          Sede
-        </label>
-        <select
-          id="sede-cita"
-          value={sedeId}
-          onChange={(evento) => {
-            setSedeId(evento.target.value);
-            setFranja(null);
-          }}
-          className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 sm:w-72"
-        >
-          <option value="">Selecciona una sede</option>
-          {sedes.map((sede) => (
-            <option key={sede.id} value={sede.id}>
-              {sede.ciudad}
-            </option>
-          ))}
-        </select>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="sede-cita" className="text-sm font-medium text-slate-700">
+            Sede
+          </label>
+          <select
+            id="sede-cita"
+            value={sedeId}
+            onChange={(evento) => {
+              setSedeId(evento.target.value);
+              setFranja(null);
+              setMedicoId('');
+            }}
+            className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+          >
+            <option value="">Selecciona una sede</option>
+            {sedes.map((sede) => (
+              <option key={sede.id} value={sede.id}>
+                {sede.ciudad}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="servicio-cita" className="text-sm font-medium text-slate-700">
+            Tipo de servicio
+          </label>
+          <select
+            id="servicio-cita"
+            value={servicioId}
+            onChange={(evento) => {
+              setServicioId(evento.target.value);
+              setFranja(null);
+              setMedicoId('');
+            }}
+            className="mt-1.5 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+          >
+            <option value="">Selecciona un servicio</option>
+            {servicios.map((servicio) => (
+              <option key={servicio.id} value={servicio.id}>
+                {servicio.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <SelectorFranjas sedeId={sedeId} valorSeleccionado={franja} onSeleccionar={setFranja} />
+      <SelectorFranjas
+        sedeId={sedeId}
+        servicioId={servicioId}
+        valorSeleccionado={franja}
+        onSeleccionar={(valor) => {
+          setFranja(valor);
+          setMedicoId('');
+        }}
+      />
+
+      <SelectorMedico
+        sedeId={sedeId}
+        servicioId={servicioId}
+        fechaHora={franja}
+        valorSeleccionado={medicoId}
+        onSeleccionar={setMedicoId}
+      />
 
       <Campo
         id="nombreMascota"

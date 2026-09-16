@@ -64,20 +64,56 @@ export function IconoLaboratorio({ className }) {
   );
 }
 
-export function IconoEstetica({ className }) {
+export function IconoEstetoscopio({ className }) {
   return (
     <Icono className={className}>
-      <path d="M12 3c1.5 2 1.5 4-.3 5.4C13.5 9.6 15 11.6 15 14a3 3 0 1 1-6 0c0-2.4 1.5-4.4 3.3-5.6C10.5 7 10.5 5 12 3Z" />
-      <path d="M9 20h6" />
+      <path d="M6 3v6a4 4 0 0 0 8 0V3M6 3H4.5M14 3h1.5" />
+      <path d="M10 13v2.5a4.5 4.5 0 0 0 9 0v-1" />
+      <circle cx="19.5" cy="14.5" r="1.8" />
     </Icono>
   );
 }
 
-export function IconoHospitalizacion({ className }) {
+export function IconoDesparasitacion({ className }) {
   return (
     <Icono className={className}>
-      <rect x="3" y="6" width="18" height="13" rx="1.5" />
-      <path d="M12 9.5v6M9 12.5h6M3 6l4-3h10l4 3" />
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8 8l8 8M16 8l-8 8" />
+    </Icono>
+  );
+}
+
+export function IconoDienteDental({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M12 3c-2.8 0-5 1.8-5 4.5 0 2 .6 3 1 5.5.3 1.8.6 4.5 1.8 6.5.6 1 1.6 1 2.2 0 .7-1.2.9-2.5 1-3.5.1 1 .3 2.3 1 3.5.6 1 1.6 1 2.2 0C17.4 18 17.7 15.3 18 13.5c.4-2.5 1-3.5 1-5.5 0-2.7-2.2-4.5-5-4.5-.8 0-1.5.2-2 .5-.5-.3-1.2-.5-2-.5Z" />
+    </Icono>
+  );
+}
+
+export function IconoRadiografia({ className }) {
+  return (
+    <Icono className={className}>
+      <rect x="4" y="3" width="16" height="18" rx="1.5" />
+      <path d="M8 8h8M8 12h8M8 16h5" />
+    </Icono>
+  );
+}
+
+export function IconoCintaOncologia({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M9 4a3 3 0 1 1 6 0c0 2.5-1.2 3.8-2 5.5-.3.6-.8.6-1 0C11.2 7.8 9 6.5 9 4Z" />
+      <path d="M9.5 9.8 6 20M14.5 9.8 18 20" />
+    </Icono>
+  );
+}
+
+export function IconoEndoscopia({ className }) {
+  return (
+    <Icono className={className}>
+      <circle cx="7" cy="6" r="2.3" />
+      <path d="M8.6 7.6c3 3 5.6 4 8.4 6 1.3 1 2.2 2.4 2.2 3.9a2.5 2.5 0 0 1-5 0c0-1 .4-1.7 1-2.4" />
     </Icono>
   );
 }
