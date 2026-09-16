@@ -1,13 +1,15 @@
 // tests/cita.controller.test.js
 // RF-06 (agendar), RF-07 (disponibilidad), RF-08 (reprogramar),
-// RF-09 (cancelar). Los modelos se mockean; horarioAtencion.js se deja
-// real porque es logica pura (sin base de datos).
+// RF-09 (cancelar). Los modelos se mockean, incluido horario.model
+// (RF-13, horario configurable por sede); utils/franjas.js se deja real
+// porque es logica pura (sin base de datos).
 
 jest.mock('../src/models/cita.model');
 jest.mock('../src/models/sede.model');
 jest.mock('../src/models/servicio.model');
 jest.mock('../src/models/medico.model');
 jest.mock('../src/models/usuario.model');
+jest.mock('../src/models/horario.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -17,7 +19,7 @@ const sedeModel = require('../src/models/sede.model');
 const servicioModel = require('../src/models/servicio.model');
 const medicoModel = require('../src/models/medico.model');
 const usuarioModel = require('../src/models/usuario.model');
-const { generarFranjasDelDia } = require('../src/config/horarioAtencion');
+const horarioModel = require('../src/models/horario.model');
 
 const ID_CLIENTE = 'cliente-1';
 const ID_SEDE = 'sede-1';
@@ -25,16 +27,13 @@ const ID_SERVICIO = 'servicio-1';
 const ID_MEDICO = 'medico-1';
 const TOKEN_CLIENTE = jwt.sign({ id: ID_CLIENTE, rol: 'cliente' }, process.env.JWT_SECRET);
 const MEDICO_EJEMPLO = { id: ID_MEDICO, nombre_completo: 'Dra. Ejemplo' };
+const HORARIO_ABIERTO = { hora_inicio: '08:00:00', hora_fin: '17:00:00' };
 
 function proximaFranjaValida(diasAdelante = 10) {
   const fecha = new Date();
   fecha.setDate(fecha.getDate() + diasAdelante);
-  let franjas = generarFranjasDelDia(fecha);
-  while (franjas.length === 0) {
-    fecha.setDate(fecha.getDate() + 1);
-    franjas = generarFranjasDelDia(fecha);
-  }
-  return franjas[0];
+  fecha.setHours(8, 0, 0, 0);
+  return fecha;
 }
 
 function mockearEntidadesBasicas() {
@@ -42,6 +41,7 @@ function mockearEntidadesBasicas() {
   servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO, nombre: 'Consulta médica' });
   usuarioModel.buscarPorId.mockResolvedValue({ id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE });
   medicoModel.ofreceServicio.mockResolvedValue(true);
+  horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
 }
 
 describe('GET /api/citas/disponibilidad', () => {
@@ -70,6 +70,7 @@ describe('GET /api/citas/disponibilidad', () => {
     sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     medicoModel.listarPorSedeYServicio.mockResolvedValue([]);
+    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
 
     const respuesta = await request(app)
       .get('/api/citas/disponibilidad')
@@ -85,6 +86,7 @@ describe('GET /api/citas/disponibilidad', () => {
     sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     medicoModel.listarPorSedeYServicio.mockResolvedValue([MEDICO_EJEMPLO]);
+    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
     const franja = proximaFranjaValida();
     medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: ID_MEDICO, fecha_hora: franja }]);
 
@@ -108,6 +110,7 @@ describe('GET /api/citas/disponibilidad con medicoId (usado al reprogramar)', ()
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     usuarioModel.buscarPorId.mockResolvedValue({ id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE });
     medicoModel.ofreceServicio.mockResolvedValue(true);
+    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
     const franja = proximaFranjaValida();
     medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: ID_MEDICO, fecha_hora: franja }]);
 
