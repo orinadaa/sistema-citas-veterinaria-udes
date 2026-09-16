@@ -8,26 +8,28 @@ import { IconoAlerta } from '../icons';
 
 const ESTADOS = { INACTIVO: 'inactivo', CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
 
-export function SelectorFranjas({ sedeId, valorSeleccionado, onSeleccionar }) {
+export function SelectorFranjas({ sedeId, servicioId, medicoId, valorSeleccionado, onSeleccionar }) {
   const { token } = useAuth();
   const [fecha, setFecha] = useState(hoyComoFechaLocal());
   const [franjas, setFranjas] = useState([]);
+  const [medicosEnSede, setMedicosEnSede] = useState(null);
   const [estado, setEstado] = useState(ESTADOS.INACTIVO);
 
   useEffect(() => {
-    if (!sedeId || !fecha) return;
+    if (!sedeId || !servicioId || !fecha) return;
 
     setEstado(ESTADOS.CARGANDO);
-    obtenerDisponibilidad({ sedeId, fecha, token })
+    obtenerDisponibilidad({ sedeId, servicioId, fecha, medicoId, token })
       .then((datos) => {
         setFranjas(datos.franjas);
+        setMedicosEnSede(datos.medicosDisponiblesEnSede);
         setEstado(ESTADOS.LISTO);
       })
       .catch(() => setEstado(ESTADOS.ERROR));
-  }, [sedeId, fecha, token]);
+  }, [sedeId, servicioId, medicoId, fecha, token]);
 
-  if (!sedeId) {
-    return <p className="text-sm text-slate-500">Selecciona primero una sede.</p>;
+  if (!sedeId || !servicioId) {
+    return <p className="text-sm text-slate-500">Selecciona primero la sede y el servicio.</p>;
   }
 
   return (
@@ -63,11 +65,17 @@ export function SelectorFranjas({ sedeId, valorSeleccionado, onSeleccionar }) {
           </div>
         )}
 
-        {estado === ESTADOS.LISTO && franjas.length === 0 && (
+        {estado === ESTADOS.LISTO && medicosEnSede === 0 && (
+          <p className="text-sm text-slate-500">
+            No hay médicos que presten este servicio en esta sede por ahora.
+          </p>
+        )}
+
+        {estado === ESTADOS.LISTO && medicosEnSede > 0 && franjas.length === 0 && (
           <p className="text-sm text-slate-500">La clínica no atiende ese día. Elige otra fecha.</p>
         )}
 
-        {estado === ESTADOS.LISTO && franjas.length > 0 && (
+        {estado === ESTADOS.LISTO && medicosEnSede > 0 && franjas.length > 0 && (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {franjas.map((franja) => {
               const seleccionada = franja.horaInicio === valorSeleccionado;

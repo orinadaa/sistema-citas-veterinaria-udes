@@ -52,7 +52,10 @@ export function FilaCita({ cita, onActualizada }) {
           <p className="text-sm text-slate-600">
             {formatearHora(cita.fecha_hora)} · {cita.sede_nombre}
           </p>
-          <p className="mt-1 text-sm text-slate-500">Mascota: {cita.nombre_mascota}</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {cita.servicio_nombre} con {cita.medico_nombre}
+          </p>
+          <p className="text-sm text-slate-500">Mascota: {cita.nombre_mascota}</p>
           {cita.motivo && <p className="text-sm text-slate-500">Motivo: {cita.motivo}</p>}
         </div>
 
@@ -86,7 +89,14 @@ export function FilaCita({ cita, onActualizada }) {
 
       {modo === 'reprogramar' && (
         <div className="mt-4 border-t border-slate-100 pt-4">
-          <SelectorFranjas sedeId={cita.sede_id} valorSeleccionado={nuevaFranja} onSeleccionar={setNuevaFranja} />
+          <SelectorFranjas
+            sedeId={cita.sede_id}
+            servicioId={cita.servicio_id}
+            medicoId={cita.medico_id}
+            valorSeleccionado={nuevaFranja}
+            onSeleccionar={setNuevaFranja}
+          />
+          <p className="mt-2 text-xs text-slate-400">Se mantiene el mismo médico ({cita.medico_nombre}).</p>
           {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           <div className="mt-4 flex gap-3">
             <button
