@@ -13,7 +13,8 @@ const sedeModel = require('../models/sede.model');
 const servicioModel = require('../models/servicio.model');
 const medicoModel = require('../models/medico.model');
 const usuarioModel = require('../models/usuario.model');
-const { generarFranjasDelDia, DURACION_SLOT_MINUTOS } = require('../config/horarioAtencion');
+const horarioModel = require('../models/horario.model');
+const { generarFranjasEntreHoras, DURACION_SLOT_MINUTOS } = require('../utils/franjas');
 
 function limitesDelDia(fecha) {
   const inicio = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
@@ -26,9 +27,17 @@ function parsearFechaISO(valor) {
   return Number.isNaN(fecha.getTime()) ? null : fecha;
 }
 
-function esFranjaValida(fecha) {
-  const franjasValidas = generarFranjasDelDia(fecha).map((franja) => franja.getTime());
-  return franjasValidas.includes(fecha.getTime());
+// RF-13: el horario de atencion es configurable por sede. Si la sede no
+// tiene fila para ese dia de la semana, esta cerrada ese dia.
+async function franjasDelDiaParaSede(sedeId, fecha) {
+  const dia = await horarioModel.buscarDia(sedeId, fecha.getDay());
+  if (!dia) return [];
+  return generarFranjasEntreHoras(fecha, dia.hora_inicio, dia.hora_fin);
+}
+
+async function esFranjaValida(sedeId, fecha) {
+  const franjas = await franjasDelDiaParaSede(sedeId, fecha);
+  return franjas.some((franja) => franja.getTime() === fecha.getTime());
 }
 
 // GET /api/citas/disponibilidad?sedeId=...&servicioId=...&fecha=YYYY-MM-DD
@@ -70,7 +79,7 @@ async function consultarDisponibilidad(req, res, next) {
       medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId);
     }
 
-    const franjas = generarFranjasDelDia(fechaConsultada);
+    const franjas = await franjasDelDiaParaSede(sedeId, fechaConsultada);
 
     if (medicos.length === 0) {
       return res.status(200).json({
@@ -188,7 +197,7 @@ async function crear(req, res, next) {
     if (fecha <= new Date()) {
       return res.status(409).json({ mensaje: 'No se puede agendar una fecha en el pasado.' });
     }
-    if (!esFranjaValida(fecha)) {
+    if (!(await esFranjaValida(sedeId, fecha))) {
       return res.status(409).json({ mensaje: 'La hora seleccionada no coincide con una franja de atención válida.' });
     }
 
@@ -251,7 +260,7 @@ async function reprogramarCita(req, res, next) {
     if (fecha <= new Date()) {
       return res.status(409).json({ mensaje: 'No se puede reprogramar a una fecha en el pasado.' });
     }
-    if (!esFranjaValida(fecha)) {
+    if (!(await esFranjaValida(cita.sede_id, fecha))) {
       return res.status(409).json({ mensaje: 'La hora seleccionada no coincide con una franja de atención válida.' });
     }
 

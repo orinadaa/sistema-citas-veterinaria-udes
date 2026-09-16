@@ -37,6 +37,36 @@ async function listarPorCliente(clienteId) {
   return resultado.rows;
 }
 
+// RF-12: seguimiento de citas por parte de administrativo/veterinario.
+async function listarPorSede(sedeId) {
+  const resultado = await pool.query(
+    `SELECT c.*, sv.nombre AS servicio_nombre, m.nombre_completo AS medico_nombre,
+            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono
+     FROM cita c
+     JOIN servicio sv ON sv.id = c.servicio_id
+     JOIN usuario m ON m.id = c.medico_id
+     JOIN usuario cl ON cl.id = c.cliente_id
+     WHERE c.sede_id = $1
+     ORDER BY c.fecha_hora`,
+    [sedeId]
+  );
+  return resultado.rows;
+}
+
+async function listarPorMedico(medicoId) {
+  const resultado = await pool.query(
+    `SELECT c.*, sv.nombre AS servicio_nombre,
+            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono
+     FROM cita c
+     JOIN servicio sv ON sv.id = c.servicio_id
+     JOIN usuario cl ON cl.id = c.cliente_id
+     WHERE c.medico_id = $1
+     ORDER BY c.fecha_hora`,
+    [medicoId]
+  );
+  return resultado.rows;
+}
+
 async function buscarPorId(id) {
   const resultado = await pool.query('SELECT * FROM cita WHERE id = $1', [id]);
   return resultado.rows[0] || null;
@@ -66,6 +96,8 @@ module.exports = {
   existeConflicto,
   crear,
   listarPorCliente,
+  listarPorSede,
+  listarPorMedico,
   buscarPorId,
   reprogramar,
   cancelar,
