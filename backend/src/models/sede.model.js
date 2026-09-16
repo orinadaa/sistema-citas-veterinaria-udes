@@ -6,4 +6,9 @@ async function listarTodas() {
   return resultado.rows;
 }
 
-module.exports = { listarTodas };
+async function buscarPorId(id) {
+  const resultado = await pool.query('SELECT id, nombre, ciudad FROM sede WHERE id = $1', [id]);
+  return resultado.rows[0] || null;
+}
+
+module.exports = { listarTodas, buscarPorId };
