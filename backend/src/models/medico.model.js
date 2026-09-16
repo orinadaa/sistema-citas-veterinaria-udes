@@ -1,8 +1,7 @@
 // models/medico.model.js
-// "Medico" aqui es un usuario con rol 'veterinario'. La asignacion de
-// que medico presta que servicio (servicio_medico) la administrara el
-// panel administrativo en el incremento 3; mientras tanto se siembra
-// con backend/src/scripts/seedVeterinarios.js.
+// "Medico" aqui es un usuario con rol 'veterinario'. RF-10/RF-11: el
+// administrador ve los medicos de su sede y administra que servicio
+// presta cada uno (servicio_medico).
 const { pool } = require('../config/db');
 
 async function listarPorSedeYServicio(sedeId, servicioId) {
@@ -44,4 +43,53 @@ async function asignarServicio(medicoId, servicioId) {
   );
 }
 
-module.exports = { listarPorSedeYServicio, listarFranjasOcupadas, ofreceServicio, asignarServicio };
+// Todos los veterinarios de una sede, con la lista de servicios que
+// presta cada uno. Para el panel administrativo (RF-10/RF-11).
+async function listarConServicios(sedeId) {
+  const resultado = await pool.query(
+    `SELECT u.id, u.nombre_completo, u.correo, u.sede_id, u.activo,
+            COALESCE(
+              json_agg(json_build_object('id', sv.id, 'nombre', sv.nombre)) FILTER (WHERE sv.id IS NOT NULL),
+              '[]'
+            ) AS servicios
+     FROM usuario u
+     LEFT JOIN servicio_medico sm ON sm.medico_id = u.id
+     LEFT JOIN servicio sv ON sv.id = sm.servicio_id
+     WHERE u.rol = 'veterinario' AND u.sede_id = $1
+     GROUP BY u.id
+     ORDER BY u.nombre_completo`,
+    [sedeId]
+  );
+  return resultado.rows;
+}
+
+// Reemplaza por completo el conjunto de servicios que presta un medico.
+// Transaccional: o se aplican todos los cambios, o ninguno.
+async function reemplazarServicios(medicoId, servicioIds) {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query('BEGIN');
+    await cliente.query('DELETE FROM servicio_medico WHERE medico_id = $1', [medicoId]);
+    for (const servicioId of servicioIds) {
+      await cliente.query('INSERT INTO servicio_medico (medico_id, servicio_id) VALUES ($1, $2)', [
+        medicoId,
+        servicioId,
+      ]);
+    }
+    await cliente.query('COMMIT');
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+    throw error;
+  } finally {
+    cliente.release();
+  }
+}
+
+module.exports = {
+  listarPorSedeYServicio,
+  listarFranjasOcupadas,
+  ofreceServicio,
+  asignarServicio,
+  listarConServicios,
+  reemplazarServicios,
+};
