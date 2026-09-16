@@ -69,3 +69,43 @@ export function reprogramarCita(id, nuevaFechaHora, token) {
 export function cancelarCita(id, token) {
   return solicitar(`/citas/${id}/cancelar`, { metodo: 'PATCH', token });
 }
+
+export function obtenerHorarios(sedeId) {
+  return solicitar(`/horarios?${new URLSearchParams({ sedeId })}`);
+}
+
+export function actualizarHorario(datos, token) {
+  return solicitar('/horarios', { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function cerrarDiaHorario(sedeId, diaSemana, token) {
+  return solicitar(`/horarios/${sedeId}/${diaSemana}`, { metodo: 'DELETE', token });
+}
+
+export function obtenerServiciosAdmin(token) {
+  return solicitar('/servicios/admin', { token });
+}
+
+export function crearServicio(datos, token) {
+  return solicitar('/servicios', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function actualizarServicio(id, datos, token) {
+  return solicitar(`/servicios/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function obtenerMedicosAdmin(token) {
+  return solicitar('/administracion/medicos', { token });
+}
+
+export function actualizarServiciosDeMedico(medicoId, servicioIds, token) {
+  return solicitar(`/administracion/medicos/${medicoId}/servicios`, {
+    metodo: 'PUT',
+    cuerpo: { servicioIds },
+    token,
+  });
+}
+
+export function obtenerCitasAdministracion(token) {
+  return solicitar('/administracion/citas', { token });
+}
