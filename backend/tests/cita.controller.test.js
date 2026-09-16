@@ -100,6 +100,44 @@ describe('GET /api/citas/disponibilidad', () => {
   });
 });
 
+describe('GET /api/citas/disponibilidad con medicoId (usado al reprogramar)', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('calcula disponibilidad para un solo medico en vez del agregado', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    usuarioModel.buscarPorId.mockResolvedValue({ id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE });
+    medicoModel.ofreceServicio.mockResolvedValue(true);
+    const franja = proximaFranjaValida();
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: ID_MEDICO, fecha_hora: franja }]);
+
+    const fechaTexto = franja.toISOString().slice(0, 10);
+    const respuesta = await request(app)
+      .get('/api/citas/disponibilidad')
+      .query({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, fecha: fechaTexto, medicoId: ID_MEDICO })
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+
+    expect(respuesta.status).toBe(200);
+    expect(medicoModel.listarPorSedeYServicio).not.toHaveBeenCalled();
+    const franjaOcupada = respuesta.body.franjas.find((f) => f.horaInicio === franja.toISOString());
+    expect(franjaOcupada.disponible).toBe(false);
+  });
+
+  test('responde 400 si el medico no presta ese servicio', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    usuarioModel.buscarPorId.mockResolvedValue({ id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE });
+    medicoModel.ofreceServicio.mockResolvedValue(false);
+
+    const respuesta = await request(app)
+      .get('/api/citas/disponibilidad')
+      .query({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, fecha: '2030-01-07', medicoId: ID_MEDICO })
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+
+    expect(respuesta.status).toBe(400);
+  });
+});
+
 describe('GET /api/citas/medicos-disponibles', () => {
   beforeEach(() => jest.clearAllMocks());
 

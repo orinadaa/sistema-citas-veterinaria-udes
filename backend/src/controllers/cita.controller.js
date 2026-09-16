@@ -32,9 +32,12 @@ function esFranjaValida(fecha) {
 }
 
 // GET /api/citas/disponibilidad?sedeId=...&servicioId=...&fecha=YYYY-MM-DD
+// medicoId (opcional): restringe la disponibilidad a un solo medico, en
+// vez del agregado de todos los que prestan ese servicio en esa sede.
+// Se usa al reprogramar, donde el medico de la cita ya esta fijo.
 async function consultarDisponibilidad(req, res, next) {
   try {
-    const { sedeId, servicioId, fecha } = req.query;
+    const { sedeId, servicioId, fecha, medicoId } = req.query;
     if (!sedeId || !servicioId || !fecha) {
       return res.status(400).json({ mensaje: 'sedeId, servicioId y fecha son obligatorios.' });
     }
@@ -52,7 +55,21 @@ async function consultarDisponibilidad(req, res, next) {
       return res.status(400).json({ mensaje: 'La fecha debe tener el formato YYYY-MM-DD.' });
     }
 
-    const medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId);
+    let medicos;
+    if (medicoId) {
+      const medico = await usuarioModel.buscarPorId(medicoId);
+      if (!medico || medico.rol !== 'veterinario' || medico.sede_id !== sedeId) {
+        return res.status(404).json({ mensaje: 'El médico indicado no existe en esa sede.' });
+      }
+      const ofrece = await medicoModel.ofreceServicio(medicoId, servicioId);
+      if (!ofrece) {
+        return res.status(400).json({ mensaje: 'Ese médico no presta el servicio seleccionado.' });
+      }
+      medicos = [{ id: medicoId }];
+    } else {
+      medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId);
+    }
+
     const franjas = generarFranjasDelDia(fechaConsultada);
 
     if (medicos.length === 0) {
