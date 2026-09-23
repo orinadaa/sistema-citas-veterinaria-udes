@@ -153,6 +153,14 @@ export function obtenerDetallePaciente(id, token) {
   return solicitar(`/administracion/pacientes/${id}`, { token });
 }
 
+export function obtenerReportes({ sedeId, desde, hasta } = {}, token) {
+  const parametros = new URLSearchParams();
+  if (sedeId) parametros.set('sedeId', sedeId);
+  if (desde) parametros.set('desde', desde);
+  if (hasta) parametros.set('hasta', hasta);
+  return solicitar(`/administracion/reportes?${parametros}`, { token });
+}
+
 export function actualizarUsuario(id, datos, token) {
   return solicitar(`/usuarios/${id}`, { metodo: 'PATCH', cuerpo: datos, token });
 }

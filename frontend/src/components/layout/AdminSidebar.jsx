@@ -15,6 +15,7 @@ import {
   IconoMedicos,
   IconoSede,
   IconoPersona,
+  IconoGrafica,
   IconoEngranaje,
   IconoPata,
   IconoFlechaDerecha,
@@ -27,6 +28,7 @@ const ITEMS_NAV = [
   { id: 'medicos', etiqueta: 'Médicos', icono: IconoMedicos },
   { id: 'pacientes', etiqueta: 'Pacientes', icono: IconoPersona },
   { id: 'horarios', etiqueta: 'Sedes y horarios', icono: IconoSede },
+  { id: 'reportes', etiqueta: 'Reportes', icono: IconoGrafica },
   { id: 'configuracion', etiqueta: 'Configuración', icono: IconoEngranaje },
 ];
 
