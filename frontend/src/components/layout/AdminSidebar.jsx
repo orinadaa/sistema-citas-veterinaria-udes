@@ -1,8 +1,10 @@
 // components/layout/AdminSidebar.jsx
-// Sidebar fijo del panel administrativo (variante clara, fondo #F5F5F7 -
-// ver seccion 3 del sistema de diseno). La variante navy de rol medico
-// no se construye todavia: no existe pantalla de calendario/dashboard
-// para ese rol en ningun incremento planeado.
+// Sidebar fijo del panel administrativo, con la identidad de marca real
+// de la clinica (ver identidadmarca/): fondo azul institucional
+// #4280F7, logo completo (logoblanco.png) expandido y el isotipo corto
+// (logocorto.png) colapsado. La variante navy de rol medico no se
+// construye todavia: no existe pantalla de calendario/dashboard para
+// ese rol en ningun incremento planeado.
 //
 // Se puede expandir/contraer (solo iconos); el estado se recuerda entre
 // sesiones. El ancho es fijo dentro de cada estado (no cambia con el
@@ -17,10 +19,11 @@ import {
   IconoPersona,
   IconoGrafica,
   IconoEngranaje,
-  IconoPata,
   IconoFlechaDerecha,
 } from '../icons';
 import { useAuth } from '../../context/AuthContext';
+import logoBlanco from '../../assets/logoblanco.png';
+import logoCorto from '../../assets/logocorto.png';
 
 const ITEMS_NAV = [
   { id: 'citas', etiqueta: 'Citas', icono: IconoCalendario },
@@ -32,6 +35,7 @@ const ITEMS_NAV = [
   { id: 'configuracion', etiqueta: 'Configuración', icono: IconoEngranaje },
 ];
 
+const COLOR_SIDEBAR = '#4280F7';
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';
 const ANCHO_EXPANDIDO = '248px';
 const ANCHO_COLAPSADO = '76px';
@@ -66,30 +70,25 @@ export function AdminSidebar({ activo, onCambiar }) {
 
   return (
     <aside
-      className="hidden h-screen shrink-0 flex-col overflow-y-auto bg-[#F5F5F7] py-6 transition-[width] duration-200 lg:flex"
-      style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO }}
+      className="hidden h-screen shrink-0 flex-col overflow-y-auto py-6 transition-[width] duration-200 lg:flex"
+      style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO, backgroundColor: COLOR_SIDEBAR }}
     >
       <div className={`flex items-center px-4 ${colapsado ? 'justify-center' : 'justify-end'}`}>
         <button
           type="button"
           onClick={alternarColapsado}
           title={colapsado ? 'Expandir menú' : 'Contraer menú'}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-brand-navy/50 transition hover:bg-white hover:text-brand-navy"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/70 transition hover:bg-white/15 hover:text-white"
         >
           <IconoFlechaDerecha className={`h-4 w-4 transition-transform duration-200 ${colapsado ? '' : 'rotate-180'}`} />
         </button>
       </div>
 
-      <div className={`mt-4 flex items-center gap-3 px-4 ${colapsado ? 'justify-center px-0' : ''}`}>
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
-          <IconoPata className="h-5 w-5" />
-        </span>
-        {!colapsado && (
-          <span className="font-heading text-sm font-bold leading-tight text-brand-navy">
-            CLÍNICA VETERINARIA
-            <br />
-            UDES
-          </span>
+      <div className={`mt-4 flex items-center px-4 ${colapsado ? 'justify-center px-0' : ''}`}>
+        {colapsado ? (
+          <img src={logoCorto} alt="Clínica Veterinaria UDES" className="h-10 w-10 object-contain" />
+        ) : (
+          <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-auto w-full max-w-[200px] object-contain" />
         )}
       </div>
 
@@ -105,7 +104,7 @@ export function AdminSidebar({ activo, onCambiar }) {
               title={colapsado ? item.etiqueta : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                 colapsado ? 'justify-center px-0' : ''
-              } ${esActivo ? 'bg-brand-amber text-brand-navy' : 'text-brand-navy/70 hover:bg-white'}`}
+              } ${esActivo ? 'bg-brand-amber text-brand-navy' : 'text-white/80 hover:bg-white/15 hover:text-white'}`}
             >
               <Icono className="h-5 w-5 shrink-0" />
               {!colapsado && item.etiqueta}
@@ -115,8 +114,8 @@ export function AdminSidebar({ activo, onCambiar }) {
       </nav>
 
       {!colapsado && (
-        <div className="mx-4 mt-6 rounded-2xl bg-white/70 px-4 py-4 text-center">
-          <IconoPata className="mx-auto h-6 w-6 text-brand-blue" />
+        <div className="mx-4 mt-6 rounded-2xl bg-white/90 px-4 py-4 text-center">
+          <img src={logoCorto} alt="" className="mx-auto h-8 w-8 object-contain" />
           <p className="mt-2 font-heading text-xs italic text-brand-blue">
             Juntos por una vida más saludable
           </p>
