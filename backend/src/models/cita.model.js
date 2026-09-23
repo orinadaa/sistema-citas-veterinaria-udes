@@ -12,12 +12,12 @@ async function existeConflicto(medicoId, fechaHora) {
   return resultado.rowCount > 0;
 }
 
-async function crear({ clienteId, sedeId, servicioId, medicoId, fechaHora, nombreMascota, motivo }) {
+async function crear({ clienteId, sedeId, servicioId, medicoId, fechaHora, mascotaId, motivo }) {
   const resultado = await pool.query(
-    `INSERT INTO cita (cliente_id, sede_id, servicio_id, medico_id, fecha_hora, nombre_mascota, motivo)
+    `INSERT INTO cita (cliente_id, sede_id, servicio_id, medico_id, fecha_hora, mascota_id, motivo)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [clienteId, sedeId, servicioId, medicoId, fechaHora, nombreMascota, motivo || null]
+    [clienteId, sedeId, servicioId, medicoId, fechaHora, mascotaId, motivo || null]
   );
   return resultado.rows[0];
 }
@@ -25,11 +25,13 @@ async function crear({ clienteId, sedeId, servicioId, medicoId, fechaHora, nombr
 async function listarPorCliente(clienteId) {
   const resultado = await pool.query(
     `SELECT c.*, s.nombre AS sede_nombre, s.ciudad AS sede_ciudad,
-            sv.nombre AS servicio_nombre, m.nombre_completo AS medico_nombre
+            sv.nombre AS servicio_nombre, m.nombre_completo AS medico_nombre,
+            mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza
      FROM cita c
      JOIN sede s ON s.id = c.sede_id
      JOIN servicio sv ON sv.id = c.servicio_id
      JOIN usuario m ON m.id = c.medico_id
+     JOIN mascota mc ON mc.id = c.mascota_id
      WHERE c.cliente_id = $1
      ORDER BY c.fecha_hora DESC`,
     [clienteId]
@@ -39,17 +41,19 @@ async function listarPorCliente(clienteId) {
 
 // RF-12: seguimiento de citas por parte de administrativo/veterinario.
 // Incluye la categoria del servicio (color) para el calendario del
-// panel administrativo.
+// panel administrativo y los datos de la mascota.
 async function listarPorSede(sedeId) {
   const resultado = await pool.query(
     `SELECT c.*, sv.nombre AS servicio_nombre, cat.nombre AS categoria_nombre, cat.color AS categoria_color,
             m.nombre_completo AS medico_nombre,
-            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono
+            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono,
+            mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza
      FROM cita c
      JOIN servicio sv ON sv.id = c.servicio_id
      JOIN categoria_servicio cat ON cat.id = sv.categoria_id
      JOIN usuario m ON m.id = c.medico_id
      JOIN usuario cl ON cl.id = c.cliente_id
+     JOIN mascota mc ON mc.id = c.mascota_id
      WHERE c.sede_id = $1
      ORDER BY c.fecha_hora`,
     [sedeId]
@@ -60,11 +64,13 @@ async function listarPorSede(sedeId) {
 async function listarPorMedico(medicoId) {
   const resultado = await pool.query(
     `SELECT c.*, sv.nombre AS servicio_nombre, cat.nombre AS categoria_nombre, cat.color AS categoria_color,
-            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono
+            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono,
+            mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza
      FROM cita c
      JOIN servicio sv ON sv.id = c.servicio_id
      JOIN categoria_servicio cat ON cat.id = sv.categoria_id
      JOIN usuario cl ON cl.id = c.cliente_id
+     JOIN mascota mc ON mc.id = c.mascota_id
      WHERE c.medico_id = $1
      ORDER BY c.fecha_hora`,
     [medicoId]

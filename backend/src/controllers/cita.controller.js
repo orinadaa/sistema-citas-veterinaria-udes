@@ -14,6 +14,7 @@ const servicioModel = require('../models/servicio.model');
 const medicoModel = require('../models/medico.model');
 const usuarioModel = require('../models/usuario.model');
 const horarioModel = require('../models/horario.model');
+const mascotaModel = require('../models/mascota.model');
 const { generarFranjasEntreHoras, DURACION_SLOT_MINUTOS } = require('../utils/franjas');
 
 function limitesDelDia(fecha) {
@@ -170,12 +171,12 @@ async function consultarMedicosDisponibles(req, res, next) {
 async function crear(req, res, next) {
   try {
     const esAdmin = req.usuario.rol === 'administrador';
-    const { servicioId, medicoId, fechaHora, nombreMascota, motivo, clienteId: clienteIdBody } = req.body;
+    const { servicioId, medicoId, fechaHora, mascotaId, motivo, clienteId: clienteIdBody } = req.body;
     const sedeId = esAdmin ? req.usuario.sedeId : req.body.sedeId;
 
-    if (!sedeId || !servicioId || !medicoId || !fechaHora || !nombreMascota) {
+    if (!sedeId || !servicioId || !medicoId || !fechaHora || !mascotaId) {
       return res.status(400).json({
-        mensaje: 'sedeId, servicioId, medicoId, fechaHora y nombreMascota son obligatorios.',
+        mensaje: 'sedeId, servicioId, medicoId, fechaHora y mascotaId son obligatorios.',
       });
     }
 
@@ -189,6 +190,10 @@ async function crear(req, res, next) {
         return res.status(404).json({ mensaje: 'El cliente indicado no existe.' });
       }
       clienteId = clienteIdBody;
+    }
+
+    if (!(await mascotaModel.perteneceACliente(mascotaId, clienteId))) {
+      return res.status(404).json({ mensaje: 'La mascota indicada no existe o no pertenece a ese cliente.' });
     }
 
     const [sede, servicio, medico] = await Promise.all([
@@ -229,7 +234,7 @@ async function crear(req, res, next) {
       servicioId,
       medicoId,
       fechaHora: fecha,
-      nombreMascota,
+      mascotaId,
       motivo,
     });
 

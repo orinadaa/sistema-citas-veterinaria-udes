@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorFranjas } from './SelectorFranjas';
 import { SelectorMedico } from './SelectorMedico';
+import { MascotaSelector } from './MascotaSelector';
 
 export function FormularioAgendar({ onAgendada }) {
   const { token } = useAuth();
@@ -16,7 +17,7 @@ export function FormularioAgendar({ onAgendada }) {
   const [servicioId, setServicioId] = useState('');
   const [franja, setFranja] = useState(null);
   const [medicoId, setMedicoId] = useState('');
-  const [nombreMascota, setNombreMascota] = useState('');
+  const [mascotaId, setMascotaId] = useState('');
   const [motivo, setMotivo] = useState('');
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -30,22 +31,22 @@ export function FormularioAgendar({ onAgendada }) {
     evento.preventDefault();
     setError('');
 
-    if (!sedeId || !servicioId || !franja || !medicoId || !nombreMascota) {
-      setError('Completa sede, servicio, franja, médico y el nombre de tu mascota.');
+    if (!sedeId || !servicioId || !franja || !medicoId || !mascotaId) {
+      setError('Completa sede, servicio, franja, médico y la mascota.');
       return;
     }
 
     setEnviando(true);
     try {
       await agendarCita(
-        { sedeId, servicioId, medicoId, fechaHora: franja, nombreMascota, motivo },
+        { sedeId, servicioId, medicoId, fechaHora: franja, mascotaId, motivo },
         token
       );
       setSedeId('');
       setServicioId('');
       setFranja(null);
       setMedicoId('');
-      setNombreMascota('');
+      setMascotaId('');
       setMotivo('');
       onAgendada();
     } catch (err) {
@@ -123,13 +124,8 @@ export function FormularioAgendar({ onAgendada }) {
         onSeleccionar={setMedicoId}
       />
 
-      <Campo
-        id="nombreMascota"
-        label="Nombre de tu mascota"
-        value={nombreMascota}
-        onChange={(evento) => setNombreMascota(evento.target.value)}
-        required
-      />
+      <MascotaSelector valorSeleccionado={mascotaId} onSeleccionar={setMascotaId} />
+
       <Campo
         id="motivo"
         label="Motivo de la consulta (opcional)"

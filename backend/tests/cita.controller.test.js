@@ -10,6 +10,7 @@ jest.mock('../src/models/servicio.model');
 jest.mock('../src/models/medico.model');
 jest.mock('../src/models/usuario.model');
 jest.mock('../src/models/horario.model');
+jest.mock('../src/models/mascota.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -20,11 +21,13 @@ const servicioModel = require('../src/models/servicio.model');
 const medicoModel = require('../src/models/medico.model');
 const usuarioModel = require('../src/models/usuario.model');
 const horarioModel = require('../src/models/horario.model');
+const mascotaModel = require('../src/models/mascota.model');
 
 const ID_CLIENTE = 'cliente-1';
 const ID_SEDE = 'sede-1';
 const ID_SERVICIO = 'servicio-1';
 const ID_MEDICO = 'medico-1';
+const ID_MASCOTA = 'mascota-1';
 const TOKEN_CLIENTE = jwt.sign({ id: ID_CLIENTE, rol: 'cliente' }, process.env.JWT_SECRET);
 const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: ID_SEDE }, process.env.JWT_SECRET);
 const MEDICO_EJEMPLO = { id: ID_MEDICO, nombre_completo: 'Dra. Ejemplo' };
@@ -43,6 +46,7 @@ function mockearEntidadesBasicas() {
   usuarioModel.buscarPorId.mockResolvedValue({ id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE });
   medicoModel.ofreceServicio.mockResolvedValue(true);
   horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+  mascotaModel.perteneceACliente.mockResolvedValue(true);
 }
 
 describe('GET /api/citas/disponibilidad', () => {
@@ -186,7 +190,7 @@ describe('POST /api/citas', () => {
         servicioId: ID_SERVICIO,
         medicoId: ID_MEDICO,
         fechaHora: franja.toISOString(),
-        nombreMascota: 'Firulais',
+        mascotaId: ID_MASCOTA,
       });
 
     expect(respuesta.status).toBe(400);
@@ -203,7 +207,7 @@ describe('POST /api/citas', () => {
         servicioId: ID_SERVICIO,
         medicoId: ID_MEDICO,
         fechaHora: '2020-01-01T08:00:00',
-        nombreMascota: 'Firulais',
+        mascotaId: ID_MASCOTA,
       });
 
     expect(respuesta.status).toBe(409);
@@ -222,10 +226,29 @@ describe('POST /api/citas', () => {
         servicioId: ID_SERVICIO,
         medicoId: ID_MEDICO,
         fechaHora: franja.toISOString(),
-        nombreMascota: 'Firulais',
+        mascotaId: ID_MASCOTA,
       });
 
     expect(respuesta.status).toBe(409);
+  });
+
+  test('responde 404 si la mascota no existe o no es del cliente', async () => {
+    mockearEntidadesBasicas();
+    mascotaModel.perteneceACliente.mockResolvedValue(false);
+    const franja = proximaFranjaValida();
+
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({
+        sedeId: ID_SEDE,
+        servicioId: ID_SERVICIO,
+        medicoId: ID_MEDICO,
+        fechaHora: franja.toISOString(),
+        mascotaId: ID_MASCOTA,
+      });
+
+    expect(respuesta.status).toBe(404);
   });
 
   test('agenda la cita correctamente', async () => {
@@ -239,7 +262,7 @@ describe('POST /api/citas', () => {
       servicio_id: ID_SERVICIO,
       medico_id: ID_MEDICO,
       fecha_hora: franja,
-      nombre_mascota: 'Firulais',
+      mascota_id: ID_MASCOTA,
       estado: 'agendada',
     });
 
@@ -251,7 +274,7 @@ describe('POST /api/citas', () => {
         servicioId: ID_SERVICIO,
         medicoId: ID_MEDICO,
         fechaHora: franja.toISOString(),
-        nombreMascota: 'Firulais',
+        mascotaId: ID_MASCOTA,
       });
 
     expect(respuesta.status).toBe(201);
@@ -273,7 +296,7 @@ describe('POST /api/citas (administrador agenda en nombre de un cliente)', () =>
         servicioId: ID_SERVICIO,
         medicoId: ID_MEDICO,
         fechaHora: franja.toISOString(),
-        nombreMascota: 'Firulais',
+        mascotaId: ID_MASCOTA,
       });
 
     expect(respuesta.status).toBe(400);
@@ -295,7 +318,30 @@ describe('POST /api/citas (administrador agenda en nombre de un cliente)', () =>
         servicioId: ID_SERVICIO,
         medicoId: ID_MEDICO,
         fechaHora: franja.toISOString(),
-        nombreMascota: 'Firulais',
+        mascotaId: ID_MASCOTA,
+      });
+
+    expect(respuesta.status).toBe(404);
+  });
+
+  test('responde 404 si la mascota no pertenece al cliente indicado', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    usuarioModel.buscarPorId.mockImplementation((id) =>
+      id === ID_CLIENTE ? { id: ID_CLIENTE, rol: 'cliente' } : { id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE }
+    );
+    mascotaModel.perteneceACliente.mockResolvedValue(false);
+    const franja = proximaFranjaValida();
+
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({
+        clienteId: ID_CLIENTE,
+        servicioId: ID_SERVICIO,
+        medicoId: ID_MEDICO,
+        fechaHora: franja.toISOString(),
+        mascotaId: ID_MASCOTA,
       });
 
     expect(respuesta.status).toBe(404);
@@ -307,6 +353,7 @@ describe('POST /api/citas (administrador agenda en nombre de un cliente)', () =>
     usuarioModel.buscarPorId.mockImplementation((id) =>
       id === ID_CLIENTE ? { id: ID_CLIENTE, rol: 'cliente' } : { id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE }
     );
+    mascotaModel.perteneceACliente.mockResolvedValue(true);
     medicoModel.ofreceServicio.mockResolvedValue(true);
     horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
     citaModel.existeConflicto.mockResolvedValue(false);
@@ -321,7 +368,7 @@ describe('POST /api/citas (administrador agenda en nombre de un cliente)', () =>
         servicioId: ID_SERVICIO,
         medicoId: ID_MEDICO,
         fechaHora: franja.toISOString(),
-        nombreMascota: 'Firulais',
+        mascotaId: ID_MASCOTA,
       });
 
     expect(respuesta.status).toBe(201);

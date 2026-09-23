@@ -21,13 +21,14 @@ import { Campo } from '../form/Campo';
 import { MiniCalendario } from '../citas/MiniCalendario';
 import { SelectorFranjas } from '../citas/SelectorFranjas';
 import { SelectorMedico } from '../citas/SelectorMedico';
+import { MascotaSelector } from '../citas/MascotaSelector';
 import { IconoFlechaDerecha, IconoPata } from '../icons';
 
 const HORA_INICIO_GRID = 7;
 const HORA_FIN_GRID = 19;
 const TOTAL_SLOTS = (HORA_FIN_GRID - HORA_INICIO_GRID) * 2;
 const LETRAS_DIA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-const FORM_VACIO = { clienteId: '', servicioId: '', franja: null, medicoId: '', nombreMascota: '', motivo: '' };
+const FORM_VACIO = { clienteId: '', servicioId: '', franja: null, medicoId: '', mascotaId: '', motivo: '' };
 
 function etiquetaHora(slotIndex) {
   const hora24 = HORA_INICIO_GRID + slotIndex / 2;
@@ -52,7 +53,7 @@ function TarjetaCita({ cita, mostrarMedico, onClick }) {
       className="mb-1 flex w-full flex-col rounded-lg px-1.5 py-1 text-left text-[11px] leading-tight transition hover:brightness-95"
     >
       <span className="font-semibold">{formatearHora(cita.fecha_hora)}</span>
-      <span className="truncate">{cita.nombre_mascota}</span>
+      <span className="truncate">{cita.mascota_nombre}</span>
       <span className="truncate opacity-80">{mostrarMedico ? cita.medico_nombre : cita.servicio_nombre}</span>
     </button>
   );
@@ -159,8 +160,8 @@ export function PanelCitasSeguimiento() {
   async function guardarNueva(evento) {
     evento.preventDefault();
     setErrorNueva('');
-    if (!formNueva.clienteId || !formNueva.servicioId || !formNueva.franja || !formNueva.medicoId || !formNueva.nombreMascota) {
-      setErrorNueva('Completa cliente, servicio, franja, médico y el nombre de la mascota.');
+    if (!formNueva.clienteId || !formNueva.servicioId || !formNueva.franja || !formNueva.medicoId || !formNueva.mascotaId) {
+      setErrorNueva('Completa cliente, servicio, franja, médico y la mascota.');
       return;
     }
 
@@ -172,7 +173,7 @@ export function PanelCitasSeguimiento() {
           servicioId: formNueva.servicioId,
           medicoId: formNueva.medicoId,
           fechaHora: formNueva.franja,
-          nombreMascota: formNueva.nombreMascota,
+          mascotaId: formNueva.mascotaId,
           motivo: formNueva.motivo || null,
         },
         token
@@ -284,7 +285,7 @@ export function PanelCitasSeguimiento() {
                       <IconoPata className="h-3.5 w-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-slate-800">{cita.nombre_mascota}</span>
+                      <span className="block truncate text-sm font-medium text-slate-800">{cita.mascota_nombre}</span>
                       <span className="block truncate text-xs text-slate-400">
                         {formatearHora(cita.fecha_hora)} · {cita.servicio_nombre}
                       </span>
@@ -341,7 +342,10 @@ export function PanelCitasSeguimiento() {
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Mascota</p>
-              <p className="text-sm text-slate-800">{citaDetalle.nombre_mascota}</p>
+              <p className="text-sm text-slate-800">
+                {citaDetalle.mascota_nombre}
+                {citaDetalle.mascota_especie ? ` (${citaDetalle.mascota_especie})` : ''}
+              </p>
             </div>
             {citaDetalle.motivo && (
               <div>
@@ -380,7 +384,7 @@ export function PanelCitasSeguimiento() {
               <select
                 id="cliente-cita"
                 value={formNueva.clienteId}
-                onChange={(e) => setFormNueva({ ...formNueva, clienteId: e.target.value })}
+                onChange={(e) => setFormNueva({ ...formNueva, clienteId: e.target.value, mascotaId: '' })}
                 className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
               >
                 <option value="">Selecciona un cliente</option>
@@ -426,12 +430,12 @@ export function PanelCitasSeguimiento() {
               onSeleccionar={(valor) => setFormNueva({ ...formNueva, medicoId: valor })}
             />
 
-            <Campo
-              id="mascota-cita-admin"
-              label="Nombre de la mascota"
-              value={formNueva.nombreMascota}
-              onChange={(e) => setFormNueva({ ...formNueva, nombreMascota: e.target.value })}
+            <MascotaSelector
+              clienteId={formNueva.clienteId}
+              valorSeleccionado={formNueva.mascotaId}
+              onSeleccionar={(valor) => setFormNueva({ ...formNueva, mascotaId: valor })}
             />
+
             <Campo
               id="motivo-cita-admin"
               label="Motivo (opcional)"

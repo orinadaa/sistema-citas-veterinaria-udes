@@ -145,3 +145,19 @@ export function obtenerCitasAdministracion(token) {
 export function obtenerClientes(token) {
   return solicitar(`/usuarios?${new URLSearchParams({ rol: 'cliente' })}`, { token });
 }
+
+export function obtenerMisMascotas(token) {
+  return solicitar('/mascotas/mias', { token });
+}
+
+export function obtenerMascotasDeCliente(clienteId, token) {
+  return solicitar(`/mascotas?${new URLSearchParams({ clienteId })}`, { token });
+}
+
+export function crearMascota(datos, token) {
+  return solicitar('/mascotas', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function actualizarMascota(id, datos, token) {
+  return solicitar(`/mascotas/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}

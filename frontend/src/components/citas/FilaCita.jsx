@@ -55,7 +55,10 @@ export function FilaCita({ cita, onActualizada }) {
           <p className="mt-1 text-sm text-slate-500">
             {cita.servicio_nombre} con {cita.medico_nombre}
           </p>
-          <p className="text-sm text-slate-500">Mascota: {cita.nombre_mascota}</p>
+          <p className="text-sm text-slate-500">
+            Mascota: {cita.mascota_nombre}
+            {cita.mascota_especie ? ` (${cita.mascota_especie})` : ''}
+          </p>
           {cita.motivo && <p className="text-sm text-slate-500">Motivo: {cita.motivo}</p>}
         </div>
 
