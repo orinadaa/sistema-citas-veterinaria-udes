@@ -11,6 +11,7 @@ import { PanelServicios } from '../components/admin/PanelServicios';
 import { PanelMedicos } from '../components/admin/PanelMedicos';
 import { PanelHorarios } from '../components/admin/PanelHorarios';
 import { PanelCitasSeguimiento } from '../components/admin/PanelCitasSeguimiento';
+import { PanelPacientes } from '../components/admin/PanelPacientes';
 
 export function PanelAdminPage() {
   const { usuario } = useAuth();
@@ -28,6 +29,7 @@ export function PanelAdminPage() {
           {esAdministrador && pestana === 'citas' && <PanelCitasSeguimiento />}
           {esAdministrador && pestana === 'servicios' && <PanelServicios />}
           {esAdministrador && pestana === 'medicos' && <PanelMedicos />}
+          {esAdministrador && pestana === 'pacientes' && <PanelPacientes />}
           {esAdministrador && pestana === 'horarios' && <PanelHorarios />}
           {!esAdministrador && <PanelCitasSeguimiento />}
         </main>

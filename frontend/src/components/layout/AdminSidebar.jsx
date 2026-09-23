@@ -14,6 +14,7 @@ import {
   IconoJeringa,
   IconoMedicos,
   IconoSede,
+  IconoPersona,
   IconoPata,
   IconoFlechaDerecha,
 } from '../icons';
@@ -23,6 +24,7 @@ const ITEMS_NAV = [
   { id: 'citas', etiqueta: 'Citas', icono: IconoCalendario },
   { id: 'servicios', etiqueta: 'Servicios', icono: IconoJeringa },
   { id: 'medicos', etiqueta: 'Médicos', icono: IconoMedicos },
+  { id: 'pacientes', etiqueta: 'Pacientes', icono: IconoPersona },
   { id: 'horarios', etiqueta: 'Sedes y horarios', icono: IconoSede },
 ];
 

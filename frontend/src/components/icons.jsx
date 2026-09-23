@@ -226,6 +226,32 @@ export function IconoChevronAbajo({ className }) {
   );
 }
 
+export function IconoPersona({ className }) {
+  return (
+    <Icono className={className}>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M4.5 20c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7" />
+    </Icono>
+  );
+}
+
+export function IconoGrafica({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M4 20V10M10 20V4M16 20v-7M4 20h16" />
+    </Icono>
+  );
+}
+
+export function IconoEngranaje({ className }) {
+  return (
+    <Icono className={className}>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.55 1.55M7.15 16.85 5.6 18.4M18.4 18.4l-1.55-1.55M7.15 7.15 5.6 5.6" />
+    </Icono>
+  );
+}
+
 export function IconoX({ className }) {
   return (
     <Icono className={className}>

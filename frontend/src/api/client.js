@@ -142,6 +142,21 @@ export function obtenerCitasAdministracion(token) {
   return solicitar('/administracion/citas', { token });
 }
 
+export function obtenerPacientes({ sedeId, busqueda } = {}, token) {
+  const parametros = new URLSearchParams();
+  if (sedeId) parametros.set('sedeId', sedeId);
+  if (busqueda) parametros.set('busqueda', busqueda);
+  return solicitar(`/administracion/pacientes?${parametros}`, { token });
+}
+
+export function obtenerDetallePaciente(id, token) {
+  return solicitar(`/administracion/pacientes/${id}`, { token });
+}
+
+export function actualizarUsuario(id, datos, token) {
+  return solicitar(`/usuarios/${id}`, { metodo: 'PATCH', cuerpo: datos, token });
+}
+
 export function obtenerClientes(token) {
   return solicitar(`/usuarios?${new URLSearchParams({ rol: 'cliente' })}`, { token });
 }
