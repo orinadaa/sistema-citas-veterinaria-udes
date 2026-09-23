@@ -137,3 +137,7 @@ export function actualizarEspecialidadesDeMedico(medicoId, categoriaIds, token) 
 export function obtenerCitasAdministracion(token) {
   return solicitar('/administracion/citas', { token });
 }
+
+export function obtenerClientes(token) {
+  return solicitar(`/usuarios?${new URLSearchParams({ rol: 'cliente' })}`, { token });
+}
