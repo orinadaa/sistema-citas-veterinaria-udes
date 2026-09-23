@@ -161,6 +161,18 @@ export function obtenerClientes(token) {
   return solicitar(`/usuarios?${new URLSearchParams({ rol: 'cliente' })}`, { token });
 }
 
+export function obtenerUsuarios(token) {
+  return solicitar('/usuarios', { token });
+}
+
+export function crearUsuarioStaff(datos, token) {
+  return solicitar('/usuarios', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function cambiarRolUsuario(id, datos, token) {
+  return solicitar(`/usuarios/${id}/rol`, { metodo: 'PATCH', cuerpo: datos, token });
+}
+
 export function obtenerMisMascotas(token) {
   return solicitar('/mascotas/mias', { token });
 }

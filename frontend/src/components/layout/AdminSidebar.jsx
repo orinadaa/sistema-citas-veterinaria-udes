@@ -15,6 +15,7 @@ import {
   IconoMedicos,
   IconoSede,
   IconoPersona,
+  IconoEngranaje,
   IconoPata,
   IconoFlechaDerecha,
 } from '../icons';
@@ -26,6 +27,7 @@ const ITEMS_NAV = [
   { id: 'medicos', etiqueta: 'Médicos', icono: IconoMedicos },
   { id: 'pacientes', etiqueta: 'Pacientes', icono: IconoPersona },
   { id: 'horarios', etiqueta: 'Sedes y horarios', icono: IconoSede },
+  { id: 'configuracion', etiqueta: 'Configuración', icono: IconoEngranaje },
 ];
 
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';
