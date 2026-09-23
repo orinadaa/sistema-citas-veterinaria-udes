@@ -102,10 +102,26 @@ export function obtenerMedicosAdmin(token) {
   return solicitar('/administracion/medicos', { token });
 }
 
+export function crearMedico(datos, token) {
+  return solicitar('/administracion/medicos', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function actualizarMedico(id, datos, token) {
+  return solicitar(`/administracion/medicos/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
 export function actualizarServiciosDeMedico(medicoId, servicioIds, token) {
   return solicitar(`/administracion/medicos/${medicoId}/servicios`, {
     metodo: 'PUT',
     cuerpo: { servicioIds },
+    token,
+  });
+}
+
+export function actualizarEspecialidadesDeMedico(medicoId, categoriaIds, token) {
+  return solicitar(`/administracion/medicos/${medicoId}/especialidades`, {
+    metodo: 'PUT',
+    cuerpo: { categoriaIds },
     token,
   });
 }
