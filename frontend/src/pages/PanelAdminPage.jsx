@@ -19,19 +19,28 @@ export function PanelAdminPage() {
   const { usuario } = useAuth();
   const esAdministrador = usuario?.rol === 'administrador';
   const [pestana, setPestana] = useState('citas');
+  // Termino de busqueda precargado por pestana: lo llena la busqueda
+  // global del topbar (AdminHeader) cuando se elige un resultado, y
+  // cada panel lo usa para inicializar su propio filtro de busqueda.
+  const [busquedaPorPestana, setBusquedaPorPestana] = useState({});
+
+  function navegarDesdeBusqueda(pestanaDestino, termino) {
+    setBusquedaPorPestana((anterior) => ({ ...anterior, [pestanaDestino]: termino }));
+    setPestana(pestanaDestino);
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FAFBFC]">
       <AdminSidebar activo={pestana} onCambiar={setPestana} />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <AdminHeader />
+        <AdminHeader onNavegar={navegarDesdeBusqueda} />
 
         <main className="flex-1 overflow-y-auto px-6 py-8 sm:px-8">
           {esAdministrador && pestana === 'citas' && <PanelCitasSeguimiento />}
-          {esAdministrador && pestana === 'servicios' && <PanelServicios />}
-          {esAdministrador && pestana === 'medicos' && <PanelMedicos />}
-          {esAdministrador && pestana === 'pacientes' && <PanelPacientes />}
+          {esAdministrador && pestana === 'servicios' && <PanelServicios busquedaInicial={busquedaPorPestana.servicios} />}
+          {esAdministrador && pestana === 'medicos' && <PanelMedicos busquedaInicial={busquedaPorPestana.medicos} />}
+          {esAdministrador && pestana === 'pacientes' && <PanelPacientes busquedaInicial={busquedaPorPestana.pacientes} />}
           {esAdministrador && pestana === 'horarios' && <PanelHorarios />}
           {esAdministrador && pestana === 'reportes' && <PanelReportes />}
           {esAdministrador && pestana === 'configuracion' && <PanelConfiguracion />}

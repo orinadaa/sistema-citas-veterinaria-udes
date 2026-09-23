@@ -28,16 +28,21 @@ const TABS_DETALLE = [
   { id: 'citas', label: 'Citas' },
 ];
 
-export function PanelPacientes() {
+export function PanelPacientes({ busquedaInicial }) {
   const { token } = useAuth();
   const [pacientes, setPacientes] = useState([]);
   const [citasDelMes, setCitasDelMes] = useState(0);
   const [sedes, setSedes] = useState([]);
   const [cargando, setCargando] = useState(true);
 
-  const [busqueda, setBusqueda] = useState('');
+  const [busqueda, setBusqueda] = useState(busquedaInicial || '');
   const [filtroSede, setFiltroSede] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
+
+  // Llega desde la busqueda global del topbar (AdminHeader).
+  useEffect(() => {
+    if (busquedaInicial) setBusqueda(busquedaInicial);
+  }, [busquedaInicial]);
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [pestanaDetalle, setPestanaDetalle] = useState('info');

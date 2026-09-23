@@ -41,16 +41,21 @@ function iniciales(nombre) {
     .toUpperCase();
 }
 
-export function PanelMedicos() {
+export function PanelMedicos({ busquedaInicial }) {
   const { token } = useAuth();
   const [medicos, setMedicos] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
 
-  const [busqueda, setBusqueda] = useState('');
+  const [busqueda, setBusqueda] = useState(busquedaInicial || '');
   const [filtroEspecialidad, setFiltroEspecialidad] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
+
+  // Llega desde la busqueda global del topbar (AdminHeader).
+  useEffect(() => {
+    if (busquedaInicial) setBusqueda(busquedaInicial);
+  }, [busquedaInicial]);
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [medicoEditando, setMedicoEditando] = useState(null);

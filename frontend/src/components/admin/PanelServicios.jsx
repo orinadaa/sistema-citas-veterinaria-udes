@@ -21,15 +21,22 @@ const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency:
 
 const FORM_VACIO = { nombre: '', descripcion: '', categoriaId: '', precio: '', activo: true };
 
-export function PanelServicios() {
+export function PanelServicios({ busquedaInicial }) {
   const { token } = useAuth();
   const [servicios, setServicios] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
 
-  const [busqueda, setBusqueda] = useState('');
+  const [busqueda, setBusqueda] = useState(busquedaInicial || '');
   const [filtroCategoria, setFiltroCategoria] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
+
+  // Llega desde la busqueda global del topbar (AdminHeader): al hacer
+  // clic en un resultado se cambia de pestana y se precarga el filtro
+  // con el termino buscado.
+  useEffect(() => {
+    if (busquedaInicial) setBusqueda(busquedaInicial);
+  }, [busquedaInicial]);
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [servicioEditando, setServicioEditando] = useState(null);
