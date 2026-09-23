@@ -28,10 +28,16 @@ async function obtenerPerfilPropio(req, res, next) {
   }
 }
 
-// GET /api/usuarios (solo administrador)
+// GET /api/usuarios (solo administrador) — ?rol= filtra por rol, usado
+// por ejemplo para listar clientes al agendar una cita desde el panel.
 async function listar(req, res, next) {
   try {
-    const usuarios = await listarTodos();
+    const { rol } = req.query;
+    if (rol && !ROLES_VALIDOS.includes(rol)) {
+      return res.status(400).json({ mensaje: `El rol debe ser uno de: ${ROLES_VALIDOS.join(', ')}.` });
+    }
+
+    const usuarios = await listarTodos(rol);
     return res.status(200).json({ usuarios });
   } catch (error) {
     next(error);

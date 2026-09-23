@@ -26,6 +26,7 @@ const ID_SEDE = 'sede-1';
 const ID_SERVICIO = 'servicio-1';
 const ID_MEDICO = 'medico-1';
 const TOKEN_CLIENTE = jwt.sign({ id: ID_CLIENTE, rol: 'cliente' }, process.env.JWT_SECRET);
+const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: ID_SEDE }, process.env.JWT_SECRET);
 const MEDICO_EJEMPLO = { id: ID_MEDICO, nombre_completo: 'Dra. Ejemplo' };
 const HORARIO_ABIERTO = { hora_inicio: '08:00:00', hora_fin: '17:00:00' };
 
@@ -258,6 +259,76 @@ describe('POST /api/citas', () => {
   });
 });
 
+describe('POST /api/citas (administrador agenda en nombre de un cliente)', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('rechaza sin clienteId', async () => {
+    mockearEntidadesBasicas();
+    const franja = proximaFranjaValida();
+
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({
+        servicioId: ID_SERVICIO,
+        medicoId: ID_MEDICO,
+        fechaHora: franja.toISOString(),
+        nombreMascota: 'Firulais',
+      });
+
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('responde 404 si el clienteId no corresponde a un cliente', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    usuarioModel.buscarPorId.mockImplementation((id) =>
+      id === ID_CLIENTE ? { id: ID_CLIENTE, rol: 'veterinario' } : { id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE }
+    );
+    const franja = proximaFranjaValida();
+
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({
+        clienteId: ID_CLIENTE,
+        servicioId: ID_SERVICIO,
+        medicoId: ID_MEDICO,
+        fechaHora: franja.toISOString(),
+        nombreMascota: 'Firulais',
+      });
+
+    expect(respuesta.status).toBe(404);
+  });
+
+  test('agenda la cita en la sede del administrador y con el cliente indicado', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    usuarioModel.buscarPorId.mockImplementation((id) =>
+      id === ID_CLIENTE ? { id: ID_CLIENTE, rol: 'cliente' } : { id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE }
+    );
+    medicoModel.ofreceServicio.mockResolvedValue(true);
+    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    citaModel.existeConflicto.mockResolvedValue(false);
+    const franja = proximaFranjaValida();
+    citaModel.crear.mockResolvedValue({ id: 'cita-1', cliente_id: ID_CLIENTE, sede_id: ID_SEDE, estado: 'agendada' });
+
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({
+        clienteId: ID_CLIENTE,
+        servicioId: ID_SERVICIO,
+        medicoId: ID_MEDICO,
+        fechaHora: franja.toISOString(),
+        nombreMascota: 'Firulais',
+      });
+
+    expect(respuesta.status).toBe(201);
+    expect(citaModel.crear).toHaveBeenCalledWith(expect.objectContaining({ clienteId: ID_CLIENTE, sedeId: ID_SEDE }));
+  });
+});
+
 describe('PATCH /api/citas/:id/reprogramar', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -362,13 +433,44 @@ describe('PATCH /api/citas/:id/cancelar', () => {
 });
 
 describe('Control de acceso del modulo de citas', () => {
-  test('un administrador no puede usar las rutas de citas (son exclusivas de cliente)', async () => {
-    const tokenAdmin = jwt.sign({ id: 'admin-1', rol: 'administrador' }, process.env.JWT_SECRET);
+  beforeEach(() => jest.clearAllMocks());
 
+  test('un administrador no puede ver "mis citas" (es una vista exclusiva del cliente dueño)', async () => {
     const respuesta = await request(app)
       .get('/api/citas/mias')
-      .set('Authorization', `Bearer ${tokenAdmin}`);
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
 
     expect(respuesta.status).toBe(403);
+  });
+
+  test('un administrador no puede reprogramar citas (exclusivo del cliente dueño)', async () => {
+    const respuesta = await request(app)
+      .patch('/api/citas/cita-1/reprogramar')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nuevaFechaHora: proximaFranjaValida().toISOString() });
+
+    expect(respuesta.status).toBe(403);
+  });
+
+  test('un administrador no puede cancelar citas (exclusivo del cliente dueño)', async () => {
+    const respuesta = await request(app)
+      .patch('/api/citas/cita-1/cancelar')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    expect(respuesta.status).toBe(403);
+  });
+
+  test('un administrador si puede consultar disponibilidad y medicos-disponibles (calendario del panel)', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    medicoModel.listarPorSedeYServicio.mockResolvedValue([]);
+    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+
+    const respuesta = await request(app)
+      .get('/api/citas/disponibilidad')
+      .query({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, fecha: '2030-01-07' })
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    expect(respuesta.status).toBe(200);
   });
 });

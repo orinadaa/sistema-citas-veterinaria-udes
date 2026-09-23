@@ -39,6 +39,25 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
     expect(respuesta.body.usuarios).toHaveLength(1);
   });
 
+  test('GET /api/usuarios?rol=cliente filtra por rol', async () => {
+    usuarioModel.listarTodos.mockResolvedValue([{ id: 'u1', rol: 'cliente' }]);
+
+    const respuesta = await request(app)
+      .get('/api/usuarios?rol=cliente')
+      .set('Authorization', `Bearer ${tokenPara('administrador')}`);
+
+    expect(respuesta.status).toBe(200);
+    expect(usuarioModel.listarTodos).toHaveBeenCalledWith('cliente');
+  });
+
+  test('GET /api/usuarios?rol=invalido responde 400', async () => {
+    const respuesta = await request(app)
+      .get('/api/usuarios?rol=superadmin')
+      .set('Authorization', `Bearer ${tokenPara('administrador')}`);
+
+    expect(respuesta.status).toBe(400);
+  });
+
   test('POST /api/usuarios rechaza rol "cliente" (debe usarse /api/auth/registro)', async () => {
     const respuesta = await request(app)
       .post('/api/usuarios')

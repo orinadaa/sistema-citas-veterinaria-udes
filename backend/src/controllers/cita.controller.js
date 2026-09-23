@@ -164,14 +164,31 @@ async function consultarMedicosDisponibles(req, res, next) {
   }
 }
 
-// POST /api/citas
+// POST /api/citas — el cliente agenda para si mismo; el administrador
+// agenda en nombre de un cliente de su propia sede (calendario del
+// panel administrativo) indicando clienteId explicitamente.
 async function crear(req, res, next) {
   try {
-    const { sedeId, servicioId, medicoId, fechaHora, nombreMascota, motivo } = req.body;
+    const esAdmin = req.usuario.rol === 'administrador';
+    const { servicioId, medicoId, fechaHora, nombreMascota, motivo, clienteId: clienteIdBody } = req.body;
+    const sedeId = esAdmin ? req.usuario.sedeId : req.body.sedeId;
+
     if (!sedeId || !servicioId || !medicoId || !fechaHora || !nombreMascota) {
       return res.status(400).json({
         mensaje: 'sedeId, servicioId, medicoId, fechaHora y nombreMascota son obligatorios.',
       });
+    }
+
+    let clienteId = req.usuario.id;
+    if (esAdmin) {
+      if (!clienteIdBody) {
+        return res.status(400).json({ mensaje: 'clienteId es obligatorio al agendar desde el panel administrativo.' });
+      }
+      const cliente = await usuarioModel.buscarPorId(clienteIdBody);
+      if (!cliente || cliente.rol !== 'cliente') {
+        return res.status(404).json({ mensaje: 'El cliente indicado no existe.' });
+      }
+      clienteId = clienteIdBody;
     }
 
     const [sede, servicio, medico] = await Promise.all([
@@ -207,7 +224,7 @@ async function crear(req, res, next) {
     }
 
     const cita = await citaModel.crear({
-      clienteId: req.usuario.id,
+      clienteId,
       sedeId,
       servicioId,
       medicoId,

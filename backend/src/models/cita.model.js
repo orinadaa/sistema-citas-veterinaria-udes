@@ -38,12 +38,16 @@ async function listarPorCliente(clienteId) {
 }
 
 // RF-12: seguimiento de citas por parte de administrativo/veterinario.
+// Incluye la categoria del servicio (color) para el calendario del
+// panel administrativo.
 async function listarPorSede(sedeId) {
   const resultado = await pool.query(
-    `SELECT c.*, sv.nombre AS servicio_nombre, m.nombre_completo AS medico_nombre,
+    `SELECT c.*, sv.nombre AS servicio_nombre, cat.nombre AS categoria_nombre, cat.color AS categoria_color,
+            m.nombre_completo AS medico_nombre,
             cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono
      FROM cita c
      JOIN servicio sv ON sv.id = c.servicio_id
+     JOIN categoria_servicio cat ON cat.id = sv.categoria_id
      JOIN usuario m ON m.id = c.medico_id
      JOIN usuario cl ON cl.id = c.cliente_id
      WHERE c.sede_id = $1
@@ -55,10 +59,11 @@ async function listarPorSede(sedeId) {
 
 async function listarPorMedico(medicoId) {
   const resultado = await pool.query(
-    `SELECT c.*, sv.nombre AS servicio_nombre,
+    `SELECT c.*, sv.nombre AS servicio_nombre, cat.nombre AS categoria_nombre, cat.color AS categoria_color,
             cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono
      FROM cita c
      JOIN servicio sv ON sv.id = c.servicio_id
+     JOIN categoria_servicio cat ON cat.id = sv.categoria_id
      JOIN usuario cl ON cl.id = c.cliente_id
      WHERE c.medico_id = $1
      ORDER BY c.fecha_hora`,

@@ -43,9 +43,12 @@ async function crearPersonal({ nombreCompleto, correo, contrasenaHash, rol, sede
   return resultado.rows[0];
 }
 
-async function listarTodos() {
+async function listarTodos(rol) {
+  const condicion = rol ? 'WHERE rol = $1' : '';
   const resultado = await pool.query(
-    'SELECT id, nombre_completo, correo, rol, sede_id, telefono, activo, creado_en FROM usuario ORDER BY creado_en DESC'
+    `SELECT id, nombre_completo, correo, rol, sede_id, telefono, activo, creado_en
+     FROM usuario ${condicion} ORDER BY creado_en DESC`,
+    rol ? [rol] : []
   );
   return resultado.rows;
 }
