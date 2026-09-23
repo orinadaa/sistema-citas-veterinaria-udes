@@ -1,12 +1,15 @@
 // routes/servicio.routes.js
 const express = require('express');
-const { listar, listarAdmin, crear, actualizar } = require('../controllers/servicio.controller');
+const { listar, listarAdmin, listarCategorias, crear, actualizar } = require('../controllers/servicio.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
 // GET /api/servicios — publico
 router.get('/', listar);
+
+// GET /api/servicios/categorias — publico (categorias/especialidades del sistema de diseno)
+router.get('/categorias', listarCategorias);
 
 // GET /api/servicios/admin — solo administrador
 router.get('/admin', verificarToken, verificarRol('administrador'), listarAdmin);

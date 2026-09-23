@@ -2,14 +2,17 @@
 // RF-11: catalogo publico de lectura; CRUD exclusivo del administrador.
 
 jest.mock('../src/models/servicio.model');
+jest.mock('../src/models/categoriaServicio.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const servicioModel = require('../src/models/servicio.model');
+const categoriaServicioModel = require('../src/models/categoriaServicio.model');
 
 const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador' }, process.env.JWT_SECRET);
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
+const CATEGORIA_ID = 'cat-1';
 
 describe('GET /api/servicios', () => {
   test('es publico y devuelve solo los activos', async () => {
@@ -18,6 +21,16 @@ describe('GET /api/servicios', () => {
     const respuesta = await request(app).get('/api/servicios');
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.servicios).toHaveLength(1);
+  });
+});
+
+describe('GET /api/servicios/categorias', () => {
+  test('es publico', async () => {
+    categoriaServicioModel.listarTodas.mockResolvedValue([{ id: CATEGORIA_ID, nombre: 'Consulta', color: 'blue' }]);
+
+    const respuesta = await request(app).get('/api/servicios/categorias');
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.categorias).toHaveLength(1);
   });
 });
 
@@ -45,13 +58,16 @@ describe('GET /api/servicios/admin', () => {
 });
 
 describe('POST /api/servicios', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    categoriaServicioModel.existe.mockResolvedValue(true);
+  });
 
   test('rechaza a un cliente', async () => {
     const respuesta = await request(app)
       .post('/api/servicios')
       .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
-      .send({ nombre: 'Nuevo servicio' });
+      .send({ nombre: 'Nuevo servicio', categoriaId: CATEGORIA_ID });
     expect(respuesta.status).toBe(403);
   });
 
@@ -59,7 +75,33 @@ describe('POST /api/servicios', () => {
     const respuesta = await request(app)
       .post('/api/servicios')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({});
+      .send({ categoriaId: CATEGORIA_ID });
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('rechaza sin categoria', async () => {
+    const respuesta = await request(app)
+      .post('/api/servicios')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombre: 'Nuevo servicio' });
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('rechaza precio negativo o no entero', async () => {
+    const respuesta = await request(app)
+      .post('/api/servicios')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombre: 'Nuevo servicio', categoriaId: CATEGORIA_ID, precio: -5 });
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('rechaza si la categoria no existe', async () => {
+    categoriaServicioModel.existe.mockResolvedValue(false);
+
+    const respuesta = await request(app)
+      .post('/api/servicios')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombre: 'Nuevo servicio', categoriaId: 'no-existe' });
     expect(respuesta.status).toBe(400);
   });
 
@@ -69,18 +111,18 @@ describe('POST /api/servicios', () => {
     const respuesta = await request(app)
       .post('/api/servicios')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombre: 'Consulta médica' });
+      .send({ nombre: 'Consulta médica', categoriaId: CATEGORIA_ID });
 
     expect(respuesta.status).toBe(409);
   });
 
   test('crea el servicio correctamente', async () => {
-    servicioModel.crear.mockResolvedValue({ id: 's1', nombre: 'Nuevo servicio', activo: true });
+    servicioModel.crear.mockResolvedValue({ id: 's1', nombre: 'Nuevo servicio', precio: 50000, activo: true });
 
     const respuesta = await request(app)
       .post('/api/servicios')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombre: 'Nuevo servicio' });
+      .send({ nombre: 'Nuevo servicio', categoriaId: CATEGORIA_ID, precio: 50000 });
 
     expect(respuesta.status).toBe(201);
     expect(respuesta.body.servicio.nombre).toBe('Nuevo servicio');
@@ -88,7 +130,10 @@ describe('POST /api/servicios', () => {
 });
 
 describe('PUT /api/servicios/:id', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    categoriaServicioModel.existe.mockResolvedValue(true);
+  });
 
   test('responde 404 si el servicio no existe', async () => {
     servicioModel.actualizar.mockResolvedValue(null);
