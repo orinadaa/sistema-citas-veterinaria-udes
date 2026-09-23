@@ -18,13 +18,13 @@ export function PanelAdminPage() {
   const [pestana, setPestana] = useState('citas');
 
   return (
-    <div className="flex min-h-screen bg-[#FAFBFC]">
+    <div className="flex h-screen overflow-hidden bg-[#FAFBFC]">
       <AdminSidebar activo={pestana} onCambiar={setPestana} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <AdminHeader />
 
-        <main className="flex-1 px-6 py-8 sm:px-8">
+        <main className="flex-1 overflow-y-auto px-6 py-8 sm:px-8">
           {esAdministrador && pestana === 'citas' && <PanelCitasSeguimiento />}
           {esAdministrador && pestana === 'servicios' && <PanelServicios />}
           {esAdministrador && pestana === 'medicos' && <PanelMedicos />}
