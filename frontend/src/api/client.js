@@ -86,6 +86,10 @@ export function obtenerServiciosAdmin(token) {
   return solicitar('/servicios/admin', { token });
 }
 
+export function obtenerCategoriasServicio() {
+  return solicitar('/servicios/categorias');
+}
+
 export function crearServicio(datos, token) {
   return solicitar('/servicios', { metodo: 'POST', cuerpo: datos, token });
 }
