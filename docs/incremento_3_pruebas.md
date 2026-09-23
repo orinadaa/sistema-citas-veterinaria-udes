@@ -33,6 +33,19 @@ Ejecutadas con Jest + Supertest. Comando: `npm test` (dentro de `backend/`).
 
 **Total: 102/102 pruebas unitarias del backend pasando**, ejecutado 2026-09-23.
 
+### Ampliación: landing dinámico, mascotas/pacientes, configuración y reportes
+
+| Archivo | Casos cubiertos | Resultado |
+|---|---|---|
+| `sede.controller.test.js` (ampliado) | `GET /sedes` confirma que solo llama al modelo público (no `listarTodasAdmin`); `GET /sedes/admin` rechaza cliente, devuelve todas incluidas las inactivas | 8/8 ✅ |
+| `cita.controller.test.js` (ampliado) | `nombreMascota` reemplazado por `mascotaId` en todos los casos; nuevo caso 404 si la mascota no existe o no es del cliente (cliente y administrador) | 27/27 ✅ |
+| `mascota.controller.test.js` (nuevo) | `GET /mascotas/mias` exclusivo de cliente; `GET /mascotas?clienteId=` exclusivo de administrador; `POST /mascotas` (cliente crea la propia, administrador exige y valida `clienteId`); `PUT /mascotas/:id` (404, 403 si no es del dueño, administrador puede editar cualquiera) | 14/14 ✅ |
+| `administracion.controller.test.js` (ampliado) | `GET /pacientes` rechaza veterinario, devuelve lista + citas del mes; `GET /pacientes/:id` 404 si no es cliente, devuelve cliente+mascotas+citas | 24/24 ✅ |
+| `usuario.controller.test.js` (ampliado) | Nuevo `PATCH /usuarios/:id`: actualiza activo/teléfono, responde 404 si no existe, **rechaza que un administrador se desactive a sí mismo** | 14/14 ✅ |
+| `reportes.controller.test.js` (nuevo) | Rechaza veterinario; rechaza `desde` posterior a `hasta`; responde con rango por defecto (últimas 8 semanas) cuando no se indica; pasa el `sedeId` a los modelos que lo aceptan | 4/4 ✅ |
+
+**Total: 131/131 pruebas unitarias del backend pasando**, ejecutado 2026-09-23.
+
 ## Pruebas de aceptación (manuales, contra la API real y PostgreSQL local)
 
 | ID | Descripción | Entrada | Resultado esperado | Resultado obtenido |
@@ -68,6 +81,19 @@ Ejecutadas con Jest + Supertest. Comando: `npm test` (dentro de `backend/`).
 
 *Nota: la cita de prueba ("Firulais (prueba calendario)") creada sobre la cuenta cliente real existente en la base de datos local se eliminó después de la prueba.*
 
+### Ampliación: landing dinámico, mascotas/pacientes, configuración y reportes
+
+| ID | Descripción | Entrada | Resultado esperado | Resultado obtenido |
+|---|---|---|---|---|
+| PA-35 | El catálogo de mascotas migró sin pérdida de datos (backfill) | `GET /api/mascotas?clienteId=...` para el cliente real existente, después de correr la migración | 200, aparece una mascota "Luna" (la que antes era texto libre en la cita real) | ✅ Igual a lo esperado |
+| PA-36 | Admin crea una mascota nueva para un cliente y agenda una cita con ella | `POST /api/mascotas` con `clienteId` → `POST /api/citas` con ese `mascotaId` | 201 en ambos; la cita en `GET /api/administracion/citas` trae `mascota_nombre`, `mascota_especie`, `mascota_raza` | ✅ Igual a lo esperado |
+| PA-37 | Listar pacientes (clientes con resumen de mascotas/citas) | `GET /api/administracion/pacientes` | 200, incluye al cliente real con `mascotas_total`, `citas_total`, `ultima_cita` y `citasDelMes` | ✅ Igual a lo esperado |
+| PA-38 | Configuración crea un usuario de personal y lo desactiva con el PATCH genérico | `POST /api/usuarios` (rol veterinario) → `PATCH /api/usuarios/:id` con `activo:false` | 201 y luego 200 con `activo:false` | ✅ Igual a lo esperado |
+| PA-39 | Un administrador no puede desactivarse a sí mismo | `PATCH /api/usuarios/:id` con el id del propio token, `activo:false` | 400, "No puedes desactivar tu propia cuenta." | ✅ Igual a lo esperado |
+| PA-40 | Reportes: el filtro de sede afecta a los KPIs pero no al gráfico comparativo de sedes | `GET /api/administracion/reportes?sedeId=...` (sede con 2 de los 4 médicos) | `medicosActivos` baja de 4 (todas las sedes) a 2 (solo esa sede); `citasPorSede` sigue mostrando todas las sedes | ✅ Igual a lo esperado, confirma la decisión de diseño documentada abajo |
+
+*Nota: el usuario de personal (`pruebaconfig@udes.edu.co`) y la mascota/cita de prueba creadas durante esta validación se eliminaron después de la prueba; el cliente real se dejó reactivado (`activo:true`) tal como estaba antes de PA-39.*
+
 ## Decisiones de alcance registradas
 
 - **Horarios reemplazan la constante fija**: `backend/src/config/horarioAtencion.js` se eliminó; el módulo de citas ahora consulta `horario_atencion` por sede vía `horario.model.js`. Se verificó end-to-end que un cambio de horario por el admin afecta inmediatamente la disponibilidad de citas (PA-23).
@@ -94,4 +120,15 @@ A partir de una revisión de mockups de interfaz se amplió el alcance de este i
 - **El veterinario ve el mismo calendario pero sin "+ Nueva cita"**: solo sus propias citas, de solo lectura — no se amplió RF-12 más allá de lo que ya existía (podía consultar, ahora además lo hace en formato calendario).
 - **Sin selector de médico para el administrador**: el calendario muestra todas las citas de la sede mezcladas, diferenciadas por color de categoría del servicio y, en la tarjeta, el nombre del médico — a pedido explícito, en vez de agregar un filtro.
 - **Rango fijo de 7:00 a.m. a 7:00 p.m., Lunes a Sábado**: simplificación respecto al mockup (que sugiere vistas Semana/Día/Mes); se implementó solo la vista semanal más el mini calendario mensual para navegar, ya que cubre el caso de uso principal sin construir tres vistas distintas no pedidas explícitamente.
-- **Sin fotos reales de mascota**: el sistema no tiene un módulo de mascotas todavía (`nombre_mascota` es texto libre, ver incremento 2); las tarjetas usan un ícono de pata genérico en vez de una foto.
+- **Sin fotos reales de mascota**: en ese momento el sistema no tenía un módulo de mascotas (`nombre_mascota` era texto libre, ver incremento 2); las tarjetas usaban un ícono de pata genérico. *(Actualización: la ampliación siguiente reemplazó `nombre_mascota` por una entidad `mascota` real — ver abajo. Las tarjetas del calendario siguen sin foto real, ahora por la misma razón que médicos/sedes: sin infraestructura de upload.)*
+
+### Ampliación: landing dinámico, mascotas/pacientes, configuración y reportes (a pedido explícito)
+
+- **El propósito del panel administrativo es que un administrador no programador configure el sistema y eso se refleje en el sitio público.** Al revisarlo se encontraron dos huecos reales: `GET /api/sedes` no filtraba sedes inactivas, y el horario mostrado en el landing estaba escrito a mano en el JSX en vez de leerse de `horario_atencion`. Ambos se corrigieron antes de construir las pantallas nuevas (ver PA de landing dinámico más arriba, sección del sistema de diseño).
+- **Mascota pasa a ser una entidad real** (`mascota`, con `especie`/`raza` como texto libre, sin catálogo nuevo — igual que `servicio.descripcion`), **adelantando una porción del incremento 4 (Clientes)** que el alcance del proyecto tiene planeado después de este. `cita.nombre_mascota` se migró con *backfill* (una mascota por cada combinación distinta cliente+nombre ya existente) y se eliminó la columna vieja — sin dejar un campo de compatibilidad. El incremento 4, cuando llegue, no necesita repetir este trabajo: solo construir lo que falte (ficha de mascota más completa, si se pide).
+- **Pacientes y Reportes son vistas multisede** (filtro de sede opcional, no restringidas a "mi sede"): necesario para el gráfico comparativo de sedes en Reportes, y consistente con "una sola fuente de verdad multisede" (`PRODUCT.md`). Se verificó (PA-40) que el filtro de sede afecta a los KPIs de una sede pero no a los gráficos explícitamente comparativos (`citasPorSemana`, `citasPorSede`), que siempre muestran todas las sedes — de lo contrario dejarían de ser comparativos.
+- **Configuración se acotó a Usuarios + Sedes**, las dos únicas pestañas del mockup con respaldo real: Usuarios reutiliza en su mayoría el backend ya existente (`POST /usuarios`, `PATCH /usuarios/:id/rol`); Sedes reutiliza `PanelHorarios` tal cual, sin duplicar código. Notificaciones (es el incremento 5 completo), Preferencias, Seguridad, Respaldo y Apariencia no se construyeron: no tienen RF/RNF ni backend detrás, hubieran sido controles decorativos sin funcionalidad real.
+- **Nuevo `PATCH /api/usuarios/:id` genérico** (activo/teléfono/nombre, cualquier rol) se reutiliza en tres lugares (Configuración→Usuarios, toggle de Pacientes, y disponible para médicos si se necesitara) en vez de triplicar el mismo endpoint. Bloquea que un administrador se desactive a sí mismo (PA-39) — sin ese bloqueo, un admin podría quedar sin poder iniciar sesión.
+- **Reportes agrega las primeras dependencias nuevas del proyecto desde que se fijó el stack** (autorizadas explícitamente): Recharts para los gráficos, y `exceljs` + `jspdf`/`jspdf-autotable` para exportar. Se descartó `xlsx` (la librería originalmente planeada) por una vulnerabilidad de severidad alta sin parche disponible (prototype pollution / ReDoS al *parsear* archivos); no aplicaba directamente a nuestro uso (solo generamos archivos, nunca parseamos uno externo), pero se prefirió `exceljs` por no tener ese hueco — decisión de seguridad tomada durante la instalación, documentada aquí en vez de en silencio.
+- **Exportar Excel/PDF no tiene endpoint propio**: se genera en el navegador a partir de los mismos datos que ya carga la pantalla de Reportes.
+- **Gráfico "pacientes por especie" del mockup se omitió** (decisión ya tomada antes de este bloque, ver arriba) — sigue sin dato agregado real detrás aunque ahora exista el campo `especie` en `mascota`, porque no hay suficiente volumen de datos reales para que ese agregado tenga sentido en el entorno local del proyecto.
