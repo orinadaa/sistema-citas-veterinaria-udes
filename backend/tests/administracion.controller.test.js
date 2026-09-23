@@ -7,6 +7,8 @@ jest.mock('../src/models/servicio.model');
 jest.mock('../src/models/categoriaServicio.model');
 jest.mock('../src/models/cita.model');
 jest.mock('../src/models/usuario.model');
+jest.mock('../src/models/mascota.model');
+jest.mock('../src/models/paciente.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -16,6 +18,8 @@ const servicioModel = require('../src/models/servicio.model');
 const categoriaServicioModel = require('../src/models/categoriaServicio.model');
 const citaModel = require('../src/models/cita.model');
 const usuarioModel = require('../src/models/usuario.model');
+const mascotaModel = require('../src/models/mascota.model');
+const pacienteModel = require('../src/models/paciente.model');
 
 const ID_SEDE = 'sede-1';
 const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: ID_SEDE }, process.env.JWT_SECRET);
@@ -265,5 +269,59 @@ describe('GET /api/administracion/citas', () => {
 
     expect(respuesta.status).toBe(200);
     expect(citaModel.listarPorMedico).toHaveBeenCalledWith('vet-1');
+  });
+});
+
+describe('GET /api/administracion/pacientes', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('rechaza a un veterinario', async () => {
+    const respuesta = await request(app)
+      .get('/api/administracion/pacientes')
+      .set('Authorization', `Bearer ${TOKEN_VET}`);
+    expect(respuesta.status).toBe(403);
+  });
+
+  test('devuelve la lista de pacientes y las citas del mes', async () => {
+    pacienteModel.listarClientes.mockResolvedValue([
+      { id: 'cliente-1', nombre_completo: 'Oriana Duran', mascotas_total: 2, citas_total: 3 },
+    ]);
+    pacienteModel.contarCitasDelMes.mockResolvedValue(5);
+
+    const respuesta = await request(app)
+      .get('/api/administracion/pacientes')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.pacientes).toHaveLength(1);
+    expect(respuesta.body.citasDelMes).toBe(5);
+  });
+});
+
+describe('GET /api/administracion/pacientes/:id', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('responde 404 si el usuario no existe o no es cliente', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'vet-1', rol: 'veterinario' });
+
+    const respuesta = await request(app)
+      .get('/api/administracion/pacientes/vet-1')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    expect(respuesta.status).toBe(404);
+  });
+
+  test('devuelve el cliente con sus mascotas y citas', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'cliente-1', rol: 'cliente', nombre_completo: 'Oriana Duran' });
+    mascotaModel.listarPorCliente.mockResolvedValue([{ id: 'm1', nombre: 'Luna' }]);
+    citaModel.listarPorCliente.mockResolvedValue([{ id: 'c1', estado: 'agendada' }]);
+
+    const respuesta = await request(app)
+      .get('/api/administracion/pacientes/cliente-1')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.mascotas).toHaveLength(1);
+    expect(respuesta.body.citas).toHaveLength(1);
   });
 });

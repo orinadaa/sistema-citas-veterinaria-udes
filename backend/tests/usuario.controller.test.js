@@ -137,4 +137,36 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.usuario.rol).toBe('cliente');
   });
+
+  test('PATCH /api/usuarios/:id actualiza activo/telefono correctamente', async () => {
+    usuarioModel.actualizarPerfil.mockResolvedValue({ id: 'otro-usuario', activo: false });
+
+    const respuesta = await request(app)
+      .patch('/api/usuarios/otro-usuario')
+      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .send({ activo: false });
+
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.usuario.activo).toBe(false);
+  });
+
+  test('PATCH /api/usuarios/:id rechaza que un admin se desactive a si mismo', async () => {
+    const respuesta = await request(app)
+      .patch('/api/usuarios/admin1')
+      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .send({ activo: false });
+
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('PATCH /api/usuarios/:id responde 404 si el usuario no existe', async () => {
+    usuarioModel.actualizarPerfil.mockResolvedValue(null);
+
+    const respuesta = await request(app)
+      .patch('/api/usuarios/no-existe')
+      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .send({ telefono: '3000000000' });
+
+    expect(respuesta.status).toBe(404);
+  });
 });

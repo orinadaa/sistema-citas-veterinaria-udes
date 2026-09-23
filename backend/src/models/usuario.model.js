@@ -62,6 +62,22 @@ async function actualizarRol(id, { rol, sedeId }) {
   return resultado.rows[0] || null;
 }
 
+// Actualizacion generica de perfil (activo/telefono/nombre), para
+// cualquier rol: la usan Configuracion->Usuarios y el toggle de
+// estado de Pacientes.
+async function actualizarPerfil(id, { nombreCompleto, telefono, activo }) {
+  const resultado = await pool.query(
+    `UPDATE usuario SET
+       nombre_completo = COALESCE($2, nombre_completo),
+       telefono = COALESCE($3, telefono),
+       activo = COALESCE($4, activo)
+     WHERE id = $1
+     RETURNING id, nombre_completo, correo, rol, sede_id, telefono, activo`,
+    [id, nombreCompleto ?? null, telefono ?? null, activo ?? null]
+  );
+  return resultado.rows[0] || null;
+}
+
 module.exports = {
   buscarPorCorreo,
   buscarPorId,
@@ -69,4 +85,5 @@ module.exports = {
   crearPersonal,
   listarTodos,
   actualizarRol,
+  actualizarPerfil,
 };

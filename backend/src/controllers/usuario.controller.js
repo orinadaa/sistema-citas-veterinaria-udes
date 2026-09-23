@@ -10,6 +10,7 @@ const {
   crearPersonal,
   listarTodos,
   actualizarRol,
+  actualizarPerfil,
 } = require('../models/usuario.model');
 
 const ROLES_VALIDOS = ['administrador', 'veterinario', 'cliente'];
@@ -106,4 +107,28 @@ async function cambiarRol(req, res, next) {
   }
 }
 
-module.exports = { obtenerPerfilPropio, listar, crearStaff, cambiarRol };
+// PATCH /api/usuarios/:id (solo administrador) — activo/telefono/nombre,
+// para cualquier rol (Configuracion->Usuarios, toggle de Pacientes). No
+// cambia rol/sede (eso sigue siendo /:id/rol). Un admin no puede
+// desactivarse a si mismo (evita auto-bloqueo).
+async function actualizarPerfilUsuario(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { nombreCompleto, telefono, activo } = req.body;
+
+    if (activo === false && id === req.usuario.id) {
+      return res.status(400).json({ mensaje: 'No puedes desactivar tu propia cuenta.' });
+    }
+
+    const usuarioActualizado = await actualizarPerfil(id, { nombreCompleto, telefono, activo });
+    if (!usuarioActualizado) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
+    }
+
+    return res.status(200).json({ usuario: usuarioActualizado });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { obtenerPerfilPropio, listar, crearStaff, cambiarRol, actualizarPerfilUsuario };

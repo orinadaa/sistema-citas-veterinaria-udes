@@ -1,7 +1,7 @@
 // routes/usuario.routes.js
 // Todas estas rutas son exclusivas del rol administrador (RF-04, RF-05).
 const express = require('express');
-const { listar, crearStaff, cambiarRol } = require('../controllers/usuario.controller');
+const { listar, crearStaff, cambiarRol, actualizarPerfilUsuario } = require('../controllers/usuario.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
@@ -16,5 +16,8 @@ router.post('/', crearStaff);
 
 // PATCH /api/usuarios/:id/rol
 router.patch('/:id/rol', cambiarRol);
+
+// PATCH /api/usuarios/:id — activo/telefono/nombre (cualquier rol)
+router.patch('/:id', actualizarPerfilUsuario);
 
 module.exports = router;

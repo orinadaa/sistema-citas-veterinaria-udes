@@ -8,6 +8,8 @@ const {
   actualizarServiciosDeMedico,
   actualizarEspecialidadesDeMedico,
   listarCitas,
+  listarPacientes,
+  obtenerDetallePaciente,
 } = require('../controllers/administracion.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
@@ -32,5 +34,11 @@ router.put('/medicos/:id/especialidades', verificarRol('administrador'), actuali
 
 // GET /api/administracion/citas — administrador o veterinario
 router.get('/citas', verificarRol('administrador', 'veterinario'), listarCitas);
+
+// GET /api/administracion/pacientes — solo administrador
+router.get('/pacientes', verificarRol('administrador'), listarPacientes);
+
+// GET /api/administracion/pacientes/:id — solo administrador
+router.get('/pacientes/:id', verificarRol('administrador'), obtenerDetallePaciente);
 
 module.exports = router;

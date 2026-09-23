@@ -7,6 +7,8 @@ const servicioModel = require('../models/servicio.model');
 const categoriaServicioModel = require('../models/categoriaServicio.model');
 const citaModel = require('../models/cita.model');
 const usuarioModel = require('../models/usuario.model');
+const mascotaModel = require('../models/mascota.model');
+const pacienteModel = require('../models/paciente.model');
 
 const RONDAS_SAL = 10;
 
@@ -156,6 +158,43 @@ async function listarCitas(req, res, next) {
   }
 }
 
+// GET /api/administracion/pacientes?sedeId=&busqueda= — solo administrador.
+// "Paciente" es un cliente (dueño); vista multisede (sedeId opcional),
+// ver decisiones del incremento 3.
+async function listarPacientes(req, res, next) {
+  try {
+    const { sedeId, busqueda } = req.query;
+    const [pacientes, citasDelMes] = await Promise.all([
+      pacienteModel.listarClientes({ sedeId, busqueda }),
+      pacienteModel.contarCitasDelMes(sedeId),
+    ]);
+
+    return res.status(200).json({ pacientes, citasDelMes });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// GET /api/administracion/pacientes/:id — solo administrador
+async function obtenerDetallePaciente(req, res, next) {
+  try {
+    const { id } = req.params;
+    const cliente = await usuarioModel.buscarPorId(id);
+    if (!cliente || cliente.rol !== 'cliente') {
+      return res.status(404).json({ mensaje: 'Paciente no encontrado.' });
+    }
+
+    const [mascotas, citas] = await Promise.all([
+      mascotaModel.listarPorCliente(id),
+      citaModel.listarPorCliente(id),
+    ]);
+
+    return res.status(200).json({ cliente, mascotas, citas });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   listarMedicos,
   crearMedico,
@@ -163,4 +202,6 @@ module.exports = {
   actualizarServiciosDeMedico,
   actualizarEspecialidadesDeMedico,
   listarCitas,
+  listarPacientes,
+  obtenerDetallePaciente,
 };
