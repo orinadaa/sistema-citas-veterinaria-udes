@@ -24,6 +24,15 @@ Ejecutadas con Jest + Supertest. Comando: `npm test` (dentro de `backend/`).
 
 **Total: 94/94 pruebas unitarias del backend pasando**, ejecutado 2026-09-23.
 
+### Ampliación: calendario de citas en el panel administrativo
+
+| Archivo | Casos cubiertos | Resultado |
+|---|---|---|
+| `cita.controller.test.js` (ampliado) | `POST /citas` ahora acepta al administrador: rechaza sin `clienteId`, responde 404 si `clienteId` no es un cliente, agenda en la sede del administrador con el cliente indicado; control de acceso actualizado: administrador puede consultar disponibilidad/médicos-disponibles, pero sigue sin poder ver "mis citas", reprogramar ni cancelar (siguen siendo exclusivas del cliente dueño) | 25/25 ✅ |
+| `usuario.controller.test.js` (ampliado) | `GET /usuarios?rol=cliente` filtra correctamente; `?rol=` inválido responde 400 | 11/11 ✅ |
+
+**Total: 102/102 pruebas unitarias del backend pasando**, ejecutado 2026-09-23.
+
 ## Pruebas de aceptación (manuales, contra la API real y PostgreSQL local)
 
 | ID | Descripción | Entrada | Resultado esperado | Resultado obtenido |
@@ -49,6 +58,16 @@ Ejecutadas con Jest + Supertest. Comando: `npm test` (dentro de `backend/`).
 
 *Nota: el servicio, médico y sede creados durante esta validación (`pruebapa28@udes.edu.co`, "Sede Cúcuta (prueba PA-30)", etc.) se eliminaron de la base de datos después de la prueba.*
 
+### Ampliación: calendario de citas en el panel administrativo
+
+| ID | Descripción | Entrada | Resultado esperado | Resultado obtenido |
+|---|---|---|---|---|
+| PA-32 | Admin consulta disponibilidad para agendar en nombre de un cliente | `GET /api/citas/disponibilidad` con el `sedeId` del admin, autenticado como administrador (antes exclusivo de cliente) | 200, franjas disponibles calculadas igual que para un cliente | ✅ Igual a lo esperado |
+| PA-33 | Admin agenda una cita en nombre de un cliente real | `POST /api/citas` con `clienteId` de un cliente existente, `servicioId`, `medicoId` y `fechaHora` válidos, sin enviar `sedeId` | 201, cita creada con `sede_id` igual a la del administrador (no la que se hubiera enviado) y `cliente_id` igual al cliente indicado | ✅ Igual a lo esperado |
+| PA-34 | La cita creada aparece en el seguimiento con la categoría del servicio | `GET /api/administracion/citas` tras PA-33 | 200, la fila incluye `categoria_nombre: "Consulta"` y `categoria_color: "blue"` (para pintar la tarjeta del calendario) | ✅ Igual a lo esperado |
+
+*Nota: la cita de prueba ("Firulais (prueba calendario)") creada sobre la cuenta cliente real existente en la base de datos local se eliminó después de la prueba.*
+
 ## Decisiones de alcance registradas
 
 - **Horarios reemplazan la constante fija**: `backend/src/config/horarioAtencion.js` se eliminó; el módulo de citas ahora consulta `horario_atencion` por sede vía `horario.model.js`. Se verificó end-to-end que un cambio de horario por el admin afecta inmediatamente la disponibilidad de citas (PA-23).
@@ -65,4 +84,14 @@ A partir de una revisión de mockups de interfaz se amplió el alcance de este i
 - **Gestión de sedes es global para cualquier administrador**, no restringida a "mi sede" — se verificó (PA-31) que esto ya era así para horarios antes de esta ampliación, así que extender sedes con el mismo criterio no introduce un precedente nuevo de permisos.
 - **Médicos siguen restringidos a la sede del administrador que los gestiona** (403 si se intenta administrar un médico de otra sede) — a diferencia de sedes/horarios, este límite sí se mantuvo tal como ya existía.
 - **Sin subida real de archivos**: no existe infraestructura de upload en el backend; `foto_url` (médicos y sedes) es un campo de texto opcional (URL), con avatar de iniciales como fallback en la interfaz.
-- **Calendario/dashboard de rol médico (secciones del mockup fuera de este incremento)**: no se construyeron — no corresponden a ningún incremento planeado en el alcance del proyecto todavía.
+- **Dashboard de rol médico (sección 4.2 del mockup) sigue fuera de este incremento**: no se construyó — no corresponde a ningún incremento planeado en el alcance del proyecto todavía. El calendario (sección 4.1) sí se construyó a pedido explícito posterior (ver abajo).
+
+### Ampliación: calendario de citas (a pedido explícito, tras el sistema de diseño)
+
+- **La vista de calendario reemplaza la tabla de "Seguimiento de citas"**, no conviven ambas — se mantiene un solo componente (`PanelCitasSeguimiento.jsx`) para no duplicar lógica de carga.
+- **El administrador ahora puede agendar citas desde el panel** ("+ Nueva cita"), algo que antes era exclusivo del cliente (RF-06). Esto amplió el backend: `POST /citas`, `GET /citas/disponibilidad` y `GET /citas/medicos-disponibles` aceptan también al rol administrador; `clienteId` es obligatorio y se valida que sea una cuenta con `rol = 'cliente'`; `sedeId` se fija a la sede del administrador (ignora cualquier otro valor recibido).
+- **Reprogramar y cancelar NO se ampliaron**: siguen siendo exclusivas del cliente dueño de la cita (RF-08/RF-09). El detalle de una cita en el calendario del admin es de solo lectura.
+- **El veterinario ve el mismo calendario pero sin "+ Nueva cita"**: solo sus propias citas, de solo lectura — no se amplió RF-12 más allá de lo que ya existía (podía consultar, ahora además lo hace en formato calendario).
+- **Sin selector de médico para el administrador**: el calendario muestra todas las citas de la sede mezcladas, diferenciadas por color de categoría del servicio y, en la tarjeta, el nombre del médico — a pedido explícito, en vez de agregar un filtro.
+- **Rango fijo de 7:00 a.m. a 7:00 p.m., Lunes a Sábado**: simplificación respecto al mockup (que sugiere vistas Semana/Día/Mes); se implementó solo la vista semanal más el mini calendario mensual para navegar, ya que cubre el caso de uso principal sin construir tres vistas distintas no pedidas explícitamente.
+- **Sin fotos reales de mascota**: el sistema no tiene un módulo de mascotas todavía (`nombre_mascota` es texto libre, ver incremento 2); las tarjetas usan un ícono de pata genérico en vez de una foto.
