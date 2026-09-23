@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { obtenerCitasAdministracion } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
+import { PageHeader } from '../ui/PageHeader';
+import { DataTable } from '../ui/DataTable';
 
 export function PanelCitasSeguimiento() {
   const { token, usuario } = useAuth();
@@ -18,61 +20,51 @@ export function PanelCitasSeguimiento() {
     });
   }, [token]);
 
-  if (cargando) {
-    return (
-      <div className="flex flex-col gap-3">
-        {[0, 1, 2].map((clave) => (
-          <div key={clave} className="h-16 animate-pulse rounded-lg bg-slate-100" />
-        ))}
-      </div>
-    );
-  }
-
-  if (citas.length === 0) {
-    return <p className="text-sm text-slate-500">No hay citas programadas todavía.</p>;
-  }
+  const columnas = [
+    { header: 'Fecha', render: (c) => formatearFechaLarga(c.fecha_hora) },
+    { header: 'Hora', render: (c) => formatearHora(c.fecha_hora) },
+    { header: 'Servicio', render: (c) => c.servicio_nombre },
+    ...(usuario.rol === 'administrador' ? [{ header: 'Médico', render: (c) => c.medico_nombre }] : []),
+    {
+      header: 'Cliente',
+      render: (c) => (
+        <div>
+          <p>{c.cliente_nombre}</p>
+          {c.cliente_telefono && <p className="text-xs text-slate-400">{c.cliente_telefono}</p>}
+        </div>
+      ),
+    },
+    { header: 'Mascota', render: (c) => c.nombre_mascota },
+    {
+      header: 'Estado',
+      render: (c) => (
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+            c.estado === 'agendada' ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'
+          }`}
+        >
+          {c.estado === 'agendada' ? 'Agendada' : 'Cancelada'}
+        </span>
+      ),
+    },
+  ];
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px] text-left text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            <th className="py-2 pr-4">Fecha</th>
-            <th className="py-2 pr-4">Hora</th>
-            <th className="py-2 pr-4">Servicio</th>
-            {usuario.rol === 'administrador' && <th className="py-2 pr-4">Médico</th>}
-            <th className="py-2 pr-4">Cliente</th>
-            <th className="py-2 pr-4">Mascota</th>
-            <th className="py-2 pr-4">Estado</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {citas.map((cita) => (
-            <tr key={cita.id}>
-              <td className="py-2.5 pr-4 text-slate-700">{formatearFechaLarga(cita.fecha_hora)}</td>
-              <td className="py-2.5 pr-4 text-slate-700">{formatearHora(cita.fecha_hora)}</td>
-              <td className="py-2.5 pr-4 text-slate-700">{cita.servicio_nombre}</td>
-              {usuario.rol === 'administrador' && (
-                <td className="py-2.5 pr-4 text-slate-700">{cita.medico_nombre}</td>
-              )}
-              <td className="py-2.5 pr-4 text-slate-700">
-                {cita.cliente_nombre}
-                {cita.cliente_telefono && <span className="block text-xs text-slate-400">{cita.cliente_telefono}</span>}
-              </td>
-              <td className="py-2.5 pr-4 text-slate-700">{cita.nombre_mascota}</td>
-              <td className="py-2.5 pr-4">
-                <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    cita.estado === 'agendada' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                  }`}
-                >
-                  {cita.estado === 'agendada' ? 'Agendada' : 'Cancelada'}
-                </span>
-              </td>
-            </tr>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={usuario.rol === 'administrador' ? 'Seguimiento de citas' : 'Mis citas asignadas'}
+        subtitle="Consulta las citas programadas en tu sede."
+      />
+
+      {cargando ? (
+        <div className="flex flex-col gap-2">
+          {[0, 1, 2].map((clave) => (
+            <div key={clave} className="h-14 animate-pulse rounded-xl bg-slate-100" />
           ))}
-        </tbody>
-      </table>
+        </div>
+      ) : (
+        <DataTable filaVacia="No hay citas programadas todavía." columns={columnas} rows={citas} />
+      )}
     </div>
   );
 }
