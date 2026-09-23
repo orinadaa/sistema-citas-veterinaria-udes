@@ -1,7 +1,7 @@
 // components/layout/AdminSidebar.jsx
 // Sidebar fijo del panel administrativo, con la identidad de marca real
 // de la clinica (ver identidadmarca/): fondo azul institucional
-// #4280F7, logo completo (logoblanco.png) expandido y el isotipo corto
+// #4280F7, logo completo a color (logocolor.png) expandido y el isotipo corto
 // (logocorto.png) colapsado. La variante navy de rol medico no se
 // construye todavia: no existe pantalla de calendario/dashboard para
 // ese rol en ningun incremento planeado.
@@ -22,7 +22,7 @@ import {
   IconoFlechaDerecha,
 } from '../icons';
 import { useAuth } from '../../context/AuthContext';
-import logoBlanco from '../../assets/logoblanco.png';
+import logoColor from '../../assets/logocolor.png';
 import logoCorto from '../../assets/logocorto.png';
 
 const ITEMS_NAV = [
@@ -88,7 +88,7 @@ export function AdminSidebar({ activo, onCambiar }) {
         {colapsado ? (
           <img src={logoCorto} alt="Clínica Veterinaria UDES" className="h-10 w-10 object-contain" />
         ) : (
-          <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-auto w-full max-w-[200px] object-contain" />
+          <img src={logoColor} alt="Clínica Veterinaria UDES" className="h-auto w-full max-w-[200px] object-contain" />
         )}
       </div>
 
