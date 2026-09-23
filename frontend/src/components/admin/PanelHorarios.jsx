@@ -4,7 +4,7 @@
 // sede (ver database/incremento_3d_sedes_perfil.sql).
 import { useEffect, useMemo, useState } from 'react';
 import {
-  obtenerSedes,
+  obtenerSedesAdmin,
   crearSede,
   actualizarSede,
   obtenerHorarios,
@@ -63,7 +63,7 @@ export function PanelHorarios() {
 
   function cargar() {
     setCargando(true);
-    obtenerSedes().then(async (datos) => {
+    obtenerSedesAdmin(token).then(async (datos) => {
       setSedes(datos.sedes);
       const entradas = await Promise.all(
         datos.sedes.map((sede) => obtenerHorarios(sede.id).then((h) => [sede.id, h.horario]))
@@ -73,7 +73,7 @@ export function PanelHorarios() {
     });
   }
 
-  useEffect(cargar, []);
+  useEffect(cargar, [token]);
 
   function diasDeSede(sedeId) {
     const horario = horariosPorSede[sedeId] || [];

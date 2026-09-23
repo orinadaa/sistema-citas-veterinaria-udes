@@ -14,12 +14,38 @@ const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: 'sed
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
 
 describe('GET /api/sedes', () => {
-  test('es publico', async () => {
-    sedeModel.listarTodas.mockResolvedValue([{ id: 's1', nombre: 'Sede Bucaramanga' }]);
+  test('es publico y solo devuelve sedes activas', async () => {
+    sedeModel.listarTodas.mockResolvedValue([{ id: 's1', nombre: 'Sede Bucaramanga', activo: true }]);
 
     const respuesta = await request(app).get('/api/sedes');
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.sedes).toHaveLength(1);
+    expect(sedeModel.listarTodasAdmin).not.toHaveBeenCalled();
+  });
+});
+
+describe('GET /api/sedes/admin', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('rechaza a un cliente', async () => {
+    const respuesta = await request(app)
+      .get('/api/sedes/admin')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(403);
+  });
+
+  test('devuelve todas las sedes, incluidas las inactivas', async () => {
+    sedeModel.listarTodasAdmin.mockResolvedValue([
+      { id: 's1', nombre: 'Sede Bucaramanga', activo: true },
+      { id: 's2', nombre: 'Sede Valledupar', activo: false },
+    ]);
+
+    const respuesta = await request(app)
+      .get('/api/sedes/admin')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.sedes).toHaveLength(2);
   });
 });
 

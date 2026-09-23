@@ -3,7 +3,16 @@ const { pool } = require('../config/db');
 
 const CAMPOS = 'id, nombre, ciudad, direccion, foto_url, activo';
 
+// Publico (landing, formulario de agendamiento): solo sedes activas, no
+// tiene sentido ofrecer agendar en una sede que el admin desactivo.
 async function listarTodas() {
+  const resultado = await pool.query(`SELECT ${CAMPOS} FROM sede WHERE activo = true ORDER BY ciudad`);
+  return resultado.rows;
+}
+
+// Para el panel administrativo: incluye tambien las inactivas, para
+// poder reactivarlas.
+async function listarTodasAdmin() {
   const resultado = await pool.query(`SELECT ${CAMPOS} FROM sede ORDER BY ciudad`);
   return resultado.rows;
 }
@@ -36,4 +45,4 @@ async function actualizar(id, { nombre, ciudad, direccion, fotoUrl, activo }) {
   return resultado.rows[0] || null;
 }
 
-module.exports = { listarTodas, buscarPorId, crear, actualizar };
+module.exports = { listarTodas, listarTodasAdmin, buscarPorId, crear, actualizar };

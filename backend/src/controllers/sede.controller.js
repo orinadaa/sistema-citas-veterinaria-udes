@@ -5,10 +5,20 @@
 // que ya tenian los horarios de atencion).
 const sedeModel = require('../models/sede.model');
 
-// GET /api/sedes — publico
+// GET /api/sedes — publico, solo activas
 async function listar(req, res, next) {
   try {
     const sedes = await sedeModel.listarTodas();
+    return res.status(200).json({ sedes });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// GET /api/sedes/admin — solo administrador, incluye inactivas
+async function listarAdmin(req, res, next) {
+  try {
+    const sedes = await sedeModel.listarTodasAdmin();
     return res.status(200).json({ sedes });
   } catch (error) {
     next(error);
@@ -47,4 +57,4 @@ async function actualizar(req, res, next) {
   }
 }
 
-module.exports = { listar, crear, actualizar };
+module.exports = { listar, listarAdmin, crear, actualizar };

@@ -35,6 +35,10 @@ export function obtenerSedes() {
   return solicitar('/sedes');
 }
 
+export function obtenerSedesAdmin(token) {
+  return solicitar('/sedes/admin', { token });
+}
+
 export function crearSede(datos, token) {
   return solicitar('/sedes', { metodo: 'POST', cuerpo: datos, token });
 }

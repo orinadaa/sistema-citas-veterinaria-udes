@@ -1,13 +1,16 @@
 // routes/sede.routes.js
 // Lectura publica (RF-03); creacion/edicion exclusiva del administrador.
 const express = require('express');
-const { listar, crear, actualizar } = require('../controllers/sede.controller');
+const { listar, listarAdmin, crear, actualizar } = require('../controllers/sede.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// GET /api/sedes — publico
+// GET /api/sedes — publico, solo activas
 router.get('/', listar);
+
+// GET /api/sedes/admin — solo administrador, incluye inactivas
+router.get('/admin', verificarToken, verificarRol('administrador'), listarAdmin);
 
 // POST /api/sedes — solo administrador
 router.post('/', verificarToken, verificarRol('administrador'), crear);
