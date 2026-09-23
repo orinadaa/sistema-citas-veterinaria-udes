@@ -35,6 +35,14 @@ export function obtenerSedes() {
   return solicitar('/sedes');
 }
 
+export function crearSede(datos, token) {
+  return solicitar('/sedes', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function actualizarSede(id, datos, token) {
+  return solicitar(`/sedes/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
 export function obtenerPerfil(token) {
   return solicitar('/auth/perfil', { token });
 }
