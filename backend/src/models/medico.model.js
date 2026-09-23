@@ -1,7 +1,8 @@
 // models/medico.model.js
 // "Medico" aqui es un usuario con rol 'veterinario'. RF-10/RF-11: el
-// administrador ve los medicos de su sede y administra que servicio
-// presta cada uno (servicio_medico).
+// administrador ve los medicos de su sede y administra su perfil
+// (documento, telefono, foto, biografia, especialidades, activo) y que
+// servicio presta cada uno (servicio_medico).
 const { pool } = require('../config/db');
 
 async function listarPorSedeYServicio(sedeId, servicioId) {
@@ -43,24 +44,57 @@ async function asignarServicio(medicoId, servicioId) {
   );
 }
 
-// Todos los veterinarios de una sede, con la lista de servicios que
-// presta cada uno. Para el panel administrativo (RF-10/RF-11).
+// Todos los veterinarios de una sede, con su perfil, los servicios que
+// presta y sus especialidades. Para el panel administrativo (RF-10/RF-11).
 async function listarConServicios(sedeId) {
   const resultado = await pool.query(
-    `SELECT u.id, u.nombre_completo, u.correo, u.sede_id, u.activo,
+    `SELECT u.id, u.nombre_completo, u.correo, u.sede_id, u.telefono, u.documento, u.foto_url,
+            u.biografia, u.activo,
             COALESCE(
-              json_agg(json_build_object('id', sv.id, 'nombre', sv.nombre)) FILTER (WHERE sv.id IS NOT NULL),
+              json_agg(DISTINCT jsonb_build_object('id', sv.id, 'nombre', sv.nombre)) FILTER (WHERE sv.id IS NOT NULL),
               '[]'
-            ) AS servicios
+            ) AS servicios,
+            COALESCE(
+              json_agg(DISTINCT jsonb_build_object('id', esp.id, 'nombre', esp.nombre, 'color', esp.color)) FILTER (WHERE esp.id IS NOT NULL),
+              '[]'
+            ) AS especialidades
      FROM usuario u
      LEFT JOIN servicio_medico sm ON sm.medico_id = u.id
      LEFT JOIN servicio sv ON sv.id = sm.servicio_id
+     LEFT JOIN usuario_especialidad ue ON ue.usuario_id = u.id
+     LEFT JOIN categoria_servicio esp ON esp.id = ue.categoria_id
      WHERE u.rol = 'veterinario' AND u.sede_id = $1
      GROUP BY u.id
      ORDER BY u.nombre_completo`,
     [sedeId]
   );
   return resultado.rows;
+}
+
+async function crear({ nombreCompleto, correo, contrasenaHash, documento, telefono, sedeId }) {
+  const resultado = await pool.query(
+    `INSERT INTO usuario (nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, documento)
+     VALUES ($1, $2, $3, 'veterinario', $4, $5, $6)
+     RETURNING id`,
+    [nombreCompleto, correo, contrasenaHash, sedeId, telefono || null, documento || null]
+  );
+  return resultado.rows[0].id;
+}
+
+async function actualizar(id, { nombreCompleto, telefono, documento, fotoUrl, biografia, activo }) {
+  const resultado = await pool.query(
+    `UPDATE usuario SET
+       nombre_completo = COALESCE($2, nombre_completo),
+       telefono = COALESCE($3, telefono),
+       documento = COALESCE($4, documento),
+       foto_url = COALESCE($5, foto_url),
+       biografia = COALESCE($6, biografia),
+       activo = COALESCE($7, activo)
+     WHERE id = $1 AND rol = 'veterinario'
+     RETURNING id`,
+    [id, nombreCompleto ?? null, telefono ?? null, documento ?? null, fotoUrl ?? null, biografia ?? null, activo ?? null]
+  );
+  return resultado.rowCount > 0;
 }
 
 // Reemplaza por completo el conjunto de servicios que presta un medico.
@@ -85,11 +119,36 @@ async function reemplazarServicios(medicoId, servicioIds) {
   }
 }
 
+// Reemplaza por completo las especialidades (categorias) de un medico.
+// Mismo patron transaccional que reemplazarServicios.
+async function reemplazarEspecialidades(medicoId, categoriaIds) {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query('BEGIN');
+    await cliente.query('DELETE FROM usuario_especialidad WHERE usuario_id = $1', [medicoId]);
+    for (const categoriaId of categoriaIds) {
+      await cliente.query('INSERT INTO usuario_especialidad (usuario_id, categoria_id) VALUES ($1, $2)', [
+        medicoId,
+        categoriaId,
+      ]);
+    }
+    await cliente.query('COMMIT');
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+    throw error;
+  } finally {
+    cliente.release();
+  }
+}
+
 module.exports = {
   listarPorSedeYServicio,
   listarFranjasOcupadas,
   ofreceServicio,
   asignarServicio,
   listarConServicios,
+  crear,
+  actualizar,
   reemplazarServicios,
+  reemplazarEspecialidades,
 };
