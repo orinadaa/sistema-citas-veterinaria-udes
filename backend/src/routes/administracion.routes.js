@@ -11,6 +11,7 @@ const {
   listarPacientes,
   obtenerDetallePaciente,
 } = require('../controllers/administracion.controller');
+const { obtenerReporte } = require('../controllers/reportes.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
@@ -40,5 +41,8 @@ router.get('/pacientes', verificarRol('administrador'), listarPacientes);
 
 // GET /api/administracion/pacientes/:id — solo administrador
 router.get('/pacientes/:id', verificarRol('administrador'), obtenerDetallePaciente);
+
+// GET /api/administracion/reportes — solo administrador
+router.get('/reportes', verificarRol('administrador'), obtenerReporte);
 
 module.exports = router;
