@@ -145,3 +145,91 @@ export function IconoAlerta({ className }) {
     </Icono>
   );
 }
+
+export function IconoCalendario({ className }) {
+  return (
+    <Icono className={className}>
+      <rect x="3.5" y="5" width="17" height="15" rx="2" />
+      <path d="M8 3v4M16 3v4M3.5 10h17" />
+    </Icono>
+  );
+}
+
+export function IconoMedicos({ className }) {
+  return (
+    <Icono className={className}>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 20c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2" />
+      <path d="M16 4.3a3 3 0 0 1 0 5.8M20.5 20c0-2.6-1.8-4.7-4.2-5.1" />
+    </Icono>
+  );
+}
+
+export function IconoSede({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M5 20V9l7-4.5L19 9v11" />
+      <path d="M9.5 20v-6h5v6M4 20h16" />
+    </Icono>
+  );
+}
+
+export function IconoBuscar({ className }) {
+  return (
+    <Icono className={className}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m20 20-4.5-4.5" />
+    </Icono>
+  );
+}
+
+export function IconoCampana({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10Z" />
+      <path d="M10 19a2 2 0 0 0 4 0" />
+    </Icono>
+  );
+}
+
+export function IconoMas({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </Icono>
+  );
+}
+
+export function IconoLapiz({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3Z" />
+      <path d="M13.5 6.5l3 3" />
+    </Icono>
+  );
+}
+
+export function IconoPapelera({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
+      <path d="M10 11v6M14 11v6" />
+    </Icono>
+  );
+}
+
+export function IconoChevronAbajo({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="m6 9 6 6 6-6" />
+    </Icono>
+  );
+}
+
+export function IconoX({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </Icono>
+  );
+}
