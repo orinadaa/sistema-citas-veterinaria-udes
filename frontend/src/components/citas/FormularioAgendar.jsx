@@ -9,7 +9,7 @@ import { SelectorFranjas } from './SelectorFranjas';
 import { SelectorMedico } from './SelectorMedico';
 import { MascotaSelector } from './MascotaSelector';
 
-export function FormularioAgendar({ onAgendada }) {
+export function FormularioAgendar({ onAgendada, servicioIdInicial }) {
   const { token } = useAuth();
   const [sedes, setSedes] = useState([]);
   const [servicios, setServicios] = useState([]);
@@ -24,7 +24,15 @@ export function FormularioAgendar({ onAgendada }) {
 
   useEffect(() => {
     obtenerSedes().then((datos) => setSedes(datos.sedes));
-    obtenerServicios().then((datos) => setServicios(datos.servicios));
+    obtenerServicios().then((datos) => {
+      setServicios(datos.servicios);
+      // Preseleccion desde el landing (boton de una tarjeta de
+      // servicio): solo si el id sigue existiendo entre los activos.
+      if (servicioIdInicial && datos.servicios.some((s) => s.id === servicioIdInicial)) {
+        setServicioId(servicioIdInicial);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function enviarFormulario(evento) {

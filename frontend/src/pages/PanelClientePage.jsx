@@ -48,6 +48,7 @@ export function PanelClientePage() {
           {mostrarFormulario && (
             <div className="mt-6 border-t border-slate-100 pt-6">
               <FormularioAgendar
+                servicioIdInicial={parametros.get('servicioId') || undefined}
                 onAgendada={() => {
                   setMostrarFormulario(false);
                   cargarCitas();
