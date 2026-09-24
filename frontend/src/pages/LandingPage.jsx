@@ -5,6 +5,7 @@ import { Footer } from '../components/layout/Footer';
 import { Hero } from '../components/landing/Hero';
 import { Servicios } from '../components/landing/Servicios';
 import { Sedes } from '../components/landing/Sedes';
+import { Horarios } from '../components/landing/Horarios';
 import { CtaBanner } from '../components/landing/CtaBanner';
 
 export function LandingPage() {
@@ -15,6 +16,7 @@ export function LandingPage() {
         <Hero />
         <Servicios />
         <Sedes />
+        <Horarios />
         <CtaBanner />
       </main>
       <Footer />

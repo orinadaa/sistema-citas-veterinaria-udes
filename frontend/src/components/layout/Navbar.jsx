@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logoAzul from '../../assets/logo-azul.png';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
+import { IconoCalendario } from '../icons';
 
 export function Navbar() {
   const { estaAutenticado, usuario, cerrarSesion } = useAuth();
@@ -40,18 +41,27 @@ export function Navbar() {
               </button>
             </>
           ) : (
-            <Link
-              to="/iniciar-sesion"
-              className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 sm:inline-block"
-            >
-              Iniciar sesión
-            </Link>
+            <div className="hidden items-center gap-1 sm:flex">
+              <Link
+                to="/iniciar-sesion"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/registrarse"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+              >
+                Registrarse
+              </Link>
+            </div>
           )}
           <button
             type="button"
             onClick={irAAgendar}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98]"
           >
+            <IconoCalendario className="h-4 w-4" />
             Agendar cita
           </button>
         </div>

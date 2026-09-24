@@ -1,9 +1,21 @@
 // components/landing/Hero.jsx
+// Fondo = identidadmarca/fondoazullanding.png (degradado azul con la
+// veterinaria, la mascota y los iconos 3D ya compuestos dentro de la
+// imagen — no se recrean por separado). Se agrega un scrim degradado
+// detras del texto para garantizar contraste sin importar en que ancho
+// de pantalla quede posicionada la foto (bg-cover recorta distinto
+// segun el viewport).
 import { useNavigate } from 'react-router-dom';
-import logoBlanco from '../../assets/logo-blanco.png';
-import { IconoUbicacion, IconoReloj, IconoFlechaDerecha } from '../icons';
+import heroFondo from '../../assets/hero-fondo.png';
+import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
+
+const BULLETS = [
+  { icono: IconoPata, texto: '2 sedes en Bucaramanga y Valledupar' },
+  { icono: IconoEscudo, texto: 'Atención veterinaria integral' },
+  { icono: IconoReloj, texto: 'Agendamiento en línea sin llamadas ni filas' },
+];
 
 export function Hero() {
   const navegar = useNavigate();
@@ -14,47 +26,57 @@ export function Hero() {
   }
 
   return (
-    <section className="mx-auto grid max-w-7xl gap-12 px-4 pt-16 pb-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:pt-20">
-      <div>
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
-          Agenda la cita de tu mascota en minutos
-        </h1>
-        <p className="mt-5 max-w-[46ch] text-lg leading-relaxed text-slate-600">
-          Consulta horarios, elige tu sede y agenda en línea, sin llamadas ni
-          filas. Bucaramanga y Valledupar.
-        </p>
+    <section
+      className="relative overflow-hidden bg-cover bg-[position:right_center] bg-no-repeat"
+      style={{ backgroundImage: `url(${heroFondo})` }}
+    >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'linear-gradient(90deg, rgba(0,44,145,0.75) 0%, rgba(0,44,145,0.45) 45%, rgba(0,44,145,0) 70%)' }}
+        aria-hidden="true"
+      />
 
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          <button
-            type="button"
-            onClick={irAAgendar}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98]"
-          >
-            Agendar cita
-            <IconoFlechaDerecha className="h-4 w-4" />
-          </button>
-          <a
-            href="#servicios"
-            className="rounded-lg px-6 py-3 text-base font-semibold text-slate-700 transition hover:bg-slate-100"
-          >
-            Ver servicios
-          </a>
-        </div>
-      </div>
+      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:py-28">
+        <div className="max-w-xl">
+          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white/90">
+            <IconoPata className="h-4 w-4" />
+            Clínica Veterinaria UDES
+          </p>
 
-      <div className="relative">
-        <div className="flex aspect-[4/3] items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-blue-900 p-10 shadow-xl">
-          <img src={logoBlanco} alt="" className="w-3/4 max-w-xs" />
-        </div>
+          <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
+            Cuidamos de quienes hacen parte de <span style={{ color: '#F9C422' }}>tu familia</span>
+          </h1>
 
-        <div className="absolute -right-4 -top-4 hidden items-center gap-2 rounded-xl bg-white px-4 py-3 shadow-lg ring-1 ring-slate-200 sm:flex">
-          <IconoUbicacion className="h-5 w-5 text-blue-600" />
-          <span className="text-sm font-medium text-slate-700">2 sedes disponibles</span>
-        </div>
+          <p className="mt-5 max-w-[46ch] text-lg leading-relaxed text-blue-50">
+            Atención veterinaria integral, con profesionales comprometidos y tecnología al servicio de la salud de tu mascota.
+          </p>
 
-        <div className="absolute -bottom-4 -left-4 hidden items-center gap-2 rounded-xl bg-white px-4 py-3 shadow-lg ring-1 ring-slate-200 sm:flex">
-          <IconoReloj className="h-5 w-5 text-amber-500" />
-          <span className="text-sm font-medium text-slate-700">Confirmación automática</span>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={irAAgendar}
+              className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-base font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
+              style={{ backgroundColor: '#FDCA18' }}
+            >
+              Agendar cita
+              <IconoFlechaDerecha className="h-4 w-4" />
+            </button>
+            <a
+              href="#servicios"
+              className="rounded-lg border border-white/70 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10"
+            >
+              Conoce nuestros servicios
+            </a>
+          </div>
+
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-3">
+            {BULLETS.map(({ icono: Icono, texto }) => (
+              <div key={texto} className="flex items-center gap-2 text-sm font-medium text-white/90">
+                <Icono className="h-4 w-4 shrink-0" />
+                {texto}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
