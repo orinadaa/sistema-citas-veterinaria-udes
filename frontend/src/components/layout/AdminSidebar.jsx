@@ -35,7 +35,6 @@ const ITEMS_NAV = [
   { id: 'configuracion', etiqueta: 'Configuración', icono: IconoEngranaje },
 ];
 
-const COLOR_SIDEBAR = '#4280F7';
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';
 const ANCHO_EXPANDIDO = '248px';
 const ANCHO_COLAPSADO = '76px';
@@ -70,8 +69,8 @@ export function AdminSidebar({ activo, onCambiar }) {
 
   return (
     <aside
-      className="hidden h-screen shrink-0 flex-col overflow-y-auto py-6 transition-[width] duration-200 lg:flex"
-      style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO, backgroundColor: COLOR_SIDEBAR }}
+      className="hidden h-screen shrink-0 flex-col overflow-y-auto bg-brand-blue py-6 transition-[width] duration-200 lg:flex"
+      style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO }}
     >
       <div className={`flex items-center px-4 ${colapsado ? 'justify-center' : 'justify-end'}`}>
         <button

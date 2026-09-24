@@ -1,15 +1,16 @@
 // components/layout/Navbar.jsx
-// Topbar azul institucional (#4280F7): logo blanco, texto blanco y el
-// boton "Agendar cita" en ambar (#F7A71C) -- unicos tres colores en
-// esta barra (azul de fondo, ambar del boton, blanco para todo lo demas).
+// Topbar azul institucional (brand.blue): logo blanco, texto blanco y
+// el boton "Agendar cita" en ambar (brand.amber) -- unicos tres
+// colores en esta barra (azul de fondo, ambar del boton, blanco para
+// todo lo demas). En la landing (unica pagina con Hero), brand.blue
+// tambien es el primer stop del degradado del Hero (from-brand-blue-500),
+// asi que el navbar solido se continua sin costura visible hacia el
+// degradado de abajo.
 import { Link, useNavigate } from 'react-router-dom';
 import logoBlanco from '../../assets/logoblanco.png';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { IconoCalendario } from '../icons';
-
-const COLOR_TOPBAR = '#4280F7';
-const COLOR_BOTON = '#F7A71C';
 
 export function Navbar() {
   const { estaAutenticado, usuario, cerrarSesion } = useAuth();
@@ -20,7 +21,7 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40" style={{ backgroundColor: COLOR_TOPBAR }}>
+    <header className="sticky top-0 z-40 bg-brand-blue">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
           <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-12 w-auto object-contain" />
@@ -65,8 +66,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={irAAgendar}
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 active:scale-[0.98]"
-            style={{ backgroundColor: COLOR_BOTON }}
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-amber px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 active:scale-[0.98]"
           >
             <IconoCalendario className="h-4 w-4" />
             Agendar cita

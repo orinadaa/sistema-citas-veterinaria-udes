@@ -1,10 +1,22 @@
 @import "tailwindcss";
 
-/* Tokens del sistema de diseño del panel administrativo (ver mockups). */
+/* Tokens del sistema de diseño (ver mockups). brand.blue/brand.amber son
+   los colores de marca definitivos (no aproximados por muestreo); la
+   escala 400-800 esta derivada matematicamente (HSL) para degradados,
+   no inventada a ojo. */
 @theme {
   --color-brand-navy: #0b3c74;
-  --color-brand-blue: #0078fc;
-  --color-brand-amber: #fbb724;
+  --color-brand-blue: #4280f7;
+  --color-brand-blue-400: #78a4f9;
+  --color-brand-blue-500: #4280f7;
+  --color-brand-blue-600: #0c5cf5;
+  --color-brand-blue-700: #0847c0;
+  --color-brand-blue-800: #06338a;
+  --color-brand-amber: #f7a71c;
+  --color-brand-amber-400: #f8b644;
+  --color-brand-amber-500: #f7a71c;
+  --color-brand-amber-600: #da8d08;
+  --color-brand-amber-700: #aa6e06;
   --color-brand-green: #16a34a;
   --color-brand-red: #e4434b;
 

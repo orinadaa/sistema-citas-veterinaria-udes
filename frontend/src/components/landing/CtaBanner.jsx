@@ -1,5 +1,5 @@
 // components/landing/CtaBanner.jsx
-// Banda de cierre: azul solido #2D73F7 con formas ambar en las
+// Banda de cierre: azul de marca solido (brand.blue) con formas ambar en las
 // esquinas y un patron sutil de huellas de fondo. Las formas y las
 // huellas se generan con CSS/el icono de pata ya existente (sin
 // inventar un asset de imagen nuevo para algo puramente decorativo).
@@ -27,7 +27,7 @@ export function CtaBanner() {
   }
 
   return (
-    <section className="relative overflow-hidden" style={{ backgroundColor: '#2D73F7' }}>
+    <section className="relative overflow-hidden bg-brand-blue">
       <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-amber-400/30 blur-2xl" aria-hidden="true" />
       <div className="pointer-events-none absolute -bottom-20 -right-10 h-64 w-64 rounded-full bg-amber-400/30 blur-2xl" aria-hidden="true" />
 

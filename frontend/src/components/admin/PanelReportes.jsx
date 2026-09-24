@@ -243,7 +243,7 @@ export function PanelReportes() {
                     <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12 }} stroke="#94A3B8" />
                     <YAxis type="category" dataKey="servicio" width={140} tick={{ fontSize: 12 }} stroke="#94A3B8" />
                     <Tooltip />
-                    <Bar dataKey="total" fill="#0078FC" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="total" fill="#4280F7" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
