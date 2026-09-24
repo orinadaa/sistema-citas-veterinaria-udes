@@ -77,7 +77,7 @@ export function Hero() {
         </div>
 
         <div className="relative">
-          <img src={fotoMain} alt="" className="mx-auto w-full max-w-[582px] drop-shadow-2xl lg:max-w-[666px]" />
+          <img src={fotoMain} alt="" className="mx-auto w-full max-w-[670px] drop-shadow-2xl lg:max-w-[770px]" />
         </div>
       </div>
     </section>
