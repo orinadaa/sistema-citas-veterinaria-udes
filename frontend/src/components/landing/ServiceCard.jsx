@@ -21,7 +21,7 @@ export function ServiceCard({ image, title, description, href }) {
   return (
     <Envoltura
       {...propsEnvoltura}
-      className={`group relative mx-auto block w-full max-w-[300px] transition-all duration-200 ease-out hover:-translate-y-2 hover:scale-[1.03] ${
+      className={`group relative mx-auto block w-full max-w-[390px] transition-all duration-200 ease-out hover:-translate-y-2 hover:scale-[1.03] ${
         href ? 'cursor-pointer' : ''
       }`}
     >

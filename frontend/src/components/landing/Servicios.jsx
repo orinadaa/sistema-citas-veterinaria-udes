@@ -64,7 +64,7 @@ export function Servicios() {
         {estado === ESTADOS.CARGANDO && (
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, indice) => (
-              <div key={indice} className="mx-auto aspect-square w-full max-w-[240px] animate-pulse rounded-2xl bg-slate-100" />
+              <div key={indice} className="mx-auto aspect-square w-full max-w-[390px] animate-pulse rounded-2xl bg-slate-100" />
             ))}
           </div>
         )}

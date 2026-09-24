@@ -50,7 +50,7 @@ export function Carrusel({ children, anchoSlide = ANCHO_SLIDE_DEFECTO }) {
       <div
         ref={trackRef}
         onScroll={actualizarLimites}
-        className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4 pt-5 [&::-webkit-scrollbar]:hidden"
         style={{ scrollbarWidth: 'none' }}
       >
         {children.map((hijo, indice) => (
