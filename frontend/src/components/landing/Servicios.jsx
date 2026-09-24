@@ -10,6 +10,7 @@ import { rutaAgendarCita } from '../../utils/rutas';
 import { IconoAlerta } from '../icons';
 import { SectionHeading } from './SectionHeading';
 import { ServiceCard } from './ServiceCard';
+import { Carrusel } from './Carrusel';
 import imgConsulta from '../../assets/servicios-card/consulta.png';
 import imgCirugia from '../../assets/servicios-card/cirugia.png';
 import imgDesparasitacion from '../../assets/servicios-card/desparasitacion.png';
@@ -61,8 +62,8 @@ export function Servicios() {
         />
 
         {estado === ESTADOS.CARGANDO && (
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 9 }).map((_, indice) => (
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, indice) => (
               <div key={indice} className="mx-auto aspect-square w-full max-w-[240px] animate-pulse rounded-2xl bg-slate-100" />
             ))}
           </div>
@@ -76,21 +77,24 @@ export function Servicios() {
         )}
 
         {estado === ESTADOS.LISTO && (
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {servicios.map((servicio) => {
-              const config = CONFIG_POR_SERVICIO[servicio.nombre];
-              if (!config) return null;
-              return (
-                <ServiceCard
-                  key={servicio.id}
-                  image={config.imagen}
-                  title={config.etiquetaPublica ?? servicio.nombre}
-                  description={servicio.descripcion}
-                  accentColor={config.color}
-                  href={rutaAgendarCita(estaAutenticado, servicio.id)}
-                />
-              );
-            })}
+          <div className="mt-10">
+            <Carrusel>
+              {servicios
+                .filter((servicio) => CONFIG_POR_SERVICIO[servicio.nombre])
+                .map((servicio) => {
+                  const config = CONFIG_POR_SERVICIO[servicio.nombre];
+                  return (
+                    <ServiceCard
+                      key={servicio.id}
+                      image={config.imagen}
+                      title={config.etiquetaPublica ?? servicio.nombre}
+                      description={servicio.descripcion}
+                      accentColor={config.color}
+                      href={rutaAgendarCita(estaAutenticado, servicio.id)}
+                    />
+                  );
+                })}
+            </Carrusel>
           </div>
         )}
       </div>
