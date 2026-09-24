@@ -1,8 +1,9 @@
 // components/landing/Carrusel.jsx
 // Slider horizontal generico con scroll nativo + snap (sin libreria
 // nueva): cada `children` es un slide de ancho fijo por breakpoint
-// (`anchoSlide`), 3 visibles en desktop por defecto. Las flechas
-// desplazan una pantalla completa (clientWidth) con scroll suave.
+// (`anchoSlide`), 3 visibles en desktop por defecto. Las flechas viven
+// en su propia columna de flex (no superpuestas sobre el track), asi
+// nunca tapan la tarjeta que se asoma al costado.
 import { useEffect, useRef, useState } from 'react';
 import { IconoFlechaDerecha } from '../icons';
 
@@ -36,13 +37,13 @@ export function Carrusel({ children, anchoSlide = ANCHO_SLIDE_DEFECTO }) {
   }
 
   return (
-    <div className="relative">
+    <div className="flex items-center gap-2 sm:gap-4">
       <button
         type="button"
         onClick={() => desplazar(-1)}
         disabled={!puedeAtras}
         aria-label="Ver servicios anteriores"
-        className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-blue shadow-md ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-0"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-brand-blue shadow-md ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-0"
       >
         <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
       </button>
@@ -50,7 +51,7 @@ export function Carrusel({ children, anchoSlide = ANCHO_SLIDE_DEFECTO }) {
       <div
         ref={trackRef}
         onScroll={actualizarLimites}
-        className="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4 pt-5 [&::-webkit-scrollbar]:hidden"
+        className="flex min-w-0 flex-1 snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-1 pb-4 pt-5 [&::-webkit-scrollbar]:hidden"
         style={{ scrollbarWidth: 'none' }}
       >
         {children.map((hijo, indice) => (
@@ -65,7 +66,7 @@ export function Carrusel({ children, anchoSlide = ANCHO_SLIDE_DEFECTO }) {
         onClick={() => desplazar(1)}
         disabled={!puedeAdelante}
         aria-label="Ver más servicios"
-        className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full bg-white text-brand-blue shadow-md ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-0"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-brand-blue shadow-md ring-1 ring-slate-200 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-0"
       >
         <IconoFlechaDerecha className="h-4 w-4" />
       </button>

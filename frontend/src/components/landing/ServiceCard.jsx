@@ -31,9 +31,9 @@ export function ServiceCard({ image, title, description, href }) {
         className="w-full drop-shadow-md transition-[filter] duration-200 ease-out group-hover:drop-shadow-xl"
       />
 
-      <div className="absolute inset-x-0 bottom-0 px-5 pb-5 pt-8">
-        <h3 className="text-sm font-bold text-brand-navy">{title}</h3>
-        {description && <p className="mt-0.5 text-xs leading-snug text-slate-500 line-clamp-2">{description}</p>}
+      <div className="absolute inset-x-0 bottom-0 px-6 pb-6 pt-10">
+        <h3 className="text-xl font-bold text-brand-navy">{title}</h3>
+        {description && <p className="mt-1.5 text-base leading-snug text-slate-500 line-clamp-2">{description}</p>}
       </div>
     </Envoltura>
   );
