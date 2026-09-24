@@ -1,10 +1,8 @@
 // components/landing/Hero.jsx
 // Fondo = identidadmarca/fondoazullanding.png (degradado azul con la
 // veterinaria, la mascota y los iconos 3D ya compuestos dentro de la
-// imagen — no se recrean por separado). Se agrega un scrim degradado
-// detras del texto para garantizar contraste sin importar en que ancho
-// de pantalla quede posicionada la foto (bg-cover recorta distinto
-// segun el viewport).
+// imagen — no se recrean por separado). Se muestra la foto tal cual,
+// sin scrim/degradado superpuesto.
 import { useNavigate } from 'react-router-dom';
 import heroFondo from '../../assets/hero-fondo.png';
 import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
@@ -30,12 +28,6 @@ export function Hero() {
       className="relative overflow-hidden bg-cover bg-[position:right_center] bg-no-repeat"
       style={{ backgroundImage: `url(${heroFondo})` }}
     >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: 'linear-gradient(90deg, rgba(0,44,145,0.75) 0%, rgba(0,44,145,0.45) 45%, rgba(0,44,145,0) 70%)' }}
-        aria-hidden="true"
-      />
-
       <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:py-28">
         <div className="max-w-xl">
           <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white/90">
