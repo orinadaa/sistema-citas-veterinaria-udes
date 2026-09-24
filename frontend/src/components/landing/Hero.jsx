@@ -1,10 +1,14 @@
 // components/landing/Hero.jsx
-// Fondo = identidadmarca/fondoazullanding.png (degradado azul con la
-// veterinaria, la mascota y los iconos 3D ya compuestos dentro de la
-// imagen — no se recrean por separado). Se muestra la foto tal cual,
-// sin scrim/degradado superpuesto.
+// Fondo = degradado de marca (brand.blue.500 -> brand.blue.800, ver
+// index.css) en vez de una imagen de fondo fija: permite compartir el
+// mismo degradado con el navbar (topbar integrado, ver Navbar.jsx) sin
+// depender de donde caiga el recorte de una imagen de fondo en cada
+// ancho de pantalla. La veterinaria + mascota + iconos flotantes son
+// una sola imagen con transparencia (identidadmarca/fotomain.png), ya
+// compuesta -- se ubica como <img> normal en la columna derecha, no
+// como background-image, asi que no hay riesgo de recorte responsivo.
 import { useNavigate } from 'react-router-dom';
-import heroFondo from '../../assets/hero-fondo.png';
+import fotoMain from '../../assets/foto-main.png';
 import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
@@ -24,11 +28,8 @@ export function Hero() {
   }
 
   return (
-    <section
-      className="relative overflow-hidden bg-cover bg-[position:right_center] bg-no-repeat"
-      style={{ backgroundImage: `url(${heroFondo})` }}
-    >
-      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:py-28">
+    <section className="relative overflow-hidden bg-gradient-to-br from-brand-blue-500 to-brand-blue-800">
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="max-w-xl">
           <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white/90">
             <IconoPata className="h-4 w-4" />
@@ -36,7 +37,7 @@ export function Hero() {
           </p>
 
           <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
-            Cuidamos de quienes hacen parte de <span style={{ color: '#F9C422' }}>tu familia</span>
+            Cuidamos de quienes hacen parte de <span className="text-brand-amber">tu familia</span>
           </h1>
 
           <p className="mt-5 max-w-[46ch] text-lg leading-relaxed text-blue-50">
@@ -47,8 +48,7 @@ export function Hero() {
             <button
               type="button"
               onClick={irAAgendar}
-              className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-base font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
-              style={{ backgroundColor: '#FDCA18' }}
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-amber px-6 py-3 text-base font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
             >
               Agendar cita
               <IconoFlechaDerecha className="h-4 w-4" />
@@ -69,6 +69,10 @@ export function Hero() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="relative">
+          <img src={fotoMain} alt="" className="mx-auto w-full max-w-md drop-shadow-2xl lg:max-w-lg" />
         </div>
       </div>
     </section>
