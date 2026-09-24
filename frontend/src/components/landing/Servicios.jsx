@@ -89,7 +89,6 @@ export function Servicios() {
                       image={config.imagen}
                       title={config.etiquetaPublica ?? servicio.nombre}
                       description={servicio.descripcion}
-                      accentColor={config.color}
                       href={rutaAgendarCita(estaAutenticado, servicio.id)}
                     />
                   );
