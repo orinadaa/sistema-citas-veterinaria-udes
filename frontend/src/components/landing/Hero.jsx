@@ -3,10 +3,15 @@
 // index.css) en vez de una imagen de fondo fija: permite compartir el
 // mismo degradado con el navbar (topbar integrado, ver Navbar.jsx) sin
 // depender de donde caiga el recorte de una imagen de fondo en cada
-// ancho de pantalla. La veterinaria + mascota + iconos flotantes son
-// una sola imagen con transparencia (identidadmarca/fotomain.png), ya
-// compuesta -- se ubica como <img> normal en la columna derecha, no
-// como background-image, asi que no hay riesgo de recorte responsivo.
+// ancho de pantalla. Degradado vertical (to-b), no diagonal: con
+// diagonal el borde superior derecho ya sale mas oscuro que el navbar
+// (flat brand.blue) y se nota una linea de union; vertical hace que
+// TODO el borde superior, de punta a punta, arranque exactamente en
+// brand.blue.500 -- igual al navbar solido de arriba, sin costura.
+// La veterinaria + mascota + iconos flotantes son una sola imagen con
+// transparencia (identidadmarca/fotomain.png), ya compuesta -- se
+// ubica como <img> normal en la columna derecha, no como
+// background-image, asi que no hay riesgo de recorte responsivo.
 import { useNavigate } from 'react-router-dom';
 import fotoMain from '../../assets/foto-main.png';
 import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
@@ -28,7 +33,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-brand-blue-500 to-brand-blue-800">
+    <section className="relative overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800">
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="max-w-xl">
           <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white/90">
@@ -72,7 +77,7 @@ export function Hero() {
         </div>
 
         <div className="relative">
-          <img src={fotoMain} alt="" className="mx-auto w-full max-w-md drop-shadow-2xl lg:max-w-lg" />
+          <img src={fotoMain} alt="" className="mx-auto w-full max-w-[582px] drop-shadow-2xl lg:max-w-[666px]" />
         </div>
       </div>
     </section>

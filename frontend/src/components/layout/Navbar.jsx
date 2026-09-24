@@ -1,11 +1,11 @@
 // components/layout/Navbar.jsx
 // Topbar azul institucional (brand.blue): logo blanco, texto blanco y
-// el boton "Agendar cita" en ambar (brand.amber) -- unicos tres
-// colores en esta barra (azul de fondo, ambar del boton, blanco para
-// todo lo demas). En la landing (unica pagina con Hero), brand.blue
-// tambien es el primer stop del degradado del Hero (from-brand-blue-500),
-// asi que el navbar solido se continua sin costura visible hacia el
-// degradado de abajo.
+// el boton "Agendar cita" en ambar (brand.amber, texto slate-900 --
+// mismo color de texto que el boton equivalente del Hero). En la
+// landing (unica pagina con Hero), brand.blue tambien es el primer
+// stop del degradado del Hero (from-brand-blue-500), asi que el
+// navbar solido se continua sin costura visible hacia el degradado de
+// abajo.
 import { Link, useNavigate } from 'react-router-dom';
 import logoBlanco from '../../assets/logoblanco.png';
 import { useAuth } from '../../context/AuthContext';
@@ -66,7 +66,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={irAAgendar}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-amber px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-95 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-amber px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
           >
             <IconoCalendario className="h-4 w-4" />
             Agendar cita
