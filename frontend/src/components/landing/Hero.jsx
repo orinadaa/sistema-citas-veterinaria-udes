@@ -1,13 +1,12 @@
 // components/landing/Hero.jsx
-// Fondo = degradado de marca (brand.blue.500 -> brand.blue.800, ver
-// index.css) en vez de una imagen de fondo fija: permite compartir el
-// mismo degradado con el navbar (topbar integrado, ver Navbar.jsx) sin
-// depender de donde caiga el recorte de una imagen de fondo en cada
-// ancho de pantalla. Degradado vertical (to-b), no diagonal: con
-// diagonal el borde superior derecho ya sale mas oscuro que el navbar
-// (flat brand.blue) y se nota una linea de union; vertical hace que
-// TODO el borde superior, de punta a punta, arranque exactamente en
-// brand.blue.500 -- igual al navbar solido de arriba, sin costura.
+// Fondo = degradado de marca inline (ver index.css para los tokens
+// --color-brand-blue-*): arranca en blue-500 (igual al navbar solido
+// de arriba, sin costura -- ver Navbar.jsx), se oscurece a blue-800 a
+// mitad de camino, y en el ultimo tramo aclara a blue-400 y se
+// disuelve en blanco solido, para fundirse con la seccion de
+// Servicios de abajo. Ese ultimo tramo ademas lleva una capa de
+// burbujas (.hero-bubble-fade, definida en index.css) en vez de un
+// corte recto azul/blanco.
 // La veterinaria + mascota + iconos flotantes son una sola imagen con
 // transparencia (identidadmarca/fotomain.png), ya compuesta -- se
 // ubica como <img> normal en la columna derecha, no como
@@ -34,8 +33,14 @@ export function Hero() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800">
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
+    <section
+      className="hero-bubble-fade relative overflow-hidden"
+      style={{
+        background:
+          'linear-gradient(to bottom, var(--color-brand-blue-500) 0%, var(--color-brand-blue-800) 45%, var(--color-brand-blue-400) 78%, #ffffff 100%)',
+      }}
+    >
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="max-w-xl">
           <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-20 w-auto object-contain" />
 
