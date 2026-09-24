@@ -41,7 +41,7 @@ export function Sedes() {
         {estado === ESTADOS.CARGANDO && (
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
             {[0, 1].map((clave) => (
-              <div key={clave} className="h-64 animate-pulse rounded-2xl bg-slate-100" />
+              <div key={clave} className="h-[26rem] animate-pulse rounded-2xl bg-slate-100" />
             ))}
           </div>
         )}
@@ -62,9 +62,9 @@ export function Sedes() {
               return (
                 <div key={sede.id} className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
                   {sede.foto_url ? (
-                    <img src={sede.foto_url} alt={sede.nombre} className="h-44 w-full object-cover" />
+                    <img src={sede.foto_url} alt={sede.nombre} className="h-72 w-full object-cover sm:h-80" />
                   ) : (
-                    <div className="flex h-44 w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100">
+                    <div className="flex h-72 w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 sm:h-80">
                       <IconoSede className="h-12 w-12 text-brand-blue/40" />
                     </div>
                   )}
