@@ -7,7 +7,7 @@
 // navbar solido se continua sin costura visible hacia el degradado de
 // abajo.
 import { Link, useNavigate } from 'react-router-dom';
-import logoBlanco from '../../assets/logoblanco.png';
+import logoCorto from '../../assets/logocorto.png';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { IconoCalendario } from '../icons';
@@ -24,7 +24,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 bg-brand-blue">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-12 w-auto object-contain" />
+          <img src={logoCorto} alt="Clínica Veterinaria UDES" className="h-12 w-auto object-contain" />
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
