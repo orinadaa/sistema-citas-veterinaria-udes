@@ -9,7 +9,6 @@
 // disponible para el rol administrador — el veterinario no tiene
 // ninguna de esas 3 pantallas en su sidebar.
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes } from '../../api/client';
@@ -19,17 +18,18 @@ const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [] };
 
 export function AdminHeader({ onNavegar }) {
   const { usuario, token, cerrarSesion } = useAuth();
-  const navegar = useNavigate();
   const esAdmin = usuario?.rol === 'administrador';
 
   function salir() {
-    // Primero navegar y despues cerrar sesion, no al revés: /admin esta
+    // Redireccion "dura" (no navegar() de react-router): /admin esta
     // protegido por ProtectedRoute, que reacciona al cambio de
-    // estaAutenticado -- si la sesion se cierra primero, ProtectedRoute
-    // redirige solo a /iniciar-sesion?next=%2Fadmin antes de que el
-    // navegar('/') de aqui llegue a aplicarse (se pisan entre si).
-    navegar('/');
+    // estaAutenticado -- por mas que se reordenen las llamadas,
+    // ProtectedRoute puede llegar a evaluarse con la ruta /admin todavia
+    // activa y redirigir el solo a /iniciar-sesion?next=%2Fadmin,
+    // pisando cualquier navegacion interna de la SPA. Una recarga
+    // completa a "/" evita el problema de raiz.
     cerrarSesion();
+    window.location.href = '/';
   }
 
   const [menuAbierto, setMenuAbierto] = useState(false);

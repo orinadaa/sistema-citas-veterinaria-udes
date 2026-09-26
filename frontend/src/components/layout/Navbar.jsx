@@ -21,12 +21,14 @@ export function Navbar() {
   }
 
   function salir() {
-    // Primero navegar y despues cerrar sesion: en /panel (protegido por
-    // ProtectedRoute) el orden inverso deja que ProtectedRoute reaccione
-    // al cambio de estaAutenticado y redirija a /iniciar-sesion antes de
-    // que este navegar('/') llegue a aplicarse.
-    navegar('/');
+    // Redireccion "dura" (no navegar() de react-router): en /panel
+    // (protegido por ProtectedRoute) reordenar las llamadas no basta --
+    // ProtectedRoute puede llegar a evaluarse con /panel todavia activo
+    // y redirigir el solo a /iniciar-sesion, pisando cualquier
+    // navegacion interna de la SPA. Una recarga completa a "/" evita el
+    // problema de raiz.
     cerrarSesion();
+    window.location.href = '/';
   }
 
   return (
