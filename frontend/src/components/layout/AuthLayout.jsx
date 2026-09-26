@@ -12,7 +12,7 @@ export function AuthLayout({ titulo, subtitulo, children, pieDePagina }) {
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 px-4 py-12">
       <Link to="/" className="mb-8">
-        <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-12 w-auto" />
+        <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-[62px] w-auto" />
       </Link>
 
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
