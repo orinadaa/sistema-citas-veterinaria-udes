@@ -21,8 +21,12 @@ export function Navbar() {
   }
 
   function salir() {
-    cerrarSesion();
+    // Primero navegar y despues cerrar sesion: en /panel (protegido por
+    // ProtectedRoute) el orden inverso deja que ProtectedRoute reaccione
+    // al cambio de estaAutenticado y redirija a /iniciar-sesion antes de
+    // que este navegar('/') llegue a aplicarse.
     navegar('/');
+    cerrarSesion();
   }
 
   return (

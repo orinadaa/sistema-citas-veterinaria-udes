@@ -23,8 +23,13 @@ export function AdminHeader({ onNavegar }) {
   const esAdmin = usuario?.rol === 'administrador';
 
   function salir() {
-    cerrarSesion();
+    // Primero navegar y despues cerrar sesion, no al revés: /admin esta
+    // protegido por ProtectedRoute, que reacciona al cambio de
+    // estaAutenticado -- si la sesion se cierra primero, ProtectedRoute
+    // redirige solo a /iniciar-sesion?next=%2Fadmin antes de que el
+    // navegar('/') de aqui llegue a aplicarse (se pisan entre si).
     navegar('/');
+    cerrarSesion();
   }
 
   const [menuAbierto, setMenuAbierto] = useState(false);
