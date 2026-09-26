@@ -19,6 +19,7 @@ import { CategoryBadge } from '../ui/CategoryBadge';
 import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
+import { EstadoError } from '../ui/EstadoError';
 import { IconoMedicos } from '../icons';
 
 const FORM_VACIO = {
@@ -47,6 +48,7 @@ export function PanelMedicos({ busquedaInicial }) {
   const [servicios, setServicios] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
 
   const [busqueda, setBusqueda] = useState(busquedaInicial || '');
   const [filtroEspecialidad, setFiltroEspecialidad] = useState('');
@@ -65,14 +67,15 @@ export function PanelMedicos({ busquedaInicial }) {
 
   function cargar() {
     setCargando(true);
-    Promise.all([obtenerMedicosAdmin(token), obtenerServiciosAdmin(token), obtenerCategoriasServicio()]).then(
-      ([medicosDatos, serviciosDatos, categoriasDatos]) => {
+    setErrorCarga('');
+    Promise.all([obtenerMedicosAdmin(token), obtenerServiciosAdmin(token), obtenerCategoriasServicio()])
+      .then(([medicosDatos, serviciosDatos, categoriasDatos]) => {
         setMedicos(medicosDatos.medicos);
         setServicios(serviciosDatos.servicios.filter((s) => s.activo));
         setCategorias(categoriasDatos.categorias);
-        setCargando(false);
-      }
-    );
+      })
+      .catch((err) => setErrorCarga(err.message || 'No se pudieron cargar los médicos.'))
+      .finally(() => setCargando(false));
   }
 
   useEffect(cargar, [token]);
@@ -261,6 +264,8 @@ export function PanelMedicos({ busquedaInicial }) {
             <div key={clave} className="h-16 animate-pulse rounded-xl bg-slate-100" />
           ))}
         </div>
+      ) : errorCarga ? (
+        <EstadoError mensaje={errorCarga} onReintentar={cargar} />
       ) : (
         <DataTable
           filaVacia="No hay médicos que coincidan con los filtros."

@@ -17,6 +17,7 @@ import { PageHeader } from '../ui/PageHeader';
 import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
+import { EstadoError } from '../ui/EstadoError';
 import { IconoSede } from '../icons';
 
 const DIAS = [
@@ -52,6 +53,7 @@ export function PanelHorarios() {
   const [sedes, setSedes] = useState([]);
   const [horariosPorSede, setHorariosPorSede] = useState({});
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [sedeEditando, setSedeEditando] = useState(null);
@@ -63,14 +65,17 @@ export function PanelHorarios() {
 
   function cargar() {
     setCargando(true);
-    obtenerSedesAdmin(token).then(async (datos) => {
-      setSedes(datos.sedes);
-      const entradas = await Promise.all(
-        datos.sedes.map((sede) => obtenerHorarios(sede.id).then((h) => [sede.id, h.horario]))
-      );
-      setHorariosPorSede(Object.fromEntries(entradas));
-      setCargando(false);
-    });
+    setErrorCarga('');
+    obtenerSedesAdmin(token)
+      .then(async (datos) => {
+        setSedes(datos.sedes);
+        const entradas = await Promise.all(
+          datos.sedes.map((sede) => obtenerHorarios(sede.id).then((h) => [sede.id, h.horario]))
+        );
+        setHorariosPorSede(Object.fromEntries(entradas));
+      })
+      .catch((err) => setErrorCarga(err.message || 'No se pudieron cargar las sedes.'))
+      .finally(() => setCargando(false));
   }
 
   useEffect(cargar, [token]);
@@ -193,6 +198,8 @@ export function PanelHorarios() {
             <div key={clave} className="h-16 animate-pulse rounded-xl bg-slate-100" />
           ))}
         </div>
+      ) : errorCarga ? (
+        <EstadoError mensaje={errorCarga} onReintentar={cargar} />
       ) : (
         <DataTable
           filaVacia="No hay sedes registradas todavía."

@@ -19,6 +19,7 @@ import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { Tabs } from '../ui/Tabs';
+import { EstadoError } from '../ui/EstadoError';
 import { IconoPersona, IconoPata } from '../icons';
 
 const UMBRAL_FRECUENTE = 3;
@@ -34,6 +35,7 @@ export function PanelPacientes({ busquedaInicial }) {
   const [citasDelMes, setCitasDelMes] = useState(0);
   const [sedes, setSedes] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
 
   const [busqueda, setBusqueda] = useState(busquedaInicial || '');
   const [filtroSede, setFiltroSede] = useState('');
@@ -48,6 +50,8 @@ export function PanelPacientes({ busquedaInicial }) {
   const [pestanaDetalle, setPestanaDetalle] = useState('info');
   const [detalle, setDetalle] = useState(null);
   const [cargandoDetalle, setCargandoDetalle] = useState(false);
+  const [errorDetalle, setErrorDetalle] = useState('');
+  const [pacienteDetalleId, setPacienteDetalleId] = useState(null);
 
   const [nuevaMascota, setNuevaMascota] = useState({ nombre: '', especie: '', raza: '' });
   const [errorMascota, setErrorMascota] = useState('');
@@ -55,14 +59,15 @@ export function PanelPacientes({ busquedaInicial }) {
 
   function cargar() {
     setCargando(true);
-    Promise.all([obtenerPacientes({ sedeId: filtroSede || undefined }, token), obtenerSedesAdmin(token)]).then(
-      ([pacientesDatos, sedesDatos]) => {
+    setErrorCarga('');
+    Promise.all([obtenerPacientes({ sedeId: filtroSede || undefined }, token), obtenerSedesAdmin(token)])
+      .then(([pacientesDatos, sedesDatos]) => {
         setPacientes(pacientesDatos.pacientes);
         setCitasDelMes(pacientesDatos.citasDelMes);
         setSedes(sedesDatos.sedes);
-        setCargando(false);
-      }
-    );
+      })
+      .catch((err) => setErrorCarga(err.message || 'No se pudieron cargar los pacientes.'))
+      .finally(() => setCargando(false));
   }
 
   useEffect(cargar, [token, filtroSede]);
@@ -89,11 +94,19 @@ export function PanelPacientes({ busquedaInicial }) {
     setPanelAbierto(true);
     setPestanaDetalle('info');
     setCargandoDetalle(true);
+    setErrorDetalle('');
+    setDetalle(null);
+    setPacienteDetalleId(paciente.id);
     setNuevaMascota({ nombre: '', especie: '', raza: '' });
     setErrorMascota('');
-    const datos = await obtenerDetallePaciente(paciente.id, token);
-    setDetalle(datos);
-    setCargandoDetalle(false);
+    try {
+      const datos = await obtenerDetallePaciente(paciente.id, token);
+      setDetalle(datos);
+    } catch (err) {
+      setErrorDetalle(err.message || 'No se pudo cargar el detalle del paciente.');
+    } finally {
+      setCargandoDetalle(false);
+    }
   }
 
   async function alternarActivo(paciente) {
@@ -170,6 +183,8 @@ export function PanelPacientes({ busquedaInicial }) {
             <div key={clave} className="h-14 animate-pulse rounded-xl bg-slate-100" />
           ))}
         </div>
+      ) : errorCarga ? (
+        <EstadoError mensaje={errorCarga} onReintentar={cargar} />
       ) : (
         <DataTable
           filaVacia="No hay pacientes que coincidan con los filtros."
@@ -220,7 +235,9 @@ export function PanelPacientes({ busquedaInicial }) {
       )}
 
       <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title="Detalle del paciente">
-        {cargandoDetalle || !detalle ? (
+        {errorDetalle ? (
+          <EstadoError mensaje={errorDetalle} onReintentar={() => abrirDetalle({ id: pacienteDetalleId })} />
+        ) : cargandoDetalle || !detalle ? (
           <div className="flex flex-col gap-3">
             {[0, 1, 2].map((k) => (
               <div key={k} className="h-10 animate-pulse rounded-lg bg-slate-100" />

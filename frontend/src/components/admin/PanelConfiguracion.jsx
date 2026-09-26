@@ -19,6 +19,7 @@ import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { Tabs } from '../ui/Tabs';
+import { EstadoError } from '../ui/EstadoError';
 import { PanelHorarios } from './PanelHorarios';
 
 const TABS = [
@@ -36,6 +37,7 @@ export function PanelConfiguracion() {
   const [usuarios, setUsuarios] = useState([]);
   const [sedes, setSedes] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
 
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
@@ -48,11 +50,14 @@ export function PanelConfiguracion() {
 
   function cargar() {
     setCargando(true);
-    Promise.all([obtenerUsuarios(token), obtenerSedesAdmin(token)]).then(([usuariosDatos, sedesDatos]) => {
-      setUsuarios(usuariosDatos.usuarios.filter((u) => u.rol !== 'cliente'));
-      setSedes(sedesDatos.sedes);
-      setCargando(false);
-    });
+    setErrorCarga('');
+    Promise.all([obtenerUsuarios(token), obtenerSedesAdmin(token)])
+      .then(([usuariosDatos, sedesDatos]) => {
+        setUsuarios(usuariosDatos.usuarios.filter((u) => u.rol !== 'cliente'));
+        setSedes(sedesDatos.sedes);
+      })
+      .catch((err) => setErrorCarga(err.message || 'No se pudieron cargar los usuarios.'))
+      .finally(() => setCargando(false));
   }
 
   useEffect(cargar, [token]);
@@ -179,6 +184,8 @@ export function PanelConfiguracion() {
                 <div key={k} className="h-14 animate-pulse rounded-xl bg-slate-100" />
               ))}
             </div>
+          ) : errorCarga ? (
+            <EstadoError mensaje={errorCarga} onReintentar={cargar} />
           ) : (
             <DataTable
               filaVacia="No hay usuarios que coincidan con los filtros."

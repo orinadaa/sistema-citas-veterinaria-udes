@@ -23,6 +23,7 @@ import { SelectorFranjas } from '../citas/SelectorFranjas';
 import { SelectorMedico } from '../citas/SelectorMedico';
 import { MascotaSelector } from '../citas/MascotaSelector';
 import { IconoFlechaDerecha, IconoPata } from '../icons';
+import { EstadoError } from '../ui/EstadoError';
 
 const HORA_INICIO_GRID = 7;
 const HORA_FIN_GRID = 19;
@@ -65,6 +66,7 @@ export function PanelCitasSeguimiento() {
 
   const [citas, setCitas] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
   const [servicios, setServicios] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [busquedaCliente, setBusquedaCliente] = useState('');
@@ -80,18 +82,29 @@ export function PanelCitasSeguimiento() {
 
   function cargarCitas() {
     setCargando(true);
-    obtenerCitasAdministracion(token).then((datos) => {
-      setCitas(datos.citas);
-      setCargando(false);
-    });
+    setErrorCarga('');
+    obtenerCitasAdministracion(token)
+      .then((datos) => {
+        setCitas(datos.citas);
+      })
+      .catch((err) => {
+        setErrorCarga(err.message || 'No se pudieron cargar las citas.');
+      })
+      .finally(() => {
+        setCargando(false);
+      });
   }
 
   useEffect(cargarCitas, [token]);
 
   useEffect(() => {
     if (!esAdmin) return;
-    obtenerServicios().then((datos) => setServicios(datos.servicios));
-    obtenerClientes(token).then((datos) => setClientes(datos.usuarios));
+    obtenerServicios()
+      .then((datos) => setServicios(datos.servicios))
+      .catch((err) => console.error('No se pudieron cargar los servicios:', err));
+    obtenerClientes(token)
+      .then((datos) => setClientes(datos.usuarios))
+      .catch((err) => console.error('No se pudieron cargar los clientes:', err));
   }, [token, esAdmin]);
 
   const diasSemana = useMemo(() => Array.from({ length: 6 }, (_, i) => sumarDias(semanaInicio, i)), [semanaInicio]);
@@ -227,6 +240,8 @@ export function PanelCitasSeguimiento() {
                 <div key={k} className="h-10 animate-pulse rounded-lg bg-slate-100" />
               ))}
             </div>
+          ) : errorCarga ? (
+            <EstadoError mensaje={errorCarga} onReintentar={cargarCitas} />
           ) : (
             <div className="min-w-[760px]" style={{ display: 'grid', gridTemplateColumns: '64px repeat(6, minmax(110px, 1fr))' }}>
               <div />

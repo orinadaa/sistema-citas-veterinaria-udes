@@ -15,6 +15,7 @@ import { CategoryBadge } from '../ui/CategoryBadge';
 import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
+import { EstadoError } from '../ui/EstadoError';
 import { IconoJeringa } from '../icons';
 
 const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
@@ -26,6 +27,7 @@ export function PanelServicios({ busquedaInicial }) {
   const [servicios, setServicios] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
 
   const [busqueda, setBusqueda] = useState(busquedaInicial || '');
   const [filtroCategoria, setFiltroCategoria] = useState('');
@@ -46,11 +48,14 @@ export function PanelServicios({ busquedaInicial }) {
 
   function cargar() {
     setCargando(true);
-    Promise.all([obtenerServiciosAdmin(token), obtenerCategoriasServicio()]).then(([serviciosDatos, categoriasDatos]) => {
-      setServicios(serviciosDatos.servicios);
-      setCategorias(categoriasDatos.categorias);
-      setCargando(false);
-    });
+    setErrorCarga('');
+    Promise.all([obtenerServiciosAdmin(token), obtenerCategoriasServicio()])
+      .then(([serviciosDatos, categoriasDatos]) => {
+        setServicios(serviciosDatos.servicios);
+        setCategorias(categoriasDatos.categorias);
+      })
+      .catch((err) => setErrorCarga(err.message || 'No se pudieron cargar los servicios.'))
+      .finally(() => setCargando(false));
   }
 
   useEffect(cargar, [token]);
@@ -199,6 +204,8 @@ export function PanelServicios({ busquedaInicial }) {
             <div key={clave} className="h-14 animate-pulse rounded-xl bg-slate-100" />
           ))}
         </div>
+      ) : errorCarga ? (
+        <EstadoError mensaje={errorCarga} onReintentar={cargar} />
       ) : (
         <DataTable
           filaVacia="No hay servicios que coincidan con los filtros."

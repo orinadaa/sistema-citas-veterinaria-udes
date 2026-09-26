@@ -26,6 +26,7 @@ import { COLORES_CATEGORIA } from '../ui/CategoryBadge';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { DataTable } from '../ui/DataTable';
+import { EstadoError } from '../ui/EstadoError';
 import { IconoCalendario, IconoJeringa, IconoMedicos, IconoPersona } from '../icons';
 
 // Orden categorico fijo (mismo set que las categorias de servicio, ver
@@ -77,19 +78,25 @@ export function PanelReportes() {
   const [hasta, setHasta] = useState('');
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
   const [exportando, setExportando] = useState('');
 
   function cargar() {
     setCargando(true);
-    obtenerReportes({ sedeId: sedeId || undefined, desde: desde || undefined, hasta: hasta || undefined }, token).then((resultado) => {
-      setDatos(resultado);
-      setCargando(false);
-    });
+    setErrorCarga('');
+    obtenerReportes({ sedeId: sedeId || undefined, desde: desde || undefined, hasta: hasta || undefined }, token)
+      .then((resultado) => {
+        setDatos(resultado);
+      })
+      .catch((err) => setErrorCarga(err.message || 'No se pudo generar el reporte.'))
+      .finally(() => setCargando(false));
   }
 
   useEffect(cargar, [token]);
   useEffect(() => {
-    obtenerSedesAdmin(token).then((resultado) => setSedes(resultado.sedes));
+    obtenerSedesAdmin(token)
+      .then((resultado) => setSedes(resultado.sedes))
+      .catch((err) => console.error('No se pudieron cargar las sedes:', err));
   }, [token]);
 
   const nombresSede = useMemo(() => {
@@ -200,12 +207,14 @@ export function PanelReportes() {
         </div>
       </div>
 
-      {cargando || !datos ? (
+      {cargando ? (
         <div className="flex flex-col gap-2">
           {[0, 1, 2].map((k) => (
             <div key={k} className="h-24 animate-pulse rounded-xl bg-slate-100" />
           ))}
         </div>
+      ) : errorCarga || !datos ? (
+        <EstadoError mensaje={errorCarga || 'No se pudo generar el reporte.'} onReintentar={cargar} />
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
