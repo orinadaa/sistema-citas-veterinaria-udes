@@ -31,6 +31,14 @@ export function iniciarSesion(datos) {
   return solicitar('/auth/login', { metodo: 'POST', cuerpo: datos });
 }
 
+export function solicitarCodigoRecuperacion(datos) {
+  return solicitar('/auth/olvide-clave', { metodo: 'POST', cuerpo: datos });
+}
+
+export function restablecerContrasena(datos) {
+  return solicitar('/auth/restablecer-clave', { metodo: 'POST', cuerpo: datos });
+}
+
 export function obtenerSedes() {
   return solicitar('/sedes');
 }

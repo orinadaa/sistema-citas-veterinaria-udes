@@ -16,6 +16,7 @@ export function LoginPage() {
   // veterinario (antes mandaba a todos ahi y ProtectedRoute los
   // rebotaba a "/" por no tener el rol correcto).
   const siguienteExplicito = parametros.get('next');
+  const vieneDeRestablecer = parametros.get('restablecida') === '1';
   const navegar = useNavigate();
   const { iniciarSesion } = useAuth();
 
@@ -60,6 +61,12 @@ export function LoginPage() {
       }
     >
       <form onSubmit={enviarFormulario} className="flex flex-col gap-4" noValidate>
+        {vieneDeRestablecer && (
+          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 ring-1 ring-green-200">
+            Tu contraseña fue actualizada. Inicia sesión con la nueva clave.
+          </p>
+        )}
+
         <Campo
           id="correo"
           label="Correo electrónico"
@@ -78,6 +85,13 @@ export function LoginPage() {
           onChange={actualizarCampo}
           required
         />
+
+        <Link
+          to="/olvide-clave"
+          className="-mt-2 self-end text-sm font-medium text-blue-600 hover:text-blue-700"
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
 
         {error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">

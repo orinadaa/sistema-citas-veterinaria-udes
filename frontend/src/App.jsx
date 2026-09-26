@@ -4,6 +4,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegistroPage } from './pages/RegistroPage';
+import { OlvideClavePage } from './pages/OlvideClavePage';
 import { PanelClientePage } from './pages/PanelClientePage';
 import { PanelAdminPage } from './pages/PanelAdminPage';
 
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/iniciar-sesion" element={<LoginPage />} />
           <Route path="/registrarse" element={<RegistroPage />} />
+          <Route path="/olvide-clave" element={<OlvideClavePage />} />
           <Route
             path="/panel"
             element={

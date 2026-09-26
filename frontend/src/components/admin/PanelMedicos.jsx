@@ -25,7 +25,6 @@ import { IconoMedicos } from '../icons';
 const FORM_VACIO = {
   nombreCompleto: '',
   correo: '',
-  contrasena: '',
   documento: '',
   telefono: '',
   fotoUrl: '',
@@ -64,6 +63,7 @@ export function PanelMedicos({ busquedaInicial }) {
   const [form, setForm] = useState(FORM_VACIO);
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const [aviso, setAviso] = useState(null);
 
   function cargar() {
     setCargando(true);
@@ -104,6 +104,7 @@ export function PanelMedicos({ busquedaInicial }) {
     setMedicoEditando(null);
     setForm(FORM_VACIO);
     setError('');
+    setAviso(null);
     setPanelAbierto(true);
   }
 
@@ -112,7 +113,6 @@ export function PanelMedicos({ busquedaInicial }) {
     setForm({
       nombreCompleto: medico.nombre_completo,
       correo: medico.correo,
-      contrasena: '',
       documento: medico.documento || '',
       telefono: medico.telefono || '',
       fotoUrl: medico.foto_url || '',
@@ -120,6 +120,7 @@ export function PanelMedicos({ busquedaInicial }) {
       activo: medico.activo,
     });
     setError('');
+    setAviso(null);
     setPanelAbierto(true);
   }
 
@@ -147,20 +148,24 @@ export function PanelMedicos({ busquedaInicial }) {
           token
         );
       } else {
-        if (!form.correo || !form.contrasena) {
-          setError('El correo y la contraseña son obligatorios para crear un médico.');
+        if (!form.correo) {
+          setError('El correo es obligatorio para crear un médico.');
           setGuardando(false);
           return;
         }
-        await crearMedico(
+        const respuesta = await crearMedico(
           {
             nombreCompleto: form.nombreCompleto,
             correo: form.correo,
-            contrasena: form.contrasena,
             documento: form.documento || null,
             telefono: form.telefono || null,
           },
           token
+        );
+        setAviso(
+          respuesta.correoEnviado
+            ? { tipo: 'exito', texto: `Médico creado. Se envió un correo con sus credenciales a ${form.correo}.` }
+            : { tipo: 'advertencia', texto: 'Médico creado, pero no se pudo enviar el correo con sus credenciales — verifica la configuración de correo.' }
         );
       }
       setPanelAbierto(false);
@@ -219,6 +224,18 @@ export function PanelMedicos({ busquedaInicial }) {
         actionLabel="Nuevo médico"
         onAction={abrirCrear}
       />
+
+      {aviso && (
+        <p
+          className={`rounded-lg px-3 py-2 text-sm ring-1 ${
+            aviso.tipo === 'exito'
+              ? 'bg-green-50 text-green-700 ring-green-200'
+              : 'bg-amber-50 text-amber-700 ring-amber-200'
+          }`}
+        >
+          {aviso.texto}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KPICard icon={IconoMedicos} color="blue" value={kpis.total} label="Registrados" />
@@ -373,13 +390,9 @@ export function PanelMedicos({ busquedaInicial }) {
             onChange={(e) => setForm({ ...form, correo: e.target.value })}
           />
           {!medicoEditando && (
-            <Campo
-              id="contrasena-medico"
-              label="Contraseña temporal"
-              type="password"
-              value={form.contrasena}
-              onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
-            />
+            <p className="text-xs text-slate-500">
+              La contraseña se genera automáticamente y se envía por correo al médico.
+            </p>
           )}
           <Campo
             id="telefono-medico"

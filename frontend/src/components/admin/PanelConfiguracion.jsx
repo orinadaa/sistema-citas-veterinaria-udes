@@ -28,7 +28,7 @@ const TABS = [
 ];
 
 const ETIQUETA_ROL = { administrador: 'Administrador', veterinario: 'Médico Veterinario' };
-const FORM_VACIO = { nombreCompleto: '', correo: '', contrasena: '', rol: 'veterinario', sedeId: '', telefono: '', activo: true };
+const FORM_VACIO = { nombreCompleto: '', correo: '', rol: 'veterinario', sedeId: '', telefono: '', activo: true };
 
 export function PanelConfiguracion() {
   const { token, usuario } = useAuth();
@@ -47,6 +47,7 @@ export function PanelConfiguracion() {
   const [form, setForm] = useState(FORM_VACIO);
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const [aviso, setAviso] = useState(null);
 
   function cargar() {
     setCargando(true);
@@ -74,6 +75,7 @@ export function PanelConfiguracion() {
     setUsuarioEditando(null);
     setForm(FORM_VACIO);
     setError('');
+    setAviso(null);
     setPanelAbierto(true);
   }
 
@@ -82,13 +84,13 @@ export function PanelConfiguracion() {
     setForm({
       nombreCompleto: u.nombre_completo,
       correo: u.correo,
-      contrasena: '',
       rol: u.rol,
       sedeId: u.sede_id || '',
       telefono: u.telefono || '',
       activo: u.activo,
     });
     setError('');
+    setAviso(null);
     setPanelAbierto(true);
   }
 
@@ -107,21 +109,25 @@ export function PanelConfiguracion() {
         await cambiarRolUsuario(usuarioEditando.id, { rol: form.rol, sedeId: form.sedeId }, token);
         await actualizarUsuario(usuarioEditando.id, { nombreCompleto: form.nombreCompleto, telefono: form.telefono, activo: form.activo }, token);
       } else {
-        if (!form.correo || !form.contrasena) {
-          setError('El correo y la contraseña son obligatorios para crear un usuario.');
+        if (!form.correo) {
+          setError('El correo es obligatorio para crear un usuario.');
           setGuardando(false);
           return;
         }
-        await crearUsuarioStaff(
+        const respuesta = await crearUsuarioStaff(
           {
             nombreCompleto: form.nombreCompleto,
             correo: form.correo,
-            contrasena: form.contrasena,
             rol: form.rol,
             sedeId: form.sedeId,
             telefono: form.telefono || null,
           },
           token
+        );
+        setAviso(
+          respuesta.correoEnviado
+            ? { tipo: 'exito', texto: `Usuario creado. Se envió un correo con sus credenciales a ${form.correo}.` }
+            : { tipo: 'advertencia', texto: 'Usuario creado, pero no se pudo enviar el correo con sus credenciales — verifica la configuración de correo.' }
         );
       }
       setPanelAbierto(false);
@@ -142,6 +148,18 @@ export function PanelConfiguracion() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Configuración" subtitle="Gestiona las cuentas de personal y las sedes de la clínica." />
+
+      {aviso && (
+        <p
+          className={`rounded-lg px-3 py-2 text-sm ring-1 ${
+            aviso.tipo === 'exito'
+              ? 'bg-green-50 text-green-700 ring-green-200'
+              : 'bg-amber-50 text-amber-700 ring-amber-200'
+          }`}
+        >
+          {aviso.texto}
+        </p>
+      )}
 
       <Tabs items={TABS} activeItem={pestana} onChange={setPestana} />
 
@@ -246,13 +264,9 @@ export function PanelConfiguracion() {
             onChange={(e) => setForm({ ...form, correo: e.target.value })}
           />
           {!usuarioEditando && (
-            <Campo
-              id="contrasena-usuario-config"
-              label="Contraseña temporal"
-              type="password"
-              value={form.contrasena}
-              onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
-            />
+            <p className="text-xs text-slate-500">
+              La contraseña se genera automáticamente y se envía por correo al usuario.
+            </p>
           )}
 
           <div className="flex flex-col gap-1.5">
