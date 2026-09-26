@@ -31,3 +31,12 @@
   --font-heading: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Apaga el icono nativo de "mostrar contraseña" de Edge/IE (::-ms-reveal)
+   para que no se superponga con el boton propio de Campo.jsx -- sin
+   esto, en Edge el icono del navegador queda encima del nuestro y el
+   clic no llega al boton real. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
