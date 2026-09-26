@@ -5,6 +5,13 @@
 const mascotaModel = require('../models/mascota.model');
 const usuarioModel = require('../models/usuario.model');
 
+const SEXOS_VALIDOS = ['macho', 'hembra'];
+
+function pesoValido(peso) {
+  const numero = Number(peso);
+  return Number.isFinite(numero) && numero > 0;
+}
+
 // GET /api/mascotas/mias — solo cliente
 async function misMascotas(req, res, next) {
   try {
@@ -35,10 +42,27 @@ async function listarDeCliente(req, res, next) {
 async function crear(req, res, next) {
   try {
     const esAdmin = req.usuario.rol === 'administrador';
-    const { nombre, especie, raza, fotoUrl, clienteId: clienteIdBody } = req.body;
+    const {
+      nombre,
+      especie,
+      raza,
+      fotoUrl,
+      fechaNacimiento,
+      sexo,
+      color,
+      pesoKg,
+      caracteristicas,
+      clienteId: clienteIdBody,
+    } = req.body;
 
     if (!nombre) {
       return res.status(400).json({ mensaje: 'El nombre de la mascota es obligatorio.' });
+    }
+    if (sexo && !SEXOS_VALIDOS.includes(sexo)) {
+      return res.status(400).json({ mensaje: `El sexo debe ser uno de: ${SEXOS_VALIDOS.join(', ')}.` });
+    }
+    if (pesoKg !== undefined && pesoKg !== null && pesoKg !== '' && !pesoValido(pesoKg)) {
+      return res.status(400).json({ mensaje: 'El peso debe ser un número mayor a 0.' });
     }
 
     let clienteId = req.usuario.id;
@@ -53,7 +77,18 @@ async function crear(req, res, next) {
       clienteId = clienteIdBody;
     }
 
-    const mascota = await mascotaModel.crear({ clienteId, nombre, especie, raza, fotoUrl });
+    const mascota = await mascotaModel.crear({
+      clienteId,
+      nombre,
+      especie,
+      raza,
+      fotoUrl,
+      fechaNacimiento,
+      sexo,
+      color,
+      pesoKg: pesoKg || null,
+      caracteristicas,
+    });
     return res.status(201).json({ mascota });
   } catch (error) {
     next(error);
@@ -65,8 +100,15 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const { id } = req.params;
-    const { nombre, especie, raza, fotoUrl } = req.body;
+    const { nombre, especie, raza, fotoUrl, fechaNacimiento, sexo, color, pesoKg, caracteristicas } = req.body;
     const esAdmin = req.usuario.rol === 'administrador';
+
+    if (sexo && !SEXOS_VALIDOS.includes(sexo)) {
+      return res.status(400).json({ mensaje: `El sexo debe ser uno de: ${SEXOS_VALIDOS.join(', ')}.` });
+    }
+    if (pesoKg !== undefined && pesoKg !== null && pesoKg !== '' && !pesoValido(pesoKg)) {
+      return res.status(400).json({ mensaje: 'El peso debe ser un número mayor a 0.' });
+    }
 
     const mascota = await mascotaModel.buscarPorId(id);
     if (!mascota) {
@@ -76,7 +118,17 @@ async function actualizar(req, res, next) {
       return res.status(403).json({ mensaje: 'No puedes editar una mascota que no es tuya.' });
     }
 
-    const actualizada = await mascotaModel.actualizar(id, { nombre, especie, raza, fotoUrl });
+    const actualizada = await mascotaModel.actualizar(id, {
+      nombre,
+      especie,
+      raza,
+      fotoUrl,
+      fechaNacimiento,
+      sexo,
+      color,
+      pesoKg: pesoKg || null,
+      caracteristicas,
+    });
     return res.status(200).json({ mascota: actualizada });
   } catch (error) {
     next(error);

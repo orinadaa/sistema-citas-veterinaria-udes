@@ -102,6 +102,47 @@ describe('POST /api/mascotas', () => {
     expect(mascotaModel.crear).toHaveBeenCalledWith(expect.objectContaining({ clienteId: ID_CLIENTE, nombre: 'Luna' }));
   });
 
+  test('el cliente crea su mascota con el perfil completo (fecha, sexo, color, peso, caracteristicas)', async () => {
+    mascotaModel.crear.mockResolvedValue({ id: 'm1', cliente_id: ID_CLIENTE, nombre: 'Luna' });
+
+    const respuesta = await request(app)
+      .post('/api/mascotas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({
+        nombre: 'Luna',
+        especie: 'Canino',
+        raza: 'Labrador',
+        fechaNacimiento: '2022-05-01',
+        sexo: 'hembra',
+        color: 'Dorado',
+        pesoKg: 24.5,
+        caracteristicas: 'Muy juguetona',
+      });
+
+    expect(respuesta.status).toBe(201);
+    expect(mascotaModel.crear).toHaveBeenCalledWith(
+      expect.objectContaining({ sexo: 'hembra', color: 'Dorado', pesoKg: 24.5, caracteristicas: 'Muy juguetona' })
+    );
+  });
+
+  test('rechaza un sexo invalido', async () => {
+    const respuesta = await request(app)
+      .post('/api/mascotas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nombre: 'Luna', sexo: 'otro' });
+
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('rechaza un peso invalido', async () => {
+    const respuesta = await request(app)
+      .post('/api/mascotas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nombre: 'Luna', pesoKg: -5 });
+
+    expect(respuesta.status).toBe(400);
+  });
+
   test('el administrador rechaza sin clienteId', async () => {
     const respuesta = await request(app)
       .post('/api/mascotas')
