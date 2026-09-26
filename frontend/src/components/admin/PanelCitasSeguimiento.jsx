@@ -204,8 +204,11 @@ export function PanelCitasSeguimiento() {
   const fin = sumarDias(semanaInicio, 5);
   const hoy = hoyAMedianoche();
 
+  const algunPanelAbierto = Boolean(citaDetalle) || panelNuevaAbierto;
+
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={algunPanelAbierto} aria-hidden={algunPanelAbierto}>
       <PageHeader
         title={esAdmin ? 'Calendario de citas' : 'Mi Calendario'}
         subtitle={esAdmin ? 'Consulta y agenda las citas de tu sede.' : 'Gestiona tus citas y organiza tu día.'}
@@ -330,7 +333,9 @@ export function PanelCitasSeguimiento() {
         </div>
       </div>
 
-      <SidePanel isOpen={Boolean(citaDetalle)} onClose={() => setCitaDetalle(null)} title="Detalle de la cita">
+    </div>
+
+    <SidePanel isOpen={Boolean(citaDetalle)} onClose={() => setCitaDetalle(null)} title="Detalle de la cita">
         {citaDetalle && (
           <div className="flex flex-col gap-4">
             <CategoryBadge nombre={citaDetalle.categoria_nombre} color={citaDetalle.categoria_color} />
@@ -383,8 +388,22 @@ export function PanelCitasSeguimiento() {
       </SidePanel>
 
       {esAdmin && (
-        <SidePanel isOpen={panelNuevaAbierto} onClose={() => setPanelNuevaAbierto(false)} title="Nueva cita">
-          <form onSubmit={guardarNueva} className="flex flex-col gap-4">
+        <SidePanel
+          isOpen={panelNuevaAbierto}
+          onClose={() => setPanelNuevaAbierto(false)}
+          title="Nueva cita"
+          footer={
+            <button
+              type="submit"
+              form="form-nueva-cita-admin"
+              disabled={guardandoNueva}
+              className="w-full rounded-xl bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:opacity-60"
+            >
+              {guardandoNueva ? 'Agendando...' : 'Agendar cita'}
+            </button>
+          }
+        >
+          <form id="form-nueva-cita-admin" onSubmit={guardarNueva} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="cliente-cita" className="text-sm font-medium text-slate-700">
                 Cliente<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
@@ -459,17 +478,9 @@ export function PanelCitasSeguimiento() {
             />
 
             {errorNueva && <p className="text-sm text-red-600">{errorNueva}</p>}
-
-            <button
-              type="submit"
-              disabled={guardandoNueva}
-              className="rounded-xl bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:opacity-60"
-            >
-              {guardandoNueva ? 'Agendando...' : 'Agendar cita'}
-            </button>
           </form>
         </SidePanel>
       )}
-    </div>
+    </>
   );
 }

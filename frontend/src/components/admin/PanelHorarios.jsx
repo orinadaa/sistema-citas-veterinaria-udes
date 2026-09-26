@@ -189,7 +189,8 @@ export function PanelHorarios() {
   );
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <PageHeader title="Sedes y horarios" subtitle="Gestiona las sedes de la clínica y su horario de atención." actionLabel="Nueva sede" onAction={abrirCrear} />
 
       {cargando ? (
@@ -267,8 +268,24 @@ export function PanelHorarios() {
         />
       )}
 
-      <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title={sedeEditando ? 'Editar sede' : 'Nueva sede'}>
-        <form onSubmit={guardarSede} className="flex flex-col gap-4">
+    </div>
+
+    <SidePanel
+      isOpen={panelAbierto}
+      onClose={() => setPanelAbierto(false)}
+      title={sedeEditando ? 'Editar sede' : 'Nueva sede'}
+      footer={
+        <button
+          type="submit"
+          form="form-sede"
+          disabled={guardando}
+          className="w-full rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+        >
+          {guardando ? 'Guardando...' : sedeEditando ? 'Guardar cambios' : 'Crear sede'}
+        </button>
+      }
+    >
+        <form id="form-sede" onSubmit={guardarSede} className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             {form.fotoUrl ? (
               <img src={form.fotoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
@@ -289,14 +306,6 @@ export function PanelHorarios() {
           <StatusToggle checked={form.activo} onChange={alternarActivaDesdeElPanel} label="Sede activa" helpText="Si se desactiva, no aparecerá disponible para agendar citas." />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={guardando}
-            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
-          >
-            {guardando ? 'Guardando...' : sedeEditando ? 'Guardar cambios' : 'Crear sede'}
-          </button>
 
           {sedeEditando ? (
             <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 pt-4">
@@ -357,7 +366,7 @@ export function PanelHorarios() {
             <p className="text-xs text-slate-400">Guarda la sede primero para configurar su horario de atención.</p>
           )}
         </form>
-      </SidePanel>
-    </div>
+    </SidePanel>
+    </>
   );
 }

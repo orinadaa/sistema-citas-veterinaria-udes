@@ -42,7 +42,8 @@ export function PanelMisCitas({
   }, [citas, filtro]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={Boolean(citaDetalle)} aria-hidden={Boolean(citaDetalle)}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-heading text-lg font-semibold text-brand-navy">Mis citas</h2>
@@ -137,14 +138,16 @@ export function PanelMisCitas({
         </div>
       )}
 
-      <DetalleCitaPanel
-        cita={citaDetalle}
-        onClose={() => setCitaDetalle(null)}
-        onActualizada={() => {
-          onActualizada();
-          setCitaDetalle(null);
-        }}
-      />
     </div>
+
+    <DetalleCitaPanel
+      cita={citaDetalle}
+      onClose={() => setCitaDetalle(null)}
+      onActualizada={() => {
+        onActualizada();
+        setCitaDetalle(null);
+      }}
+    />
+    </>
   );
 }

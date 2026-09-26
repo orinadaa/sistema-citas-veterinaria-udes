@@ -136,7 +136,8 @@ export function PanelPacientes({ busquedaInicial }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <PageHeader title="Pacientes" subtitle="Dueños y mascotas registrados en el sistema." />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -233,8 +234,9 @@ export function PanelPacientes({ busquedaInicial }) {
           )}
         />
       )}
+    </div>
 
-      <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title="Detalle del paciente">
+    <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title="Detalle del paciente">
         {errorDetalle ? (
           <EstadoError mensaje={errorDetalle} onReintentar={() => abrirDetalle({ id: pacienteDetalleId })} />
         ) : cargandoDetalle || !detalle ? (
@@ -378,6 +380,6 @@ export function PanelPacientes({ busquedaInicial }) {
           </div>
         )}
       </SidePanel>
-    </div>
+    </>
   );
 }

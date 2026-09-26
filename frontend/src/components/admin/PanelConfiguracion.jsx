@@ -146,7 +146,8 @@ export function PanelConfiguracion() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <PageHeader title="Configuración" subtitle="Gestiona las cuentas de personal y las sedes de la clínica." />
 
       {aviso && (
@@ -252,8 +253,24 @@ export function PanelConfiguracion() {
         </div>
       )}
 
-      <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title={usuarioEditando ? 'Editar usuario' : 'Nuevo usuario'}>
-        <form onSubmit={guardar} className="flex flex-col gap-4">
+    </div>
+
+    <SidePanel
+      isOpen={panelAbierto}
+      onClose={() => setPanelAbierto(false)}
+      title={usuarioEditando ? 'Editar usuario' : 'Nuevo usuario'}
+      footer={
+        <button
+          type="submit"
+          form="form-usuario-config"
+          disabled={guardando}
+          className="w-full rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+        >
+          {guardando ? 'Guardando...' : 'Guardar cambios'}
+        </button>
+      }
+    >
+        <form id="form-usuario-config" onSubmit={guardar} className="flex flex-col gap-4">
           <Campo id="nombre-usuario-config" label="Nombre completo" value={form.nombreCompleto} onChange={(e) => setForm({ ...form, nombreCompleto: e.target.value })} required />
           <Campo
             id="correo-usuario-config"
@@ -317,16 +334,8 @@ export function PanelConfiguracion() {
           )}
 
           {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={guardando}
-            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
-          >
-            {guardando ? 'Guardando...' : 'Guardar cambios'}
-          </button>
         </form>
-      </SidePanel>
-    </div>
+    </SidePanel>
+    </>
   );
 }
