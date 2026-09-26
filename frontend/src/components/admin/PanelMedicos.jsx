@@ -217,7 +217,8 @@ export function PanelMedicos({ busquedaInicial }) {
   const medicoActual = medicoEditando ? medicos.find((m) => m.id === medicoEditando.id) ?? medicoEditando : null;
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <PageHeader
         title="Médicos Veterinarios"
         subtitle="Gestiona el personal médico de tu sede."
@@ -348,8 +349,38 @@ export function PanelMedicos({ busquedaInicial }) {
         />
       )}
 
-      <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title={medicoEditando ? 'Editar médico' : 'Nuevo médico'}>
-        <form onSubmit={guardar} className="flex flex-col gap-4">
+    </div>
+
+    <SidePanel
+      isOpen={panelAbierto}
+      onClose={() => setPanelAbierto(false)}
+      title={medicoEditando ? 'Editar médico' : 'Nuevo médico'}
+      footer={
+        <div className="flex items-center justify-between gap-3">
+          {medicoEditando ? (
+            <button
+              type="button"
+              disabled={guardando}
+              onClick={desactivarDesdeElPanel}
+              className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
+            >
+              Desactivar médico
+            </button>
+          ) : (
+            <span />
+          )}
+          <button
+            type="submit"
+            form="form-medico"
+            disabled={guardando}
+            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+          >
+            {guardando ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        </div>
+      }
+    >
+        <form id="form-medico" onSubmit={guardar} className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             {form.fotoUrl ? (
               <img src={form.fotoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
@@ -473,30 +504,8 @@ export function PanelMedicos({ busquedaInicial }) {
           />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <div className="mt-2 flex items-center justify-between gap-3">
-            {medicoEditando ? (
-              <button
-                type="button"
-                disabled={guardando}
-                onClick={desactivarDesdeElPanel}
-                className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
-              >
-                Desactivar médico
-              </button>
-            ) : (
-              <span />
-            )}
-            <button
-              type="submit"
-              disabled={guardando}
-              className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
-            >
-              {guardando ? 'Guardando...' : 'Guardar cambios'}
-            </button>
-          </div>
         </form>
-      </SidePanel>
-    </div>
+    </SidePanel>
+    </>
   );
 }

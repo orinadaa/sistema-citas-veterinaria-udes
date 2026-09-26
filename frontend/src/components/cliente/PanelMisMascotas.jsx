@@ -110,7 +110,8 @@ export function PanelMisMascotas() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-heading text-lg font-semibold text-brand-navy">Mis mascotas</h2>
@@ -168,12 +169,33 @@ export function PanelMisMascotas() {
         </div>
       )}
 
-      <SidePanel
-        isOpen={panelAbierto}
-        onClose={() => setPanelAbierto(false)}
-        title={mascotaEditando ? 'Editar mascota' : 'Agregar mascota'}
-      >
-        <form onSubmit={guardar} className="flex flex-col gap-4">
+    </div>
+
+    <SidePanel
+      isOpen={panelAbierto}
+      onClose={() => setPanelAbierto(false)}
+      title={mascotaEditando ? 'Editar mascota' : 'Agregar mascota'}
+      footer={
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setPanelAbierto(false)}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            form="form-mis-mascotas"
+            disabled={guardando}
+            className="flex-1 rounded-xl bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {guardando ? 'Guardando...' : 'Guardar mascota'}
+          </button>
+        </div>
+      }
+    >
+        <form id="form-mis-mascotas" onSubmit={guardar} className="flex flex-col gap-4">
           <Campo
             id="nombre-mascota-cliente"
             label="Nombre"
@@ -263,25 +285,8 @@ export function PanelMisMascotas() {
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setPanelAbierto(false)}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={guardando}
-              className="flex-1 rounded-xl bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {guardando ? 'Guardando...' : 'Guardar mascota'}
-            </button>
-          </div>
         </form>
-      </SidePanel>
-    </div>
+    </SidePanel>
+    </>
   );
 }

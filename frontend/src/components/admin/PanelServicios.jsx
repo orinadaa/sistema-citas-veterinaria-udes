@@ -152,7 +152,8 @@ export function PanelServicios({ busquedaInicial }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <>
+    <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <PageHeader
         title="Servicios veterinarios"
         subtitle="Gestiona los servicios que ofrece tu clínica."
@@ -246,8 +247,38 @@ export function PanelServicios({ busquedaInicial }) {
         />
       )}
 
-      <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title={servicioEditando ? 'Editar servicio' : 'Nuevo servicio'}>
-        <form onSubmit={guardar} className="flex flex-col gap-4">
+    </div>
+
+    <SidePanel
+      isOpen={panelAbierto}
+      onClose={() => setPanelAbierto(false)}
+      title={servicioEditando ? 'Editar servicio' : 'Nuevo servicio'}
+      footer={
+        <div className="flex items-center justify-between gap-3">
+          {servicioEditando ? (
+            <button
+              type="button"
+              disabled={guardando}
+              onClick={desactivarDesdeElPanel}
+              className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
+            >
+              Desactivar servicio
+            </button>
+          ) : (
+            <span />
+          )}
+          <button
+            type="submit"
+            form="form-servicio"
+            disabled={guardando}
+            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+          >
+            {guardando ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        </div>
+      }
+    >
+        <form id="form-servicio" onSubmit={guardar} className="flex flex-col gap-4">
           {servicioEditando && (
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
@@ -309,30 +340,8 @@ export function PanelServicios({ busquedaInicial }) {
           />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <div className="mt-2 flex items-center justify-between gap-3">
-            {servicioEditando ? (
-              <button
-                type="button"
-                disabled={guardando}
-                onClick={desactivarDesdeElPanel}
-                className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
-              >
-                Desactivar servicio
-              </button>
-            ) : (
-              <span />
-            )}
-            <button
-              type="submit"
-              disabled={guardando}
-              className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
-            >
-              {guardando ? 'Guardando...' : 'Guardar cambios'}
-            </button>
-          </div>
         </form>
-      </SidePanel>
-    </div>
+    </SidePanel>
+    </>
   );
 }
