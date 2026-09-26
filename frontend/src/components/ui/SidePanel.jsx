@@ -6,12 +6,15 @@
 // cualquier PanelXxx.jsx que lo use), no modal en apariencia.
 // `footer` (opcional) fija los botones de accion abajo, fuera del
 // scroll del cuerpo -- si no se pasa, el panel queda sin pie fijo.
+// z-50: mas alto que el navbar publico (Navbar.jsx, sticky z-40) -- con
+// z-30 el navbar tapaba el encabezado del panel (titulo + boton de
+// cerrar) en /panel y en el landing, porque ambos arrancan en y=0.
 import { IconoX } from '../icons';
 
 export function SidePanel({ isOpen, onClose, title, children, footer }) {
   return (
     <div
-      className={`fixed inset-y-0 right-0 z-30 flex h-full w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-200 ${
+      className={`fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-200 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
       aria-hidden={!isOpen}
