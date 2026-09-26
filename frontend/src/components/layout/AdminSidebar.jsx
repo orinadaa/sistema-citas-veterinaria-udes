@@ -1,7 +1,9 @@
 // components/layout/AdminSidebar.jsx
 // Sidebar fijo del panel administrativo, con la identidad de marca real
-// de la clinica (ver identidadmarca/): fondo azul institucional
-// #4280F7, logo completo a color (logocolor.png) expandido y el isotipo corto
+// de la clinica (ver identidadmarca/): mismo degradado de marca que el
+// Hero del landing y las pantallas de login/registro (bg-gradient-to-b
+// from-brand-blue-500 to-brand-blue-800, ver Hero.jsx/AuthLayout.jsx),
+// logo completo a color (logocolor.png) expandido y el isotipo corto
 // (logocorto.png) colapsado. La variante navy de rol medico no se
 // construye todavia: no existe pantalla de calendario/dashboard para
 // ese rol en ningun incremento planeado.
@@ -69,7 +71,7 @@ export function AdminSidebar({ activo, onCambiar }) {
 
   return (
     <aside
-      className="hidden h-screen shrink-0 flex-col overflow-y-auto bg-brand-blue py-6 transition-[width] duration-200 lg:flex"
+      className="hidden h-screen shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 py-6 transition-[width] duration-200 lg:flex"
       style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO }}
     >
       <div className={`flex items-center px-4 ${colapsado ? 'justify-center' : 'justify-end'}`}>
