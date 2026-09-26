@@ -60,7 +60,7 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_VET}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', documento: '123456' });
     expect(respuesta.status).toBe(403);
   });
 
@@ -68,7 +68,15 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo' });
+      .send({ nombreCompleto: 'Dr. Nuevo', documento: '123456' });
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('rechaza sin documento de identidad', async () => {
+    const respuesta = await request(app)
+      .post('/api/administracion/medicos')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co' });
     expect(respuesta.status).toBe(400);
   });
 
@@ -78,7 +86,7 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'repetido@udes.edu.co' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'repetido@udes.edu.co', documento: '123456' });
 
     expect(respuesta.status).toBe(409);
   });
@@ -91,10 +99,10 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', documento: '123456' });
 
     expect(respuesta.status).toBe(201);
-    expect(medicoModel.crear).toHaveBeenCalledWith(expect.objectContaining({ sedeId: ID_SEDE }));
+    expect(medicoModel.crear).toHaveBeenCalledWith(expect.objectContaining({ sedeId: ID_SEDE, documento: '123456' }));
     expect(medicoModel.crear.mock.calls[0][0]).not.toHaveProperty('contrasena');
     expect(respuesta.body.medico.id).toBe('vet-nuevo');
     expect(respuesta.body.correoEnviado).toBe(true);
@@ -111,7 +119,7 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', documento: '123456' });
 
     expect(respuesta.status).toBe(201);
     expect(respuesta.body.correoEnviado).toBe(false);

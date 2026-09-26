@@ -148,8 +148,8 @@ export function PanelMedicos({ busquedaInicial }) {
           token
         );
       } else {
-        if (!form.correo) {
-          setError('El correo es obligatorio para crear un médico.');
+        if (!form.correo || !form.documento) {
+          setError('El correo y el documento de identidad son obligatorios para crear un médico.');
           setGuardando(false);
           return;
         }
@@ -157,7 +157,7 @@ export function PanelMedicos({ busquedaInicial }) {
           {
             nombreCompleto: form.nombreCompleto,
             correo: form.correo,
-            documento: form.documento || null,
+            documento: form.documento,
             telefono: form.telefono || null,
           },
           token
@@ -374,12 +374,14 @@ export function PanelMedicos({ busquedaInicial }) {
             label="Nombre completo"
             value={form.nombreCompleto}
             onChange={(e) => setForm({ ...form, nombreCompleto: e.target.value })}
+            required
           />
           <Campo
             id="documento-medico"
             label="Documento de identidad"
             value={form.documento}
             onChange={(e) => setForm({ ...form, documento: e.target.value })}
+            required={!medicoEditando}
           />
           <Campo
             id="correo-medico"
@@ -388,6 +390,7 @@ export function PanelMedicos({ busquedaInicial }) {
             value={form.correo}
             disabled={Boolean(medicoEditando)}
             onChange={(e) => setForm({ ...form, correo: e.target.value })}
+            required={!medicoEditando}
           />
           {!medicoEditando && (
             <p className="text-xs text-slate-500">

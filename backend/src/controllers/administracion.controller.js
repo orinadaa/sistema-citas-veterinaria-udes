@@ -30,8 +30,8 @@ async function crearMedico(req, res, next) {
   try {
     const { nombreCompleto, correo, documento, telefono } = req.body;
 
-    if (!nombreCompleto || !correo) {
-      return res.status(400).json({ mensaje: 'Nombre completo y correo son obligatorios.' });
+    if (!nombreCompleto || !correo || !documento) {
+      return res.status(400).json({ mensaje: 'Nombre completo, correo y documento de identidad son obligatorios.' });
     }
 
     // La contraseña nunca la escribe el admin: se autogenera y se envia
