@@ -6,7 +6,7 @@ import { AuthLayout } from '../components/layout/AuthLayout';
 import { Campo } from '../components/form/Campo';
 import { iniciarSesion as iniciarSesionApi } from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import { rutaPanelPorRol } from '../utils/rutas';
+import { destinoTrasLogin } from '../utils/rutas';
 
 export function LoginPage() {
   const [parametros] = useSearchParams();
@@ -35,7 +35,7 @@ export function LoginPage() {
     try {
       const respuesta = await iniciarSesionApi(datos);
       iniciarSesion(respuesta);
-      navegar(siguienteExplicito || rutaPanelPorRol(respuesta.usuario.rol), { replace: true });
+      navegar(destinoTrasLogin(siguienteExplicito, respuesta.usuario.rol), { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
