@@ -7,16 +7,19 @@
 // navbar solido se continua sin costura visible hacia el degradado de
 // abajo.
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoCorto from '../../assets/logocorto.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
-import { rutaAgendarCita } from '../../utils/rutas';
+import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
 import { IconoCalendario, IconoCampana, IconoChevronAbajo } from '../icons';
 
 export function Navbar() {
   const { estaAutenticado, usuario } = useAuth();
   const navegar = useNavigate();
+  const ubicacion = useLocation();
+  const enLanding = ubicacion.pathname === '/';
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const esCliente = usuario?.rol === 'cliente';
 
   const iniciales = usuario?.nombreCompleto
     ?.split(' ')
@@ -47,9 +50,13 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
-          <a href="#servicios" className="transition hover:text-white">Servicios</a>
-          <a href="#sedes" className="transition hover:text-white">Sedes</a>
-          <a href="#horarios" className="transition hover:text-white">Horarios</a>
+          {/* Link (no <a>) para que funcionen desde cualquier pagina, no
+              solo desde el landing: si el usuario esta en /panel, primero
+              navega a "/" y LandingPage.jsx hace scroll al hash una vez
+              montada (ver su useEffect sobre location.hash). */}
+          <Link to="/#servicios" className="transition hover:text-white">Servicios</Link>
+          <Link to="/#sedes" className="transition hover:text-white">Sedes</Link>
+          <Link to="/#horarios" className="transition hover:text-white">Horarios</Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -69,17 +76,48 @@ export function Navbar() {
                     {iniciales || '·'}
                   </span>
                   <span className="text-left text-sm font-medium text-white">
-                    {usuario?.nombreCompleto?.split(' ')[0]}
+                    {/* "Hola, " solo en el landing -- en /panel el Hero ya
+                        saluda por su nombre, seria redundante repetirlo aqui. */}
+                    {enLanding ? `Hola, ${usuario?.nombreCompleto?.split(' ')[0]}` : usuario?.nombreCompleto?.split(' ')[0]}
                   </span>
                   <IconoChevronAbajo className="h-4 w-4 text-white/70" />
                 </button>
 
                 {menuAbierto && (
-                  <div className="absolute right-0 top-full mt-2 w-44 rounded-xl bg-white py-1.5 shadow-lg ring-1 ring-slate-200">
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-white py-1.5 shadow-lg ring-1 ring-slate-200">
+                    {/* Atajos para volver al panel propio despues de
+                        navegar a una seccion del landing (Servicios/Sedes/
+                        Horarios) sin perder la sesion. */}
+                    {esCliente ? (
+                      <>
+                        <Link
+                          to="/panel?tab=citas"
+                          onClick={() => setMenuAbierto(false)}
+                          className="block px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
+                        >
+                          Mis citas
+                        </Link>
+                        <Link
+                          to="/panel?tab=mascotas"
+                          onClick={() => setMenuAbierto(false)}
+                          className="block px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
+                        >
+                          Mis mascotas
+                        </Link>
+                      </>
+                    ) : (
+                      <Link
+                        to={rutaPanelPorRol(usuario?.rol)}
+                        onClick={() => setMenuAbierto(false)}
+                        className="block px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
+                      >
+                        Ir al panel
+                      </Link>
+                    )}
                     <button
                       type="button"
                       onClick={salir}
-                      className="w-full px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
+                      className="w-full border-t border-slate-100 px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
                     >
                       Cerrar sesión
                     </button>

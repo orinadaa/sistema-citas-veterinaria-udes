@@ -27,7 +27,9 @@ const TABS = [
 export function PanelClientePage() {
   const { usuario, token } = useAuth();
   const [parametros] = useSearchParams();
-  const [pestana, setPestana] = useState('citas');
+  // ?tab=mascotas (ej. desde el atajo "Mis mascotas" del menu del
+  // navbar, Navbar.jsx) preselecciona esa pestaña al entrar.
+  const [pestana, setPestana] = useState(parametros.get('tab') === 'mascotas' ? 'mascotas' : 'citas');
 
   const [citas, setCitas] = useState([]);
   const [cargandoCitas, setCargandoCitas] = useState(true);
