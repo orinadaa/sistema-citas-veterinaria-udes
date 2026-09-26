@@ -17,8 +17,7 @@ import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoJeringa } from '../icons';
-
-const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+import { formatearCOP } from '../../utils/moneda';
 
 const FORM_VACIO = { nombre: '', descripcion: '', categoriaId: '', precio: '', activo: true };
 
@@ -226,7 +225,7 @@ export function PanelServicios({ busquedaInicial }) {
               ),
             },
             { header: 'Categoría', render: (s) => <CategoryBadge nombre={s.categoria_nombre} color={s.categoria_color} /> },
-            { header: 'Precio', render: (s) => formatoCOP.format(s.precio) },
+            { header: 'Precio', render: (s) => formatearCOP(s.precio) },
             {
               header: 'Estado',
               render: (s) => (

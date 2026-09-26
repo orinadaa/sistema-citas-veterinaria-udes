@@ -22,11 +22,24 @@ async function crear({ clienteId, sedeId, servicioId, medicoId, fechaHora, masco
   return resultado.rows[0];
 }
 
+// Incluye datos de detalle (direccion/foto de sede, precio del
+// servicio, especialidad del medico, perfil de la mascota) para la
+// pantalla "Detalle de la cita" del panel del cliente. Subconsulta
+// escalar para la especialidad (en vez de LEFT JOIN + GROUP BY): un
+// medico puede tener varias, y asi se evita tener que agregar cada
+// columna de sede/servicio/mascota al GROUP BY solo por eso.
 async function listarPorCliente(clienteId) {
   const resultado = await pool.query(
-    `SELECT c.*, s.nombre AS sede_nombre, s.ciudad AS sede_ciudad,
-            sv.nombre AS servicio_nombre, m.nombre_completo AS medico_nombre,
-            mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza
+    `SELECT c.*, s.nombre AS sede_nombre, s.ciudad AS sede_ciudad, s.direccion AS sede_direccion, s.foto_url AS sede_foto_url,
+            sv.nombre AS servicio_nombre, sv.precio AS servicio_precio,
+            m.nombre_completo AS medico_nombre,
+            (SELECT string_agg(cs.nombre, ', ' ORDER BY cs.nombre)
+             FROM usuario_especialidad ue
+             JOIN categoria_servicio cs ON cs.id = ue.categoria_id
+             WHERE ue.usuario_id = c.medico_id) AS medico_especialidad,
+            mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza,
+            mc.sexo AS mascota_sexo, mc.peso_kg AS mascota_peso_kg, mc.color AS mascota_color,
+            mc.fecha_nacimiento AS mascota_fecha_nacimiento
      FROM cita c
      JOIN sede s ON s.id = c.sede_id
      JOIN servicio sv ON sv.id = c.servicio_id

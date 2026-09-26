@@ -18,6 +18,14 @@ export function formatearFechaLarga(iso) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
+const formatoFechaCorta = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+
+// Fecha corta sin hora (ej. fecha de nacimiento de una mascota) -- a
+// diferencia de formatearFechaLarga, sin dia de la semana.
+export function formatearFechaCorta(iso) {
+  return formatoFechaCorta.format(new Date(iso));
+}
+
 // YYYY-MM-DD en horario local (evita el corrimiento de un dia que da
 // toISOString() al convertir a UTC).
 export function hoyComoFechaLocal() {

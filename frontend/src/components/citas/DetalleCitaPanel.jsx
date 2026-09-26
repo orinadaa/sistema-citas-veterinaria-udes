@@ -8,10 +8,14 @@
 import { useEffect, useState } from 'react';
 import { reprogramarCita, cancelarCita } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
+import { formatearFechaLarga, formatearFechaCorta, formatearHora } from '../../utils/fecha';
+import { formatearCOP } from '../../utils/moneda';
 import { SidePanel } from '../ui/SidePanel';
 import { StatusBadge } from '../ui/StatusBadge';
 import { SelectorFranjas } from './SelectorFranjas';
+import { IconoUbicacion, IconoSede } from '../icons';
+
+const ETIQUETA_SEXO = { macho: 'Macho', hembra: 'Hembra' };
 
 export function estadoDeCita(cita) {
   if (cita.estado === 'cancelada') return 'cancelada';
@@ -133,20 +137,70 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           <div className="flex items-center justify-between">
             <p className="font-heading text-base font-semibold text-brand-navy">
               {cita.mascota_nombre}
-              {cita.mascota_especie ? ` (${cita.mascota_especie})` : ''}
+              {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).length > 0
+                ? ` (${[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')})`
+                : ''}
             </p>
             <StatusBadge status={estado} />
           </div>
 
-          <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
-            <p>
-              {formatearFechaLarga(cita.fecha_hora)} · {formatearHora(cita.fecha_hora)}
+          {(cita.mascota_sexo || cita.mascota_fecha_nacimiento || cita.mascota_peso_kg || cita.mascota_color) && (
+            <p className="text-xs text-slate-500">
+              {[
+                cita.mascota_sexo && (ETIQUETA_SEXO[cita.mascota_sexo] ?? cita.mascota_sexo),
+                cita.mascota_fecha_nacimiento && `Nació el ${formatearFechaCorta(cita.mascota_fecha_nacimiento)}`,
+                cita.mascota_peso_kg && `${cita.mascota_peso_kg} kg`,
+                cita.mascota_color,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
-            <p className="mt-1">
-              {cita.servicio_nombre} con {cita.medico_nombre}
-            </p>
-            <p>{cita.sede_nombre}</p>
-            {cita.motivo && <p className="mt-1">Motivo: {cita.motivo}</p>}
+          )}
+
+          <div className="flex flex-col gap-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Fecha y hora</p>
+              <p className="text-slate-800">
+                {formatearFechaLarga(cita.fecha_hora)} · {formatearHora(cita.fecha_hora)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Servicio</p>
+              <p className="text-slate-800">{cita.servicio_nombre}</p>
+              {cita.servicio_precio != null && <p className="text-xs text-slate-400">{formatearCOP(cita.servicio_precio)}</p>}
+            </div>
+
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Médico veterinario</p>
+              <p className="text-slate-800">{cita.medico_nombre}</p>
+              {cita.medico_especialidad && <p className="text-xs text-slate-400">{cita.medico_especialidad}</p>}
+            </div>
+
+            {cita.motivo && (
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Motivo</p>
+                <p className="text-slate-800">{cita.motivo}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-slate-200">
+            {cita.sede_foto_url && (
+              <img src={cita.sede_foto_url} alt="" className="h-28 w-full object-cover" />
+            )}
+            <div className="flex items-start gap-2 p-3">
+              <IconoSede className="mt-0.5 h-4 w-4 shrink-0 text-brand-blue" />
+              <div>
+                <p className="text-sm font-medium text-slate-800">{cita.sede_nombre}</p>
+                {cita.sede_direccion && (
+                  <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
+                    <IconoUbicacion className="h-3 w-3 shrink-0" />
+                    {cita.sede_direccion}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           {modo === 'reprogramar' && (
