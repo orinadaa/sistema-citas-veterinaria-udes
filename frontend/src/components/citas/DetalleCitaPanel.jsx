@@ -1,0 +1,165 @@
+// components/citas/DetalleCitaPanel.jsx
+// Detalle de una cita en "Mis citas" del panel del cliente, con
+// reprogramar (RF-08) y cancelar (RF-09) cuando esta activa y es
+// futura. Antes esto vivia inline en cada fila (FilaCita.jsx); ahora
+// se abre en un SidePanel, como el resto de la app.
+import { useEffect, useState } from 'react';
+import { reprogramarCita, cancelarCita } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
+import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
+import { SidePanel } from '../ui/SidePanel';
+import { StatusBadge } from '../ui/StatusBadge';
+import { SelectorFranjas } from './SelectorFranjas';
+
+export function estadoDeCita(cita) {
+  if (cita.estado === 'cancelada') return 'cancelada';
+  return new Date(cita.fecha_hora) > new Date() ? 'proxima' : 'completada';
+}
+
+export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
+  const { token } = useAuth();
+  const [modo, setModo] = useState('vista');
+  const [nuevaFranja, setNuevaFranja] = useState(null);
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setModo('vista');
+    setNuevaFranja(null);
+    setError('');
+  }, [cita?.id]);
+
+  async function confirmarReprogramacion() {
+    if (!nuevaFranja) return;
+    setEnviando(true);
+    setError('');
+    try {
+      await reprogramarCita(cita.id, nuevaFranja, token);
+      onActualizada();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  async function confirmarCancelacion() {
+    setEnviando(true);
+    setError('');
+    try {
+      await cancelarCita(cita.id, token);
+      onActualizada();
+    } catch (err) {
+      setError(err.message);
+      setEnviando(false);
+    }
+  }
+
+  const estado = cita ? estadoDeCita(cita) : null;
+  const puedeGestionar = estado === 'proxima';
+
+  return (
+    <SidePanel isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita">
+      {cita && (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <p className="font-heading text-base font-semibold text-brand-navy">
+              {cita.mascota_nombre}
+              {cita.mascota_especie ? ` (${cita.mascota_especie})` : ''}
+            </p>
+            <StatusBadge status={estado} />
+          </div>
+
+          <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+            <p>
+              {formatearFechaLarga(cita.fecha_hora)} · {formatearHora(cita.fecha_hora)}
+            </p>
+            <p className="mt-1">
+              {cita.servicio_nombre} con {cita.medico_nombre}
+            </p>
+            <p>{cita.sede_nombre}</p>
+            {cita.motivo && <p className="mt-1">Motivo: {cita.motivo}</p>}
+          </div>
+
+          {puedeGestionar && modo === 'vista' && (
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setModo('reprogramar')}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              >
+                Reprogramar
+              </button>
+              <button
+                type="button"
+                onClick={() => setModo('confirmarCancelar')}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-red transition hover:bg-red-50"
+              >
+                Cancelar cita
+              </button>
+            </div>
+          )}
+
+          {modo === 'reprogramar' && (
+            <div className="border-t border-slate-100 pt-4">
+              <SelectorFranjas
+                sedeId={cita.sede_id}
+                servicioId={cita.servicio_id}
+                medicoId={cita.medico_id}
+                valorSeleccionado={nuevaFranja}
+                onSeleccionar={setNuevaFranja}
+              />
+              <p className="mt-2 text-xs text-slate-400">Se mantiene el mismo médico ({cita.medico_nombre}).</p>
+              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+              <div className="mt-4 flex gap-3">
+                <button
+                  type="button"
+                  disabled={!nuevaFranja || enviando}
+                  onClick={confirmarReprogramacion}
+                  className="rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {enviando ? 'Guardando...' : 'Confirmar nueva fecha'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModo('vista');
+                    setNuevaFranja(null);
+                    setError('');
+                  }}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+                >
+                  Volver
+                </button>
+              </div>
+            </div>
+          )}
+
+          {modo === 'confirmarCancelar' && (
+            <div className="border-t border-slate-100 pt-4">
+              <p className="text-sm text-slate-700">¿Seguro que quieres cancelar esta cita?</p>
+              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+              <div className="mt-3 flex gap-3">
+                <button
+                  type="button"
+                  disabled={enviando}
+                  onClick={confirmarCancelacion}
+                  className="rounded-lg bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {enviando ? 'Cancelando...' : 'Sí, cancelar'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModo('vista')}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+                >
+                  No, mantenerla
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </SidePanel>
+  );
+}

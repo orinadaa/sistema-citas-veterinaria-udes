@@ -146,6 +146,14 @@ export function IconoAlerta({ className }) {
   );
 }
 
+export function IconoCorazon({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M12 20.2s-7.5-4.4-9.7-9.1C.9 7.8 2.6 4.5 6 4c2.1-.3 4 .8 6 3 2-2.2 3.9-3.3 6-3 3.4.5 5.1 3.8 3.7 7.1-2.2 4.7-9.7 9.1-9.7 9.1Z" />
+    </Icono>
+  );
+}
+
 export function IconoOjo({ className }) {
   return (
     <Icono className={className}>
