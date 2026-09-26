@@ -9,6 +9,8 @@ const citaModel = require('../models/cita.model');
 const usuarioModel = require('../models/usuario.model');
 const mascotaModel = require('../models/mascota.model');
 const pacienteModel = require('../models/paciente.model');
+const correoService = require('../services/correo.service');
+const { generarContrasenaTemporal } = require('../utils/contrasena.util');
 
 const RONDAS_SAL = 10;
 
@@ -26,16 +28,16 @@ async function listarMedicos(req, res, next) {
 // en su propia sede (no se puede elegir otra sede desde este panel).
 async function crearMedico(req, res, next) {
   try {
-    const { nombreCompleto, correo, contrasena, documento, telefono } = req.body;
+    const { nombreCompleto, correo, documento, telefono } = req.body;
 
-    if (!nombreCompleto || !correo || !contrasena) {
-      return res.status(400).json({ mensaje: 'Nombre completo, correo y contraseña son obligatorios.' });
-    }
-    if (contrasena.length < 8) {
-      return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 8 caracteres.' });
+    if (!nombreCompleto || !correo) {
+      return res.status(400).json({ mensaje: 'Nombre completo y correo son obligatorios.' });
     }
 
-    const contrasenaHash = await bcrypt.hash(contrasena, RONDAS_SAL);
+    // La contraseña nunca la escribe el admin: se autogenera y se envia
+    // por correo (unica forma en que el medico se entera de su clave).
+    const contrasenaTemporal = generarContrasenaTemporal();
+    const contrasenaHash = await bcrypt.hash(contrasenaTemporal, RONDAS_SAL);
     const medicoId = await medicoModel.crear({
       nombreCompleto,
       correo,
@@ -45,8 +47,21 @@ async function crearMedico(req, res, next) {
       sedeId: req.usuario.sedeId,
     });
 
+    let correoEnviado = true;
+    try {
+      await correoService.enviarCredenciales({
+        correo,
+        nombreCompleto,
+        contrasenaTemporal,
+        rolEtiqueta: 'médico veterinario',
+      });
+    } catch (error) {
+      console.error('No se pudo enviar el correo de credenciales:', error.message);
+      correoEnviado = false;
+    }
+
     const medicos = await medicoModel.listarConServicios(req.usuario.sedeId);
-    return res.status(201).json({ medico: medicos.find((m) => m.id === medicoId) });
+    return res.status(201).json({ medico: medicos.find((m) => m.id === medicoId), correoEnviado });
   } catch (error) {
     if (error.code === '23505') {
       return res.status(409).json({ mensaje: 'Ya existe una cuenta registrada con este correo.' });

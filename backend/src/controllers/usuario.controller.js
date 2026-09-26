@@ -12,9 +12,12 @@ const {
   actualizarRol,
   actualizarPerfil,
 } = require('../models/usuario.model');
+const correoService = require('../services/correo.service');
+const { generarContrasenaTemporal } = require('../utils/contrasena.util');
 
 const ROLES_VALIDOS = ['administrador', 'veterinario', 'cliente'];
 const RONDAS_SAL = 10;
+const ETIQUETA_ROL = { administrador: 'administrador', veterinario: 'médico veterinario' };
 
 // GET /api/auth/perfil
 async function obtenerPerfilPropio(req, res, next) {
@@ -48,11 +51,11 @@ async function listar(req, res, next) {
 // POST /api/usuarios (solo administrador) — alta de personal administrativo/veterinario
 async function crearStaff(req, res, next) {
   try {
-    const { nombreCompleto, correo, contrasena, rol, sedeId, telefono } = req.body;
+    const { nombreCompleto, correo, rol, sedeId, telefono } = req.body;
 
-    if (!nombreCompleto || !correo || !contrasena || !rol || !sedeId) {
+    if (!nombreCompleto || !correo || !rol || !sedeId) {
       return res.status(400).json({
-        mensaje: 'Nombre completo, correo, contraseña, rol y sede son obligatorios.',
+        mensaje: 'Nombre completo, correo, rol y sede son obligatorios.',
       });
     }
     if (rol !== 'administrador' && rol !== 'veterinario') {
@@ -60,11 +63,11 @@ async function crearStaff(req, res, next) {
         mensaje: 'Este endpoint solo crea cuentas de administrador o veterinario. Para clientes use /api/auth/registro.',
       });
     }
-    if (contrasena.length < 8) {
-      return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 8 caracteres.' });
-    }
 
-    const contrasenaHash = await bcrypt.hash(contrasena, RONDAS_SAL);
+    // La contraseña nunca la escribe el admin: se autogenera y se envia
+    // por correo (unica forma en que la persona se entera de su clave).
+    const contrasenaTemporal = generarContrasenaTemporal();
+    const contrasenaHash = await bcrypt.hash(contrasenaTemporal, RONDAS_SAL);
     const nuevoUsuario = await crearPersonal({
       nombreCompleto,
       correo,
@@ -74,7 +77,20 @@ async function crearStaff(req, res, next) {
       telefono,
     });
 
-    return res.status(201).json({ usuario: nuevoUsuario });
+    let correoEnviado = true;
+    try {
+      await correoService.enviarCredenciales({
+        correo,
+        nombreCompleto,
+        contrasenaTemporal,
+        rolEtiqueta: ETIQUETA_ROL[rol],
+      });
+    } catch (error) {
+      console.error('No se pudo enviar el correo de credenciales:', error.message);
+      correoEnviado = false;
+    }
+
+    return res.status(201).json({ usuario: nuevoUsuario, correoEnviado });
   } catch (error) {
     if (error.code === '23505') {
       return res.status(409).json({ mensaje: 'Ya existe una cuenta registrada con este correo.' });

@@ -9,6 +9,7 @@ jest.mock('../src/models/cita.model');
 jest.mock('../src/models/usuario.model');
 jest.mock('../src/models/mascota.model');
 jest.mock('../src/models/paciente.model');
+jest.mock('../src/services/correo.service');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -20,6 +21,7 @@ const citaModel = require('../src/models/cita.model');
 const usuarioModel = require('../src/models/usuario.model');
 const mascotaModel = require('../src/models/mascota.model');
 const pacienteModel = require('../src/models/paciente.model');
+const correoService = require('../src/services/correo.service');
 
 const ID_SEDE = 'sede-1';
 const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: ID_SEDE }, process.env.JWT_SECRET);
@@ -58,23 +60,15 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_VET}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', contrasena: 'Password123' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co' });
     expect(respuesta.status).toBe(403);
   });
 
-  test('rechaza sin correo/contrasena', async () => {
+  test('rechaza sin correo', async () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
       .send({ nombreCompleto: 'Dr. Nuevo' });
-    expect(respuesta.status).toBe(400);
-  });
-
-  test('rechaza contrasena corta', async () => {
-    const respuesta = await request(app)
-      .post('/api/administracion/medicos')
-      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', contrasena: '123' });
     expect(respuesta.status).toBe(400);
   });
 
@@ -84,23 +78,43 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'repetido@udes.edu.co', contrasena: 'Password123' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'repetido@udes.edu.co' });
 
     expect(respuesta.status).toBe(409);
   });
 
-  test('crea el medico en la sede del administrador', async () => {
+  test('crea el medico en la sede del administrador con una contraseña autogenerada y envia el correo de credenciales', async () => {
     medicoModel.crear.mockResolvedValue('vet-nuevo');
     medicoModel.listarConServicios.mockResolvedValue([{ id: 'vet-nuevo', nombre_completo: 'Dr. Nuevo' }]);
+    correoService.enviarCredenciales.mockResolvedValue();
 
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', contrasena: 'Password123' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co' });
 
     expect(respuesta.status).toBe(201);
     expect(medicoModel.crear).toHaveBeenCalledWith(expect.objectContaining({ sedeId: ID_SEDE }));
+    expect(medicoModel.crear.mock.calls[0][0]).not.toHaveProperty('contrasena');
     expect(respuesta.body.medico.id).toBe('vet-nuevo');
+    expect(respuesta.body.correoEnviado).toBe(true);
+    expect(correoService.enviarCredenciales).toHaveBeenCalledWith(
+      expect.objectContaining({ correo: 'nuevo@udes.edu.co', rolEtiqueta: 'médico veterinario' })
+    );
+  });
+
+  test('crea el medico aunque falle el envio del correo (best-effort, no bloquea la creacion)', async () => {
+    medicoModel.crear.mockResolvedValue('vet-nuevo');
+    medicoModel.listarConServicios.mockResolvedValue([{ id: 'vet-nuevo', nombre_completo: 'Dr. Nuevo' }]);
+    correoService.enviarCredenciales.mockRejectedValue(new Error('SMTP caído'));
+
+    const respuesta = await request(app)
+      .post('/api/administracion/medicos')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co' });
+
+    expect(respuesta.status).toBe(201);
+    expect(respuesta.body.correoEnviado).toBe(false);
   });
 });
 

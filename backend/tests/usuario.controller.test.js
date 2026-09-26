@@ -2,11 +2,13 @@
 // RF-04 (gestion de roles) y RF-05 (restriccion por rol) sobre /api/usuarios.
 
 jest.mock('../src/models/usuario.model');
+jest.mock('../src/services/correo.service');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const usuarioModel = require('../src/models/usuario.model');
+const correoService = require('../src/services/correo.service');
 
 function tokenPara(rol) {
   return jwt.sign({ id: 'admin1', rol }, process.env.JWT_SECRET);
@@ -65,7 +67,6 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
       .send({
         nombreCompleto: 'Vet Nuevo',
         correo: 'vet@correo.com',
-        contrasena: 'password123',
         rol: 'cliente',
         sedeId: 'sede1',
       });
@@ -73,7 +74,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
     expect(respuesta.status).toBe(400);
   });
 
-  test('POST /api/usuarios crea personal veterinario correctamente', async () => {
+  test('POST /api/usuarios crea personal veterinario con contraseña autogenerada y envia el correo de credenciales', async () => {
     usuarioModel.crearPersonal.mockResolvedValue({
       id: 'u3',
       nombre_completo: 'Vet Nuevo',
@@ -81,6 +82,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
       rol: 'veterinario',
       sede_id: 'sede1',
     });
+    correoService.enviarCredenciales.mockResolvedValue();
 
     const respuesta = await request(app)
       .post('/api/usuarios')
@@ -88,13 +90,17 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
       .send({
         nombreCompleto: 'Vet Nuevo',
         correo: 'vet@correo.com',
-        contrasena: 'password123',
         rol: 'veterinario',
         sedeId: 'sede1',
       });
 
     expect(respuesta.status).toBe(201);
     expect(respuesta.body.usuario.rol).toBe('veterinario');
+    expect(respuesta.body.correoEnviado).toBe(true);
+    expect(usuarioModel.crearPersonal.mock.calls[0][0]).not.toHaveProperty('contrasena');
+    expect(correoService.enviarCredenciales).toHaveBeenCalledWith(
+      expect.objectContaining({ correo: 'vet@correo.com', rolEtiqueta: 'médico veterinario' })
+    );
   });
 
   test('PATCH /api/usuarios/:id/rol rechaza un rol invalido', async () => {

@@ -78,6 +78,10 @@ async function actualizarPerfil(id, { nombreCompleto, telefono, activo }) {
   return resultado.rows[0] || null;
 }
 
+async function actualizarContrasena(id, contrasenaHash) {
+  await pool.query('UPDATE usuario SET contrasena_hash = $2 WHERE id = $1', [id, contrasenaHash]);
+}
+
 module.exports = {
   buscarPorCorreo,
   buscarPorId,
@@ -86,4 +90,5 @@ module.exports = {
   listarTodos,
   actualizarRol,
   actualizarPerfil,
+  actualizarContrasena,
 };
