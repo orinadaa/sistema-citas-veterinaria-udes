@@ -9,6 +9,7 @@
 // disponible para el rol administrador — el veterinario no tiene
 // ninguna de esas 3 pantallas en su sidebar.
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes } from '../../api/client';
@@ -18,7 +19,13 @@ const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [] };
 
 export function AdminHeader({ onNavegar }) {
   const { usuario, token, cerrarSesion } = useAuth();
+  const navegar = useNavigate();
   const esAdmin = usuario?.rol === 'administrador';
+
+  function salir() {
+    cerrarSesion();
+    navegar('/');
+  }
 
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [termino, setTermino] = useState('');
@@ -191,7 +198,7 @@ export function AdminHeader({ onNavegar }) {
             <div className="absolute right-0 top-full mt-2 w-44 rounded-xl bg-white py-1.5 shadow-lg ring-1 ring-slate-200">
               <button
                 type="button"
-                onClick={cerrarSesion}
+                onClick={salir}
                 className="w-full px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
               >
                 Cerrar sesión

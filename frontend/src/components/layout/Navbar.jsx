@@ -20,6 +20,11 @@ export function Navbar() {
     navegar(rutaAgendarCita(estaAutenticado));
   }
 
+  function salir() {
+    cerrarSesion();
+    navegar('/');
+  }
+
   return (
     <header className="sticky top-0 z-40 bg-brand-blue">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -41,7 +46,7 @@ export function Navbar() {
               </span>
               <button
                 type="button"
-                onClick={cerrarSesion}
+                onClick={salir}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
               >
                 Cerrar sesión
