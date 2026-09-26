@@ -29,7 +29,9 @@ export function SelectorMedico({ sedeId, servicioId, fechaHora, valorSeleccionad
 
   return (
     <div>
-      <p className="text-sm font-medium text-slate-700">Profesional</p>
+      <p className="text-sm font-medium text-slate-700">
+        Profesional<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
+      </p>
 
       {estado === ESTADOS.CARGANDO && (
         <div className="mt-2 flex flex-col gap-2">

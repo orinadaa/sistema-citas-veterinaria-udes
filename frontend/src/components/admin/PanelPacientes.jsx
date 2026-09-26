@@ -324,6 +324,7 @@ export function PanelPacientes({ busquedaInicial }) {
                     label="Nombre"
                     value={nuevaMascota.nombre}
                     onChange={(e) => setNuevaMascota({ ...nuevaMascota, nombre: e.target.value })}
+                    required
                   />
                   <Campo
                     id="nueva-mascota-especie-paciente"

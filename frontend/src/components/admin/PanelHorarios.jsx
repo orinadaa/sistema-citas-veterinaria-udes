@@ -282,8 +282,8 @@ export function PanelHorarios() {
             </div>
           </div>
 
-          <Campo id="nombre-sede" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
-          <Campo id="ciudad-sede" label="Ciudad" value={form.ciudad} onChange={(e) => setForm({ ...form, ciudad: e.target.value })} />
+          <Campo id="nombre-sede" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
+          <Campo id="ciudad-sede" label="Ciudad" value={form.ciudad} onChange={(e) => setForm({ ...form, ciudad: e.target.value })} required />
           <Campo id="direccion-sede" label="Dirección" value={form.direccion} onChange={(e) => setForm({ ...form, direccion: e.target.value })} />
 
           <StatusToggle checked={form.activo} onChange={alternarActivaDesdeElPanel} label="Sede activa" helpText="Si se desactiva, no aparecerá disponible para agendar citas." />

@@ -74,7 +74,9 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
 
   return (
     <div>
-      <p className="text-sm font-medium text-slate-700">Mascota</p>
+      <p className="text-sm font-medium text-slate-700">
+        Mascota<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
+      </p>
 
       {estado === ESTADOS.CARGANDO && (
         <div className="mt-2 flex flex-col gap-2">
@@ -121,7 +123,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
       {mostrarNueva && (
         <div className="mt-3 flex flex-col gap-3 rounded-lg border border-slate-200 p-3 sm:flex-row sm:items-end">
           <div className="flex-1">
-            <Campo id="nueva-mascota-nombre" label="Nombre" value={nombreNueva} onChange={(e) => setNombreNueva(e.target.value)} />
+            <Campo id="nueva-mascota-nombre" label="Nombre" value={nombreNueva} onChange={(e) => setNombreNueva(e.target.value)} required />
           </div>
           <div className="flex-1">
             <Campo

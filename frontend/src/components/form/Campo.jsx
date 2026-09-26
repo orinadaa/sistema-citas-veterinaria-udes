@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { IconoOjo, IconoOjoTachado } from '../icons';
 
-export function Campo({ id, label, error, type = 'text', ...resto }) {
+export function Campo({ id, label, error, type = 'text', required, ...resto }) {
   const [mostrarClave, setMostrarClave] = useState(false);
   const esClave = type === 'password';
   const tipoInput = esClave && mostrarClave ? 'text' : type;
@@ -14,12 +14,18 @@ export function Campo({ id, label, error, type = 'text', ...resto }) {
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-sm font-medium text-slate-700">
         {label}
+        {required && (
+          <span className="ml-0.5 text-red-500" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       <div className="relative">
         <input
           id={id}
           name={id}
           type={tipoInput}
+          required={required}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
           className={`w-full rounded-lg border px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 ${

@@ -254,7 +254,7 @@ export function PanelConfiguracion() {
 
       <SidePanel isOpen={panelAbierto} onClose={() => setPanelAbierto(false)} title={usuarioEditando ? 'Editar usuario' : 'Nuevo usuario'}>
         <form onSubmit={guardar} className="flex flex-col gap-4">
-          <Campo id="nombre-usuario-config" label="Nombre completo" value={form.nombreCompleto} onChange={(e) => setForm({ ...form, nombreCompleto: e.target.value })} />
+          <Campo id="nombre-usuario-config" label="Nombre completo" value={form.nombreCompleto} onChange={(e) => setForm({ ...form, nombreCompleto: e.target.value })} required />
           <Campo
             id="correo-usuario-config"
             label="Correo"
@@ -262,6 +262,7 @@ export function PanelConfiguracion() {
             value={form.correo}
             disabled={Boolean(usuarioEditando)}
             onChange={(e) => setForm({ ...form, correo: e.target.value })}
+            required={!usuarioEditando}
           />
           {!usuarioEditando && (
             <p className="text-xs text-slate-500">
@@ -271,7 +272,7 @@ export function PanelConfiguracion() {
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="rol-usuario-config" className="text-sm font-medium text-slate-700">
-              Rol
+              Rol<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
             </label>
             <select
               id="rol-usuario-config"
@@ -286,7 +287,7 @@ export function PanelConfiguracion() {
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="sede-usuario-config" className="text-sm font-medium text-slate-700">
-              Sede
+              Sede<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
             </label>
             <select
               id="sede-usuario-config"

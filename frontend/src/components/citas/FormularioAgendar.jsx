@@ -69,7 +69,7 @@ export function FormularioAgendar({ onAgendada, servicioIdInicial }) {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="sede-cita" className="text-sm font-medium text-slate-700">
-            Sede
+            Sede<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
           </label>
           <select
             id="sede-cita"
@@ -92,7 +92,7 @@ export function FormularioAgendar({ onAgendada, servicioIdInicial }) {
 
         <div>
           <label htmlFor="servicio-cita" className="text-sm font-medium text-slate-700">
-            Tipo de servicio
+            Tipo de servicio<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
           </label>
           <select
             id="servicio-cita"

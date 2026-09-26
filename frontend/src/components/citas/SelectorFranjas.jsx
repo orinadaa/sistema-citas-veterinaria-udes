@@ -35,7 +35,7 @@ export function SelectorFranjas({ sedeId, servicioId, medicoId, valorSeleccionad
   return (
     <div>
       <label htmlFor="fecha-cita" className="text-sm font-medium text-slate-700">
-        Fecha
+        Fecha<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
       </label>
       <input
         id="fecha-cita"

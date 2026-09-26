@@ -257,11 +257,11 @@ export function PanelServicios({ busquedaInicial }) {
             </div>
           )}
 
-          <Campo id="nombre-servicio" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+          <Campo id="nombre-servicio" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="categoria-servicio" className="text-sm font-medium text-slate-700">
-              Categoría
+              Categoría<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
             </label>
             <select
               id="categoria-servicio"

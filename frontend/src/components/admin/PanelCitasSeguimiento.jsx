@@ -387,7 +387,7 @@ export function PanelCitasSeguimiento() {
           <form onSubmit={guardarNueva} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="cliente-cita" className="text-sm font-medium text-slate-700">
-                Cliente
+                Cliente<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
               </label>
               <input
                 type="search"
@@ -413,7 +413,7 @@ export function PanelCitasSeguimiento() {
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="servicio-cita-admin" className="text-sm font-medium text-slate-700">
-                Servicio
+                Servicio<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="servicio-cita-admin"
