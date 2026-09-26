@@ -10,25 +10,24 @@
 // ninguna de esas 3 pantallas en su sidebar.
 import { useEffect, useRef, useState } from 'react';
 import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona } from '../icons';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes } from '../../api/client';
 
 const ETIQUETA_ROL = { administrador: 'Administrador', veterinario: 'Médico Veterinario' };
 const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [] };
 
 export function AdminHeader({ onNavegar }) {
-  const { usuario, token, cerrarSesion } = useAuth();
+  const { usuario, token } = useAuth();
   const esAdmin = usuario?.rol === 'administrador';
 
   function salir() {
-    // Redireccion "dura" (no navegar() de react-router): /admin esta
-    // protegido por ProtectedRoute, que reacciona al cambio de
-    // estaAutenticado -- por mas que se reordenen las llamadas,
-    // ProtectedRoute puede llegar a evaluarse con la ruta /admin todavia
-    // activa y redirigir el solo a /iniciar-sesion?next=%2Fadmin,
-    // pisando cualquier navegacion interna de la SPA. Una recarga
-    // completa a "/" evita el problema de raiz.
-    cerrarSesion();
+    // No se llama cerrarSesion() (dispara un re-render vía React state):
+    // /admin esta protegido por ProtectedRoute, que mostraba un flash de
+    // /iniciar-sesion?next=%2Fadmin antes de que la recarga completa
+    // tuviera efecto. Se limpia localStorage directamente y se recarga
+    // -- la pagina nueva arranca ya sin sesion, sin ningun render
+    // intermedio sobre /admin.
+    localStorage.removeItem(CLAVE_ALMACENAMIENTO);
     window.location.href = '/';
   }
 

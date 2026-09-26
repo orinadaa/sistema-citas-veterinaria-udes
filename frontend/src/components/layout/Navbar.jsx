@@ -8,12 +8,12 @@
 // abajo.
 import { Link, useNavigate } from 'react-router-dom';
 import logoCorto from '../../assets/logocorto.png';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { IconoCalendario } from '../icons';
 
 export function Navbar() {
-  const { estaAutenticado, usuario, cerrarSesion } = useAuth();
+  const { estaAutenticado, usuario } = useAuth();
   const navegar = useNavigate();
 
   function irAAgendar() {
@@ -21,13 +21,12 @@ export function Navbar() {
   }
 
   function salir() {
-    // Redireccion "dura" (no navegar() de react-router): en /panel
-    // (protegido por ProtectedRoute) reordenar las llamadas no basta --
-    // ProtectedRoute puede llegar a evaluarse con /panel todavia activo
-    // y redirigir el solo a /iniciar-sesion, pisando cualquier
-    // navegacion interna de la SPA. Una recarga completa a "/" evita el
-    // problema de raiz.
-    cerrarSesion();
+    // No se llama cerrarSesion() (dispara un re-render vía React state):
+    // en /panel (protegido por ProtectedRoute) eso mostraba un flash de
+    // /iniciar-sesion antes de que la recarga completa tuviera efecto.
+    // Se limpia localStorage directamente y se recarga -- la pagina
+    // nueva arranca ya sin sesion, sin pasar por ningun render intermedio.
+    localStorage.removeItem(CLAVE_ALMACENAMIENTO);
     window.location.href = '/';
   }
 

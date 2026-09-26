@@ -5,7 +5,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext(null);
-const CLAVE_ALMACENAMIENTO = 'udes_veterinaria_sesion';
+// Exportada para poder limpiarla directamente (sin pasar por React state)
+// justo antes de una recarga completa del navegador -- ver Navbar.jsx y
+// AdminHeader.jsx: cerrarSesion() dispara un re-render en la pagina
+// actual (todavia protegida) antes de que la recarga tenga efecto, lo
+// que causaba un flash de /iniciar-sesion antes de llegar al landing.
+export const CLAVE_ALMACENAMIENTO = 'udes_veterinaria_sesion';
 
 function leerSesionGuardada() {
   try {
