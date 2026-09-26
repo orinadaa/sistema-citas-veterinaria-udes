@@ -6,15 +6,24 @@
 // stop del degradado del Hero (from-brand-blue-500), asi que el
 // navbar solido se continua sin costura visible hacia el degradado de
 // abajo.
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logoCorto from '../../assets/logocorto.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
-import { IconoCalendario } from '../icons';
+import { IconoCalendario, IconoCampana, IconoChevronAbajo } from '../icons';
 
 export function Navbar() {
   const { estaAutenticado, usuario } = useAuth();
   const navegar = useNavigate();
+  const [menuAbierto, setMenuAbierto] = useState(false);
+
+  const iniciales = usuario?.nombreCompleto
+    ?.split(' ')
+    .slice(0, 2)
+    .map((palabra) => palabra[0])
+    .join('')
+    .toUpperCase();
 
   function irAAgendar() {
     navegar(rutaAgendarCita(estaAutenticado));
@@ -45,18 +54,39 @@ export function Navbar() {
 
         <div className="flex items-center gap-3">
           {estaAutenticado ? (
-            <>
-              <span className="hidden text-sm text-white/90 sm:inline">
-                Hola, {usuario?.nombreCompleto?.split(' ')[0]}
-              </span>
-              <button
-                type="button"
-                onClick={salir}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
-              >
-                Cerrar sesión
+            <div className="hidden items-center gap-2 sm:flex">
+              <button type="button" className="relative rounded-full p-2 text-white/80 transition hover:bg-white/10 hover:text-white">
+                <IconoCampana className="h-5 w-5" />
               </button>
-            </>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setMenuAbierto((v) => !v)}
+                  className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-white/10"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
+                    {iniciales || '·'}
+                  </span>
+                  <span className="text-left text-sm font-medium text-white">
+                    {usuario?.nombreCompleto?.split(' ')[0]}
+                  </span>
+                  <IconoChevronAbajo className="h-4 w-4 text-white/70" />
+                </button>
+
+                {menuAbierto && (
+                  <div className="absolute right-0 top-full mt-2 w-44 rounded-xl bg-white py-1.5 shadow-lg ring-1 ring-slate-200">
+                    <button
+                      type="button"
+                      onClick={salir}
+                      className="w-full px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           ) : (
             <div className="hidden items-center gap-1 sm:flex">
               <Link
