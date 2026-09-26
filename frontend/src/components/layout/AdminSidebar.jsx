@@ -113,15 +113,6 @@ export function AdminSidebar({ activo, onCambiar }) {
           );
         })}
       </nav>
-
-      {!colapsado && (
-        <div className="mx-4 mt-6 rounded-2xl bg-white/90 px-4 py-4 text-center">
-          <img src={logoCorto} alt="" className="mx-auto h-8 w-8 object-contain" />
-          <p className="mt-2 font-heading text-xs italic text-brand-blue">
-            Juntos por una vida más saludable
-          </p>
-        </div>
-      )}
     </aside>
   );
 }
