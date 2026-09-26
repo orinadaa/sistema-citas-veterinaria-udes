@@ -6,10 +6,16 @@ import { AuthLayout } from '../components/layout/AuthLayout';
 import { Campo } from '../components/form/Campo';
 import { iniciarSesion as iniciarSesionApi } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { rutaPanelPorRol } from '../utils/rutas';
 
 export function LoginPage() {
   const [parametros] = useSearchParams();
-  const siguiente = parametros.get('next') || '/panel';
+  // "next" es para volver a un flujo puntual (ej. agendar cita). Sin
+  // eso, cada rol tiene su propio panel -- /panel es solo del cliente,
+  // asi que no sirve como destino por defecto para administrador o
+  // veterinario (antes mandaba a todos ahi y ProtectedRoute los
+  // rebotaba a "/" por no tener el rol correcto).
+  const siguienteExplicito = parametros.get('next');
   const navegar = useNavigate();
   const { iniciarSesion } = useAuth();
 
@@ -29,7 +35,7 @@ export function LoginPage() {
     try {
       const respuesta = await iniciarSesionApi(datos);
       iniciarSesion(respuesta);
-      navegar(siguiente, { replace: true });
+      navegar(siguienteExplicito || rutaPanelPorRol(respuesta.usuario.rol), { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -45,7 +51,7 @@ export function LoginPage() {
         <>
           ¿No tienes cuenta?{' '}
           <Link
-            to={`/registrarse?next=${encodeURIComponent(siguiente)}`}
+            to={`/registrarse?next=${encodeURIComponent(siguienteExplicito || '/panel')}`}
             className="font-medium text-blue-600 hover:text-blue-700"
           >
             Regístrate
