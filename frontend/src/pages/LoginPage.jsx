@@ -53,7 +53,7 @@ export function LoginPage() {
           ¿No tienes cuenta?{' '}
           <Link
             to={`/registrarse?next=${encodeURIComponent(siguienteExplicito || '/panel')}`}
-            className="font-medium text-blue-600 hover:text-blue-700"
+            className="font-medium text-brand-amber hover:text-amber-300"
           >
             Regístrate
           </Link>

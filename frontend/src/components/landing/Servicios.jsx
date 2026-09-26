@@ -88,7 +88,6 @@ export function Servicios() {
                       key={servicio.id}
                       image={config.imagen}
                       title={config.etiquetaPublica ?? servicio.nombre}
-                      description={servicio.descripcion}
                       href={rutaAgendarCita(estaAutenticado, servicio.id)}
                     />
                   );

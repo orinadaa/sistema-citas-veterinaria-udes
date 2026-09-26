@@ -14,7 +14,7 @@
 // aparte): toda la imagen es clickeable.
 import { Link } from 'react-router-dom';
 
-export function ServiceCard({ image, title, description, href }) {
+export function ServiceCard({ image, title, href }) {
   const Envoltura = href ? Link : 'div';
   const propsEnvoltura = href ? { to: href } : {};
 
@@ -33,7 +33,6 @@ export function ServiceCard({ image, title, description, href }) {
 
       <div className="absolute inset-x-0 bottom-0 px-6 pb-6 pt-10 text-center">
         <h3 className="text-2xl font-bold text-brand-navy">{title}</h3>
-        {description && <p className="mt-1.5 text-sm leading-snug text-slate-500 line-clamp-2">{description}</p>}
       </div>
     </Envoltura>
   );

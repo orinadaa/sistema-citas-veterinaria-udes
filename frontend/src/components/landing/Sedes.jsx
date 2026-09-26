@@ -31,7 +31,7 @@ export function Sedes() {
   }, []);
 
   return (
-    <section id="sedes" className="py-20">
+    <section id="sedes" className="bg-slate-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading
           titulo="Nuestras sedes"

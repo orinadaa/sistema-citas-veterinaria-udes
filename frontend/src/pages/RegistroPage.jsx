@@ -51,7 +51,7 @@ export function RegistroPage() {
           ¿Ya tienes cuenta?{' '}
           <Link
             to={`/iniciar-sesion?next=${encodeURIComponent(siguiente)}`}
-            className="font-medium text-blue-600 hover:text-blue-700"
+            className="font-medium text-brand-amber hover:text-amber-300"
           >
             Inicia sesión
           </Link>
