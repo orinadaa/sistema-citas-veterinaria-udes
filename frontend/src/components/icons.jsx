@@ -146,6 +146,24 @@ export function IconoAlerta({ className }) {
   );
 }
 
+export function IconoOjo({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </Icono>
+  );
+}
+
+export function IconoOjoTachado({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M2.5 12S6 5.5 12 5.5c1.9 0 3.5.5 4.8 1.2M21.5 12s-1.3 2.4-3.8 4.3M9.9 15.4A3 3 0 0 1 14.1 11" />
+      <path d="M4 4l16 16" />
+    </Icono>
+  );
+}
+
 export function IconoEscudo({ className }) {
   return (
     <Icono className={className}>
