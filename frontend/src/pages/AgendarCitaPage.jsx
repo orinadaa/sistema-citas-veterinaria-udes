@@ -13,8 +13,17 @@ import { Navbar } from '../components/layout/Navbar';
 import { BookingStepper } from '../components/agendar/BookingStepper';
 import { BookingSummarySidebar } from '../components/agendar/BookingSummarySidebar';
 import { PaginaMascotaServicio } from '../components/agendar/PaginaMascotaServicio';
+import { PaginaSedeFecha } from '../components/agendar/PaginaSedeFecha';
+import { PaginaConfirmacion } from '../components/agendar/PaginaConfirmacion';
 import { FormularioMascotaPanel } from '../components/cliente/FormularioMascotaPanel';
-import { obtenerMisMascotas, obtenerServicios, obtenerSedes, obtenerMisCitas } from '../api/client';
+import {
+  obtenerMisMascotas,
+  obtenerServicios,
+  obtenerSedes,
+  obtenerMisCitas,
+  obtenerHorarios,
+  agendarCita,
+} from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { IconoFlechaDerecha } from '../components/icons';
 
@@ -29,6 +38,8 @@ export function AgendarCitaPage() {
   const [mascotas, setMascotas] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [sedes, setSedes] = useState([]);
+  // { [sedeId]: filas de horario_atencion } -- undefined mientras carga.
+  const [horariosPorSede, setHorariosPorSede] = useState({});
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState('');
 
@@ -39,7 +50,18 @@ export function AgendarCitaPage() {
   // true mientras la sede sea la sugerida (la de la ultima cita) y el
   // cliente no la haya elegido explicitamente en la pagina 2.
   const [sedeSugerida, setSedeSugerida] = useState(false);
+  const [fecha, setFecha] = useState('');
   const [franja, setFranja] = useState(null);
+  const [motivo, setMotivo] = useState('');
+
+  // Confirmacion (pagina 2 -> 3)
+  const [enviando, setEnviando] = useState(false);
+  const [errorConfirmar, setErrorConfirmar] = useState('');
+  // Se incrementa para volver a consultar la disponibilidad (ej. la hora
+  // elegida se ocupo mientras el cliente confirmaba).
+  const [refrescoDisponibilidad, setRefrescoDisponibilidad] = useState(0);
+  const [citaCreada, setCitaCreada] = useState(null);
+  const [correoEnviado, setCorreoEnviado] = useState(false);
 
   const [panelMascotaAbierto, setPanelMascotaAbierto] = useState(false);
 
@@ -71,6 +93,15 @@ export function AgendarCitaPage() {
           setSedeId(ultima.sede_id);
           setSedeSugerida(true);
         }
+
+        // Horario de cada sede (tarjetas de sede + dias cerrados del
+        // calendario). Si falla el de una sede, se muestra sin horario en
+        // vez de bloquear todo el flujo.
+        datosSedes.sedes.forEach((s) => {
+          obtenerHorarios(s.id)
+            .then((datos) => setHorariosPorSede((actual) => ({ ...actual, [s.id]: datos.horario })))
+            .catch(() => setHorariosPorSede((actual) => ({ ...actual, [s.id]: [] })));
+        });
       })
       .catch((err) => setErrorCarga(err.message || 'No se pudo cargar la información para agendar.'))
       .finally(() => setCargando(false));
@@ -98,12 +129,67 @@ export function AgendarCitaPage() {
     setFranja(null);
   }
 
+  function seleccionarSede(id) {
+    setSedeSugerida(false);
+    if (id === sedeId) return;
+    setSedeId(id);
+    // Cada sede tiene su propio horario y sus propios medicos.
+    setFranja(null);
+  }
+
+  function seleccionarFecha(valor) {
+    setFecha(valor);
+    setFranja(null);
+  }
+
   function irAPagina(numero) {
+    setErrorConfirmar('');
     setPagina(numero);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const paginaCompleta = { 1: Boolean(mascota && servicio) }[pagina] ?? false;
+  // El medico lo asigna el backend (el de menos carga ese dia entre los
+  // libres en esa franja); aqui no se envia medicoId.
+  async function confirmarCita() {
+    setEnviando(true);
+    setErrorConfirmar('');
+    try {
+      const respuesta = await agendarCita({ sedeId, servicioId, fechaHora: franja, mascotaId, motivo: motivo.trim() }, token);
+      setCitaCreada(respuesta.cita);
+      setCorreoEnviado(respuesta.correoEnviado);
+      irAPagina(3);
+    } catch (err) {
+      setErrorConfirmar(err.message);
+      // La hora pudo ocuparse mientras tanto: se limpia y se vuelve a
+      // consultar la disponibilidad.
+      setFranja(null);
+      setRefrescoDisponibilidad((n) => n + 1);
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  // "Agendar otra cita": vuelve a la pagina 1 limpia. La sede de la cita
+  // recien creada queda como sugerida (es ahora la "ultima cita"), y si
+  // el cliente tiene una sola mascota se deja preseleccionada.
+  function agendarOtra() {
+    setMascotaId(mascotas.length === 1 ? mascotas[0].id : '');
+    setServicioId('');
+    setSedeId(citaCreada.sede_id);
+    setSedeSugerida(true);
+    setFecha('');
+    setFranja(null);
+    setMotivo('');
+    setCitaCreada(null);
+    setCorreoEnviado(false);
+    irAPagina(1);
+  }
+
+  const paginaCompleta =
+    {
+      1: Boolean(mascota && servicio),
+      2: Boolean(mascota && servicio && sede && franja),
+    }[pagina] ?? false;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -123,52 +209,79 @@ export function AgendarCitaPage() {
             <BookingStepper paginaActual={pagina} />
           </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
-            <div className="flex flex-col gap-6">
-              {pagina === 1 && (
-                <PaginaMascotaServicio
-                  mascotas={mascotas}
-                  servicios={servicios}
-                  cargando={cargando}
-                  errorCarga={errorCarga}
-                  onReintentar={reintentar}
-                  mascotaId={mascotaId}
-                  servicioId={servicioId}
-                  onSeleccionarMascota={setMascotaId}
-                  onSeleccionarServicio={seleccionarServicio}
-                  onAgregarMascota={() => setPanelMascotaAbierto(true)}
-                />
-              )}
-
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <button
-                  type="button"
-                  onClick={() => (pagina === 1 ? navigate('/panel') : irAPagina(pagina - 1))}
-                  className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                >
-                  {pagina === 1 ? 'Cancelar' : 'Volver'}
-                </button>
-                <button
-                  type="button"
-                  disabled={!paginaCompleta}
-                  onClick={() => irAPagina(pagina + 1)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Continuar
-                  <IconoFlechaDerecha className="h-4 w-4" />
-                </button>
-              </div>
+          {pagina === 3 && citaCreada ? (
+            <div className="mt-8">
+              <PaginaConfirmacion cita={citaCreada} correoEnviado={correoEnviado} onAgendarOtra={agendarOtra} />
             </div>
+          ) : (
+            <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+              <div className="flex flex-col gap-6">
+                {pagina === 1 && (
+                  <PaginaMascotaServicio
+                    mascotas={mascotas}
+                    servicios={servicios}
+                    cargando={cargando}
+                    errorCarga={errorCarga}
+                    onReintentar={reintentar}
+                    mascotaId={mascotaId}
+                    servicioId={servicioId}
+                    onSeleccionarMascota={setMascotaId}
+                    onSeleccionarServicio={seleccionarServicio}
+                    onAgregarMascota={() => setPanelMascotaAbierto(true)}
+                  />
+                )}
 
-            <BookingSummarySidebar
-              mascota={mascota}
-              servicio={servicio}
-              sede={sede}
-              sedeSugerida={sedeSugerida}
-              fechaHora={franja}
-              onIrAPagina={irAPagina}
-            />
-          </div>
+                {pagina === 2 && (
+                  <PaginaSedeFecha
+                    sedes={sedes}
+                    horariosPorSede={horariosPorSede}
+                    sedeId={sedeId}
+                    servicioId={servicioId}
+                    fecha={fecha}
+                    franja={franja}
+                    motivo={motivo}
+                    refrescoDisponibilidad={refrescoDisponibilidad}
+                    onSeleccionarSede={seleccionarSede}
+                    onSeleccionarFecha={seleccionarFecha}
+                    onSeleccionarFranja={setFranja}
+                    onCambiarMotivo={setMotivo}
+                  />
+                )}
+
+                {errorConfirmar && (
+                  <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200">{errorConfirmar}</p>
+                )}
+
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => (pagina === 1 ? navigate('/panel') : irAPagina(pagina - 1))}
+                    className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    {pagina === 1 ? 'Cancelar' : 'Volver'}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!paginaCompleta || enviando}
+                    onClick={pagina === 2 ? confirmarCita : () => irAPagina(pagina + 1)}
+                    className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {pagina === 2 ? (enviando ? 'Agendando...' : 'Confirmar cita') : 'Continuar'}
+                    <IconoFlechaDerecha className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <BookingSummarySidebar
+                mascota={mascota}
+                servicio={servicio}
+                sede={sede}
+                sedeSugerida={sedeSugerida}
+                fechaHora={franja}
+                onIrAPagina={irAPagina}
+              />
+            </div>
+          )}
         </main>
       </div>
 

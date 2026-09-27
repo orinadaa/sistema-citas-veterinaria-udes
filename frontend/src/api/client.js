@@ -204,3 +204,7 @@ export function crearMascota(datos, token) {
 export function actualizarMascota(id, datos, token) {
   return solicitar(`/mascotas/${id}`, { metodo: 'PUT', cuerpo: datos, token });
 }
+
+export function reenviarConfirmacionCita(id, token) {
+  return solicitar(`/citas/${id}/reenviar-confirmacion`, { metodo: 'POST', token });
+}
