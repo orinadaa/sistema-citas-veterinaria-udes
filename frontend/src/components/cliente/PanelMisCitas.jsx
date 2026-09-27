@@ -1,11 +1,12 @@
 // components/cliente/PanelMisCitas.jsx
 // Pestaña "Mis citas" del panel del cliente (RF-15, con reprogramar
 // RF-08 y cancelar RF-09 vía DetalleCitaPanel). Filtros por estado
-// como pills con conteo real -- nunca un numero inventado.
+// como pills con conteo real -- nunca un numero inventado. "Agendar
+// cita" lleva al flujo por pasos (/agendar, AgendarCitaPage.jsx).
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { StatusBadge } from '../ui/StatusBadge';
-import { FormularioAgendar } from '../citas/FormularioAgendar';
 import { DetalleCitaPanel, estadoDeCita } from '../citas/DetalleCitaPanel';
 import { IconoCalendario, IconoEstetoscopio, IconoPata } from '../icons';
 
@@ -16,15 +17,7 @@ const FILTROS = [
   { id: 'cancelada', etiqueta: 'Canceladas' },
 ];
 
-export function PanelMisCitas({
-  citas,
-  cargando,
-  onActualizada,
-  mostrarFormulario,
-  onAbrirFormulario,
-  onCerrarFormulario,
-  servicioIdInicial,
-}) {
+export function PanelMisCitas({ citas, cargando, onActualizada }) {
   const [filtro, setFiltro] = useState('todas');
   const [citaDetalle, setCitaDetalle] = useState(null);
 
@@ -49,27 +42,14 @@ export function PanelMisCitas({
           <h2 className="font-heading text-lg font-semibold text-brand-navy">Mis citas</h2>
           <p className="text-sm text-slate-500">Consulta, reprograma o cancela tus citas veterinarias.</p>
         </div>
-        <button
-          type="button"
-          onClick={mostrarFormulario ? onCerrarFormulario : onAbrirFormulario}
+        <Link
+          to="/agendar"
           className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600"
         >
           <IconoCalendario className="h-4 w-4" />
-          {mostrarFormulario ? 'Cerrar formulario' : 'Agendar cita'}
-        </button>
+          Agendar cita
+        </Link>
       </div>
-
-      {mostrarFormulario && (
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-          <FormularioAgendar
-            servicioIdInicial={servicioIdInicial}
-            onAgendada={() => {
-              onCerrarFormulario();
-              onActualizada();
-            }}
-          />
-        </div>
-      )}
 
       <div className="flex flex-wrap gap-2">
         {FILTROS.map((f) => (

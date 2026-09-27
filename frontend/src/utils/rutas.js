@@ -1,14 +1,12 @@
 // utils/rutas.js
-// `servicioId` (opcional) preselecciona el servicio en el formulario de
-// agendamiento -- lo usan las tarjetas de servicio del landing.
+// `servicioId` (opcional) preselecciona el servicio en el flujo de
+// agendamiento (/agendar) -- lo usan las tarjetas de servicio del landing.
 // Un invitado (sin sesion) se manda primero a Registrarse, no a
 // Iniciar sesion: la mayoria de quienes agendan por primera vez no
 // tienen cuenta todavia, y RegistroPage ya tiene un link a "Inicia
 // sesión" (con este mismo "next") para quien si la tiene.
 export function rutaAgendarCita(estaAutenticado, servicioId) {
-  const parametros = new URLSearchParams({ agendar: '1' });
-  if (servicioId) parametros.set('servicioId', servicioId);
-  const destino = `/panel?${parametros.toString()}`;
+  const destino = servicioId ? `/agendar?${new URLSearchParams({ servicioId })}` : '/agendar';
   return estaAutenticado ? destino : `/registrarse?next=${encodeURIComponent(destino)}`;
 }
 
@@ -27,9 +25,18 @@ export function rutaPanelPorRol(rol) {
 // lo rebota silenciosamente a "/" (ej. un next="/panel..." armado para
 // un cliente, pero quien inicia sesion es administrador/veterinario).
 // En ese caso se ignora el next y se usa el panel correcto del rol.
+// Rutas protegidas a las que puede ir cada rol (ver App.jsx).
+const RUTAS_DEL_ROL = {
+  cliente: ['/panel', '/agendar'],
+  administrador: ['/admin'],
+  veterinario: ['/admin'],
+};
+
 export function destinoTrasLogin(siguienteExplicito, rol) {
   const panelDelRol = rutaPanelPorRol(rol);
   if (!siguienteExplicito) return panelDelRol;
-  const apuntaAlPanelDelRol = siguienteExplicito === panelDelRol || siguienteExplicito.startsWith(`${panelDelRol}?`);
-  return apuntaAlPanelDelRol ? siguienteExplicito : panelDelRol;
+  const permitido = (RUTAS_DEL_ROL[rol] || []).some(
+    (ruta) => siguienteExplicito === ruta || siguienteExplicito.startsWith(`${ruta}?`)
+  );
+  return permitido ? siguienteExplicito : panelDelRol;
 }

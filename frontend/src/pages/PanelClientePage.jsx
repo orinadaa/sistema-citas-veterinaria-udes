@@ -34,7 +34,6 @@ export function PanelClientePage() {
   const [citas, setCitas] = useState([]);
   const [cargandoCitas, setCargandoCitas] = useState(true);
   const [mascotas, setMascotas] = useState([]);
-  const [mostrarFormulario, setMostrarFormulario] = useState(parametros.get('agendar') === '1');
 
   const cargarCitas = useCallback(() => {
     setCargandoCitas(true);
@@ -113,10 +112,6 @@ export function PanelClientePage() {
               citas={citas}
               cargando={cargandoCitas}
               onActualizada={cargarCitas}
-              mostrarFormulario={mostrarFormulario}
-              onAbrirFormulario={() => setMostrarFormulario(true)}
-              onCerrarFormulario={() => setMostrarFormulario(false)}
-              servicioIdInicial={parametros.get('servicioId') || undefined}
             />
           ) : (
             <PanelMisMascotas />

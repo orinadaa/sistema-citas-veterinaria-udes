@@ -294,3 +294,32 @@ export function IconoX({ className }) {
     </Icono>
   );
 }
+
+// Flujo de agendamiento (incremento 4): check de seleccion/hito
+// completado, amenidades de la sede y el correo de confirmacion.
+export function IconoCheck({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </Icono>
+  );
+}
+
+export function IconoCarro({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M5 16.5V12l1.8-4.6A1.5 1.5 0 0 1 8.2 6.5h7.6a1.5 1.5 0 0 1 1.4.9L19 12v4.5M5 16.5h14M5 16.5V19M19 16.5V19M5 12h14" />
+      <circle cx="8" cy="14.3" r=".6" />
+      <circle cx="16" cy="14.3" r=".6" />
+    </Icono>
+  );
+}
+
+export function IconoCorreo({ className }) {
+  return (
+    <Icono className={className}>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+      <path d="m4 7 8 6 8-6" />
+    </Icono>
+  );
+}

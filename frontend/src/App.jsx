@@ -7,6 +7,7 @@ import { RegistroPage } from './pages/RegistroPage';
 import { OlvideClavePage } from './pages/OlvideClavePage';
 import { PanelClientePage } from './pages/PanelClientePage';
 import { PanelAdminPage } from './pages/PanelAdminPage';
+import { AgendarCitaPage } from './pages/AgendarCitaPage';
 
 function App() {
   return (
@@ -22,6 +23,14 @@ function App() {
             element={
               <ProtectedRoute rolesPermitidos={['cliente']}>
                 <PanelClientePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/agendar"
+            element={
+              <ProtectedRoute rolesPermitidos={['cliente']}>
+                <AgendarCitaPage />
               </ProtectedRoute>
             }
           />

@@ -2,31 +2,14 @@
 // Pestaña "Mis mascotas" del panel del cliente (cierra RF-14): antes
 // solo se podia agregar una mascota de forma inline al agendar una
 // cita (MascotaSelector.jsx); aqui se pueden ver todas y editarlas.
-// Sin foto real (misma razon que medicos/sedes: sin infraestructura de
-// upload) y sin catalogo de razas por especie (especie/raza siguen
-// siendo texto libre, decision ya tomada en el incremento de mascotas
-// -- "Especie" es un select con opciones comunes solo para agilizar la
-// captura, pero se guarda como el mismo texto libre de siempre).
+// El formulario (SidePanel) vive en FormularioMascotaPanel.jsx, compartido
+// con el flujo de agendamiento.
 import { useEffect, useState } from 'react';
-import { obtenerMisMascotas, crearMascota, actualizarMascota } from '../../api/client';
+import { obtenerMisMascotas } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { Campo } from '../form/Campo';
-import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoPata, IconoLapiz } from '../icons';
-
-const ESPECIES = ['Canino', 'Felino', 'Ave', 'Otro'];
-
-const FORM_VACIO = {
-  nombre: '',
-  especie: '',
-  raza: '',
-  fechaNacimiento: '',
-  sexo: '',
-  color: '',
-  pesoKg: '',
-  caracteristicas: '',
-};
+import { FormularioMascotaPanel } from './FormularioMascotaPanel';
 
 export function PanelMisMascotas() {
   const { token } = useAuth();
@@ -36,9 +19,6 @@ export function PanelMisMascotas() {
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [mascotaEditando, setMascotaEditando] = useState(null);
-  const [form, setForm] = useState(FORM_VACIO);
-  const [error, setError] = useState('');
-  const [guardando, setGuardando] = useState(false);
 
   function cargar() {
     setCargando(true);
@@ -53,60 +33,12 @@ export function PanelMisMascotas() {
 
   function abrirCrear() {
     setMascotaEditando(null);
-    setForm(FORM_VACIO);
-    setError('');
     setPanelAbierto(true);
   }
 
   function abrirEditar(mascota) {
     setMascotaEditando(mascota);
-    setForm({
-      nombre: mascota.nombre,
-      especie: mascota.especie || '',
-      raza: mascota.raza || '',
-      fechaNacimiento: mascota.fecha_nacimiento ? String(mascota.fecha_nacimiento).slice(0, 10) : '',
-      sexo: mascota.sexo || '',
-      color: mascota.color || '',
-      pesoKg: mascota.peso_kg ?? '',
-      caracteristicas: mascota.caracteristicas || '',
-    });
-    setError('');
     setPanelAbierto(true);
-  }
-
-  async function guardar(evento) {
-    evento.preventDefault();
-    setError('');
-    if (!form.nombre) {
-      setError('El nombre es obligatorio.');
-      return;
-    }
-
-    setGuardando(true);
-    const datos = {
-      nombre: form.nombre,
-      especie: form.especie || null,
-      raza: form.raza || null,
-      fechaNacimiento: form.fechaNacimiento || null,
-      sexo: form.sexo || null,
-      color: form.color || null,
-      pesoKg: form.pesoKg || null,
-      caracteristicas: form.caracteristicas || null,
-    };
-
-    try {
-      if (mascotaEditando) {
-        await actualizarMascota(mascotaEditando.id, datos, token);
-      } else {
-        await crearMascota(datos, token);
-      }
-      setPanelAbierto(false);
-      cargar();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setGuardando(false);
-    }
   }
 
   return (
@@ -171,122 +103,15 @@ export function PanelMisMascotas() {
 
     </div>
 
-    <SidePanel
+    <FormularioMascotaPanel
       isOpen={panelAbierto}
       onClose={() => setPanelAbierto(false)}
-      title={mascotaEditando ? 'Editar mascota' : 'Agregar mascota'}
-      footer={
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setPanelAbierto(false)}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            form="form-mis-mascotas"
-            disabled={guardando}
-            className="flex-1 rounded-xl bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {guardando ? 'Guardando...' : 'Guardar mascota'}
-          </button>
-        </div>
-      }
-    >
-        <form id="form-mis-mascotas" onSubmit={guardar} className="flex flex-col gap-4">
-          <Campo
-            id="nombre-mascota-cliente"
-            label="Nombre"
-            value={form.nombre}
-            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            required
-          />
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="especie-mascota-cliente" className="text-sm font-medium text-slate-700">
-              Especie
-            </label>
-            <select
-              id="especie-mascota-cliente"
-              value={form.especie}
-              onChange={(e) => setForm({ ...form, especie: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
-            >
-              <option value="">Selecciona una especie</option>
-              {ESPECIES.map((especie) => (
-                <option key={especie} value={especie}>
-                  {especie}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <Campo
-            id="raza-mascota-cliente"
-            label="Raza (opcional)"
-            value={form.raza}
-            onChange={(e) => setForm({ ...form, raza: e.target.value })}
-          />
-
-          <Campo
-            id="fecha-nacimiento-mascota-cliente"
-            label="Fecha de nacimiento (opcional)"
-            type="date"
-            value={form.fechaNacimiento}
-            onChange={(e) => setForm({ ...form, fechaNacimiento: e.target.value })}
-          />
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="sexo-mascota-cliente" className="text-sm font-medium text-slate-700">
-              Sexo (opcional)
-            </label>
-            <select
-              id="sexo-mascota-cliente"
-              value={form.sexo}
-              onChange={(e) => setForm({ ...form, sexo: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
-            >
-              <option value="">Selecciona</option>
-              <option value="macho">Macho</option>
-              <option value="hembra">Hembra</option>
-            </select>
-          </div>
-
-          <Campo
-            id="color-mascota-cliente"
-            label="Color (opcional)"
-            value={form.color}
-            onChange={(e) => setForm({ ...form, color: e.target.value })}
-          />
-
-          <Campo
-            id="peso-mascota-cliente"
-            label="Peso en kg (opcional)"
-            type="number"
-            min="0"
-            step="0.1"
-            value={form.pesoKg}
-            onChange={(e) => setForm({ ...form, pesoKg: e.target.value })}
-          />
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="caracteristicas-mascota-cliente" className="text-sm font-medium text-slate-700">
-              Características especiales (opcional)
-            </label>
-            <textarea
-              id="caracteristicas-mascota-cliente"
-              rows={3}
-              value={form.caracteristicas}
-              onChange={(e) => setForm({ ...form, caracteristicas: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
-            />
-          </div>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </form>
-    </SidePanel>
+      mascota={mascotaEditando}
+      onGuardada={() => {
+        setPanelAbierto(false);
+        cargar();
+      }}
+    />
     </>
   );
 }
