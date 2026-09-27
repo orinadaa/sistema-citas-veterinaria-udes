@@ -95,6 +95,16 @@ describe('POST /api/servicios', () => {
     expect(respuesta.status).toBe(400);
   });
 
+  test('rechaza una duracion fuera de rango o no entera', async () => {
+    for (const duracionMinutos of [0, 2, 500, 30.5]) {
+      const respuesta = await request(app)
+        .post('/api/servicios')
+        .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+        .send({ nombre: 'Nuevo servicio', categoriaId: CATEGORIA_ID, duracionMinutos });
+      expect(respuesta.status).toBe(400);
+    }
+  });
+
   test('rechaza si la categoria no existe', async () => {
     categoriaServicioModel.existe.mockResolvedValue(false);
 

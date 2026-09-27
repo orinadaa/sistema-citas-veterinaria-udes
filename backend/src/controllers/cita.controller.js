@@ -3,10 +3,11 @@
 // RF-09 (cancelar). Todo el modulo es exclusivo del rol cliente
 // (ver cita.routes.js): son las historias de usuario HU-05 a HU-08.
 //
-// El agendamiento pide sede + servicio + franja + medico: la
-// disponibilidad de una franja depende de que al menos un medico que
-// preste ese servicio en esa sede este libre; el cliente elige despues
-// el medico especifico entre los libres en la franja escogida.
+// La disponibilidad de una franja depende de que al menos un medico que
+// preste ese servicio en esa sede este libre. En el flujo de
+// agendamiento del cliente (incremento 4) el medico se asigna
+// automaticamente al confirmar; el calendario del administrador sigue
+// eligiendolo explicitamente.
 
 const citaModel = require('../models/cita.model');
 const sedeModel = require('../models/sede.model');
@@ -15,6 +16,7 @@ const medicoModel = require('../models/medico.model');
 const usuarioModel = require('../models/usuario.model');
 const horarioModel = require('../models/horario.model');
 const mascotaModel = require('../models/mascota.model');
+const correoService = require('../services/correo.service');
 const { generarFranjasEntreHoras, DURACION_SLOT_MINUTOS } = require('../utils/franjas');
 
 function limitesDelDia(fecha) {
@@ -165,19 +167,65 @@ async function consultarMedicosDisponibles(req, res, next) {
   }
 }
 
+// Asignacion automatica de medico (flujo de agendamiento del cliente,
+// decision registrada en docs/incremento_4_pruebas.md): entre los
+// medicos activos de la sede que prestan el servicio y estan libres en
+// esa franja, primero el que tenga menos citas activas ese dia;
+// desempate por nombre para que el resultado sea estable/predecible.
+async function candidatosParaFranja(sedeId, servicioId, fecha) {
+  const medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId);
+  if (medicos.length === 0) return [];
+  const ids = medicos.map((medico) => medico.id);
+
+  const ocupadas = await medicoModel.listarFranjasOcupadas(ids, fecha, new Date(fecha.getTime() + 1000));
+  const ocupadosIds = new Set(ocupadas.map((fila) => fila.medico_id));
+
+  const { inicio, fin } = limitesDelDia(fecha);
+  const cargas = await medicoModel.contarCitasPorMedico(ids, inicio, fin);
+  const cargaPorMedico = new Map(cargas.map((fila) => [fila.medico_id, fila.total]));
+
+  return medicos
+    .filter((medico) => !ocupadosIds.has(medico.id))
+    .sort(
+      (a, b) =>
+        (cargaPorMedico.get(a.id) || 0) - (cargaPorMedico.get(b.id) || 0) ||
+        a.nombre_completo.localeCompare(b.nombre_completo, 'es')
+    )
+    .map((medico) => medico.id);
+}
+
+// Envia el correo de confirmacion sin tumbar el agendamiento si el
+// SMTP falla: la cita ya quedo creada, el cliente puede usar "Reenviar
+// correo" desde la pantalla de confirmacion.
+async function intentarEnviarConfirmacion(cita) {
+  try {
+    await correoService.enviarConfirmacionCita(cita);
+    return true;
+  } catch (error) {
+    console.error(`No se pudo enviar la confirmacion de la cita ${cita.codigo}:`, error.message);
+    return false;
+  }
+}
+
 // POST /api/citas — el cliente agenda para si mismo; el administrador
 // agenda en nombre de un cliente de su propia sede (calendario del
 // panel administrativo) indicando clienteId explicitamente.
+// medicoId es opcional: el flujo de agendamiento del cliente no tiene
+// paso de medico, se asigna automaticamente (candidatosParaFranja). El
+// calendario del administrador si lo sigue enviando explicito.
 async function crear(req, res, next) {
   try {
     const esAdmin = req.usuario.rol === 'administrador';
     const { servicioId, medicoId, fechaHora, mascotaId, motivo, clienteId: clienteIdBody } = req.body;
     const sedeId = esAdmin ? req.usuario.sedeId : req.body.sedeId;
 
-    if (!sedeId || !servicioId || !medicoId || !fechaHora || !mascotaId) {
+    if (!sedeId || !servicioId || !fechaHora || !mascotaId) {
       return res.status(400).json({
-        mensaje: 'sedeId, servicioId, medicoId, fechaHora y mascotaId son obligatorios.',
+        mensaje: 'sedeId, servicioId, fechaHora y mascotaId son obligatorios.',
       });
+    }
+    if (motivo && String(motivo).length > 255) {
+      return res.status(400).json({ mensaje: 'El motivo no puede superar los 255 caracteres.' });
     }
 
     let clienteId = req.usuario.id;
@@ -196,20 +244,19 @@ async function crear(req, res, next) {
       return res.status(404).json({ mensaje: 'La mascota indicada no existe o no pertenece a ese cliente.' });
     }
 
-    const [sede, servicio, medico] = await Promise.all([
-      sedeModel.buscarPorId(sedeId),
-      servicioModel.buscarPorId(servicioId),
-      usuarioModel.buscarPorId(medicoId),
-    ]);
+    const [sede, servicio] = await Promise.all([sedeModel.buscarPorId(sedeId), servicioModel.buscarPorId(servicioId)]);
     if (!sede) return res.status(404).json({ mensaje: 'La sede indicada no existe.' });
     if (!servicio) return res.status(404).json({ mensaje: 'El servicio indicado no existe.' });
-    if (!medico || medico.rol !== 'veterinario' || medico.sede_id !== sedeId) {
-      return res.status(404).json({ mensaje: 'El médico indicado no existe en esa sede.' });
-    }
 
-    const ofrece = await medicoModel.ofreceServicio(medicoId, servicioId);
-    if (!ofrece) {
-      return res.status(400).json({ mensaje: 'Ese médico no presta el servicio seleccionado.' });
+    if (medicoId) {
+      const medico = await usuarioModel.buscarPorId(medicoId);
+      if (!medico || medico.rol !== 'veterinario' || medico.sede_id !== sedeId) {
+        return res.status(404).json({ mensaje: 'El médico indicado no existe en esa sede.' });
+      }
+      const ofrece = await medicoModel.ofreceServicio(medicoId, servicioId);
+      if (!ofrece) {
+        return res.status(400).json({ mensaje: 'Ese médico no presta el servicio seleccionado.' });
+      }
     }
 
     const fecha = parsearFechaISO(fechaHora);
@@ -223,26 +270,75 @@ async function crear(req, res, next) {
       return res.status(409).json({ mensaje: 'La hora seleccionada no coincide con una franja de atención válida.' });
     }
 
-    const ocupado = await citaModel.existeConflicto(medicoId, fecha);
-    if (ocupado) {
-      return res.status(409).json({ mensaje: 'Ese médico ya tiene una cita en esa franja. Elige otra.' });
+    let candidatos;
+    if (medicoId) {
+      if (await citaModel.existeConflicto(medicoId, fecha)) {
+        return res.status(409).json({ mensaje: 'Ese médico ya tiene una cita en esa franja. Elige otra.' });
+      }
+      candidatos = [medicoId];
+    } else {
+      candidatos = await candidatosParaFranja(sedeId, servicioId, fecha);
+      if (candidatos.length === 0) {
+        return res.status(409).json({ mensaje: 'Ya no hay médicos disponibles en esa franja. Elige otra hora.' });
+      }
     }
 
-    const cita = await citaModel.crear({
-      clienteId,
-      sedeId,
-      servicioId,
-      medicoId,
-      fechaHora: fecha,
-      mascotaId,
-      motivo,
-    });
+    // Se prueba cada candidato en orden: si otro cliente tomo ese medico
+    // en esa franja entre la consulta y el INSERT, el indice unico
+    // (medico_id, fecha_hora) responde 23505 y se pasa al siguiente.
+    let creada = null;
+    for (const candidatoId of candidatos) {
+      try {
+        creada = await citaModel.crear({
+          clienteId,
+          sedeId,
+          sedeCodigo: sede.codigo,
+          servicioId,
+          medicoId: candidatoId,
+          fechaHora: fecha,
+          mascotaId,
+          motivo,
+        });
+        break;
+      } catch (error) {
+        if (error.code !== '23505') throw error;
+      }
+    }
+    if (!creada) {
+      return res.status(409).json({ mensaje: 'Esa franja se acaba de ocupar. Elige otra hora.' });
+    }
 
-    return res.status(201).json({ cita });
+    const detalle = (await citaModel.buscarDetallePorId(creada.id)) || creada;
+    const correoEnviado = await intentarEnviarConfirmacion(detalle);
+
+    return res.status(201).json({ cita: detalle, correoEnviado });
   } catch (error) {
-    if (error.code === '23505') {
-      return res.status(409).json({ mensaje: 'Ese médico ya tiene una cita en esa franja. Elige otra.' });
+    next(error);
+  }
+}
+
+// POST /api/citas/:id/reenviar-confirmacion — boton "Reenviar correo"
+// de la pantalla de confirmacion. Solo el cliente dueño, solo citas
+// activas.
+async function reenviarConfirmacion(req, res, next) {
+  try {
+    const cita = await citaModel.buscarDetallePorId(req.params.id);
+    if (!cita) return res.status(404).json({ mensaje: 'Cita no encontrada.' });
+    if (cita.cliente_id !== req.usuario.id) {
+      return res.status(403).json({ mensaje: 'No puedes reenviar la confirmación de una cita que no es tuya.' });
     }
+    if (cita.estado !== 'agendada') {
+      return res.status(400).json({ mensaje: 'La cita está cancelada.' });
+    }
+
+    try {
+      await correoService.enviarConfirmacionCita(cita);
+    } catch (error) {
+      console.error(`No se pudo reenviar la confirmacion de la cita ${cita.codigo}:`, error.message);
+      return res.status(502).json({ mensaje: 'No se pudo enviar el correo en este momento. Intenta de nuevo más tarde.' });
+    }
+    return res.status(200).json({ mensaje: `Enviamos de nuevo la confirmación a ${cita.cliente_correo}.` });
+  } catch (error) {
     next(error);
   }
 }
@@ -329,6 +425,7 @@ module.exports = {
   consultarDisponibilidad,
   consultarMedicosDisponibles,
   crear,
+  reenviarConfirmacion,
   misCitas,
   reprogramarCita,
   cancelarCita,

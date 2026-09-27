@@ -29,6 +29,19 @@ async function listarFranjasOcupadas(medicoIds, inicio, fin) {
   return resultado.rows;
 }
 
+// Citas activas de cada medico dentro de [inicio, fin): criterio de
+// balanceo al asignar medico automaticamente (el menos cargado ese dia).
+async function contarCitasPorMedico(medicoIds, inicio, fin) {
+  if (medicoIds.length === 0) return [];
+  const resultado = await pool.query(
+    `SELECT medico_id, COUNT(*)::int AS total FROM cita
+     WHERE medico_id = ANY($1::uuid[]) AND estado = 'agendada' AND fecha_hora >= $2 AND fecha_hora < $3
+     GROUP BY medico_id`,
+    [medicoIds, inicio, fin]
+  );
+  return resultado.rows;
+}
+
 async function ofreceServicio(medicoId, servicioId) {
   const resultado = await pool.query(
     'SELECT 1 FROM servicio_medico WHERE medico_id = $1 AND servicio_id = $2',
@@ -144,6 +157,7 @@ async function reemplazarEspecialidades(medicoId, categoriaIds) {
 module.exports = {
   listarPorSedeYServicio,
   listarFranjasOcupadas,
+  contarCitasPorMedico,
   ofreceServicio,
   asignarServicio,
   listarConServicios,

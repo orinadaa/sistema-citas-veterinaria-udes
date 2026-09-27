@@ -11,6 +11,8 @@ jest.mock('../src/models/medico.model');
 jest.mock('../src/models/usuario.model');
 jest.mock('../src/models/horario.model');
 jest.mock('../src/models/mascota.model');
+// El correo de confirmacion (incremento 4) nunca debe salir por SMTP real en pruebas.
+jest.mock('../src/services/correo.service');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -22,6 +24,7 @@ const medicoModel = require('../src/models/medico.model');
 const usuarioModel = require('../src/models/usuario.model');
 const horarioModel = require('../src/models/horario.model');
 const mascotaModel = require('../src/models/mascota.model');
+const correoService = require('../src/services/correo.service');
 
 const ID_CLIENTE = 'cliente-1';
 const ID_SEDE = 'sede-1';
@@ -373,6 +376,149 @@ describe('POST /api/citas (administrador agenda en nombre de un cliente)', () =>
 
     expect(respuesta.status).toBe(201);
     expect(citaModel.crear).toHaveBeenCalledWith(expect.objectContaining({ clienteId: ID_CLIENTE, sedeId: ID_SEDE }));
+  });
+});
+
+describe('POST /api/citas sin medicoId (asignacion automatica, flujo del cliente)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockearEntidadesBasicas();
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE, codigo: 'BGA' });
+    citaModel.buscarDetallePorId.mockResolvedValue(null);
+    correoService.enviarConfirmacionCita.mockResolvedValue();
+  });
+
+  function agendarSinMedico(franja) {
+    return request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, fechaHora: franja.toISOString(), mascotaId: ID_MASCOTA });
+  }
+
+  test('asigna al medico libre con menos citas ese dia', async () => {
+    medicoModel.listarPorSedeYServicio.mockResolvedValue([
+      { id: 'med-a', nombre_completo: 'Ana' },
+      { id: 'med-b', nombre_completo: 'Bruno' },
+      { id: 'med-c', nombre_completo: 'Carla' },
+    ]);
+    // med-a esta ocupado justo en esa franja; med-b tiene 3 citas ese dia, med-c 1
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: 'med-a' }]);
+    medicoModel.contarCitasPorMedico.mockResolvedValue([
+      { medico_id: 'med-b', total: 3 },
+      { medico_id: 'med-c', total: 1 },
+    ]);
+    citaModel.crear.mockResolvedValue({ id: 'cita-1', codigo: 'CV-BGA-2026-00001', estado: 'agendada' });
+
+    const respuesta = await agendarSinMedico(proximaFranjaValida());
+
+    expect(respuesta.status).toBe(201);
+    expect(citaModel.crear).toHaveBeenCalledTimes(1);
+    expect(citaModel.crear).toHaveBeenCalledWith(expect.objectContaining({ medicoId: 'med-c', sedeCodigo: 'BGA' }));
+    expect(respuesta.body.correoEnviado).toBe(true);
+  });
+
+  test('responde 409 si ningun medico esta libre en esa franja', async () => {
+    medicoModel.listarPorSedeYServicio.mockResolvedValue([{ id: 'med-a', nombre_completo: 'Ana' }]);
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: 'med-a' }]);
+    medicoModel.contarCitasPorMedico.mockResolvedValue([]);
+
+    const respuesta = await agendarSinMedico(proximaFranjaValida());
+
+    expect(respuesta.status).toBe(409);
+    expect(citaModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('si el primer candidato se ocupa en el instante del INSERT (23505), prueba con el siguiente', async () => {
+    medicoModel.listarPorSedeYServicio.mockResolvedValue([
+      { id: 'med-a', nombre_completo: 'Ana' },
+      { id: 'med-b', nombre_completo: 'Bruno' },
+    ]);
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([]);
+    medicoModel.contarCitasPorMedico.mockResolvedValue([]);
+    citaModel.crear
+      .mockRejectedValueOnce(Object.assign(new Error('duplicado'), { code: '23505' }))
+      .mockResolvedValueOnce({ id: 'cita-1', codigo: 'CV-BGA-2026-00002', estado: 'agendada' });
+
+    const respuesta = await agendarSinMedico(proximaFranjaValida());
+
+    expect(respuesta.status).toBe(201);
+    expect(citaModel.crear).toHaveBeenNthCalledWith(1, expect.objectContaining({ medicoId: 'med-a' }));
+    expect(citaModel.crear).toHaveBeenNthCalledWith(2, expect.objectContaining({ medicoId: 'med-b' }));
+  });
+
+  test('si el correo falla, la cita igual queda creada y se informa correoEnviado=false', async () => {
+    medicoModel.listarPorSedeYServicio.mockResolvedValue([{ id: 'med-a', nombre_completo: 'Ana' }]);
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([]);
+    medicoModel.contarCitasPorMedico.mockResolvedValue([]);
+    citaModel.crear.mockResolvedValue({ id: 'cita-1', codigo: 'CV-BGA-2026-00003', estado: 'agendada' });
+    correoService.enviarConfirmacionCita.mockRejectedValue(new Error('SMTP caido'));
+    const errorOriginal = console.error;
+    console.error = jest.fn();
+
+    const respuesta = await agendarSinMedico(proximaFranjaValida());
+    console.error = errorOriginal;
+
+    expect(respuesta.status).toBe(201);
+    expect(respuesta.body.correoEnviado).toBe(false);
+  });
+
+  test('rechaza un motivo de mas de 255 caracteres', async () => {
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({
+        sedeId: ID_SEDE,
+        servicioId: ID_SERVICIO,
+        fechaHora: proximaFranjaValida().toISOString(),
+        mascotaId: ID_MASCOTA,
+        motivo: 'x'.repeat(256),
+      });
+    expect(respuesta.status).toBe(400);
+  });
+});
+
+describe('POST /api/citas/:id/reenviar-confirmacion', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  const CITA_DETALLE = { id: 'cita-1', cliente_id: ID_CLIENTE, estado: 'agendada', codigo: 'CV-BGA-2026-00001', cliente_correo: 'c@c.com' };
+
+  test('responde 403 si la cita es de otro cliente', async () => {
+    citaModel.buscarDetallePorId.mockResolvedValue({ ...CITA_DETALLE, cliente_id: 'otro' });
+    const respuesta = await request(app)
+      .post('/api/citas/cita-1/reenviar-confirmacion')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(403);
+    expect(correoService.enviarConfirmacionCita).not.toHaveBeenCalled();
+  });
+
+  test('responde 400 si la cita esta cancelada', async () => {
+    citaModel.buscarDetallePorId.mockResolvedValue({ ...CITA_DETALLE, estado: 'cancelada' });
+    const respuesta = await request(app)
+      .post('/api/citas/cita-1/reenviar-confirmacion')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('reenvia el correo de una cita propia y activa', async () => {
+    citaModel.buscarDetallePorId.mockResolvedValue(CITA_DETALLE);
+    correoService.enviarConfirmacionCita.mockResolvedValue();
+    const respuesta = await request(app)
+      .post('/api/citas/cita-1/reenviar-confirmacion')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(200);
+    expect(correoService.enviarConfirmacionCita).toHaveBeenCalledWith(CITA_DETALLE);
+  });
+
+  test('responde 502 si el servidor de correo falla', async () => {
+    citaModel.buscarDetallePorId.mockResolvedValue(CITA_DETALLE);
+    correoService.enviarConfirmacionCita.mockRejectedValue(new Error('SMTP caido'));
+    const errorOriginal = console.error;
+    console.error = jest.fn();
+    const respuesta = await request(app)
+      .post('/api/citas/cita-1/reenviar-confirmacion')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    console.error = errorOriginal;
+    expect(respuesta.status).toBe(502);
   });
 });
 

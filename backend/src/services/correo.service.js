@@ -91,4 +91,46 @@ Clínica Veterinaria UDES`,
   });
 }
 
-module.exports = { enviarCredenciales, enviarBienvenidaCliente, enviarCodigoRecuperacion };
+const formatoFechaCita = new Intl.DateTimeFormat('es-CO', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+});
+
+// Confirmacion de una cita recien agendada (parte de confirmacion de
+// RF-17, adelantada al flujo de agendamiento del incremento 4; el
+// recordatorio de 24 horas antes, RF-18, sigue pendiente para el
+// incremento 5). `cita` es la fila de cita.model.js#buscarDetallePorId.
+async function enviarConfirmacionCita(cita) {
+  const lineas = [
+    `Hola ${cita.cliente_nombre},`,
+    '',
+    `Tu cita quedó agendada. Este es el resumen:`,
+    '',
+    `Código de la cita: ${cita.codigo}`,
+    `Mascota: ${cita.mascota_nombre}`,
+    `Servicio: ${cita.servicio_nombre}`,
+    `Fecha y hora: ${formatoFechaCita.format(new Date(cita.fecha_hora))}`,
+    `Sede: ${cita.sede_nombre}${cita.sede_direccion ? ` — ${cita.sede_direccion}` : ''}`,
+    `Médico veterinario: ${cita.medico_nombre}`,
+  ];
+  if (cita.motivo) lineas.push(`Motivo: ${cita.motivo}`);
+  lineas.push(
+    '',
+    'Te recomendamos llegar 10 minutos antes. Si necesitas reprogramar o cancelar, puedes hacerlo desde "Mis citas" en tu cuenta.',
+    '',
+    'Clínica Veterinaria UDES'
+  );
+
+  await enviarCorreo({
+    para: cita.cliente_correo,
+    asunto: `Cita confirmada ${cita.codigo} — Clínica Veterinaria UDES`,
+    texto: lineas.join('\n'),
+  });
+}
+
+module.exports = { enviarCredenciales, enviarBienvenidaCliente, enviarCodigoRecuperacion, enviarConfirmacionCita };

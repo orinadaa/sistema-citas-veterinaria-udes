@@ -74,10 +74,39 @@ describe('POST /api/sedes', () => {
     const respuesta = await request(app)
       .post('/api/sedes')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombre: 'Sede nueva', ciudad: 'Cúcuta' });
+      .send({ nombre: 'Sede nueva', ciudad: 'Cúcuta', codigo: 'cuc' });
 
     expect(respuesta.status).toBe(201);
     expect(respuesta.body.sede.nombre).toBe('Sede nueva');
+    // el codigo se normaliza a mayusculas antes de guardarse
+    expect(sedeModel.crear).toHaveBeenCalledWith(expect.objectContaining({ codigo: 'CUC' }));
+  });
+
+  test('rechaza crear una sede sin codigo', async () => {
+    const respuesta = await request(app)
+      .post('/api/sedes')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombre: 'Sede nueva', ciudad: 'Cúcuta' });
+    expect(respuesta.status).toBe(400);
+    expect(sedeModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('rechaza un codigo con numeros o tildes', async () => {
+    const respuesta = await request(app)
+      .post('/api/sedes')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombre: 'Sede nueva', ciudad: 'Cúcuta', codigo: 'CÚ1' });
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('responde 409 si el codigo ya lo usa otra sede', async () => {
+    sedeModel.crear.mockRejectedValue(Object.assign(new Error('duplicado'), { code: '23505' }));
+
+    const respuesta = await request(app)
+      .post('/api/sedes')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombre: 'Sede nueva', ciudad: 'Cúcuta', codigo: 'BGA' });
+    expect(respuesta.status).toBe(409);
   });
 });
 

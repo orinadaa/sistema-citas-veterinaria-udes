@@ -8,6 +8,13 @@ function precioValido(precio) {
   return Number.isInteger(precio) && precio >= 0;
 }
 
+// Duracion estimada (informativa, ver database/incremento_4b_agendamiento.sql):
+// minutos enteros entre 5 y 480 (8 horas).
+function duracionValida(duracion) {
+  return Number.isInteger(duracion) && duracion >= 5 && duracion <= 480;
+}
+const MENSAJE_DURACION = 'La duración debe ser un número entero de minutos entre 5 y 480.';
+
 // GET /api/servicios — publico, solo activos
 async function listar(req, res, next) {
   try {
@@ -41,7 +48,7 @@ async function listarCategorias(req, res, next) {
 // POST /api/servicios — solo administrador
 async function crear(req, res, next) {
   try {
-    const { nombre, descripcion, categoriaId, precio } = req.body;
+    const { nombre, descripcion, categoriaId, precio, duracionMinutos } = req.body;
     if (!nombre) {
       return res.status(400).json({ mensaje: 'El nombre del servicio es obligatorio.' });
     }
@@ -51,11 +58,14 @@ async function crear(req, res, next) {
     if (precio !== undefined && !precioValido(precio)) {
       return res.status(400).json({ mensaje: 'El precio debe ser un número entero mayor o igual a 0.' });
     }
+    if (duracionMinutos !== undefined && !duracionValida(duracionMinutos)) {
+      return res.status(400).json({ mensaje: MENSAJE_DURACION });
+    }
     if (!(await categoriaServicioModel.existe(categoriaId))) {
       return res.status(400).json({ mensaje: 'La categoría indicada no existe.' });
     }
 
-    const servicio = await servicioModel.crear({ nombre, descripcion, categoriaId, precio });
+    const servicio = await servicioModel.crear({ nombre, descripcion, categoriaId, precio, duracionMinutos });
     return res.status(201).json({ servicio });
   } catch (error) {
     if (error.code === '23505') {
@@ -69,16 +79,19 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const { id } = req.params;
-    const { nombre, descripcion, categoriaId, precio, activo } = req.body;
+    const { nombre, descripcion, categoriaId, precio, duracionMinutos, activo } = req.body;
 
     if (precio !== undefined && !precioValido(precio)) {
       return res.status(400).json({ mensaje: 'El precio debe ser un número entero mayor o igual a 0.' });
+    }
+    if (duracionMinutos !== undefined && !duracionValida(duracionMinutos)) {
+      return res.status(400).json({ mensaje: MENSAJE_DURACION });
     }
     if (categoriaId && !(await categoriaServicioModel.existe(categoriaId))) {
       return res.status(400).json({ mensaje: 'La categoría indicada no existe.' });
     }
 
-    const servicio = await servicioModel.actualizar(id, { nombre, descripcion, categoriaId, precio, activo });
+    const servicio = await servicioModel.actualizar(id, { nombre, descripcion, categoriaId, precio, duracionMinutos, activo });
     if (!servicio) {
       return res.status(404).json({ mensaje: 'Servicio no encontrado.' });
     }

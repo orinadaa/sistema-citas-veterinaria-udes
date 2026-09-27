@@ -13,6 +13,7 @@ const {
   consultarDisponibilidad,
   consultarMedicosDisponibles,
   crear,
+  reenviarConfirmacion,
   misCitas,
   reprogramarCita,
   cancelarCita,
@@ -34,6 +35,9 @@ router.get('/mias', verificarRol('cliente'), misCitas);
 
 // POST /api/citas
 router.post('/', verificarRol('cliente', 'administrador'), crear);
+
+// POST /api/citas/:id/reenviar-confirmacion — exclusivo del cliente dueño
+router.post('/:id/reenviar-confirmacion', verificarRol('cliente'), reenviarConfirmacion);
 
 // PATCH /api/citas/:id/reprogramar — exclusivo del cliente dueño de la cita
 router.patch('/:id/reprogramar', verificarRol('cliente'), reprogramarCita);
