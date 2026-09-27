@@ -34,6 +34,18 @@ export function hoyComoFechaLocal() {
   return new Date(hoy - offset).toISOString().slice(0, 10);
 }
 
+// Date (hora local) <-> "YYYY-MM-DD", sin pasar por UTC.
+export function aFechaLocal(fecha) {
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${fecha.getFullYear()}-${mes}-${dia}`;
+}
+
+export function desdeFechaLocal(texto) {
+  const [anio, mes, dia] = texto.split('-').map(Number);
+  return new Date(anio, mes - 1, dia);
+}
+
 // Utilidades de calendario (vista semanal del panel administrativo).
 
 export function sumarDias(fecha, dias) {
