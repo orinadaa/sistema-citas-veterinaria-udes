@@ -30,7 +30,20 @@ const DIAS = [
   { numero: 0, letra: 'D', nombre: 'Domingo' },
 ];
 
-const FORM_VACIO = { nombre: '', ciudad: '', direccion: '', fotoUrl: '', activo: true };
+// codigo: 2-5 letras, va dentro del consecutivo de cada cita
+// (CV-BGA-2026-00045). esPrincipal/amenidades: tarjeta de sede del
+// flujo de agendamiento del cliente (incremento 4).
+const FORM_VACIO = {
+  nombre: '',
+  ciudad: '',
+  codigo: '',
+  direccion: '',
+  fotoUrl: '',
+  activo: true,
+  esPrincipal: false,
+  tieneParqueadero: false,
+  salaPetFriendly: false,
+};
 
 function formatoInput(hora) {
   return hora ? hora.slice(0, 5) : '';
@@ -103,9 +116,13 @@ export function PanelHorarios() {
     setForm({
       nombre: sede.nombre,
       ciudad: sede.ciudad,
+      codigo: sede.codigo || '',
       direccion: sede.direccion || '',
       fotoUrl: sede.foto_url || '',
       activo: sede.activo,
+      esPrincipal: sede.es_principal,
+      tieneParqueadero: sede.tiene_parqueadero,
+      salaPetFriendly: sede.sala_pet_friendly,
     });
     setDiasHorario(diasDeSede(sede.id));
     setError('');
@@ -115,8 +132,8 @@ export function PanelHorarios() {
   async function guardarSede(evento) {
     evento.preventDefault();
     setError('');
-    if (!form.nombre || !form.ciudad) {
-      setError('El nombre y la ciudad son obligatorios.');
+    if (!form.nombre || !form.ciudad || !form.codigo) {
+      setError('El nombre, la ciudad y el código son obligatorios.');
       return;
     }
 
@@ -217,7 +234,12 @@ export function PanelHorarios() {
                     </span>
                   )}
                   <div>
-                    <p className="font-medium text-slate-900">{sede.nombre}</p>
+                    <p className="flex items-center gap-2 font-medium text-slate-900">
+                      {sede.nombre}
+                      {sede.es_principal && (
+                        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Principal</span>
+                      )}
+                    </p>
                     <p className="text-xs text-slate-400">{sede.direccion || sede.ciudad}</p>
                   </div>
                 </div>
@@ -301,9 +323,33 @@ export function PanelHorarios() {
 
           <Campo id="nombre-sede" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
           <Campo id="ciudad-sede" label="Ciudad" value={form.ciudad} onChange={(e) => setForm({ ...form, ciudad: e.target.value })} required />
+          <Campo
+            id="codigo-sede"
+            label="Código (2 a 5 letras, ej. BGA)"
+            value={form.codigo}
+            maxLength={5}
+            onChange={(e) => setForm({ ...form, codigo: e.target.value.toUpperCase().replace(/[^A-Z]/g, '') })}
+            required
+          />
           <Campo id="direccion-sede" label="Dirección" value={form.direccion} onChange={(e) => setForm({ ...form, direccion: e.target.value })} />
 
           <StatusToggle checked={form.activo} onChange={alternarActivaDesdeElPanel} label="Sede activa" helpText="Si se desactiva, no aparecerá disponible para agendar citas." />
+          <StatusToggle
+            checked={form.esPrincipal}
+            onChange={(valor) => setForm({ ...form, esPrincipal: valor })}
+            label="Sede principal"
+            helpText="Solo puede haber una. Se muestra con un distintivo al agendar."
+          />
+          <StatusToggle
+            checked={form.tieneParqueadero}
+            onChange={(valor) => setForm({ ...form, tieneParqueadero: valor })}
+            label="Tiene parqueadero"
+          />
+          <StatusToggle
+            checked={form.salaPetFriendly}
+            onChange={(valor) => setForm({ ...form, salaPetFriendly: valor })}
+            label="Sala de espera pet friendly"
+          />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 

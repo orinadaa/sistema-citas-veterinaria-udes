@@ -1,5 +1,7 @@
 // components/admin/PanelServicios.jsx
-// RF-11: catalogo de servicios veterinarios (categoria, precio, estado).
+// RF-11: catalogo de servicios veterinarios (categoria, precio, duracion
+// estimada, estado). La duracion se muestra al cliente en el resumen del
+// flujo de agendamiento; es informativa (la agenda sigue en franjas de 30 min).
 import { useEffect, useMemo, useState } from 'react';
 import {
   obtenerServiciosAdmin,
@@ -19,7 +21,7 @@ import { EstadoError } from '../ui/EstadoError';
 import { IconoJeringa } from '../icons';
 import { formatearCOP } from '../../utils/moneda';
 
-const FORM_VACIO = { nombre: '', descripcion: '', categoriaId: '', precio: '', activo: true };
+const FORM_VACIO = { nombre: '', descripcion: '', categoriaId: '', precio: '', duracionMinutos: '30', activo: true };
 
 export function PanelServicios({ busquedaInicial }) {
   const { token } = useAuth();
@@ -93,6 +95,7 @@ export function PanelServicios({ busquedaInicial }) {
       descripcion: servicio.descripcion || '',
       categoriaId: servicio.categoria_id,
       precio: String(servicio.precio),
+      duracionMinutos: String(servicio.duracion_minutos ?? 30),
       activo: servicio.activo,
     });
     setError('');
@@ -112,6 +115,7 @@ export function PanelServicios({ busquedaInicial }) {
       descripcion: form.descripcion || null,
       categoriaId: form.categoriaId,
       precio: Number(form.precio) || 0,
+      duracionMinutos: Number(form.duracionMinutos) || 30,
       activo: form.activo,
     };
 
@@ -226,6 +230,7 @@ export function PanelServicios({ busquedaInicial }) {
             },
             { header: 'Categoría', render: (s) => <CategoryBadge nombre={s.categoria_nombre} color={s.categoria_color} /> },
             { header: 'Precio', render: (s) => formatearCOP(s.precio) },
+            { header: 'Duración', render: (s) => `${s.duracion_minutos} min` },
             {
               header: 'Estado',
               render: (s) => (
@@ -329,6 +334,18 @@ export function PanelServicios({ busquedaInicial }) {
             step="1000"
             value={form.precio}
             onChange={(e) => setForm({ ...form, precio: e.target.value })}
+          />
+
+          <Campo
+            id="duracion-servicio"
+            label="Duración estimada (minutos)"
+            type="number"
+            min="5"
+            max="480"
+            step="5"
+            value={form.duracionMinutos}
+            onChange={(e) => setForm({ ...form, duracionMinutos: e.target.value })}
+            required
           />
 
           <StatusToggle
