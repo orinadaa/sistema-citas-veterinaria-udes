@@ -370,3 +370,14 @@ export function IconoPeso({ className }) {
     </Icono>
   );
 }
+
+// Menu de acciones de una tarjeta (tres puntos verticales).
+export function IconoPuntos({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <circle cx="12" cy="5.5" r="1.7" />
+      <circle cx="12" cy="12" r="1.7" />
+      <circle cx="12" cy="18.5" r="1.7" />
+    </svg>
+  );
+}

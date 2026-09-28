@@ -22,7 +22,9 @@ function Etiqueta({ htmlFor, children }) {
   );
 }
 
-export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, className = 'flex flex-col gap-4' }) {
+// iconoEspecie (opcional): icono dentro del campo de especie, a la
+// izquierda (formulario de mascota del admin).
+export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, className = 'flex flex-col gap-4', iconoEspecie: IconoEspecie }) {
   // Especie guardada con un texto que no esta en el catalogo (ej.
   // "Perro" escrito a mano antes de este cambio): se muestra tal cual.
   const especiesOpciones = especie && !ESPECIES.includes(especie) ? [...ESPECIES, especie] : ESPECIES;
@@ -33,21 +35,26 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
     <div className={className}>
       <div className="flex flex-1 flex-col gap-1.5">
         <Etiqueta htmlFor={`${idPrefijo}-especie`}>Especie</Etiqueta>
-        <select
-          id={`${idPrefijo}-especie`}
-          required
-          value={especie}
-          // Cambiar de especie invalida la raza elegida.
-          onChange={(e) => onChange({ especie: e.target.value, raza: '' })}
-          className={CLASE_CAMPO}
-        >
-          <option value="">Selecciona una especie</option>
-          {especiesOpciones.map((opcion) => (
-            <option key={opcion} value={opcion}>
-              {opcion}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          {IconoEspecie && (
+            <IconoEspecie className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-blue" />
+          )}
+          <select
+            id={`${idPrefijo}-especie`}
+            required
+            value={especie}
+            // Cambiar de especie invalida la raza elegida.
+            onChange={(e) => onChange({ especie: e.target.value, raza: '' })}
+            className={`${CLASE_CAMPO} ${IconoEspecie ? 'pl-9' : ''}`}
+          >
+            <option value="">Selecciona una especie</option>
+            {especiesOpciones.map((opcion) => (
+              <option key={opcion} value={opcion}>
+                {opcion}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5">
@@ -71,7 +78,7 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
             onChange={(e) => onChange({ especie, raza: e.target.value })}
             className={CLASE_CAMPO}
           >
-            <option value="">{especie ? 'Selecciona la raza' : 'Primero elige la especie'}</option>
+            <option value="">{especie ? 'Selecciona una raza' : 'Primero elige la especie'}</option>
             {(razasOpciones || []).map((opcion) => (
               <option key={opcion} value={opcion}>
                 {opcion}

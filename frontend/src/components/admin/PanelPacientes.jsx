@@ -7,13 +7,10 @@ import {
   obtenerPacientes,
   obtenerDetallePaciente,
   obtenerSedesAdmin,
-  crearMascota,
   actualizarUsuario,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
-import { Campo } from '../form/Campo';
-import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { StatusToggle } from '../ui/StatusToggle';
@@ -21,13 +18,14 @@ import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { Tabs } from '../ui/Tabs';
 import { EstadoError } from '../ui/EstadoError';
-import { IconoPersona, IconoPata } from '../icons';
+import { IconoPersona, IconoPata, IconoCalendario } from '../icons';
+import { MascotasPaciente } from './MascotasPaciente';
 
 const UMBRAL_FRECUENTE = 3;
 const TABS_DETALLE = [
-  { id: 'info', label: 'Información' },
-  { id: 'mascotas', label: 'Mascota(s)' },
-  { id: 'citas', label: 'Citas' },
+  { id: 'info', label: 'Información', icon: IconoPersona },
+  { id: 'mascotas', label: 'Mascota(s)', icon: IconoPata },
+  { id: 'citas', label: 'Citas', icon: IconoCalendario },
 ];
 
 export function PanelPacientes({ busquedaInicial }) {
@@ -54,9 +52,6 @@ export function PanelPacientes({ busquedaInicial }) {
   const [errorDetalle, setErrorDetalle] = useState('');
   const [pacienteDetalleId, setPacienteDetalleId] = useState(null);
 
-  const [nuevaMascota, setNuevaMascota] = useState({ nombre: '', especie: '', raza: '' });
-  const [errorMascota, setErrorMascota] = useState('');
-  const [guardandoMascota, setGuardandoMascota] = useState(false);
 
   function cargar() {
     setCargando(true);
@@ -98,8 +93,6 @@ export function PanelPacientes({ busquedaInicial }) {
     setErrorDetalle('');
     setDetalle(null);
     setPacienteDetalleId(paciente.id);
-    setNuevaMascota({ nombre: '', especie: '', raza: '' });
-    setErrorMascota('');
     try {
       const datos = await obtenerDetallePaciente(paciente.id, token);
       setDetalle(datos);
@@ -115,25 +108,15 @@ export function PanelPacientes({ busquedaInicial }) {
     cargar();
   }
 
-  async function agregarMascota(evento) {
-    evento.preventDefault();
-    setErrorMascota('');
-    if (!nuevaMascota.nombre || !nuevaMascota.especie || !nuevaMascota.raza) {
-      setErrorMascota('Nombre, especie y raza son obligatorios.');
-      return;
-    }
-    setGuardandoMascota(true);
+  // Tras agregar/editar/eliminar una mascota: refresca el detalle abierto
+  // y la tabla (el conteo de mascotas por paciente).
+  async function refrescarDetalle() {
     try {
-      await crearMascota({ ...nuevaMascota, clienteId: detalle.cliente.id }, token);
-      const actualizado = await obtenerDetallePaciente(detalle.cliente.id, token);
-      setDetalle(actualizado);
-      setNuevaMascota({ nombre: '', especie: '', raza: '' });
-      cargar();
+      setDetalle(await obtenerDetallePaciente(detalle.cliente.id, token));
     } catch (err) {
-      setErrorMascota(err.message);
-    } finally {
-      setGuardandoMascota(false);
+      setErrorDetalle(err.message || 'No se pudo recargar el detalle del paciente.');
     }
+    cargar();
   }
 
   return (
@@ -249,7 +232,7 @@ export function PanelPacientes({ busquedaInicial }) {
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-navy text-sm font-semibold text-white">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
                 {detalle.cliente.nombre_completo
                   .split(' ')
                   .slice(0, 2)
@@ -260,10 +243,11 @@ export function PanelPacientes({ busquedaInicial }) {
               <div>
                 <p className="font-heading text-base font-semibold text-brand-navy">{detalle.cliente.nombre_completo}</p>
                 <span
-                  className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  className={`mt-0.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
                     detalle.cliente.activo ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'
                   }`}
                 >
+                  <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${detalle.cliente.activo ? 'bg-brand-green' : 'bg-slate-400'}`} />
                   {detalle.cliente.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
@@ -299,53 +283,7 @@ export function PanelPacientes({ busquedaInicial }) {
             )}
 
             {pestanaDetalle === 'mascotas' && (
-              <div className="flex flex-col gap-4">
-                {detalle.mascotas.length === 0 ? (
-                  <p className="text-sm text-slate-400">Sin mascotas registradas todavía.</p>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {detalle.mascotas.map((m) => (
-                      <div key={m.id} className="flex items-center gap-3 rounded-lg border border-slate-200 p-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                          <IconoPata className="h-4 w-4" />
-                        </span>
-                        <div>
-                          <p className="text-sm font-medium text-slate-900">{m.nombre}</p>
-                          <p className="text-xs text-slate-400">
-                            {[m.especie, m.raza].filter(Boolean).join(' · ') || 'Sin datos adicionales'}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <form onSubmit={agregarMascota} className="flex flex-col gap-3 rounded-lg border border-dashed border-slate-300 p-3">
-                  <p className="text-sm font-medium text-slate-700">+ Agregar mascota</p>
-                  <Campo
-                    id="nueva-mascota-nombre-paciente"
-                    label="Nombre"
-                    value={nuevaMascota.nombre}
-                    onChange={(e) => setNuevaMascota({ ...nuevaMascota, nombre: e.target.value })}
-                    required
-                  />
-                  <SelectorEspecieRaza
-                    idPrefijo="nueva-mascota-paciente"
-                    className="flex flex-col gap-3"
-                    especie={nuevaMascota.especie}
-                    raza={nuevaMascota.raza}
-                    onChange={({ especie, raza }) => setNuevaMascota({ ...nuevaMascota, especie, raza })}
-                  />
-                  {errorMascota && <p className="text-sm text-red-600">{errorMascota}</p>}
-                  <button
-                    type="submit"
-                    disabled={guardandoMascota}
-                    className="self-start rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
-                  >
-                    {guardandoMascota ? 'Guardando...' : 'Agregar'}
-                  </button>
-                </form>
-              </div>
+              <MascotasPaciente clienteId={detalle.cliente.id} mascotas={detalle.mascotas} onCambio={refrescarDetalle} />
             )}
 
             {pestanaDetalle === 'citas' && (

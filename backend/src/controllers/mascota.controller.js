@@ -203,7 +203,8 @@ async function actualizar(req, res, next) {
   }
 }
 
-// DELETE /api/mascotas/:id — el cliente solo puede eliminar la suya.
+// DELETE /api/mascotas/:id — el cliente solo puede eliminar la suya; el
+// administrador, la de cualquier cliente (Detalle del paciente).
 // Baja logica (activo = false): las citas pasadas conservan la mascota.
 // Si tiene citas agendadas a futuro, primero hay que cancelarlas.
 async function eliminar(req, res, next) {
@@ -213,7 +214,7 @@ async function eliminar(req, res, next) {
     if (!mascota) {
       return res.status(404).json({ mensaje: 'Mascota no encontrada.' });
     }
-    if (mascota.cliente_id !== req.usuario.id) {
+    if (req.usuario.rol !== 'administrador' && mascota.cliente_id !== req.usuario.id) {
       return res.status(403).json({ mensaje: 'No puedes eliminar una mascota que no es tuya.' });
     }
 
@@ -225,7 +226,8 @@ async function eliminar(req, res, next) {
     }
 
     await mascotaModel.desactivar(id);
-    return res.status(200).json({ mensaje: `${mascota.nombre} se eliminó de tus mascotas.` });
+    const sufijo = req.usuario.rol === 'administrador' ? '' : ' de tus mascotas';
+    return res.status(200).json({ mensaje: `${mascota.nombre} se eliminó${sufijo}.` });
   } catch (error) {
     next(error);
   }
