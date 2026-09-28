@@ -3,9 +3,10 @@
 // panel del cliente: 3 estados (proxima/completada/cancelada), a
 // diferencia de StatusToggle.jsx (que es un interruptor on/off de
 // activo/inactivo). Reutiliza brand.blue/green/red, no colores nuevos.
+// Proxima = verde, Completada = azul (confirmado con la usuaria).
 const CONFIG = {
-  proxima: { texto: 'Próxima', className: 'bg-blue-50 text-brand-blue' },
-  completada: { texto: 'Completada', className: 'bg-emerald-50 text-brand-green' },
+  proxima: { texto: 'Próxima', className: 'bg-emerald-50 text-brand-green' },
+  completada: { texto: 'Completada', className: 'bg-blue-50 text-brand-blue' },
   cancelada: { texto: 'Cancelada', className: 'bg-red-50 text-brand-red' },
 };
 
