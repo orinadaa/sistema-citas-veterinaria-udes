@@ -222,13 +222,10 @@ describe('DELETE /api/mascotas/:id (baja logica)', () => {
     expect(respuesta.status).toBe(403);
   });
 
-  test('un administrador puede eliminar la mascota de cualquier cliente sin citas pendientes', async () => {
-    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: 'otro-cliente', nombre: 'Rocky' });
-    mascotaModel.contarCitasPendientes.mockResolvedValue(0);
-    mascotaModel.desactivar.mockResolvedValue({ id: 'm1' });
+  test('un administrador no puede eliminar mascotas (exclusivo del dueño)', async () => {
     const respuesta = await request(app).delete('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_ADMIN}`);
-    expect(respuesta.status).toBe(200);
-    expect(mascotaModel.desactivar).toHaveBeenCalledWith('m1');
+    expect(respuesta.status).toBe(403);
+    expect(mascotaModel.desactivar).not.toHaveBeenCalled();
   });
 
   test('responde 404 si la mascota no existe o ya fue eliminada', async () => {

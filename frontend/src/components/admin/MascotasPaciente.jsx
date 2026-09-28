@@ -2,23 +2,23 @@
 // Tab "Mascota(s)" del SidePanel "Detalle del paciente" (rol
 // administrador). Distinto a proposito del lado del cliente:
 // - Tarjeta por mascota (foto, especie · raza, sexo | edad · peso) con
-//   menu de tres puntos: Editar (carga la mascota en el mismo
-//   formulario de abajo) y Eliminar (confirmacion dentro de la tarjeta;
-//   baja logica, 409 si tiene citas agendadas a futuro).
+//   menu de tres puntos: solo Editar (carga la mascota en el mismo
+//   formulario de abajo). El administrador NO puede eliminar mascotas:
+//   eso lo hace unicamente su dueño (decision de la usuaria).
 // - Formulario "Agregar mascota" embebido en el tab (no es otro panel),
 //   con zona de foto cuadrada punteada (sube el archivo tal cual, sin
 //   el editor circular del cliente), Sexo como segmented control
 //   obligatorio en este formulario, y sin "Informacion medica" (no
 //   aparece en la referencia de este modulo).
 import { useEffect, useRef, useState } from 'react';
-import { crearMascota, actualizarMascota, eliminarMascota, subirFotoMascota } from '../../api/client';
+import { crearMascota, actualizarMascota, subirFotoMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
 import { SelectorSexo } from '../form/SelectorSexo';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { edadYPeso } from '../../utils/mascota';
-import { IconoCamara, IconoLapiz, IconoMas, IconoPapelera, IconoPata, IconoPuntos } from '../icons';
+import { IconoCamara, IconoLapiz, IconoMas, IconoPata, IconoPuntos } from '../icons';
 
 const MAX_CARACTERISTICAS = 200;
 const TAMANO_MAXIMO_FOTO = 5 * 1024 * 1024;
@@ -48,12 +48,8 @@ function formDesdeMascota(m) {
   };
 }
 
-function TarjetaMascota({ mascota, onEditar, onEliminada }) {
-  const { token } = useAuth();
+function TarjetaMascota({ mascota, onEditar }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const [confirmando, setConfirmando] = useState(false);
-  const [eliminando, setEliminando] = useState(false);
-  const [error, setError] = useState('');
   const menu = useRef(null);
 
   // Cierra el menu al hacer clic fuera de el.
@@ -65,18 +61,6 @@ function TarjetaMascota({ mascota, onEditar, onEliminada }) {
     document.addEventListener('mousedown', alHacerClic);
     return () => document.removeEventListener('mousedown', alHacerClic);
   }, [menuAbierto]);
-
-  async function eliminar() {
-    setEliminando(true);
-    setError('');
-    try {
-      await eliminarMascota(mascota.id, token);
-      onEliminada(mascota);
-    } catch (err) {
-      setError(err.message);
-      setEliminando(false);
-    }
-  }
 
   const detalle = edadYPeso(mascota);
 
@@ -126,48 +110,10 @@ function TarjetaMascota({ mascota, onEditar, onEliminada }) {
                 <IconoLapiz className="h-4 w-4" />
                 Editar
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuAbierto(false);
-                  setConfirmando(true);
-                }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-brand-red hover:bg-red-50"
-              >
-                <IconoPapelera className="h-4 w-4" />
-                Eliminar
-              </button>
             </div>
           )}
         </div>
       </div>
-
-      {confirmando && (
-        <div className="mt-3 rounded-lg bg-red-50 p-3 ring-1 ring-red-200">
-          <p className="text-sm font-medium text-red-800">¿Eliminar a {mascota.nombre}? Sus citas pasadas se conservan.</p>
-          {error && <p className="mt-1 text-sm text-red-700">{error}</p>}
-          <div className="mt-2 flex gap-2">
-            <button
-              type="button"
-              onClick={eliminar}
-              disabled={eliminando}
-              className="rounded-lg bg-brand-red px-3 py-1.5 text-sm font-semibold text-white hover:brightness-95 disabled:opacity-60"
-            >
-              {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setConfirmando(false);
-                setError('');
-              }}
-              className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -281,11 +227,6 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
               key={m.id}
               mascota={m}
               onEditar={editar}
-              onEliminada={(eliminada) => {
-                if (mascotaEditando?.id === eliminada.id) limpiar();
-                setAviso(`${eliminada.nombre} se eliminó.`);
-                onCambio();
-              }}
             />
           ))}
         </div>

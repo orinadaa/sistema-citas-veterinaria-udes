@@ -23,7 +23,9 @@ router.put('/:id', verificarRol('cliente', 'administrador'), actualizar);
 // POST /api/mascotas/:id/foto — dueño o administrador (multipart, campo "foto")
 router.post('/:id/foto', verificarRol('cliente', 'administrador'), subirFotoMascota, subirFoto);
 
-// DELETE /api/mascotas/:id — cliente dueño o administrador (baja logica)
-router.delete('/:id', verificarRol('cliente', 'administrador'), eliminar);
+// DELETE /api/mascotas/:id — solo el cliente dueño (baja logica). El
+// administrador puede editar los datos de la mascota, no eliminarla
+// (decision de la usuaria).
+router.delete('/:id', verificarRol('cliente'), eliminar);
 
 module.exports = router;
