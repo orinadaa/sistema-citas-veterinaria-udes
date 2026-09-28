@@ -6,7 +6,7 @@
 // El banner reutiliza el mismo degradado + foto del Hero del landing
 // (fotomain.png), sin inventar formas decorativas que no existen ahi.
 import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { Tabs } from '../components/ui/Tabs';
 import { KPICard } from '../components/ui/KPICard';
@@ -17,11 +17,11 @@ import { obtenerMisCitas, obtenerMisMascotas } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { formatearFechaLarga, formatearHora } from '../utils/fecha';
 import fotoMain from '../assets/foto-main.png';
-import { IconoCalendario, IconoPata, IconoCorazon } from '../components/icons';
+import { IconoCalendario, IconoPata, IconoCorazon, IconoMas } from '../components/icons';
 
 const TABS = [
-  { id: 'citas', label: 'Mis citas' },
-  { id: 'mascotas', label: 'Mis mascotas' },
+  { id: 'citas', label: 'Mis citas', icon: IconoCalendario },
+  { id: 'mascotas', label: 'Mis mascotas', icon: IconoPata },
 ];
 
 export function PanelClientePage() {
@@ -102,8 +102,20 @@ export function PanelClientePage() {
           />
         </div>
 
-        <div className="mt-10">
-          <Tabs items={TABS} activeItem={pestana} onChange={setPestana} />
+        {/* Tabs + "Agendar nueva cita" a la misma altura (solo en Mis citas) */}
+        <div className="mt-10 flex flex-wrap items-end justify-between gap-3 border-b border-slate-200">
+          <div className="-mb-px">
+            <Tabs items={TABS} activeItem={pestana} onChange={setPestana} />
+          </div>
+          {pestana === 'citas' && (
+            <Link
+              to="/agendar"
+              className="mb-2 inline-flex items-center gap-1.5 rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600"
+            >
+              <IconoMas className="h-4 w-4" />
+              Agendar nueva cita
+            </Link>
+          )}
         </div>
 
         <div className="mt-6">

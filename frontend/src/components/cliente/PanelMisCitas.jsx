@@ -1,14 +1,15 @@
 // components/cliente/PanelMisCitas.jsx
 // Pestaña "Mis citas" del panel del cliente (RF-15, con reprogramar
 // RF-08 y cancelar RF-09 vía DetalleCitaPanel). Filtros por estado
-// como pills con conteo real -- nunca un numero inventado. "Agendar
-// cita" lleva al flujo por pasos (/agendar, AgendarCitaPage.jsx).
+// como pills con conteo real -- nunca un numero inventado. Cada fila:
+// foto, mascota, fecha/hora, servicio/sede/medico, estado y "Ver
+// detalles" (especificacion final de la usuaria).
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { StatusBadge } from '../ui/StatusBadge';
 import { DetalleCitaPanel, estadoDeCita } from '../citas/DetalleCitaPanel';
-import { IconoCalendario, IconoEstetoscopio, IconoPata } from '../icons';
+import { IconoCalendario, IconoEstetoscopio, IconoFlechaDerecha } from '../icons';
+import { AvatarMascota } from './AvatarMascota';
 
 const FILTROS = [
   { id: 'todas', etiqueta: 'Todas' },
@@ -16,6 +17,15 @@ const FILTROS = [
   { id: 'completada', etiqueta: 'Completadas' },
   { id: 'cancelada', etiqueta: 'Canceladas' },
 ];
+
+// La proxima cita mas cercana en el tiempo lleva fondo y borde de
+// acento permanentes (no es hover): para que salte a la vista.
+function idProximaMasCercana(citas) {
+  const proximas = citas
+    .filter((cita) => estadoDeCita(cita) === 'proxima')
+    .sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora));
+  return proximas[0]?.id ?? null;
+}
 
 export function PanelMisCitas({ citas, cargando, onActualizada }) {
   const [filtro, setFiltro] = useState('todas');
@@ -34,21 +44,15 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
     return citas.filter((cita) => estadoDeCita(cita) === filtro);
   }, [citas, filtro]);
 
+  const idDestacada = useMemo(() => idProximaMasCercana(citas), [citas]);
+
   return (
     <>
     <div className="flex flex-col gap-6" inert={Boolean(citaDetalle)} aria-hidden={Boolean(citaDetalle)}>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="font-heading text-lg font-semibold text-brand-navy">Mis citas</h2>
-          <p className="text-sm text-slate-500">Consulta, reprograma o cancela tus citas veterinarias.</p>
-        </div>
-        <Link
-          to="/agendar"
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600"
-        >
-          <IconoCalendario className="h-4 w-4" />
-          Agendar cita
-        </Link>
+      {/* "Agendar nueva cita" vive en la fila de tabs (PanelClientePage.jsx). */}
+      <div>
+        <h2 className="font-heading text-xl font-bold text-brand-navy">Mis citas</h2>
+        <p className="text-sm text-slate-500">Consulta, reprograma o cancela tus citas veterinarias.</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -57,8 +61,11 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
             key={f.id}
             type="button"
             onClick={() => setFiltro(f.id)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              filtro === f.id ? 'bg-blue-50 text-brand-blue' : 'text-slate-500 hover:bg-slate-100'
+            aria-pressed={filtro === f.id}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium ring-1 transition ${
+              filtro === f.id
+                ? 'bg-[#EAF4FD] text-brand-blue ring-transparent'
+                : 'bg-white text-slate-500 ring-slate-200 hover:bg-slate-50'
             }`}
           >
             {f.etiqueta} ({conteos[f.id]})
@@ -77,44 +84,66 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
           No tienes citas en esta categoría.
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
-          {citasFiltradas.map((cita) => (
-            <div
-              key={cita.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4"
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                  <IconoPata className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-medium text-slate-900">
-                    {cita.mascota_nombre}
-                    {cita.mascota_especie ? ` (${cita.mascota_especie})` : ''}
-                  </p>
-                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
-                    <IconoCalendario className="h-3.5 w-3.5 shrink-0" />
-                    {formatearFechaLarga(cita.fecha_hora)} · {formatearHora(cita.fecha_hora)}
-                  </p>
-                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
-                    <IconoEstetoscopio className="h-3.5 w-3.5 shrink-0" />
-                    {cita.servicio_nombre} · {cita.sede_nombre} · {cita.medico_nombre}
-                  </p>
+        <div className="flex flex-col gap-2">
+          {citasFiltradas.map((cita) => {
+            const destacada = cita.id === idDestacada;
+            return (
+              <div
+                key={cita.id}
+                className={`grid grid-cols-1 items-center gap-4 rounded-xl border p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.3fr)_auto_auto] ${
+                  destacada ? 'border-brand-blue-400 bg-[#EAF4FD]' : 'border-slate-200 bg-white'
+                }`}
+              >
+                {/* 1-2. Foto + nombre y especie/raza */}
+                <div className="flex min-w-0 items-center gap-3">
+                  <AvatarMascota
+                    mascota={{ nombre: cita.mascota_nombre, foto_url: cita.mascota_foto_url }}
+                    className="h-12 w-12"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-slate-900">{cita.mascota_nombre}</p>
+                    <p className="truncate text-sm text-slate-500">
+                      {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-3">
-                <StatusBadge status={estadoDeCita(cita)} />
+                {/* 3. Fecha y hora */}
+                <div className="flex min-w-0 items-start gap-2.5">
+                  <IconoCalendario className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-900">{formatearFechaLarga(cita.fecha_hora)}</p>
+                    <p className="text-sm text-slate-500">{formatearHora(cita.fecha_hora)}</p>
+                  </div>
+                </div>
+
+                {/* 4. Servicio, sede y medico */}
+                <div className="flex min-w-0 items-start gap-2.5">
+                  <IconoEstetoscopio className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-slate-900">{cita.servicio_nombre}</p>
+                    <p className="truncate text-sm text-slate-500">{cita.sede_nombre}</p>
+                    <p className="truncate text-sm text-slate-500">{cita.medico_nombre}</p>
+                  </div>
+                </div>
+
+                {/* 5. Estado */}
+                <div>
+                  <StatusBadge status={estadoDeCita(cita)} />
+                </div>
+
+                {/* 6. Ver detalles */}
                 <button
                   type="button"
                   onClick={() => setCitaDetalle(cita)}
-                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-blue bg-white px-3 py-1.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
                 >
                   Ver detalles
+                  <IconoFlechaDerecha className="h-4 w-4" />
                 </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
