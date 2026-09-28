@@ -15,6 +15,7 @@ import { PanelPacientes } from '../components/admin/PanelPacientes';
 import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
 import { PanelReportes } from '../components/admin/PanelReportes';
 import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
+import { PanelMisPacientesMedico } from '../components/medico/PanelMisPacientesMedico';
 
 export function PanelAdminPage() {
   const { usuario } = useAuth();
@@ -47,6 +48,9 @@ export function PanelAdminPage() {
           {esAdministrador && pestana === 'configuracion' && <PanelConfiguracion />}
           {/* Panel propio del medico veterinario */}
           {!esAdministrador && pestana === 'citas' && <PanelMisCitasMedico />}
+          {!esAdministrador && pestana === 'pacientes' && (
+            <PanelMisPacientesMedico key={busquedaPorPestana.pacientes} busquedaInicial={busquedaPorPestana.pacientes} />
+          )}
         </main>
       </div>
     </div>

@@ -237,3 +237,14 @@ export function buscarClientesMedico(busqueda, token) {
 export function obtenerMisServiciosMedico(token) {
   return solicitar('/medico/servicios', { token });
 }
+
+export function obtenerPacientesMedico({ busqueda, sedeId } = {}, token) {
+  const parametros = new URLSearchParams();
+  if (busqueda) parametros.set('busqueda', busqueda);
+  if (sedeId) parametros.set('sedeId', sedeId);
+  return solicitar(`/medico/pacientes?${parametros}`, { token });
+}
+
+export function obtenerDetallePacienteMedico(clienteId, token) {
+  return solicitar(`/medico/pacientes/${clienteId}`, { token });
+}

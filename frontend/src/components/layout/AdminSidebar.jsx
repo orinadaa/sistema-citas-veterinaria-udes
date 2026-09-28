@@ -19,6 +19,7 @@ import {
   IconoMedicos,
   IconoSede,
   IconoPersona,
+  IconoPata,
   IconoGrafica,
   IconoEngranaje,
   IconoFlechaDerecha,
@@ -38,7 +39,10 @@ const ITEMS_NAV = [
 ];
 
 // Panel propio del medico veterinario.
-const ITEMS_MEDICO = [{ id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario }];
+const ITEMS_MEDICO = [
+  { id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario },
+  { id: 'pacientes', etiqueta: 'Mis pacientes', icono: IconoPata },
+];
 
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';
 const ANCHO_EXPANDIDO = '248px';

@@ -5,20 +5,22 @@
 // incremento). El buscador si es funcional: busca en Servicios,
 // Médicos y Pacientes (las 3 listas administrables con filtro de
 // nombre); al elegir un resultado cambia a esa pestaña del sidebar y
-// precarga el filtro de esa pantalla con el termino buscado. Solo
-// disponible para el rol administrador — el veterinario no tiene
-// ninguna de esas 3 pantallas en su sidebar.
+// precarga el filtro de esa pantalla con el termino buscado. Para el
+// veterinario busca entre SUS pacientes (dueños y mascotas) y lleva a
+// "Mis pacientes" con el termino precargado.
 import { useEffect, useRef, useState } from 'react';
-import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona } from '../icons';
+import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPata, IconoPersona } from '../icons';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
-import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes } from '../../api/client';
+import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerPacientesMedico } from '../../api/client';
 
 const ETIQUETA_ROL = { administrador: 'Administrador', veterinario: 'Médico Veterinario' };
-const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [] };
+const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [], mascotas: [] };
 
 export function AdminHeader({ onNavegar }) {
   const { usuario, token } = useAuth();
   const esAdmin = usuario?.rol === 'administrador';
+  const esMedico = usuario?.rol === 'veterinario';
+  const buscadorActivo = esAdmin || esMedico;
 
   function salir() {
     // No se llama cerrarSesion() (dispara un re-render vía React state):
@@ -46,7 +48,7 @@ export function AdminHeader({ onNavegar }) {
     .toUpperCase();
 
   useEffect(() => {
-    if (!esAdmin) return undefined;
+    if (!buscadorActivo) return undefined;
     const terminoLimpio = termino.trim();
     if (terminoLimpio.length < 2) {
       setResultados(RESULTADOS_VACIOS);
@@ -57,6 +59,19 @@ export function AdminHeader({ onNavegar }) {
     setBuscando(true);
     const temporizador = setTimeout(async () => {
       const coincide = (texto) => texto?.toLowerCase().includes(terminoLimpio.toLowerCase());
+      if (esMedico) {
+        // Una fila por mascota: se separan dueños (sin repetir) y mascotas.
+        const { pacientes: filas } = await obtenerPacientesMedico({ busqueda: terminoLimpio }, token).catch(() => ({ pacientes: [] }));
+        const duenos = new Map();
+        filas.filter((f) => coincide(f.cliente_nombre)).forEach((f) => duenos.set(f.cliente_id, { id: f.cliente_id, nombre_completo: f.cliente_nombre }));
+        setResultados({
+          ...RESULTADOS_VACIOS,
+          pacientes: [...duenos.values()].slice(0, 4),
+          mascotas: filas.filter((f) => coincide(f.mascota_nombre)).slice(0, 4),
+        });
+        setBuscando(false);
+        return;
+      }
       const [servicios, medicos, pacientes] = await Promise.all([
         obtenerServiciosAdmin(token),
         obtenerMedicosAdmin(token),
@@ -71,7 +86,7 @@ export function AdminHeader({ onNavegar }) {
     }, 300);
 
     return () => clearTimeout(temporizador);
-  }, [termino, token, esAdmin]);
+  }, [termino, token, buscadorActivo, esMedico]);
 
   useEffect(() => {
     function alHacerClicFuera(evento) {
@@ -91,7 +106,8 @@ export function AdminHeader({ onNavegar }) {
   }
 
   const terminoValido = termino.trim().length >= 2;
-  const hayResultados = resultados.pacientes.length + resultados.medicos.length + resultados.servicios.length > 0;
+  const hayResultados =
+    resultados.pacientes.length + resultados.medicos.length + resultados.servicios.length + resultados.mascotas.length > 0;
 
   return (
     <header
@@ -109,13 +125,13 @@ export function AdminHeader({ onNavegar }) {
               setDropdownAbierto(true);
             }}
             onFocus={() => setDropdownAbierto(true)}
-            disabled={!esAdmin}
-            placeholder={esAdmin ? 'Buscar paciente, médico o servicio...' : 'Búsqueda disponible para administrador'}
+            disabled={!buscadorActivo}
+            placeholder={esMedico ? 'Buscar paciente o mascota...' : 'Buscar paciente, médico o servicio...'}
             className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none disabled:cursor-not-allowed"
           />
         </div>
 
-        {esAdmin && dropdownAbierto && terminoValido && (
+        {buscadorActivo && dropdownAbierto && terminoValido && (
           <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-xl bg-white p-2 shadow-lg ring-1 ring-slate-200">
             {buscando && <p className="px-3 py-2 text-sm text-slate-400">Buscando...</p>}
 
@@ -135,6 +151,24 @@ export function AdminHeader({ onNavegar }) {
                   >
                     <IconoPersona className="h-4 w-4 shrink-0 text-brand-blue" />
                     {p.nombre_completo}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!buscando && resultados.mascotas.length > 0 && (
+              <div className="mb-1">
+                <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Mascotas</p>
+                {resultados.mascotas.map((m) => (
+                  <button
+                    key={m.mascota_id}
+                    type="button"
+                    onClick={() => seleccionarResultado('pacientes', m.mascota_nombre)}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                  >
+                    <IconoPata className="h-4 w-4 shrink-0 text-brand-blue" />
+                    {m.mascota_nombre}
+                    <span className="truncate text-xs text-slate-400">· {m.cliente_nombre}</span>
                   </button>
                 ))}
               </div>

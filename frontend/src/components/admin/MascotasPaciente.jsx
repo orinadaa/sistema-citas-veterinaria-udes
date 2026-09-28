@@ -48,7 +48,7 @@ function formDesdeMascota(m) {
   };
 }
 
-function TarjetaMascota({ mascota, onEditar }) {
+function TarjetaMascota({ mascota, onEditar, accionesExtra = [] }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const menu = useRef(null);
 
@@ -98,7 +98,7 @@ function TarjetaMascota({ mascota, onEditar }) {
             <IconoPuntos className="h-5 w-5" />
           </button>
           {menuAbierto && (
-            <div className="absolute right-0 top-full z-10 mt-1 w-36 overflow-hidden rounded-lg bg-white py-1 shadow-lg ring-1 ring-slate-200">
+            <div className="absolute right-0 top-full z-10 mt-1 w-48 overflow-hidden rounded-lg bg-white py-1 shadow-lg ring-1 ring-slate-200">
               <button
                 type="button"
                 onClick={() => {
@@ -110,6 +110,20 @@ function TarjetaMascota({ mascota, onEditar }) {
                 <IconoLapiz className="h-4 w-4" />
                 Editar
               </button>
+              {accionesExtra.map((accion) => (
+                <button
+                  key={accion.etiqueta}
+                  type="button"
+                  onClick={() => {
+                    setMenuAbierto(false);
+                    accion.onClick(mascota);
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                >
+                  <accion.icono className="h-4 w-4" />
+                  {accion.etiqueta}
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -118,7 +132,10 @@ function TarjetaMascota({ mascota, onEditar }) {
   );
 }
 
-export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
+// formularioColapsable: el formulario queda oculto detras de un boton
+// "+ Agregar mascota" (panel del medico); se abre tambien al editar.
+// accionesExtra: [{ etiqueta, icono, onClick(mascota) }] para el menu ⋮.
+export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioColapsable = false, accionesExtra = [] }) {
   const { token } = useAuth();
   const [form, setForm] = useState(FORM_VACIO);
   const [mascotaEditando, setMascotaEditando] = useState(null);
@@ -127,6 +144,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const [formularioAbierto, setFormularioAbierto] = useState(!formularioColapsable);
   const inputFoto = useRef(null);
   const formulario = useRef(null);
 
@@ -143,6 +161,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
     setFoto(null);
     setVistaPrevia(null);
     setError('');
+    if (formularioColapsable) setFormularioAbierto(false);
   }
 
   function editar(mascota) {
@@ -150,6 +169,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
     setAviso('');
     setMascotaEditando(mascota);
     setForm(formDesdeMascota(mascota));
+    setFormularioAbierto(true);
     formulario.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -227,6 +247,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
               key={m.id}
               mascota={m}
               onEditar={editar}
+              accionesExtra={accionesExtra}
             />
           ))}
         </div>
@@ -234,6 +255,21 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
 
       {aviso && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-brand-green ring-1 ring-emerald-200">{aviso}</p>}
 
+      {!formularioAbierto && (
+        <button
+          type="button"
+          onClick={() => {
+            setAviso('');
+            setFormularioAbierto(true);
+          }}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-brand-blue hover:text-brand-blue"
+        >
+          <IconoMas className="h-4 w-4" />
+          Agregar mascota
+        </button>
+      )}
+
+      {formularioAbierto && (
       <form ref={formulario} onSubmit={guardar} className="flex scroll-mt-4 flex-col gap-4 border-t border-slate-100 pt-5">
         <div className="flex items-center gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
@@ -390,6 +426,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio }) {
           </button>
         </div>
       </form>
+      )}
     </div>
   );
 }

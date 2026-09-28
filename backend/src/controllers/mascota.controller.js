@@ -4,6 +4,7 @@
 // Pacientes del panel administrativo).
 const mascotaModel = require('../models/mascota.model');
 const usuarioModel = require('../models/usuario.model');
+const pacienteMedicoModel = require('../models/pacienteMedico.model');
 const fs = require('fs/promises');
 const path = require('path');
 const { CARPETA_FOTOS_MASCOTAS, RUTA_PUBLICA_FOTOS_MASCOTAS } = require('../middlewares/subirFoto.middleware');
@@ -13,6 +14,18 @@ const SEXOS_VALIDOS = ['macho', 'hembra'];
 function pesoValido(peso) {
   const numero = Number(peso);
   return Number.isFinite(numero) && numero > 0;
+}
+
+// Quien puede crear/editar (y cambiar la foto de) mascotas de un dueño:
+// el administrador (cualquiera), el propio dueño, y el medico solo si
+// ese dueño es paciente suyo (tiene o tuvo cita con el) -- caso de una
+// mascota nueva que llega en plena consulta. Eliminar sigue siendo
+// exclusivo del dueño (ver eliminar()).
+async function puedeGestionarMascotasDe(usuario, clienteId) {
+  if (usuario.rol === 'administrador') return true;
+  if (usuario.rol === 'cliente') return usuario.id === clienteId;
+  if (usuario.rol === 'veterinario') return pacienteMedicoModel.esPacienteDe(clienteId, usuario.id);
+  return false;
 }
 
 function textoVacio(valor) {
@@ -104,13 +117,16 @@ async function crear(req, res, next) {
     }
 
     let clienteId = req.usuario.id;
-    if (esAdmin) {
+    if (esAdmin || req.usuario.rol === 'veterinario') {
       if (!clienteIdBody) {
-        return res.status(400).json({ mensaje: 'clienteId es obligatorio al crear una mascota desde el panel administrativo.' });
+        return res.status(400).json({ mensaje: 'clienteId es obligatorio al crear una mascota para un cliente.' });
       }
       const cliente = await usuarioModel.buscarPorId(clienteIdBody);
       if (!cliente || cliente.rol !== 'cliente') {
         return res.status(404).json({ mensaje: 'El cliente indicado no existe.' });
+      }
+      if (!(await puedeGestionarMascotasDe(req.usuario, clienteIdBody))) {
+        return res.status(403).json({ mensaje: 'Solo puedes agregar mascotas a tus pacientes.' });
       }
       clienteId = clienteIdBody;
     }
@@ -157,7 +173,6 @@ async function actualizar(req, res, next) {
       condicionesMedicas,
       observaciones,
     } = req.body;
-    const esAdmin = req.usuario.rol === 'administrador';
 
     if (nombre !== undefined && textoVacio(nombre)) {
       return res.status(400).json({ mensaje: 'El nombre de la mascota es obligatorio.' });
@@ -178,7 +193,7 @@ async function actualizar(req, res, next) {
     if (!mascota) {
       return res.status(404).json({ mensaje: 'Mascota no encontrada.' });
     }
-    if (!esAdmin && mascota.cliente_id !== req.usuario.id) {
+    if (!(await puedeGestionarMascotasDe(req.usuario, mascota.cliente_id))) {
       return res.status(403).json({ mensaje: 'No puedes editar una mascota que no es tuya.' });
     }
 
@@ -244,8 +259,7 @@ async function subirFoto(req, res, next) {
     }
 
     const mascota = await mascotaModel.buscarPorId(req.params.id);
-    const esAdmin = req.usuario.rol === 'administrador';
-    if (!mascota || (!esAdmin && mascota.cliente_id !== req.usuario.id)) {
+    if (!mascota || !(await puedeGestionarMascotasDe(req.usuario, mascota.cliente_id))) {
       await borrarFotoLocal(archivoNuevo);
       return mascota
         ? res.status(403).json({ mensaje: 'No puedes cambiar la foto de una mascota que no es tuya.' })

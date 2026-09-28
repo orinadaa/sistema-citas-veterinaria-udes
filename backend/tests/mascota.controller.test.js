@@ -5,12 +5,14 @@
 
 jest.mock('../src/models/mascota.model');
 jest.mock('../src/models/usuario.model');
+jest.mock('../src/models/pacienteMedico.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const mascotaModel = require('../src/models/mascota.model');
 const usuarioModel = require('../src/models/usuario.model');
+const pacienteMedicoModel = require('../src/models/pacienteMedico.model');
 
 const ID_CLIENTE = 'cliente-1';
 const TOKEN_CLIENTE = jwt.sign({ id: ID_CLIENTE, rol: 'cliente' }, process.env.JWT_SECRET);
@@ -74,11 +76,33 @@ describe('GET /api/mascotas?clienteId=...', () => {
 describe('POST /api/mascotas', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  test('rechaza a un veterinario', async () => {
+  test('un veterinario no puede agregar mascotas a quien no es su paciente', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: ID_CLIENTE, rol: 'cliente' });
+    pacienteMedicoModel.esPacienteDe.mockResolvedValue(false);
     const respuesta = await request(app)
       .post('/api/mascotas')
       .set('Authorization', `Bearer ${TOKEN_VET}`)
-      .send({ nombre: 'Luna' });
+      .send({ nombre: 'Luna', especie: 'Canino', raza: 'Pug', clienteId: ID_CLIENTE });
+    expect(respuesta.status).toBe(403);
+    expect(mascotaModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('un veterinario agrega una mascota a su paciente (llego con otro animal a la consulta)', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: ID_CLIENTE, rol: 'cliente' });
+    pacienteMedicoModel.esPacienteDe.mockResolvedValue(true);
+    mascotaModel.crear.mockResolvedValue({ id: 'm9' });
+    const respuesta = await request(app)
+      .post('/api/mascotas')
+      .set('Authorization', `Bearer ${TOKEN_VET}`)
+      .send({ nombre: 'Toby', especie: 'Canino', raza: 'Pug', clienteId: ID_CLIENTE });
+    expect(respuesta.status).toBe(201);
+    expect(mascotaModel.crear).toHaveBeenCalledWith(expect.objectContaining({ clienteId: ID_CLIENTE }));
+  });
+
+  test('un veterinario no puede editar la mascota de quien no es su paciente', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: 'otro', nombre: 'Luna' });
+    pacienteMedicoModel.esPacienteDe.mockResolvedValue(false);
+    const respuesta = await request(app).put('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_VET}`).send({ color: 'Negro' });
     expect(respuesta.status).toBe(403);
   });
 
