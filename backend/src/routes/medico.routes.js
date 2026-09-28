@@ -1,7 +1,14 @@
 // routes/medico.routes.js
 // Panel propio del medico veterinario. Todo exclusivo del rol veterinario.
 const express = require('express');
-const { buscarClientes, misServicios, misPacientes, detallePaciente } = require('../controllers/medico.controller');
+const {
+  buscarClientes,
+  misServicios,
+  misPacientes,
+  detallePaciente,
+  crearRecordatorio,
+  listarRecordatorios,
+} = require('../controllers/medico.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
@@ -19,5 +26,11 @@ router.get('/pacientes', misPacientes);
 
 // GET /api/medico/pacientes/:clienteId
 router.get('/pacientes/:clienteId', detallePaciente);
+
+// POST /api/medico/recordatorios
+router.post('/recordatorios', crearRecordatorio);
+
+// GET /api/medico/recordatorios?mascotaId=...
+router.get('/recordatorios', listarRecordatorios);
 
 module.exports = router;

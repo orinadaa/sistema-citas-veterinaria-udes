@@ -30,8 +30,9 @@ import { CalendarioSemanal } from '../citas/CalendarioSemanal';
 import { estadoDeCita } from '../citas/DetalleCitaPanel';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { DetalleCitaMedicoPanel } from './DetalleCitaMedicoPanel';
+import { CrearRecordatorioPanel } from './CrearRecordatorioPanel';
 import { AgendarCitaMedicoPanel } from './AgendarCitaMedicoPanel';
-import { IconoCalendario, IconoCorazon, IconoFlechaDerecha, IconoReloj } from '../icons';
+import { IconoCalendario, IconoCampana, IconoCorazon, IconoFlechaDerecha, IconoReloj } from '../icons';
 
 const VISTAS = [
   { id: 'semana', etiqueta: 'Semana' },
@@ -57,6 +58,7 @@ export function PanelMisCitasMedico() {
   const [diaSeleccionado, setDiaSeleccionado] = useState(hoyAMedianoche);
   const [citaDetalle, setCitaDetalle] = useState(null);
   const [agendarAbierto, setAgendarAbierto] = useState(false);
+  const [recordatorioPara, setRecordatorioPara] = useState(null); // { mascota, dueno }
 
   const cargar = useCallback(() => {
     obtenerCitasAdministracion(token)
@@ -131,7 +133,7 @@ export function PanelMisCitasMedico() {
       ? formatearFechaLarga(diaSeleccionado)
       : `${formatearMesAnio(semanaInicio)} · ${formatearRangoSemana(semanaInicio, sumarDias(semanaInicio, 5))}`;
 
-  const panelAbierto = Boolean(citaDetalle) || agendarAbierto;
+  const panelAbierto = Boolean(citaDetalle) || agendarAbierto || Boolean(recordatorioPara);
 
   return (
     <>
@@ -272,7 +274,36 @@ export function PanelMisCitasMedico() {
         </div>
       </div>
 
-      <DetalleCitaMedicoPanel cita={citaDetalle} onClose={() => setCitaDetalle(null)} />
+      <DetalleCitaMedicoPanel
+        cita={citaDetalle}
+        onClose={() => setCitaDetalle(null)}
+        acciones={(cita) => (
+          <button
+            type="button"
+            onClick={() =>
+              setRecordatorioPara({
+                mascota: {
+                  id: cita.mascota_id,
+                  nombre: cita.mascota_nombre,
+                  especie: cita.mascota_especie,
+                  raza: cita.mascota_raza,
+                  foto_url: cita.mascota_foto_url,
+                },
+                dueno: cita.cliente_nombre,
+              })
+            }
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-brand-blue px-4 py-2.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
+          >
+            <IconoCampana className="h-4 w-4" />
+            Crear recordatorio
+          </button>
+        )}
+      />
+      <CrearRecordatorioPanel
+        mascota={recordatorioPara?.mascota ?? null}
+        nombreDueno={recordatorioPara?.dueno}
+        onClose={() => setRecordatorioPara(null)}
+      />
       <AgendarCitaMedicoPanel
         isOpen={agendarAbierto}
         onClose={() => setAgendarAbierto(false)}

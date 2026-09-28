@@ -20,7 +20,8 @@ import { EstadoError } from '../ui/EstadoError';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { DetallePacienteMedicoPanel } from './DetallePacienteMedicoPanel';
 import { AgendarCitaMedicoPanel } from './AgendarCitaMedicoPanel';
-import { IconoBuscar, IconoCalendario, IconoCorazon, IconoPata, IconoPersona, IconoPuntos } from '../icons';
+import { CrearRecordatorioPanel } from './CrearRecordatorioPanel';
+import { IconoBuscar, IconoCalendario, IconoCampana, IconoCorazon, IconoPata, IconoPersona, IconoPuntos } from '../icons';
 
 const CLASE_FILTRO =
   'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30';
@@ -71,7 +72,7 @@ function MenuFila({ opciones }) {
   );
 }
 
-export function PanelMisPacientesMedico({ busquedaInicial = '', accionesMascota = [] }) {
+export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
   const { token } = useAuth();
   const [busqueda, setBusqueda] = useState(busquedaInicial);
   const [sedeId, setSedeId] = useState('');
@@ -82,6 +83,16 @@ export function PanelMisPacientesMedico({ busquedaInicial = '', accionesMascota 
 
   const [clienteDetalleId, setClienteDetalleId] = useState(null);
   const [agendarPara, setAgendarPara] = useState(null); // dueño preseleccionado
+  const [recordatorioPara, setRecordatorioPara] = useState(null); // { mascota, dueno }
+
+  // Menu ⋮ de cada mascota en el detalle del paciente.
+  const accionesMascota = [
+    {
+      etiqueta: 'Crear recordatorio',
+      icono: IconoCampana,
+      onClick: (mascota, cliente) => setRecordatorioPara({ mascota, dueno: cliente.nombre_completo }),
+    },
+  ];
 
   useEffect(() => {
     obtenerSedes()
@@ -111,7 +122,7 @@ export function PanelMisPacientesMedico({ busquedaInicial = '', accionesMascota 
     .map((p) => ({ ...p, id: `${p.cliente_id}-${p.mascota_id}` }));
   const hayFiltros = termino || sedeId || estado !== 'todos';
   const kpis = resultado.kpis;
-  const panelAbierto = Boolean(clienteDetalleId) || Boolean(agendarPara);
+  const panelAbierto = Boolean(clienteDetalleId) || Boolean(agendarPara) || Boolean(recordatorioPara);
 
   function agendarCon(p) {
     setAgendarPara({ id: p.cliente_id, nombre_completo: p.cliente_nombre, correo: p.cliente_correo, telefono: p.cliente_telefono });
@@ -263,6 +274,13 @@ export function PanelMisPacientesMedico({ busquedaInicial = '', accionesMascota 
         onClose={() => setClienteDetalleId(null)}
         onCambio={() => setIntento((n) => n + 1)}
         accionesMascota={accionesMascota}
+      />
+      {/* Encima del detalle del paciente; "Ver perfil" vuelve a el. */}
+      <CrearRecordatorioPanel
+        mascota={recordatorioPara?.mascota ?? null}
+        nombreDueno={recordatorioPara?.dueno}
+        onClose={() => setRecordatorioPara(null)}
+        onVerPerfil={() => setRecordatorioPara(null)}
       />
       <AgendarCitaMedicoPanel
         isOpen={Boolean(agendarPara)}

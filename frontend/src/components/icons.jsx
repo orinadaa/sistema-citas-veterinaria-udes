@@ -381,3 +381,13 @@ export function IconoPuntos({ className }) {
     </svg>
   );
 }
+
+// Recordatorio de medicacion.
+export function IconoPastilla({ className }) {
+  return (
+    <Icono className={className}>
+      <rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-45 12 12)" />
+      <path d="m9.5 9.5 5 5" />
+    </Icono>
+  );
+}

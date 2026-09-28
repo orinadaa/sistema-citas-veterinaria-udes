@@ -5,6 +5,12 @@ jest.mock('../src/models/medico.model');
 jest.mock('../src/models/pacienteMedico.model');
 jest.mock('../src/models/mascota.model');
 jest.mock('../src/models/cita.model');
+jest.mock('../src/models/recordatorio.model', () => ({
+  TIPOS: ['medicacion', 'control', 'vacunacion', 'desparasitacion', 'otro'],
+  crear: jest.fn(),
+  listarPorMascota: jest.fn(),
+}));
+jest.mock('../src/services/correo.service');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -89,5 +95,57 @@ describe('GET /api/medico/pacientes/:clienteId', () => {
     const respuesta = await request(app).get('/api/medico/pacientes/c1').set('Authorization', `Bearer ${TOKEN_VET}`);
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.citas.map((c) => c.id)).toEqual(['a']);
+  });
+});
+
+describe('POST /api/medico/recordatorios', () => {
+  const recordatorioModel = require('../src/models/recordatorio.model');
+  const correoService = require('../src/services/correo.service');
+  const manana = new Date(Date.now() + 2 * 864e5).toLocaleDateString('en-CA');
+  const cuerpo = { tipo: 'control', titulo: 'Control de Luna', fecha: manana, hora: '10:00', mascotaId: 'm1' };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: 'c1', nombre: 'Luna' });
+    pacienteMedicoModel.esPacienteDe.mockResolvedValue(true);
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'x', correo: 'c@c.com', nombre_completo: 'X' });
+    recordatorioModel.crear.mockResolvedValue({ id: 'r1', titulo: 'Control de Luna' });
+    correoService.enviarRecordatorioCreado.mockResolvedValue();
+  });
+
+  function crear(datos) {
+    return request(app).post('/api/medico/recordatorios').set('Authorization', `Bearer ${TOKEN_VET}`).send(datos);
+  }
+
+  test('rechaza un tipo invalido', async () => {
+    expect((await crear({ ...cuerpo, tipo: 'cirugia' })).status).toBe(400);
+  });
+
+  test('rechaza una fecha pasada', async () => {
+    expect((await crear({ ...cuerpo, fecha: '2020-01-01' })).status).toBe(400);
+  });
+
+  test('rechaza si la mascota no es de un paciente suyo', async () => {
+    pacienteMedicoModel.esPacienteDe.mockResolvedValue(false);
+    expect((await crear(cuerpo)).status).toBe(403);
+    expect(recordatorioModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('crea el recordatorio con el dueño de la mascota y avisa por correo', async () => {
+    const respuesta = await crear(cuerpo);
+    expect(respuesta.status).toBe(201);
+    expect(recordatorioModel.crear).toHaveBeenCalledWith(expect.objectContaining({ clienteId: 'c1', medicoId: 'vet-1', tipo: 'control' }));
+    expect(correoService.enviarRecordatorioCreado).toHaveBeenCalled();
+    expect(respuesta.body.correoEnviado).toBe(true);
+  });
+
+  test('si el correo falla, el recordatorio igual queda creado', async () => {
+    correoService.enviarRecordatorioCreado.mockRejectedValue(new Error('SMTP'));
+    const errorOriginal = console.error;
+    console.error = jest.fn();
+    const respuesta = await crear(cuerpo);
+    console.error = errorOriginal;
+    expect(respuesta.status).toBe(201);
+    expect(respuesta.body.correoEnviado).toBe(false);
   });
 });

@@ -133,4 +133,41 @@ async function enviarConfirmacionCita(cita) {
   });
 }
 
-module.exports = { enviarCredenciales, enviarBienvenidaCliente, enviarCodigoRecuperacion, enviarConfirmacionCita };
+const ETIQUETA_TIPO_RECORDATORIO = {
+  medicacion: 'Medicación',
+  control: 'Control',
+  vacunacion: 'Vacunación',
+  desparasitacion: 'Desparasitación',
+  otro: 'Recordatorio',
+};
+
+// Recordatorio creado por el medico para una mascota: se avisa al
+// dueño en el momento de crearlo (el envio automatico el mismo dia es
+// del modulo de notificaciones, incremento 5).
+async function enviarRecordatorioCreado({ correo, nombreCliente, nombreMascota, nombreMedico, tipo, titulo, descripcion, fechaTexto, hora }) {
+  const lineas = [
+    `Hola ${nombreCliente},`,
+    '',
+    `${nombreMedico} creó un recordatorio para ${nombreMascota}:`,
+    '',
+    `Tipo: ${ETIQUETA_TIPO_RECORDATORIO[tipo] ?? tipo}`,
+    `Recordatorio: ${titulo}`,
+    `Fecha y hora: ${fechaTexto}, ${hora}`,
+  ];
+  if (descripcion) lineas.push(`Detalle: ${descripcion}`);
+  lineas.push('', 'Clínica Veterinaria UDES');
+
+  await enviarCorreo({
+    para: correo,
+    asunto: `Recordatorio para ${nombreMascota}: ${titulo} — Clínica Veterinaria UDES`,
+    texto: lineas.join('\n'),
+  });
+}
+
+module.exports = {
+  enviarCredenciales,
+  enviarBienvenidaCliente,
+  enviarCodigoRecuperacion,
+  enviarConfirmacionCita,
+  enviarRecordatorioCreado,
+};

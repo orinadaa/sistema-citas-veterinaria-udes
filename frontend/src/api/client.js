@@ -248,3 +248,11 @@ export function obtenerPacientesMedico({ busqueda, sedeId } = {}, token) {
 export function obtenerDetallePacienteMedico(clienteId, token) {
   return solicitar(`/medico/pacientes/${clienteId}`, { token });
 }
+
+export function crearRecordatorioMedico(datos, token) {
+  return solicitar('/medico/recordatorios', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function obtenerRecordatoriosMascota(mascotaId, token) {
+  return solicitar(`/medico/recordatorios?${new URLSearchParams({ mascotaId })}`, { token });
+}
