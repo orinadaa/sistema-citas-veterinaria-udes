@@ -1,8 +1,8 @@
 // pages/PanelAdminPage.jsx
 // Panel administrativo/veterinario. RF-10 (agenda por sede), RF-11
 // (servicios y especialidades de los medicos), RF-12 (seguimiento de
-// citas), RF-13 (horarios). Los veterinarios solo ven su seguimiento
-// de citas; el resto de secciones son exclusivas del administrador.
+// citas), RF-13 (horarios). El veterinario tiene su propio modulo
+// (components/medico/): Mis citas, Mis pacientes y Mi perfil.
 import { useState } from 'react';
 import { AdminSidebar } from '../components/layout/AdminSidebar';
 import { AdminHeader } from '../components/layout/AdminHeader';
@@ -14,6 +14,7 @@ import { PanelCitasSeguimiento } from '../components/admin/PanelCitasSeguimiento
 import { PanelPacientes } from '../components/admin/PanelPacientes';
 import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
 import { PanelReportes } from '../components/admin/PanelReportes';
+import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
 
 export function PanelAdminPage() {
   const { usuario } = useAuth();
@@ -44,7 +45,8 @@ export function PanelAdminPage() {
           {esAdministrador && pestana === 'horarios' && <PanelHorarios />}
           {esAdministrador && pestana === 'reportes' && <PanelReportes />}
           {esAdministrador && pestana === 'configuracion' && <PanelConfiguracion />}
-          {!esAdministrador && <PanelCitasSeguimiento />}
+          {/* Panel propio del medico veterinario */}
+          {!esAdministrador && pestana === 'citas' && <PanelMisCitasMedico />}
         </main>
       </div>
     </div>

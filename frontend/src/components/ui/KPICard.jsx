@@ -12,6 +12,7 @@ const COLORES = {
   red: 'bg-red-50 text-brand-red',
   amber: 'bg-amber-50 text-brand-amber',
   pink: 'bg-[#FDE6F0] text-[#C23E80]',
+  purple: 'bg-violet-50 text-violet-600',
 };
 
 export function KPICard({ icon: Icono, color = 'blue', value, detalle, label, onClick }) {

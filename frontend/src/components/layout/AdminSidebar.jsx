@@ -4,9 +4,9 @@
 // Hero del landing y las pantallas de login/registro (bg-gradient-to-b
 // from-brand-blue-500 to-brand-blue-800, ver Hero.jsx/AuthLayout.jsx),
 // logo completo a color (logocolor.png) expandido y el isotipo corto
-// (logocorto.png) colapsado. La variante navy de rol medico no se
-// construye todavia: no existe pantalla de calendario/dashboard para
-// ese rol en ningun incremento planeado.
+// (logocorto.png) colapsado. El rol veterinario usa el mismo sidebar
+// (sin "variante navy": decision de la usuaria) con su propio set de
+// items (ITEMS_MEDICO).
 //
 // Se puede expandir/contraer (solo iconos); el estado se recuerda entre
 // sesiones. El ancho es fijo dentro de cada estado (no cambia con el
@@ -37,6 +37,9 @@ const ITEMS_NAV = [
   { id: 'configuracion', etiqueta: 'Configuración', icono: IconoEngranaje },
 ];
 
+// Panel propio del medico veterinario.
+const ITEMS_MEDICO = [{ id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario }];
+
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';
 const ANCHO_EXPANDIDO = '248px';
 const ANCHO_COLAPSADO = '76px';
@@ -52,9 +55,7 @@ function leerColapsadoGuardado() {
 export function AdminSidebar({ activo, onCambiar }) {
   const { usuario } = useAuth();
   const [colapsado, setColapsado] = useState(leerColapsadoGuardado);
-  // El veterinario solo tiene acceso a su seguimiento de citas (RF-12);
-  // el resto de secciones son exclusivas del administrador.
-  const items = usuario?.rol === 'administrador' ? ITEMS_NAV : ITEMS_NAV.filter((item) => item.id === 'citas');
+  const items = usuario?.rol === 'administrador' ? ITEMS_NAV : ITEMS_MEDICO;
 
   function alternarColapsado() {
     setColapsado((anterior) => {
