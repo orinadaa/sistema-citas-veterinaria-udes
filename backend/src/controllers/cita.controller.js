@@ -18,6 +18,15 @@ const horarioModel = require('../models/horario.model');
 const mascotaModel = require('../models/mascota.model');
 const correoService = require('../services/correo.service');
 const { generarFranjasEntreHoras, DURACION_SLOT_MINUTOS } = require('../utils/franjas');
+const disponibilidadModel = require('../models/disponibilidadMedico.model');
+const { medicoAtiende } = require('../utils/disponibilidadMedico');
+
+// true si el medico atiende en esa franja segun su horario propio y sus
+// bloqueos (sin horario propio: siempre, dentro del horario de la sede).
+async function medicoAtiendeEnFranja(medicoId, sedeId, fecha) {
+  const contexto = await disponibilidadModel.cargarContexto([medicoId], sedeId, fecha);
+  return medicoAtiende(medicoId, fecha, contexto);
+}
 
 function limitesDelDia(fecha) {
   const inicio = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
@@ -70,7 +79,7 @@ async function consultarDisponibilidad(req, res, next) {
     let medicos;
     if (medicoId) {
       const medico = await usuarioModel.buscarPorId(medicoId);
-      if (!medico || medico.rol !== 'veterinario' || medico.sede_id !== sedeId) {
+      if (!medico || medico.rol !== 'veterinario' || !(await disponibilidadModel.atiendeEnSede(medicoId, sedeId))) {
         return res.status(404).json({ mensaje: 'El médico indicado no existe en esa sede.' });
       }
       const ofrece = await medicoModel.ofreceServicio(medicoId, servicioId);
@@ -79,8 +88,11 @@ async function consultarDisponibilidad(req, res, next) {
       }
       medicos = [{ id: medicoId }];
     } else {
-      medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId);
+      medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId, fechaConsultada.getDay());
     }
+    // medicosEnSede: prestan el servicio en la sede algun dia (distingue
+    // "el servicio no se presta aqui" de "nadie lo atiende este dia").
+    const medicosEnSede = medicoId ? 1 : (await medicoModel.listarPorSedeYServicio(sedeId, servicioId)).length;
 
     const franjas = await franjasDelDiaParaSede(sedeId, fechaConsultada);
 
@@ -90,6 +102,7 @@ async function consultarDisponibilidad(req, res, next) {
         sedeId,
         servicioId,
         duracionMinutos: DURACION_SLOT_MINUTOS,
+        medicosEnSede,
         medicosDisponiblesEnSede: 0,
         franjas: franjas.map((franja) => ({ horaInicio: franja.toISOString(), disponible: false })),
       });
@@ -109,12 +122,20 @@ async function consultarDisponibilidad(req, res, next) {
       ocupadosPorFranja.get(clave).add(fila.medico_id);
     });
 
+    // Una franja esta disponible si al menos un medico atiende en ella
+    // (horario propio + bloqueos) y no tiene otra cita a esa hora.
+    const contexto = await disponibilidadModel.cargarContexto(
+      medicos.map((medico) => medico.id),
+      sedeId,
+      fechaConsultada
+    );
     const ahora = new Date();
     const disponibilidad = franjas.map((franja) => {
-      const ocupados = ocupadosPorFranja.get(franja.getTime())?.size || 0;
+      const ocupados = ocupadosPorFranja.get(franja.getTime()) || new Set();
       return {
         horaInicio: franja.toISOString(),
-        disponible: franja > ahora && ocupados < medicos.length,
+        disponible:
+          franja > ahora && medicos.some((medico) => !ocupados.has(medico.id) && medicoAtiende(medico.id, franja, contexto)),
       };
     });
 
@@ -123,6 +144,7 @@ async function consultarDisponibilidad(req, res, next) {
       sedeId,
       servicioId,
       duracionMinutos: DURACION_SLOT_MINUTOS,
+      medicosEnSede,
       medicosDisponiblesEnSede: medicos.length,
       franjas: disponibilidad,
     });
@@ -144,7 +166,13 @@ async function consultarMedicosDisponibles(req, res, next) {
       return res.status(400).json({ mensaje: 'fechaHora no es una fecha válida.' });
     }
 
-    const medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId);
+    const todos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId, fecha.getDay());
+    const contexto = await disponibilidadModel.cargarContexto(
+      todos.map((medico) => medico.id),
+      sedeId,
+      fecha
+    );
+    const medicos = todos.filter((medico) => medicoAtiende(medico.id, fecha, contexto));
     if (medicos.length === 0) {
       return res.status(200).json({ medicos: [] });
     }
@@ -173,7 +201,13 @@ async function consultarMedicosDisponibles(req, res, next) {
 // esa franja, primero el que tenga menos citas activas ese dia;
 // desempate por nombre para que el resultado sea estable/predecible.
 async function candidatosParaFranja(sedeId, servicioId, fecha) {
-  const medicos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId);
+  const todos = await medicoModel.listarPorSedeYServicio(sedeId, servicioId, fecha.getDay());
+  const contexto = await disponibilidadModel.cargarContexto(
+    todos.map((medico) => medico.id),
+    sedeId,
+    fecha
+  );
+  const medicos = todos.filter((medico) => medicoAtiende(medico.id, fecha, contexto));
   if (medicos.length === 0) return [];
   const ids = medicos.map((medico) => medico.id);
 
@@ -255,7 +289,7 @@ async function crear(req, res, next) {
 
     if (medicoId) {
       const medico = await usuarioModel.buscarPorId(medicoId);
-      if (!medico || medico.rol !== 'veterinario' || medico.sede_id !== sedeId) {
+      if (!medico || medico.rol !== 'veterinario' || !(await disponibilidadModel.atiendeEnSede(medicoId, sedeId))) {
         return res.status(404).json({ mensaje: 'El médico indicado no existe en esa sede.' });
       }
       const ofrece = await medicoModel.ofreceServicio(medicoId, servicioId);
@@ -277,6 +311,9 @@ async function crear(req, res, next) {
 
     let candidatos;
     if (medicoId) {
+      if (!(await medicoAtiendeEnFranja(medicoId, sedeId, fecha))) {
+        return res.status(409).json({ mensaje: 'El médico no atiende en ese horario. Elige otra hora.' });
+      }
       if (await citaModel.existeConflicto(medicoId, fecha)) {
         return res.status(409).json({ mensaje: 'Ese médico ya tiene una cita en esa franja. Elige otra.' });
       }
@@ -388,6 +425,9 @@ async function reprogramarCita(req, res, next) {
     }
 
     const esLaMismaFranjaActual = new Date(cita.fecha_hora).getTime() === fecha.getTime();
+    if (!esLaMismaFranjaActual && !(await medicoAtiendeEnFranja(cita.medico_id, cita.sede_id, fecha))) {
+      return res.status(409).json({ mensaje: 'El médico no atiende en ese horario. Elige otra hora.' });
+    }
     if (!esLaMismaFranjaActual) {
       const ocupado = await citaModel.existeConflicto(cita.medico_id, fecha);
       if (ocupado) {

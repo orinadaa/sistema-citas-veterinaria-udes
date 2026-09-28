@@ -290,3 +290,20 @@ export function solicitarCambioCorreoMedico(correoNuevo, token) {
 export function confirmarCambioCorreoMedico(codigo, token) {
   return solicitar('/medico/perfil/correo/confirmar', { metodo: 'POST', cuerpo: { codigo }, token });
 }
+
+// Disponibilidad propia del medico
+export function obtenerDisponibilidadMedico(token) {
+  return solicitar('/medico/disponibilidad', { token });
+}
+
+export function guardarHorarioMedico(dias, token) {
+  return solicitar('/medico/disponibilidad/horario', { metodo: 'PUT', cuerpo: { dias }, token });
+}
+
+export function crearBloqueoMedico(datos, token) {
+  return solicitar('/medico/disponibilidad/bloqueos', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function eliminarBloqueoMedico(id, token) {
+  return solicitar(`/medico/disponibilidad/bloqueos/${id}`, { metodo: 'DELETE', token });
+}

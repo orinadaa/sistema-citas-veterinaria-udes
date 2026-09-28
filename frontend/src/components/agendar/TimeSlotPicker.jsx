@@ -86,10 +86,15 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
     );
   }
 
-  const { franjas, medicosDisponiblesEnSede } = resultado.datos;
+  const { franjas, medicosDisponiblesEnSede, medicosEnSede } = resultado.datos;
   if (franjas.length === 0) return <Aviso>La sede no atiende este día. Elige otra fecha.</Aviso>;
-  if (medicosDisponiblesEnSede === 0) {
+  // medicosEnSede: prestan el servicio en la sede algun dia; si hay pero
+  // ninguno ese dia (horario propio del medico), se sugiere otra fecha.
+  if ((medicosEnSede ?? medicosDisponiblesEnSede) === 0) {
     return <Aviso>Este servicio no se presta en la sede seleccionada. Elige otra sede.</Aviso>;
+  }
+  if (medicosDisponiblesEnSede === 0) {
+    return <Aviso>Ningún médico atiende este servicio ese día. Prueba con otra fecha.</Aviso>;
   }
 
   const porTurno = Object.fromEntries(TURNOS.map((t) => [t.id, franjas.filter((f) => turnoDeFranja(f.horaInicio) === t.id)]));

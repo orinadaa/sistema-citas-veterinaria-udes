@@ -5,14 +5,23 @@
 // servicio presta cada uno (servicio_medico).
 const { pool } = require('../config/db');
 
-async function listarPorSedeYServicio(sedeId, servicioId) {
+// Medicos activos que prestan el servicio y atienden en esa sede (opcion
+// A de disponibilidad): con horario propio, si tienen un dia en esa sede
+// (ese dia de la semana, si se indica diaSemana); sin horario propio, si
+// es su sede (usuario.sede_id), como funcionaba antes.
+async function listarPorSedeYServicio(sedeId, servicioId, diaSemana = null) {
   const resultado = await pool.query(
     `SELECT u.id, u.nombre_completo
      FROM usuario u
      JOIN servicio_medico sm ON sm.medico_id = u.id
-     WHERE u.rol = 'veterinario' AND u.sede_id = $1 AND sm.servicio_id = $2 AND u.activo = true
+     WHERE u.rol = 'veterinario' AND u.activo = true AND sm.servicio_id = $2
+       AND (
+         (NOT EXISTS (SELECT 1 FROM horario_medico hm WHERE hm.medico_id = u.id) AND u.sede_id = $1)
+         OR EXISTS (SELECT 1 FROM horario_medico hm
+                    WHERE hm.medico_id = u.id AND hm.sede_id = $1 AND ($3::int IS NULL OR hm.dia_semana = $3))
+       )
      ORDER BY u.nombre_completo`,
-    [sedeId, servicioId]
+    [sedeId, servicioId, diaSemana]
   );
   return resultado.rows;
 }

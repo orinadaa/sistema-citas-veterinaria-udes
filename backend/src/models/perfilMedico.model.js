@@ -7,7 +7,7 @@ const CAMPOS_PERFIL = `u.id, u.nombre_completo, u.correo, u.telefono, u.direccio
   s.id AS sede_id, s.nombre AS sede_nombre, s.ciudad AS sede_ciudad`;
 
 async function obtener(medicoId) {
-  const [perfil, especialidades, servicios, resumen] = await Promise.all([
+  const [perfil, especialidades, servicios, resumen, sedesHorario] = await Promise.all([
     pool.query(`SELECT ${CAMPOS_PERFIL} FROM usuario u LEFT JOIN sede s ON s.id = u.sede_id WHERE u.id = $1`, [medicoId]),
     pool.query(
       `SELECT cs.id, cs.nombre, cs.color FROM usuario_especialidad ue
@@ -29,9 +29,21 @@ async function obtener(medicoId) {
        FROM cita WHERE medico_id = $1`,
       [medicoId]
     ),
+    // Sedes donde atiende segun su horario propio (vacio = solo su sede).
+    pool.query(
+      `SELECT DISTINCT s.id, s.nombre FROM horario_medico h JOIN sede s ON s.id = h.sede_id WHERE h.medico_id = $1 ORDER BY s.nombre`,
+      [medicoId]
+    ),
   ]);
   if (perfil.rowCount === 0) return null;
-  return { ...perfil.rows[0], especialidades: especialidades.rows, servicios: servicios.rows, resumen: resumen.rows[0] };
+  const datos = perfil.rows[0];
+  return {
+    ...datos,
+    especialidades: especialidades.rows,
+    servicios: servicios.rows,
+    resumen: resumen.rows[0],
+    sedes_asignadas: sedesHorario.rows.map((s) => ({ ...s, principal: s.id === datos.sede_id })),
+  };
 }
 
 // Solo actualiza las columnas que vienen en `campos` (permite vaciar los

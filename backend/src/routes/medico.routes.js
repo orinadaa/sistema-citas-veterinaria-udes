@@ -17,6 +17,12 @@ const {
   solicitarCambioCorreo,
   confirmarCambioCorreo,
 } = require('../controllers/perfilMedico.controller');
+const {
+  obtenerDisponibilidad,
+  guardarHorario,
+  crearBloqueo,
+  eliminarBloqueo,
+} = require('../controllers/disponibilidadMedico.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 
@@ -50,5 +56,11 @@ router.put('/perfil/contrasena', cambiarContrasena);
 // Cambio de correo en 2 pasos: pedir codigo al correo nuevo -> confirmar.
 router.post('/perfil/correo', solicitarCambioCorreo);
 router.post('/perfil/correo/confirmar', confirmarCambioCorreo);
+
+// Disponibilidad propia (horario por sede + bloqueos)
+router.get('/disponibilidad', obtenerDisponibilidad);
+router.put('/disponibilidad/horario', guardarHorario);
+router.post('/disponibilidad/bloqueos', crearBloqueo);
+router.delete('/disponibilidad/bloqueos/:id', eliminarBloqueo);
 
 module.exports = router;

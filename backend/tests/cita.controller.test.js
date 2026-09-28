@@ -11,6 +11,17 @@ jest.mock('../src/models/medico.model');
 jest.mock('../src/models/usuario.model');
 jest.mock('../src/models/horario.model');
 jest.mock('../src/models/mascota.model');
+// Disponibilidad propia del medico (opcion A): por defecto ningun medico
+// tiene horario propio ni bloqueos -> mismo comportamiento de antes.
+jest.mock('../src/models/disponibilidadMedico.model', () => ({
+  cargarContexto: jest.fn(async (ids, sedeId) => ({
+    sedeId,
+    conHorarioPropio: new Set(),
+    horarioDelDia: new Map(),
+    bloqueos: [],
+  })),
+  atiendeEnSede: jest.fn(async () => true),
+}));
 // El correo de confirmacion (incremento 4) nunca debe salir por SMTP real en pruebas.
 jest.mock('../src/services/correo.service');
 
@@ -25,6 +36,7 @@ const usuarioModel = require('../src/models/usuario.model');
 const horarioModel = require('../src/models/horario.model');
 const mascotaModel = require('../src/models/mascota.model');
 const correoService = require('../src/services/correo.service');
+const disponibilidadModel = require('../src/models/disponibilidadMedico.model');
 
 const ID_CLIENTE = 'cliente-1';
 const ID_SEDE = 'sede-1';
@@ -564,6 +576,59 @@ describe('POST /api/citas (medico agenda a nombre de un cliente)', () => {
     expect(citaModel.crear).toHaveBeenCalledWith(
       expect.objectContaining({ clienteId: ID_CLIENTE, sedeId: ID_SEDE, medicoId: ID_MEDICO })
     );
+  });
+});
+
+describe('Disponibilidad propia del medico en citas', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('una franja fuera del horario propio del unico medico queda no disponible', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    medicoModel.listarPorSedeYServicio.mockResolvedValue([MEDICO_EJEMPLO]);
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([]);
+    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    disponibilidadModel.cargarContexto.mockResolvedValueOnce({
+      sedeId: ID_SEDE,
+      conHorarioPropio: new Set([ID_MEDICO]),
+      horarioDelDia: new Map([[ID_MEDICO, { sede_id: ID_SEDE, hora_inicio: '09:00', hora_fin: '10:00' }]]),
+      bloqueos: [],
+    });
+
+    const respuesta = await request(app)
+      .get('/api/citas/disponibilidad')
+      .query({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, fecha: '2030-01-07' })
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+
+    expect(respuesta.status).toBe(200);
+    const libres = respuesta.body.franjas.filter((f) => f.disponible).map((f) => new Date(f.horaInicio).getHours() * 60 + new Date(f.horaInicio).getMinutes());
+    expect(libres).toEqual([9 * 60, 9 * 60 + 30]);
+  });
+
+  test('agendar con un medico explicito fuera de su horario responde 409', async () => {
+    mockearEntidadesBasicas();
+    disponibilidadModel.cargarContexto.mockResolvedValueOnce({
+      sedeId: ID_SEDE,
+      conHorarioPropio: new Set([ID_MEDICO]),
+      horarioDelDia: new Map(),
+      bloqueos: [],
+    });
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, medicoId: ID_MEDICO, fechaHora: proximaFranjaValida().toISOString(), mascotaId: ID_MASCOTA });
+    expect(respuesta.status).toBe(409);
+    expect(citaModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('un medico que no atiende en esa sede responde 404', async () => {
+    mockearEntidadesBasicas();
+    disponibilidadModel.atiendeEnSede.mockResolvedValueOnce(false);
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, medicoId: ID_MEDICO, fechaHora: proximaFranjaValida().toISOString(), mascotaId: ID_MASCOTA });
+    expect(respuesta.status).toBe(404);
   });
 });
 
