@@ -8,7 +8,8 @@ import { Seccion } from './Seccion';
 import { EstadoError } from '../ui/EstadoError';
 import { especieYRaza, edadYPeso } from '../../utils/mascota';
 import { iconoDeServicio } from '../../utils/iconoServicio';
-import { IconoMas, IconoPata } from '../icons';
+import { IconoMas } from '../icons';
+import { AvatarMascota } from '../cliente/AvatarMascota';
 
 function Esqueleto({ cantidad = 3 }) {
   return (
@@ -48,9 +49,7 @@ export function PaginaMascotaServicio({
                 onSeleccionar={() => onSeleccionarMascota(mascota.id)}
               >
                 <div className="flex items-center gap-3 pr-6">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-50 text-brand-amber">
-                    <IconoPata className="h-6 w-6" />
-                  </span>
+                  <AvatarMascota mascota={mascota} />
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
                     <p className="truncate text-sm text-slate-500">{especieYRaza(mascota) || 'Sin especie registrada'}</p>

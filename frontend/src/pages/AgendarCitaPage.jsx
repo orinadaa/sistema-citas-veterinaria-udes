@@ -288,6 +288,7 @@ export function AgendarCitaPage() {
       <FormularioMascotaPanel
         isOpen={panelMascotaAbierto}
         onClose={() => setPanelMascotaAbierto(false)}
+        fotosAnteriores={mascotas.map((m) => m.foto_url).filter(Boolean)}
         onGuardada={(nueva) => {
           setPanelMascotaAbierto(false);
           setMascotas((actuales) => [...actuales, nueva]);

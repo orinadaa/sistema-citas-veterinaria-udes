@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { obtenerMisMascotas, obtenerMascotasDeCliente, crearMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
+import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
 import { IconoAlerta } from '../icons';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
@@ -21,6 +22,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
   const [mostrarNueva, setMostrarNueva] = useState(false);
   const [nombreNueva, setNombreNueva] = useState('');
   const [especieNueva, setEspecieNueva] = useState('');
+  const [razaNueva, setRazaNueva] = useState('');
   const [creando, setCreando] = useState(false);
   const [error, setError] = useState('');
 
@@ -45,14 +47,14 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
   async function crear(evento) {
     evento.preventDefault();
     setError('');
-    if (!nombreNueva) {
-      setError('El nombre de la mascota es obligatorio.');
+    if (!nombreNueva || !especieNueva || !razaNueva) {
+      setError('Nombre, especie y raza de la mascota son obligatorios.');
       return;
     }
 
     setCreando(true);
     try {
-      const cuerpo = { nombre: nombreNueva, especie: especieNueva };
+      const cuerpo = { nombre: nombreNueva, especie: especieNueva, raza: razaNueva };
       if (modoAdmin) cuerpo.clienteId = clienteId;
 
       const { mascota } = await crearMascota(cuerpo, token);
@@ -61,6 +63,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
       setMostrarNueva(false);
       setNombreNueva('');
       setEspecieNueva('');
+      setRazaNueva('');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -121,24 +124,23 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
       )}
 
       {mostrarNueva && (
-        <div className="mt-3 flex flex-col gap-3 rounded-lg border border-slate-200 p-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <Campo id="nueva-mascota-nombre" label="Nombre" value={nombreNueva} onChange={(e) => setNombreNueva(e.target.value)} required />
-          </div>
-          <div className="flex-1">
-            <Campo
-              id="nueva-mascota-especie"
-              label="Especie (opcional)"
-              value={especieNueva}
-              onChange={(e) => setEspecieNueva(e.target.value)}
-              placeholder="Perro, gato..."
-            />
-          </div>
+        <div className="mt-3 flex flex-col gap-3 rounded-lg border border-slate-200 p-3">
+          <Campo id="nueva-mascota-nombre" label="Nombre" value={nombreNueva} onChange={(e) => setNombreNueva(e.target.value)} required />
+          <SelectorEspecieRaza
+            idPrefijo="nueva-mascota"
+            className="grid gap-3 sm:grid-cols-2"
+            especie={especieNueva}
+            raza={razaNueva}
+            onChange={({ especie, raza }) => {
+              setEspecieNueva(especie);
+              setRazaNueva(raza);
+            }}
+          />
           <button
             type="button"
             disabled={creando}
             onClick={crear}
-            className="h-fit rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+            className="self-start rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
           >
             {creando ? 'Creando...' : 'Agregar'}
           </button>

@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { Campo } from '../form/Campo';
+import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { StatusToggle } from '../ui/StatusToggle';
@@ -117,8 +118,8 @@ export function PanelPacientes({ busquedaInicial }) {
   async function agregarMascota(evento) {
     evento.preventDefault();
     setErrorMascota('');
-    if (!nuevaMascota.nombre) {
-      setErrorMascota('El nombre de la mascota es obligatorio.');
+    if (!nuevaMascota.nombre || !nuevaMascota.especie || !nuevaMascota.raza) {
+      setErrorMascota('Nombre, especie y raza son obligatorios.');
       return;
     }
     setGuardandoMascota(true);
@@ -328,17 +329,12 @@ export function PanelPacientes({ busquedaInicial }) {
                     onChange={(e) => setNuevaMascota({ ...nuevaMascota, nombre: e.target.value })}
                     required
                   />
-                  <Campo
-                    id="nueva-mascota-especie-paciente"
-                    label="Especie (opcional)"
-                    value={nuevaMascota.especie}
-                    onChange={(e) => setNuevaMascota({ ...nuevaMascota, especie: e.target.value })}
-                  />
-                  <Campo
-                    id="nueva-mascota-raza-paciente"
-                    label="Raza (opcional)"
-                    value={nuevaMascota.raza}
-                    onChange={(e) => setNuevaMascota({ ...nuevaMascota, raza: e.target.value })}
+                  <SelectorEspecieRaza
+                    idPrefijo="nueva-mascota-paciente"
+                    className="flex flex-col gap-3"
+                    especie={nuevaMascota.especie}
+                    raza={nuevaMascota.raza}
+                    onChange={({ especie, raza }) => setNuevaMascota({ ...nuevaMascota, especie, raza })}
                   />
                   {errorMascota && <p className="text-sm text-red-600">{errorMascota}</p>}
                   <button

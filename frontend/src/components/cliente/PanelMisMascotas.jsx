@@ -8,7 +8,9 @@ import { useEffect, useState } from 'react';
 import { obtenerMisMascotas } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { EstadoError } from '../ui/EstadoError';
-import { IconoPata, IconoLapiz, IconoPapelera } from '../icons';
+import { IconoPapelera } from '../icons';
+import { AvatarMascota } from './AvatarMascota';
+import { edadYPeso } from '../../utils/mascota';
 import { FormularioMascotaPanel } from './FormularioMascotaPanel';
 
 export function PanelMisMascotas() {
@@ -20,7 +22,7 @@ export function PanelMisMascotas() {
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [mascotaEditando, setMascotaEditando] = useState(null);
   const [confirmarEliminar, setConfirmarEliminar] = useState(false);
-  const [aviso, setAviso] = useState('');
+  const [aviso, setAviso] = useState({ tipo: '', texto: '' });
 
   function cargar() {
     setCargando(true);
@@ -42,7 +44,7 @@ export function PanelMisMascotas() {
   function abrirEditar(mascota, { eliminar = false } = {}) {
     setMascotaEditando(mascota);
     setConfirmarEliminar(eliminar);
-    setAviso('');
+    setAviso({ tipo: '', texto: '' });
     setPanelAbierto(true);
   }
 
@@ -63,8 +65,14 @@ export function PanelMisMascotas() {
         </button>
       </div>
 
-      {aviso && (
-        <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-brand-green ring-1 ring-emerald-200">{aviso}</p>
+      {aviso.texto && (
+        <p
+          className={`rounded-xl px-4 py-3 text-sm font-medium ring-1 ${
+            aviso.tipo === 'ok' ? 'bg-emerald-50 text-brand-green ring-emerald-200' : 'bg-amber-50 text-amber-800 ring-amber-200'
+          }`}
+        >
+          {aviso.texto}
+        </p>
       )}
 
       {cargando ? (
@@ -86,26 +94,23 @@ export function PanelMisMascotas() {
               key={mascota.id}
               className="flex items-start justify-between gap-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
             >
-              <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-50 text-brand-amber">
-                  <IconoPata className="h-6 w-6" />
-                </span>
-                <div>
-                  <p className="font-semibold text-slate-900">{mascota.nombre}</p>
-                  <p className="text-sm text-slate-500">
+              <div className="flex min-w-0 items-center gap-3">
+                <AvatarMascota mascota={mascota} className="h-14 w-14" />
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
+                  <p className="truncate text-sm text-slate-500">
                     {[mascota.especie, mascota.raza].filter(Boolean).join(' · ') || 'Sin datos adicionales'}
                   </p>
-                  {mascota.peso_kg && <p className="text-xs text-slate-400">{mascota.peso_kg} kg</p>}
+                  {edadYPeso(mascota) && <p className="text-xs text-slate-400">{edadYPeso(mascota)}</p>}
                 </div>
               </div>
-              <div className="flex shrink-0 gap-1">
+              <div className="flex shrink-0 items-center gap-1">
                 <button
                   type="button"
                   onClick={() => abrirEditar(mascota)}
-                  aria-label={`Editar a ${mascota.nombre}`}
-                  className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
                 >
-                  <IconoLapiz className="h-4 w-4" />
+                  Ver detalles
                 </button>
                 <button
                   type="button"
@@ -128,13 +133,15 @@ export function PanelMisMascotas() {
       onClose={() => setPanelAbierto(false)}
       mascota={mascotaEditando}
       confirmarAlAbrir={confirmarEliminar}
-      onGuardada={() => {
+      fotosAnteriores={mascotas.map((m) => m.foto_url).filter(Boolean)}
+      onGuardada={(_, { avisoFoto }) => {
         setPanelAbierto(false);
+        setAviso({ tipo: 'alerta', texto: avisoFoto });
         cargar();
       }}
       onEliminada={(eliminada) => {
         setPanelAbierto(false);
-        setAviso(`${eliminada.nombre} se eliminó de tus mascotas.`);
+        setAviso({ tipo: 'ok', texto: `${eliminada.nombre} se eliminó de tus mascotas.` });
         cargar();
       }}
     />
