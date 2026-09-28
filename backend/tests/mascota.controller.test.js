@@ -213,3 +213,42 @@ describe('PUT /api/mascotas/:id', () => {
     expect(respuesta.body.mascota.nombre).toBe('Luna II');
   });
 });
+
+describe('DELETE /api/mascotas/:id (baja logica)', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('un administrador no puede eliminar mascotas (exclusivo del dueño)', async () => {
+    const respuesta = await request(app).delete('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+    expect(respuesta.status).toBe(403);
+  });
+
+  test('responde 404 si la mascota no existe o ya fue eliminada', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue(null);
+    const respuesta = await request(app).delete('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(404);
+  });
+
+  test('responde 403 si la mascota es de otro cliente', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: 'otro', nombre: 'Rocky' });
+    const respuesta = await request(app).delete('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(403);
+    expect(mascotaModel.desactivar).not.toHaveBeenCalled();
+  });
+
+  test('responde 409 si la mascota tiene citas agendadas a futuro', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: ID_CLIENTE, nombre: 'Rocky' });
+    mascotaModel.contarCitasPendientes.mockResolvedValue(2);
+    const respuesta = await request(app).delete('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(409);
+    expect(mascotaModel.desactivar).not.toHaveBeenCalled();
+  });
+
+  test('desactiva la mascota propia sin citas pendientes', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: ID_CLIENTE, nombre: 'Rocky' });
+    mascotaModel.contarCitasPendientes.mockResolvedValue(0);
+    mascotaModel.desactivar.mockResolvedValue({ id: 'm1' });
+    const respuesta = await request(app).delete('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(200);
+    expect(mascotaModel.desactivar).toHaveBeenCalledWith('m1');
+  });
+});

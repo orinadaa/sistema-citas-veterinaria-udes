@@ -7,10 +7,11 @@
 // siendo texto libre -- "Especie" es un select solo para agilizar la
 // captura.
 import { useState } from 'react';
-import { crearMascota, actualizarMascota } from '../../api/client';
+import { crearMascota, actualizarMascota, eliminarMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SidePanel } from '../ui/SidePanel';
+import { IconoPapelera } from '../icons';
 
 const ESPECIES = ['Canino', 'Felino', 'Ave', 'Otro'];
 
@@ -39,7 +40,12 @@ function formDesdeMascota(mascota) {
   };
 }
 
-export function FormularioMascotaPanel({ isOpen, onClose, mascota = null, onGuardada }) {
+// onEliminada (opcional): si se pasa y se esta editando, aparece
+// "Eliminar mascota" con confirmacion dentro del mismo panel (nunca un
+// window.confirm). Es una baja logica en el backend: las citas pasadas
+// conservan la mascota. confirmarAlAbrir abre el panel directo en esa
+// confirmacion (boton de papelera de la tarjeta en Mis mascotas).
+export function FormularioMascotaPanel({ isOpen, onClose, mascota = null, onGuardada, onEliminada, confirmarAlAbrir = false }) {
   const { token } = useAuth();
   const [form, setForm] = useState(() => formDesdeMascota(mascota));
   const [error, setError] = useState('');
@@ -48,12 +54,32 @@ export function FormularioMascotaPanel({ isOpen, onClose, mascota = null, onGuar
   // Cada vez que se abre, arranca limpio (crear) o con los datos de la
   // mascota a editar. Se ajusta durante el render (patron recomendado
   // por React en vez de un useEffect que haria un render extra).
-  const [aperturaPrevia, setAperturaPrevia] = useState({ isOpen, mascota });
-  if (aperturaPrevia.isOpen !== isOpen || aperturaPrevia.mascota !== mascota) {
-    setAperturaPrevia({ isOpen, mascota });
+  const [confirmandoEliminar, setConfirmandoEliminar] = useState(false);
+  const [eliminando, setEliminando] = useState(false);
+  const [errorEliminar, setErrorEliminar] = useState('');
+
+  const [aperturaPrevia, setAperturaPrevia] = useState({ isOpen, mascota, confirmarAlAbrir });
+  if (aperturaPrevia.isOpen !== isOpen || aperturaPrevia.mascota !== mascota || aperturaPrevia.confirmarAlAbrir !== confirmarAlAbrir) {
+    setAperturaPrevia({ isOpen, mascota, confirmarAlAbrir });
     if (isOpen) {
       setForm(formDesdeMascota(mascota));
       setError('');
+      setErrorEliminar('');
+      setConfirmandoEliminar(Boolean(mascota && confirmarAlAbrir));
+    }
+  }
+
+  async function eliminar() {
+    setEliminando(true);
+    setErrorEliminar('');
+    try {
+      await eliminarMascota(mascota.id, token);
+      onEliminada(mascota);
+    } catch (err) {
+      // ej. 409: tiene citas agendadas a futuro
+      setErrorEliminar(err.message);
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -204,6 +230,49 @@ export function FormularioMascotaPanel({ isOpen, onClose, mascota = null, onGuar
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
+
+        {mascota && onEliminada && (
+          <div className="mt-2 border-t border-slate-100 pt-4">
+            {confirmandoEliminar ? (
+              <div className="rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+                <p className="text-sm font-semibold text-red-800">¿Eliminar a {mascota.nombre}?</p>
+                <p className="mt-1 text-sm text-red-700">
+                  Ya no aparecerá en tus mascotas ni podrás agendarle citas. Sus citas pasadas se conservan en tu historial.
+                </p>
+                {errorEliminar && <p className="mt-2 text-sm font-medium text-red-800">{errorEliminar}</p>}
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={eliminar}
+                    disabled={eliminando}
+                    className="rounded-lg bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:opacity-60"
+                  >
+                    {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConfirmandoEliminar(false);
+                      setErrorEliminar('');
+                    }}
+                    className="rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmandoEliminar(true)}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-brand-red transition hover:underline"
+              >
+                <IconoPapelera className="h-4 w-4" />
+                Eliminar mascota
+              </button>
+            )}
+          </div>
+        )}
       </form>
     </SidePanel>
   );

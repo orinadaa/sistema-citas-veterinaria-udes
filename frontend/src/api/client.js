@@ -208,3 +208,7 @@ export function actualizarMascota(id, datos, token) {
 export function reenviarConfirmacionCita(id, token) {
   return solicitar(`/citas/${id}/reenviar-confirmacion`, { metodo: 'POST', token });
 }
+
+export function eliminarMascota(id, token) {
+  return solicitar(`/mascotas/${id}`, { metodo: 'DELETE', token });
+}

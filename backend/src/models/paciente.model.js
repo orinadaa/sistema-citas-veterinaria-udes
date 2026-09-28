@@ -14,7 +14,7 @@ async function listarClientes({ sedeId, busqueda }) {
             COUNT(DISTINCT c.id) AS citas_total,
             MAX(c.fecha_hora) AS ultima_cita
      FROM usuario u
-     LEFT JOIN mascota m ON m.cliente_id = u.id
+     LEFT JOIN mascota m ON m.cliente_id = u.id AND m.activo
      LEFT JOIN cita c ON c.cliente_id = u.id AND ($1::uuid IS NULL OR c.sede_id = $1)
      WHERE u.rol = 'cliente'
        AND ($2::text IS NULL OR u.nombre_completo ILIKE '%' || $2 || '%')

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { obtenerMisMascotas } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { EstadoError } from '../ui/EstadoError';
-import { IconoPata, IconoLapiz } from '../icons';
+import { IconoPata, IconoLapiz, IconoPapelera } from '../icons';
 import { FormularioMascotaPanel } from './FormularioMascotaPanel';
 
 export function PanelMisMascotas() {
@@ -19,6 +19,8 @@ export function PanelMisMascotas() {
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [mascotaEditando, setMascotaEditando] = useState(null);
+  const [confirmarEliminar, setConfirmarEliminar] = useState(false);
+  const [aviso, setAviso] = useState('');
 
   function cargar() {
     setCargando(true);
@@ -33,11 +35,14 @@ export function PanelMisMascotas() {
 
   function abrirCrear() {
     setMascotaEditando(null);
+    setConfirmarEliminar(false);
     setPanelAbierto(true);
   }
 
-  function abrirEditar(mascota) {
+  function abrirEditar(mascota, { eliminar = false } = {}) {
     setMascotaEditando(mascota);
+    setConfirmarEliminar(eliminar);
+    setAviso('');
     setPanelAbierto(true);
   }
 
@@ -57,6 +62,10 @@ export function PanelMisMascotas() {
           + Agregar mascota
         </button>
       </div>
+
+      {aviso && (
+        <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-brand-green ring-1 ring-emerald-200">{aviso}</p>
+      )}
 
       {cargando ? (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -89,13 +98,24 @@ export function PanelMisMascotas() {
                   {mascota.peso_kg && <p className="text-xs text-slate-400">{mascota.peso_kg} kg</p>}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => abrirEditar(mascota)}
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-              >
-                <IconoLapiz className="h-4 w-4" />
-              </button>
+              <div className="flex shrink-0 gap-1">
+                <button
+                  type="button"
+                  onClick={() => abrirEditar(mascota)}
+                  aria-label={`Editar a ${mascota.nombre}`}
+                  className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <IconoLapiz className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => abrirEditar(mascota, { eliminar: true })}
+                  aria-label={`Eliminar a ${mascota.nombre}`}
+                  className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-brand-red"
+                >
+                  <IconoPapelera className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -107,8 +127,14 @@ export function PanelMisMascotas() {
       isOpen={panelAbierto}
       onClose={() => setPanelAbierto(false)}
       mascota={mascotaEditando}
+      confirmarAlAbrir={confirmarEliminar}
       onGuardada={() => {
         setPanelAbierto(false);
+        cargar();
+      }}
+      onEliminada={(eliminada) => {
+        setPanelAbierto(false);
+        setAviso(`${eliminada.nombre} se eliminó de tus mascotas.`);
         cargar();
       }}
     />

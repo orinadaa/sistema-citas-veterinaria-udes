@@ -135,4 +135,32 @@ async function actualizar(req, res, next) {
   }
 }
 
-module.exports = { misMascotas, listarDeCliente, crear, actualizar };
+// DELETE /api/mascotas/:id — el cliente solo puede eliminar la suya.
+// Baja logica (activo = false): las citas pasadas conservan la mascota.
+// Si tiene citas agendadas a futuro, primero hay que cancelarlas.
+async function eliminar(req, res, next) {
+  try {
+    const { id } = req.params;
+    const mascota = await mascotaModel.buscarPorId(id);
+    if (!mascota) {
+      return res.status(404).json({ mensaje: 'Mascota no encontrada.' });
+    }
+    if (mascota.cliente_id !== req.usuario.id) {
+      return res.status(403).json({ mensaje: 'No puedes eliminar una mascota que no es tuya.' });
+    }
+
+    const pendientes = await mascotaModel.contarCitasPendientes(id);
+    if (pendientes > 0) {
+      return res.status(409).json({
+        mensaje: `${mascota.nombre} tiene ${pendientes === 1 ? 'una cita agendada' : `${pendientes} citas agendadas`}. Cancélala${pendientes === 1 ? '' : 's'} antes de eliminarla.`,
+      });
+    }
+
+    await mascotaModel.desactivar(id);
+    return res.status(200).json({ mensaje: `${mascota.nombre} se eliminó de tus mascotas.` });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { misMascotas, listarDeCliente, crear, actualizar, eliminar };

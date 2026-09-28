@@ -6,20 +6,23 @@ const { pool } = require('../config/db');
 const CAMPOS =
   'id, cliente_id, nombre, especie, raza, foto_url, fecha_nacimiento, sexo, color, peso_kg, caracteristicas, creado_en';
 
+// Solo mascotas activas: las eliminadas (baja logica, ver
+// database/incremento_4c_mascota_baja.sql) ya no se listan.
 async function listarPorCliente(clienteId) {
-  const resultado = await pool.query(`SELECT ${CAMPOS} FROM mascota WHERE cliente_id = $1 ORDER BY nombre`, [
+  const resultado = await pool.query(`SELECT ${CAMPOS} FROM mascota WHERE cliente_id = $1 AND activo ORDER BY nombre`, [
     clienteId,
   ]);
   return resultado.rows;
 }
 
 async function buscarPorId(id) {
-  const resultado = await pool.query(`SELECT ${CAMPOS} FROM mascota WHERE id = $1`, [id]);
+  const resultado = await pool.query(`SELECT ${CAMPOS} FROM mascota WHERE id = $1 AND activo`, [id]);
   return resultado.rows[0] || null;
 }
 
 async function perteneceACliente(mascotaId, clienteId) {
-  const resultado = await pool.query('SELECT 1 FROM mascota WHERE id = $1 AND cliente_id = $2', [
+  // Una mascota eliminada no se puede usar para agendar.
+  const resultado = await pool.query('SELECT 1 FROM mascota WHERE id = $1 AND cliente_id = $2 AND activo', [
     mascotaId,
     clienteId,
   ]);
@@ -76,4 +79,19 @@ async function actualizar(id, { nombre, especie, raza, fotoUrl, fechaNacimiento,
   return resultado.rows[0] || null;
 }
 
-module.exports = { listarPorCliente, buscarPorId, perteneceACliente, crear, actualizar };
+// Citas activas (agendadas y futuras) de la mascota: mientras tenga
+// alguna, no se puede eliminar.
+async function contarCitasPendientes(id) {
+  const resultado = await pool.query(
+    `SELECT COUNT(*)::int AS total FROM cita WHERE mascota_id = $1 AND estado = 'agendada' AND fecha_hora > NOW()`,
+    [id]
+  );
+  return resultado.rows[0].total;
+}
+
+async function desactivar(id) {
+  const resultado = await pool.query(`UPDATE mascota SET activo = false WHERE id = $1 AND activo RETURNING ${CAMPOS}`, [id]);
+  return resultado.rows[0] || null;
+}
+
+module.exports = { listarPorCliente, buscarPorId, perteneceACliente, crear, actualizar, contarCitasPendientes, desactivar };
