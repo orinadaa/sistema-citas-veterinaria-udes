@@ -36,7 +36,7 @@ export function SidePanel({ isOpen, onClose, title, children, footer }) {
       }`}
     />
     <div
-      className={`fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-200 ${
+      className={`fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-[480px] flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-200 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
       aria-hidden={!isOpen}

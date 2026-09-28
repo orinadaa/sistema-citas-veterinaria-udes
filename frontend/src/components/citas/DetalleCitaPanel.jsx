@@ -1,10 +1,13 @@
 // components/citas/DetalleCitaPanel.jsx
 // Detalle de una cita en "Mis citas" del panel del cliente, con
 // reprogramar (RF-08) y cancelar (RF-09) cuando esta activa y es
-// futura. Antes esto vivia inline en cada fila (FilaCita.jsx); ahora
-// se abre en un SidePanel, como el resto de la app. Los botones de
-// accion viven en el pie fijo del panel (prop "footer" de
-// SidePanel.jsx), fuera del scroll del cuerpo.
+// futura. Sigue la especificacion final de la usuaria, en orden:
+// resumen de la mascota, numero de cita, informacion de la cita (filas
+// con chip azul; "Reprogramar" en la fila de Fecha y hora, "Ver en
+// mapa" en la de Sede), motivo, recomendaciones y pie con solo
+// "Cancelar cita". Decisiones de la usuaria: sin "Editar cita", sin
+// "Notas adicionales" (no existen en el sistema) y sin "Ver perfil" del
+// medico (no hay vista de perfil).
 import { useEffect, useState } from 'react';
 import { reprogramarCita, cancelarCita } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -13,13 +16,70 @@ import { formatearCOP } from '../../utils/moneda';
 import { SidePanel } from '../ui/SidePanel';
 import { StatusBadge } from '../ui/StatusBadge';
 import { SelectorFranjas } from './SelectorFranjas';
-import { IconoUbicacion, IconoSede } from '../icons';
+import { AvatarMascota } from '../cliente/AvatarMascota';
+import {
+  IconoCalendario,
+  IconoCheck,
+  IconoDocumento,
+  IconoEscudo,
+  IconoEstetoscopio,
+  IconoPapelera,
+  IconoPersona,
+  IconoPeso,
+  IconoUbicacion,
+} from '../icons';
 
 const ETIQUETA_SEXO = { macho: 'Macho', hembra: 'Hembra' };
+
+// Texto fijo definido por la usuaria (especificacion final del panel).
+const RECOMENDACIONES = [
+  'Llega 10 minutos antes de la hora programada.',
+  'Trae el carnet de vacunas de tu mascota.',
+  'Si tu mascota toma algún medicamento, infórmanos.',
+  'Mantén a tu mascota con correa o en guacal.',
+];
 
 export function estadoDeCita(cita) {
   if (cita.estado === 'cancelada') return 'cancelada';
   return new Date(cita.fecha_hora) > new Date() ? 'proxima' : 'completada';
+}
+
+// Fila de "Informacion de la cita": icono en chip circular azul claro,
+// etiqueta gris, valor en negrita, subtexto y accion opcional a la derecha.
+function FilaInfo({ icono: Icono, etiqueta, valor, detalle, accion }) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#E8F1FD] text-brand-blue-600">
+        <Icono className="h-5 w-5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-medium text-slate-400">{etiqueta}</p>
+        <p className="font-semibold text-slate-900">{valor}</p>
+        {detalle && <div className="mt-0.5 text-sm text-slate-500">{detalle}</div>}
+      </div>
+      {accion && <div className="shrink-0">{accion}</div>}
+    </div>
+  );
+}
+
+// Boton outline azul de una fila (boton, o enlace externo si trae href).
+function BotonFila({ icono: Icono, onClick, href, children }) {
+  const clase =
+    'inline-flex items-center gap-1.5 rounded-lg border border-brand-blue px-3 py-1.5 text-xs font-semibold text-brand-blue transition hover:bg-blue-50';
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={clase}>
+        <Icono className="h-3.5 w-3.5" />
+        {children}
+      </a>
+    );
+  }
+  return (
+    <button type="button" onClick={onClick} className={clase}>
+      <Icono className="h-3.5 w-3.5" />
+      {children}
+    </button>
+  );
 }
 
 export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
@@ -64,25 +124,20 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
   const estado = cita ? estadoDeCita(cita) : null;
   const puedeGestionar = estado === 'proxima';
 
+  // Pie fijo: solo "Cancelar cita" (Reprogramar vive en la fila de Fecha
+  // y hora). Ocupa todo el ancho: con un unico boton, alineado a la
+  // izquierda dejaba un hueco que se leia como un boton faltante.
   let footer = null;
   if (cita && puedeGestionar && modo === 'vista') {
     footer = (
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={() => setModo('reprogramar')}
-          className="flex-1 rounded-lg border border-brand-blue px-4 py-2 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
-        >
-          Reprogramar
-        </button>
-        <button
-          type="button"
-          onClick={() => setModo('confirmarCancelar')}
-          className="flex-1 rounded-lg border border-brand-red px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50"
-        >
-          Cancelar cita
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => setModo('confirmarCancelar')}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-brand-red px-4 py-2.5 text-sm font-semibold text-brand-red transition hover:bg-red-50"
+      >
+        <IconoPapelera className="h-4 w-4" />
+        Cancelar cita
+      </button>
     );
   } else if (cita && modo === 'reprogramar') {
     footer = (
@@ -91,7 +146,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           type="button"
           disabled={!nuevaFranja || enviando}
           onClick={confirmarReprogramacion}
-          className="flex-1 rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex-1 rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {enviando ? 'Guardando...' : 'Confirmar nueva fecha'}
         </button>
@@ -102,7 +157,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
             setNuevaFranja(null);
             setError('');
           }}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+          className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
           Volver
         </button>
@@ -115,14 +170,14 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           type="button"
           disabled={enviando}
           onClick={confirmarCancelacion}
-          className="flex-1 rounded-lg bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex-1 rounded-xl bg-brand-red px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {enviando ? 'Cancelando...' : 'Sí, cancelar'}
         </button>
         <button
           type="button"
           onClick={() => setModo('vista')}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+          className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
           No, mantenerla
         </button>
@@ -130,97 +185,167 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     );
   }
 
+  const direccionSede = cita?.sede_direccion ? `${cita.sede_direccion}, ${cita.sede_ciudad}` : cita?.sede_ciudad;
+  // "Ver en mapa": hipervinculo de salida a Google Maps (sin mapa
+  // embebido, mismo criterio que el flujo de agendamiento).
+  const urlMapa = cita
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        [cita.sede_nombre, cita.sede_direccion, cita.sede_ciudad, 'Colombia'].filter(Boolean).join(', ')
+      )}`
+    : '';
+
   return (
     <SidePanel isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={footer}>
       {cita && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <p className="font-heading text-base font-semibold text-brand-navy">
-              {cita.mascota_nombre}
-              {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).length > 0
-                ? ` (${[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')})`
-                : ''}
-            </p>
-            <StatusBadge status={estado} />
-          </div>
-
-          {(cita.mascota_sexo || cita.mascota_fecha_nacimiento || cita.mascota_peso_kg || cita.mascota_color) && (
-            <p className="text-xs text-slate-500">
-              {[
-                cita.mascota_sexo && (ETIQUETA_SEXO[cita.mascota_sexo] ?? cita.mascota_sexo),
-                cita.mascota_fecha_nacimiento && `Nació el ${formatearFechaCorta(cita.mascota_fecha_nacimiento)}`,
-                cita.mascota_peso_kg && `${cita.mascota_peso_kg} kg`,
-                cita.mascota_color,
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </p>
-          )}
-
-          <div className="flex flex-col gap-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Fecha y hora</p>
-              <p className="text-slate-800">
-                {formatearFechaLarga(cita.fecha_hora)} · {formatearHora(cita.fecha_hora)}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Servicio</p>
-              <p className="text-slate-800">{cita.servicio_nombre}</p>
-              {cita.servicio_precio != null && <p className="text-xs text-slate-400">{formatearCOP(cita.servicio_precio)}</p>}
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Médico veterinario</p>
-              <p className="text-slate-800">{cita.medico_nombre}</p>
-              {cita.medico_especialidad && <p className="text-xs text-slate-400">{cita.medico_especialidad}</p>}
-            </div>
-
-            {cita.motivo && (
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Motivo</p>
-                <p className="text-slate-800">{cita.motivo}</p>
+        <div className="flex flex-col gap-6">
+          {/* 2. Resumen de la mascota */}
+          <div className="flex items-start gap-4">
+            <AvatarMascota
+              mascota={{ nombre: cita.mascota_nombre, foto_url: cita.mascota_foto_url }}
+              className="h-16 w-16"
+              iconoClassName="h-7 w-7"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <p className="truncate font-heading text-lg font-bold text-brand-navy">{cita.mascota_nombre}</p>
+                <StatusBadge status={estado} />
               </div>
-            )}
-          </div>
-
-          <div className="overflow-hidden rounded-xl border border-slate-200">
-            {cita.sede_foto_url && (
-              <img src={cita.sede_foto_url} alt="" className="h-28 w-full object-cover" />
-            )}
-            <div className="flex items-start gap-2 p-3">
-              <IconoSede className="mt-0.5 h-4 w-4 shrink-0 text-brand-blue" />
-              <div>
-                <p className="text-sm font-medium text-slate-800">{cita.sede_nombre}</p>
-                {cita.sede_direccion && (
-                  <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
-                    <IconoUbicacion className="h-3 w-3 shrink-0" />
-                    {cita.sede_direccion}
-                  </p>
+              {(cita.mascota_especie || cita.mascota_raza) && (
+                <p className="text-sm font-medium text-brand-blue">
+                  {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}
+                </p>
+              )}
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+                {cita.mascota_sexo && (
+                  <span className="inline-flex items-center gap-1">
+                    <span aria-hidden="true" className="text-base leading-none text-brand-blue">
+                      {cita.mascota_sexo === 'hembra' ? '♀' : '♂'}
+                    </span>
+                    {ETIQUETA_SEXO[cita.mascota_sexo] ?? cita.mascota_sexo}
+                  </span>
+                )}
+                {cita.mascota_peso_kg && (
+                  <span className="inline-flex items-center gap-1">
+                    <IconoPeso className="h-3.5 w-3.5 text-brand-blue" />
+                    {Number(cita.mascota_peso_kg)} kg
+                  </span>
+                )}
+                {cita.mascota_color && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span aria-hidden="true" className="h-1 w-1 rounded-full bg-slate-300" />
+                    {cita.mascota_color}
+                  </span>
                 )}
               </div>
             </div>
           </div>
 
-          {modo === 'reprogramar' && (
-            <div className="border-t border-slate-100 pt-4">
-              <SelectorFranjas
-                sedeId={cita.sede_id}
-                servicioId={cita.servicio_id}
-                medicoId={cita.medico_id}
-                valorSeleccionado={nuevaFranja}
-                onSeleccionar={setNuevaFranja}
+          {/* 3. Numero de cita */}
+          <div className="border-t border-slate-100 pt-5">
+            <p className="font-heading text-base font-bold text-slate-900">Cita #{cita.codigo}</p>
+            {cita.creado_en && <p className="text-sm text-slate-400">Agendada el {formatearFechaCorta(cita.creado_en)}</p>}
+          </div>
+
+          {/* 4. Informacion de la cita */}
+          <div className="flex flex-col gap-5">
+            <p className="font-heading text-sm font-semibold uppercase tracking-wide text-slate-400">Información de la cita</p>
+
+            <FilaInfo
+              icono={IconoCalendario}
+              etiqueta="Fecha y hora"
+              valor={formatearFechaLarga(cita.fecha_hora)}
+              detalle={formatearHora(cita.fecha_hora)}
+              accion={
+                puedeGestionar &&
+                modo !== 'reprogramar' && (
+                  <BotonFila icono={IconoCalendario} onClick={() => setModo('reprogramar')}>
+                    Reprogramar
+                  </BotonFila>
+                )
+              }
+            />
+
+            {modo === 'reprogramar' && (
+              <div className="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                <SelectorFranjas
+                  sedeId={cita.sede_id}
+                  servicioId={cita.servicio_id}
+                  medicoId={cita.medico_id}
+                  valorSeleccionado={nuevaFranja}
+                  onSeleccionar={setNuevaFranja}
+                />
+                <p className="mt-2 text-xs text-slate-400">Se mantiene el mismo médico ({cita.medico_nombre}).</p>
+                {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+              </div>
+            )}
+
+            <FilaInfo
+              icono={IconoEstetoscopio}
+              etiqueta="Servicio"
+              valor={cita.servicio_nombre}
+              detalle={
+                <>
+                  {cita.servicio_descripcion && <span className="block">{cita.servicio_descripcion}</span>}
+                  {cita.servicio_precio != null && (
+                    <span className="block font-medium text-slate-600">Valor: {formatearCOP(cita.servicio_precio)} COP</span>
+                  )}
+                </>
+              }
+            />
+
+            <div className="flex flex-col gap-3">
+              <FilaInfo
+                icono={IconoUbicacion}
+                etiqueta="Sede"
+                valor={cita.sede_nombre}
+                detalle={direccionSede}
+                accion={
+                  <BotonFila icono={IconoUbicacion} href={urlMapa}>
+                    Ver en mapa
+                  </BotonFila>
+                }
               />
-              <p className="mt-2 text-xs text-slate-400">Se mantiene el mismo médico ({cita.medico_nombre}).</p>
-              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+              {cita.sede_foto_url && (
+                <img src={cita.sede_foto_url} alt={`Fachada de ${cita.sede_nombre}`} className="h-36 w-full rounded-xl object-cover" />
+              )}
+            </div>
+
+            <FilaInfo icono={IconoPersona} etiqueta="Médico veterinario" valor={cita.medico_nombre} detalle={cita.medico_especialidad} />
+          </div>
+
+          {/* 5. Motivo (las "notas adicionales" no existen en el sistema: no se muestran) */}
+          {cita.motivo && (
+            <div className="flex items-start gap-3 border-t border-slate-100 pt-5">
+              <IconoDocumento className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
+              <div>
+                <p className="text-xs font-medium text-slate-400">Motivo de la consulta</p>
+                <p className="text-sm text-slate-700">{cita.motivo}</p>
+              </div>
             </div>
           )}
 
+          {/* 6. Recomendaciones */}
+          <div className="rounded-2xl bg-[#EEF6FD] p-5">
+            <p className="flex items-center gap-2 font-heading text-sm font-semibold text-brand-navy">
+              <IconoEscudo className="h-5 w-5 text-brand-blue" />
+              Recomendaciones para tu cita
+            </p>
+            <ul className="mt-3 flex flex-col gap-2.5">
+              {RECOMENDACIONES.map((texto) => (
+                <li key={texto} className="flex items-start gap-2.5 text-sm text-slate-700">
+                  <span className="mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
+                    <IconoCheck className="h-3 w-3" />
+                  </span>
+                  {texto}
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {modo === 'confirmarCancelar' && (
-            <div className="border-t border-slate-100 pt-4">
-              <p className="text-sm text-slate-700">¿Seguro que quieres cancelar esta cita?</p>
-              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+            <div className="rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
+              <p className="text-sm font-medium text-red-800">¿Seguro que quieres cancelar esta cita?</p>
+              {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
             </div>
           )}
         </div>

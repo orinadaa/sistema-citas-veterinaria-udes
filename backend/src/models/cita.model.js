@@ -56,7 +56,8 @@ function formatearCodigoCita(sedeCodigo, anio, numero) {
 // confirmacion del flujo de agendamiento.
 const SELECT_DETALLE = `
   SELECT c.*, s.nombre AS sede_nombre, s.ciudad AS sede_ciudad, s.direccion AS sede_direccion, s.foto_url AS sede_foto_url,
-         sv.nombre AS servicio_nombre, sv.precio AS servicio_precio, sv.duracion_minutos AS servicio_duracion_minutos,
+         sv.nombre AS servicio_nombre, sv.descripcion AS servicio_descripcion, sv.precio AS servicio_precio,
+         sv.duracion_minutos AS servicio_duracion_minutos,
          m.nombre_completo AS medico_nombre,
          (SELECT string_agg(cs.nombre, ', ' ORDER BY cs.nombre)
           FROM usuario_especialidad ue
@@ -64,7 +65,7 @@ const SELECT_DETALLE = `
           WHERE ue.usuario_id = c.medico_id) AS medico_especialidad,
          mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza,
          mc.sexo AS mascota_sexo, mc.peso_kg AS mascota_peso_kg, mc.color AS mascota_color,
-         mc.fecha_nacimiento AS mascota_fecha_nacimiento,
+         mc.fecha_nacimiento AS mascota_fecha_nacimiento, mc.foto_url AS mascota_foto_url,
          cl.nombre_completo AS cliente_nombre, cl.correo AS cliente_correo
   FROM cita c
   JOIN sede s ON s.id = c.sede_id

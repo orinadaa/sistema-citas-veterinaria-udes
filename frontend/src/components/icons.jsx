@@ -351,3 +351,22 @@ export function IconoImagen({ className }) {
     </Icono>
   );
 }
+
+// Detalle de la cita.
+export function IconoDocumento({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M14 3.5H7.5A1.5 1.5 0 0 0 6 5v14a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V7.5L14 3.5Z" />
+      <path d="M14 3.5V7.5h4M9 12h6M9 15.5h6" />
+    </Icono>
+  );
+}
+
+export function IconoPeso({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M6.5 8h11l1.8 11.5H4.7L6.5 8Z" />
+      <circle cx="12" cy="5.5" r="2" />
+    </Icono>
+  );
+}
