@@ -42,6 +42,7 @@ const ITEMS_NAV = [
 const ITEMS_MEDICO = [
   { id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario },
   { id: 'pacientes', etiqueta: 'Mis pacientes', icono: IconoPata },
+  { id: 'perfil', etiqueta: 'Mi perfil', icono: IconoPersona },
 ];
 
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';

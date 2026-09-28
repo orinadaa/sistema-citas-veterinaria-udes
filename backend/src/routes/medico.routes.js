@@ -9,7 +9,16 @@ const {
   crearRecordatorio,
   listarRecordatorios,
 } = require('../controllers/medico.controller');
+const {
+  obtenerPerfil,
+  actualizarPerfil,
+  subirFotoPerfil,
+  cambiarContrasena,
+  solicitarCambioCorreo,
+  confirmarCambioCorreo,
+} = require('../controllers/perfilMedico.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
+const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 
 const router = express.Router();
 
@@ -32,5 +41,14 @@ router.post('/recordatorios', crearRecordatorio);
 
 // GET /api/medico/recordatorios?mascotaId=...
 router.get('/recordatorios', listarRecordatorios);
+
+// Mi perfil
+router.get('/perfil', obtenerPerfil);
+router.put('/perfil', actualizarPerfil);
+router.post('/perfil/foto', fotosUsuarios.middleware, subirFotoPerfil);
+router.put('/perfil/contrasena', cambiarContrasena);
+// Cambio de correo en 2 pasos: pedir codigo al correo nuevo -> confirmar.
+router.post('/perfil/correo', solicitarCambioCorreo);
+router.post('/perfil/correo/confirmar', confirmarCambioCorreo);
 
 module.exports = router;

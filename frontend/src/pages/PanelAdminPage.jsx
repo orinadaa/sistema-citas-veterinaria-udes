@@ -16,6 +16,7 @@ import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
 import { PanelReportes } from '../components/admin/PanelReportes';
 import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
 import { PanelMisPacientesMedico } from '../components/medico/PanelMisPacientesMedico';
+import { PanelMiPerfilMedico } from '../components/medico/PanelMiPerfilMedico';
 
 export function PanelAdminPage() {
   const { usuario } = useAuth();
@@ -51,6 +52,7 @@ export function PanelAdminPage() {
           {!esAdministrador && pestana === 'pacientes' && (
             <PanelMisPacientesMedico key={busquedaPorPestana.pacientes} busquedaInicial={busquedaPorPestana.pacientes} />
           )}
+          {!esAdministrador && pestana === 'perfil' && <PanelMiPerfilMedico />}
         </main>
       </div>
     </div>

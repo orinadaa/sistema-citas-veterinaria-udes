@@ -116,7 +116,17 @@ function exportarRecorte(imagen, zoom, rotacion, desplazamiento) {
   );
 }
 
-export function FotoMascotaModal({ isOpen, onClose, onGuardar, fotoActual, fotosAnteriores = [] }) {
+// titulo / tituloMiniaturas: el mismo editor se reutiliza para la foto
+// de perfil del medico ("Foto de perfil", sin miniaturas).
+export function FotoMascotaModal({
+  isOpen,
+  onClose,
+  onGuardar,
+  fotoActual,
+  fotosAnteriores = [],
+  titulo = 'Foto de la mascota',
+  tituloMiniaturas = 'Fotos de tus otras mascotas',
+}) {
   const [paso, setPaso] = useState('subir');
   const [src, setSrc] = useState(null);
   // Se incrementa en cada eleccion para recargar aunque el src no cambie
@@ -233,7 +243,7 @@ export function FotoMascotaModal({ isOpen, onClose, onGuardar, fotoActual, fotos
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <h2 id="titulo-foto-mascota" className="font-heading text-lg font-semibold text-brand-navy">
-            Foto de la mascota
+            {titulo}
           </h2>
           <button
             type="button"
@@ -315,7 +325,7 @@ export function FotoMascotaModal({ isOpen, onClose, onGuardar, fotoActual, fotos
 
                 {fotosAnteriores.length > 0 && (
                   <div>
-                    <p className="text-sm font-medium text-slate-700">Fotos de tus otras mascotas</p>
+                    <p className="text-sm font-medium text-slate-700">{tituloMiniaturas}</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {fotosAnteriores.map((url) => (
                         <button

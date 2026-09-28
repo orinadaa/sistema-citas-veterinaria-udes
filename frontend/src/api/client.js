@@ -256,3 +256,37 @@ export function crearRecordatorioMedico(datos, token) {
 export function obtenerRecordatoriosMascota(mascotaId, token) {
   return solicitar(`/medico/recordatorios?${new URLSearchParams({ mascotaId })}`, { token });
 }
+
+// Mi perfil (medico)
+export function obtenerPerfilMedico(token) {
+  return solicitar('/medico/perfil', { token });
+}
+
+export function actualizarPerfilMedico(datos, token) {
+  return solicitar('/medico/perfil', { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export async function subirFotoPerfilMedico(archivo, token) {
+  const datos = new FormData();
+  datos.append('foto', archivo, 'foto.jpg');
+  const respuesta = await fetch('/api/medico/perfil/foto', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: datos,
+  });
+  const cuerpo = await respuesta.json().catch(() => ({}));
+  if (!respuesta.ok) throw new Error(cuerpo.mensaje || `Error inesperado (${respuesta.status})`);
+  return cuerpo;
+}
+
+export function cambiarContrasenaMedico(datos, token) {
+  return solicitar('/medico/perfil/contrasena', { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function solicitarCambioCorreoMedico(correoNuevo, token) {
+  return solicitar('/medico/perfil/correo', { metodo: 'POST', cuerpo: { correoNuevo }, token });
+}
+
+export function confirmarCambioCorreoMedico(codigo, token) {
+  return solicitar('/medico/perfil/correo/confirmar', { metodo: 'POST', cuerpo: { codigo }, token });
+}

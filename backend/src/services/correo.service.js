@@ -133,6 +133,26 @@ async function enviarConfirmacionCita(cita) {
   });
 }
 
+// Codigo para confirmar un cambio de correo: se envia AL CORREO NUEVO,
+// asi se verifica que existe y que la persona tiene acceso a el.
+async function enviarCodigoCambioCorreo({ correo, nombreCompleto, codigo }) {
+  await enviarCorreo({
+    para: correo,
+    asunto: 'Confirma tu nuevo correo — Clínica Veterinaria UDES',
+    texto: [
+      `Hola ${nombreCompleto},`,
+      '',
+      'Solicitaste usar este correo en tu cuenta del Sistema de Citas de la Clínica Veterinaria UDES. Tu código de verificación es:',
+      '',
+      codigo,
+      '',
+      'Este código vence en 15 minutos. Si no fuiste tú, ignora este mensaje: tu cuenta no cambia.',
+      '',
+      'Clínica Veterinaria UDES',
+    ].join(String.fromCharCode(10)),
+  });
+}
+
 const ETIQUETA_TIPO_RECORDATORIO = {
   medicacion: 'Medicación',
   control: 'Control',
@@ -170,4 +190,5 @@ module.exports = {
   enviarCodigoRecuperacion,
   enviarConfirmacionCita,
   enviarRecordatorioCreado,
+  enviarCodigoCambioCorreo,
 };
