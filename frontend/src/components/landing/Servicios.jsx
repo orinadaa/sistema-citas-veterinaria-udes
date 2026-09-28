@@ -21,10 +21,9 @@ import imgRadiografia from '../../assets/servicios-card/radiografia.png';
 import imgProfilaxis from '../../assets/servicios-card/profilaxis.png';
 import imgVacunacion from '../../assets/servicios-card/vacunacion.png';
 
-// El archivo se llama "radiografia"/"profilaxis" pero en el landing se
-// muestran con el nombre comercial "Imagenología"/"Odontología" — es
-// solo una etiqueta de presentacion publica, el nombre real del
-// servicio en la base de datos no cambia.
+// "Profilaxis dental" se muestra en el landing con el nombre comercial
+// "Odontología" — es solo una etiqueta de presentacion publica, el
+// nombre real del servicio en la base de datos no cambia.
 const CONFIG_POR_SERVICIO = {
   'Consulta médica': { imagen: imgConsulta, color: 'blue' },
   Cirugía: { imagen: imgCirugia, color: 'amber' },
@@ -32,7 +31,7 @@ const CONFIG_POR_SERVICIO = {
   'Laboratorio clínico': { imagen: imgLaboratorio, color: 'amber' },
   Endoscopia: { imagen: imgEndoscopia, color: 'amber' },
   Oncología: { imagen: imgOncologia, color: 'blue' },
-  Radiología: { imagen: imgRadiografia, color: 'amber', etiquetaPublica: 'Imagenología' },
+  Radiología: { imagen: imgRadiografia, color: 'amber' },
   'Profilaxis dental': { imagen: imgProfilaxis, color: 'blue', etiquetaPublica: 'Odontología' },
   Vacunación: { imagen: imgVacunacion, color: 'blue' },
 };
