@@ -1,18 +1,40 @@
 // components/ui/SidePanel.jsx
-// Unica ventana flotante del sistema: nunca un modal centrado con
-// overlay oscuro. El contenido detras sigue visible con su color
-// normal -- modal en comportamiento (el padre debe marcar su
-// contenido principal `inert` mientras esto esta abierto, ver
-// cualquier PanelXxx.jsx que lo use), no modal en apariencia.
+// Panel lateral derecho, usado por todos los formularios/detalles del
+// sistema. Lleva overlay oscuro de fondo (cambio pedido por la usuaria,
+// reemplaza la regla anterior de "sin overlay"): oscurece el contenido
+// de atras y un clic sobre el, o la tecla Escape, cierra el panel. El
+// padre sigue marcando su contenido principal `inert` mientras esta
+// abierto (ver cualquier PanelXxx.jsx que lo use) para que tampoco se
+// pueda llegar a el con el teclado.
 // `footer` (opcional) fija los botones de accion abajo, fuera del
 // scroll del cuerpo -- si no se pasa, el panel queda sin pie fijo.
 // z-50: mas alto que el navbar publico (Navbar.jsx, sticky z-40) -- con
 // z-30 el navbar tapaba el encabezado del panel (titulo + boton de
-// cerrar) en /panel y en el landing, porque ambos arrancan en y=0.
+// cerrar) en /panel y en el landing, porque ambos arrancan en y=0. El
+// overlay tambien es z-50 pero va antes en el DOM, asi queda debajo
+// del panel y encima del navbar.
+import { useEffect } from 'react';
 import { IconoX } from '../icons';
 
 export function SidePanel({ isOpen, onClose, title, children, footer }) {
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    function alPresionarTecla(evento) {
+      if (evento.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', alPresionarTecla);
+    return () => document.removeEventListener('keydown', alPresionarTecla);
+  }, [isOpen, onClose]);
+
   return (
+    <>
+    <div
+      aria-hidden="true"
+      onClick={onClose}
+      className={`fixed inset-0 z-50 bg-black/40 transition-opacity duration-200 ${
+        isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+      }`}
+    />
     <div
       className={`fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-200 ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -34,5 +56,6 @@ export function SidePanel({ isOpen, onClose, title, children, footer }) {
 
       {footer && <div className="border-t border-slate-100 px-6 py-4">{footer}</div>}
     </div>
+    </>
   );
 }
