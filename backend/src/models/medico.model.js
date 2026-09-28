@@ -42,6 +42,21 @@ async function contarCitasPorMedico(medicoIds, inicio, fin) {
   return resultado.rows;
 }
 
+// Servicios activos que presta un medico (con su categoria), para el
+// selector de servicio cuando el medico agenda y para "Mi perfil".
+async function listarServiciosDeMedico(medicoId) {
+  const resultado = await pool.query(
+    `SELECT sv.id, sv.nombre, sv.descripcion, sv.duracion_minutos, cat.nombre AS categoria_nombre, cat.color AS categoria_color
+     FROM servicio_medico sm
+     JOIN servicio sv ON sv.id = sm.servicio_id
+     JOIN categoria_servicio cat ON cat.id = sv.categoria_id
+     WHERE sm.medico_id = $1 AND sv.activo
+     ORDER BY sv.nombre`,
+    [medicoId]
+  );
+  return resultado.rows;
+}
+
 async function ofreceServicio(medicoId, servicioId) {
   const resultado = await pool.query(
     'SELECT 1 FROM servicio_medico WHERE medico_id = $1 AND servicio_id = $2',
@@ -158,6 +173,7 @@ module.exports = {
   listarPorSedeYServicio,
   listarFranjasOcupadas,
   contarCitasPorMedico,
+  listarServiciosDeMedico,
   ofreceServicio,
   asignarServicio,
   listarConServicios,

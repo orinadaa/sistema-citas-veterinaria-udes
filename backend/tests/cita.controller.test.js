@@ -522,6 +522,51 @@ describe('POST /api/citas/:id/reenviar-confirmacion', () => {
   });
 });
 
+describe('POST /api/citas (medico agenda a nombre de un cliente)', () => {
+  beforeEach(() => jest.clearAllMocks());
+  const TOKEN_VET = jwt.sign({ id: ID_MEDICO, rol: 'veterinario', sedeId: ID_SEDE }, process.env.JWT_SECRET);
+
+  test('exige clienteId', async () => {
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_VET}`)
+      .send({ servicioId: ID_SERVICIO, fechaHora: proximaFranjaValida().toISOString(), mascotaId: ID_MASCOTA });
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('la cita queda con el mismo medico y en su sede, ignorando otros valores enviados', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE, codigo: 'BGA' });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
+    usuarioModel.buscarPorId.mockImplementation((id) =>
+      id === ID_CLIENTE ? { id: ID_CLIENTE, rol: 'cliente' } : { id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE }
+    );
+    mascotaModel.perteneceACliente.mockResolvedValue(true);
+    medicoModel.ofreceServicio.mockResolvedValue(true);
+    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    citaModel.existeConflicto.mockResolvedValue(false);
+    citaModel.crear.mockResolvedValue({ id: 'cita-1', estado: 'agendada' });
+    citaModel.buscarDetallePorId.mockResolvedValue(null);
+    correoService.enviarConfirmacionCita.mockResolvedValue();
+
+    const respuesta = await request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_VET}`)
+      .send({
+        clienteId: ID_CLIENTE,
+        sedeId: 'otra-sede',
+        medicoId: 'otro-medico',
+        servicioId: ID_SERVICIO,
+        fechaHora: proximaFranjaValida().toISOString(),
+        mascotaId: ID_MASCOTA,
+      });
+
+    expect(respuesta.status).toBe(201);
+    expect(citaModel.crear).toHaveBeenCalledWith(
+      expect.objectContaining({ clienteId: ID_CLIENTE, sedeId: ID_SEDE, medicoId: ID_MEDICO })
+    );
+  });
+});
+
 describe('PATCH /api/citas/:id/reprogramar', () => {
   beforeEach(() => jest.clearAllMocks());
 

@@ -30,6 +30,7 @@ import { CalendarioSemanal } from '../citas/CalendarioSemanal';
 import { estadoDeCita } from '../citas/DetalleCitaPanel';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { DetalleCitaMedicoPanel } from './DetalleCitaMedicoPanel';
+import { AgendarCitaMedicoPanel } from './AgendarCitaMedicoPanel';
 import { IconoCalendario, IconoCorazon, IconoFlechaDerecha, IconoReloj } from '../icons';
 
 const VISTAS = [
@@ -55,6 +56,7 @@ export function PanelMisCitasMedico() {
   const [vista, setVista] = useState('semana');
   const [diaSeleccionado, setDiaSeleccionado] = useState(hoyAMedianoche);
   const [citaDetalle, setCitaDetalle] = useState(null);
+  const [agendarAbierto, setAgendarAbierto] = useState(false);
 
   const cargar = useCallback(() => {
     obtenerCitasAdministracion(token)
@@ -129,7 +131,7 @@ export function PanelMisCitasMedico() {
       ? formatearFechaLarga(diaSeleccionado)
       : `${formatearMesAnio(semanaInicio)} · ${formatearRangoSemana(semanaInicio, sumarDias(semanaInicio, 5))}`;
 
-  const panelAbierto = Boolean(citaDetalle);
+  const panelAbierto = Boolean(citaDetalle) || agendarAbierto;
 
   return (
     <>
@@ -137,6 +139,9 @@ export function PanelMisCitasMedico() {
         <PageHeader
           title="Mis citas"
           subtitle="Consulta tu agenda y gestiona tus citas programadas."
+          actionLabel="Agendar nueva cita"
+          actionColor="blue"
+          onAction={() => setAgendarAbierto(true)}
         />
 
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -268,6 +273,14 @@ export function PanelMisCitasMedico() {
       </div>
 
       <DetalleCitaMedicoPanel cita={citaDetalle} onClose={() => setCitaDetalle(null)} />
+      <AgendarCitaMedicoPanel
+        isOpen={agendarAbierto}
+        onClose={() => setAgendarAbierto(false)}
+        onAgendada={() => {
+          setAgendarAbierto(false);
+          cargar();
+        }}
+      />
     </>
   );
 }

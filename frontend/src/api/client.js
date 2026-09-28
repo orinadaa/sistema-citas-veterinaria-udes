@@ -228,3 +228,12 @@ export async function subirFotoMascota(id, archivo, token) {
   if (!respuesta.ok) throw new Error(cuerpo.mensaje || `Error inesperado (${respuesta.status})`);
   return cuerpo;
 }
+
+// Panel del medico veterinario.
+export function buscarClientesMedico(busqueda, token) {
+  return solicitar(`/medico/clientes?${new URLSearchParams({ busqueda })}`, { token });
+}
+
+export function obtenerMisServiciosMedico(token) {
+  return solicitar('/medico/servicios', { token });
+}

@@ -11,8 +11,9 @@ router.use(verificarToken);
 // GET /api/mascotas/mias — solo cliente
 router.get('/mias', verificarRol('cliente'), misMascotas);
 
-// GET /api/mascotas?clienteId=... — solo administrador
-router.get('/', verificarRol('administrador'), listarDeCliente);
+// GET /api/mascotas?clienteId=... — administrador o medico (agendar a
+// nombre de un cliente, detalle de sus pacientes)
+router.get('/', verificarRol('administrador', 'veterinario'), listarDeCliente);
 
 // POST /api/mascotas — cliente (para si mismo) o administrador (indicando clienteId)
 router.post('/', verificarRol('cliente', 'administrador'), crear);

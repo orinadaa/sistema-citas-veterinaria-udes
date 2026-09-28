@@ -31,9 +31,11 @@ function Aviso({ children }) {
   );
 }
 
-export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange }) {
+// medicoId (opcional): disponibilidad de un solo medico (el medico que
+// agenda desde su panel) en vez del agregado de la sede.
+export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, medicoId }) {
   const { token } = useAuth();
-  const clave = sedeId && servicioId && fecha ? `${sedeId}|${servicioId}|${fecha}` : null;
+  const clave = sedeId && servicioId && fecha ? `${sedeId}|${servicioId}|${fecha}|${medicoId || ''}` : null;
 
   // El resultado guarda la clave con la que se pidio: si no coincide con
   // la actual, esta cargando (evita setState sincronico en el efecto y
@@ -45,13 +47,13 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange }) {
   useEffect(() => {
     if (!clave) return undefined;
     let vigente = true;
-    obtenerDisponibilidad({ sedeId, servicioId, fecha, token })
+    obtenerDisponibilidad({ sedeId, servicioId, fecha, medicoId, token })
       .then((datos) => vigente && setResultado({ clave, datos, error: '' }))
       .catch((err) => vigente && setResultado({ clave, datos: null, error: err.message || 'No se pudo consultar la disponibilidad.' }));
     return () => {
       vigente = false;
     };
-  }, [clave, sedeId, servicioId, fecha, token, intento]);
+  }, [clave, sedeId, servicioId, fecha, medicoId, token, intento]);
 
   if (!fecha) return <Aviso>Selecciona un día en el calendario para ver los horarios.</Aviso>;
 

@@ -216,8 +216,13 @@ async function intentarEnviarConfirmacion(cita) {
 async function crear(req, res, next) {
   try {
     const esAdmin = req.usuario.rol === 'administrador';
-    const { servicioId, medicoId, fechaHora, mascotaId, motivo, clienteId: clienteIdBody } = req.body;
-    const sedeId = esAdmin ? req.usuario.sedeId : req.body.sedeId;
+    // El medico agenda a nombre de un cliente, en SU sede y con EL MISMO
+    // como medico (decision de la usuaria): no se aceptan otros valores.
+    const esMedico = req.usuario.rol === 'veterinario';
+    const agendaPersonal = esAdmin || esMedico;
+    const { servicioId, fechaHora, mascotaId, motivo, clienteId: clienteIdBody } = req.body;
+    const medicoId = esMedico ? req.usuario.id : req.body.medicoId;
+    const sedeId = agendaPersonal ? req.usuario.sedeId : req.body.sedeId;
 
     if (!sedeId || !servicioId || !fechaHora || !mascotaId) {
       return res.status(400).json({
@@ -229,9 +234,9 @@ async function crear(req, res, next) {
     }
 
     let clienteId = req.usuario.id;
-    if (esAdmin) {
+    if (agendaPersonal) {
       if (!clienteIdBody) {
-        return res.status(400).json({ mensaje: 'clienteId es obligatorio al agendar desde el panel administrativo.' });
+        return res.status(400).json({ mensaje: 'clienteId es obligatorio al agendar a nombre de un cliente.' });
       }
       const cliente = await usuarioModel.buscarPorId(clienteIdBody);
       if (!cliente || cliente.rol !== 'cliente') {

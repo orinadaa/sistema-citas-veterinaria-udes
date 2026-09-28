@@ -25,7 +25,7 @@ const router = express.Router();
 router.use(verificarToken);
 
 // GET /api/citas/disponibilidad?sedeId=...&servicioId=...&fecha=YYYY-MM-DD
-router.get('/disponibilidad', verificarRol('cliente', 'administrador'), consultarDisponibilidad);
+router.get('/disponibilidad', verificarRol('cliente', 'administrador', 'veterinario'), consultarDisponibilidad);
 
 // GET /api/citas/medicos-disponibles?sedeId=...&servicioId=...&fechaHora=ISO
 router.get('/medicos-disponibles', verificarRol('cliente', 'administrador'), consultarMedicosDisponibles);
@@ -34,7 +34,7 @@ router.get('/medicos-disponibles', verificarRol('cliente', 'administrador'), con
 router.get('/mias', verificarRol('cliente'), misCitas);
 
 // POST /api/citas
-router.post('/', verificarRol('cliente', 'administrador'), crear);
+router.post('/', verificarRol('cliente', 'administrador', 'veterinario'), crear);
 
 // POST /api/citas/:id/reenviar-confirmacion — exclusivo del cliente dueño
 router.post('/:id/reenviar-confirmacion', verificarRol('cliente'), reenviarConfirmacion);
