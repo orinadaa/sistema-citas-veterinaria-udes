@@ -16,3 +16,6 @@ npm-debug.log*
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+# Fotos subidas por los usuarios (se generan en uso, no van al repo)
+backend/uploads/*
+!backend/uploads/.gitkeep

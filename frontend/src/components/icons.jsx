@@ -323,3 +323,31 @@ export function IconoCorreo({ className }) {
     </Icono>
   );
 }
+
+// Editor de foto de mascota.
+export function IconoCamara({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9Z" />
+      <circle cx="12" cy="13" r="3.3" />
+    </Icono>
+  );
+}
+
+export function IconoRotar({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M19 12a7 7 0 1 1-2.05-4.95M19 4.5V8h-3.5" />
+    </Icono>
+  );
+}
+
+export function IconoImagen({ className }) {
+  return (
+    <Icono className={className}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+      <circle cx="9" cy="10" r="1.8" />
+      <path d="m20.5 16-5-5-8.5 8.5" />
+    </Icono>
+  );
+}

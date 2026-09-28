@@ -212,3 +212,19 @@ export function reenviarConfirmacionCita(id, token) {
 export function eliminarMascota(id, token) {
   return solicitar(`/mascotas/${id}`, { metodo: 'DELETE', token });
 }
+
+// Sube la foto final (ya recortada en el navegador) como multipart. No
+// usa solicitar(): el navegador debe poner el Content-Type con el
+// boundary del FormData, no application/json.
+export async function subirFotoMascota(id, archivo, token) {
+  const datos = new FormData();
+  datos.append('foto', archivo, 'foto.jpg');
+  const respuesta = await fetch(`/api/mascotas/${id}/foto`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: datos,
+  });
+  const cuerpo = await respuesta.json().catch(() => ({}));
+  if (!respuesta.ok) throw new Error(cuerpo.mensaje || `Error inesperado (${respuesta.status})`);
+  return cuerpo;
+}

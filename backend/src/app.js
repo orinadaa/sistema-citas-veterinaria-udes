@@ -2,6 +2,7 @@
 // Configuracion de la aplicacion Express, separada de server.js para poder
 // importarla en las pruebas (supertest) sin levantar un puerto real.
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
@@ -20,6 +21,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Fotos subidas (mascotas): archivos estaticos, ver subirFoto.middleware.js.
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);

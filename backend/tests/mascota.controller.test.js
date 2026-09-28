@@ -96,7 +96,7 @@ describe('POST /api/mascotas', () => {
     const respuesta = await request(app)
       .post('/api/mascotas')
       .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
-      .send({ nombre: 'Luna', especie: 'Perro' });
+      .send({ nombre: 'Luna', especie: 'Canino', raza: 'Criollo / mestizo' });
 
     expect(respuesta.status).toBe(201);
     expect(mascotaModel.crear).toHaveBeenCalledWith(expect.objectContaining({ clienteId: ID_CLIENTE, nombre: 'Luna' }));
@@ -129,7 +129,7 @@ describe('POST /api/mascotas', () => {
     const respuesta = await request(app)
       .post('/api/mascotas')
       .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
-      .send({ nombre: 'Luna', sexo: 'otro' });
+      .send({ nombre: 'Luna', especie: 'Canino', raza: 'Criollo / mestizo', sexo: 'otro' });
 
     expect(respuesta.status).toBe(400);
   });
@@ -138,7 +138,7 @@ describe('POST /api/mascotas', () => {
     const respuesta = await request(app)
       .post('/api/mascotas')
       .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
-      .send({ nombre: 'Luna', pesoKg: -5 });
+      .send({ nombre: 'Luna', especie: 'Canino', raza: 'Criollo / mestizo', pesoKg: -5 });
 
     expect(respuesta.status).toBe(400);
   });
@@ -147,7 +147,7 @@ describe('POST /api/mascotas', () => {
     const respuesta = await request(app)
       .post('/api/mascotas')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombre: 'Luna' });
+      .send({ nombre: 'Luna', especie: 'Canino', raza: 'Criollo / mestizo' });
     expect(respuesta.status).toBe(400);
   });
 
@@ -157,7 +157,7 @@ describe('POST /api/mascotas', () => {
     const respuesta = await request(app)
       .post('/api/mascotas')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombre: 'Luna', clienteId: ID_CLIENTE });
+      .send({ nombre: 'Luna', especie: 'Canino', raza: 'Criollo / mestizo', clienteId: ID_CLIENTE });
 
     expect(respuesta.status).toBe(404);
   });
@@ -169,7 +169,7 @@ describe('POST /api/mascotas', () => {
     const respuesta = await request(app)
       .post('/api/mascotas')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombre: 'Luna', clienteId: ID_CLIENTE });
+      .send({ nombre: 'Luna', especie: 'Canino', raza: 'Criollo / mestizo', clienteId: ID_CLIENTE });
 
     expect(respuesta.status).toBe(201);
   });
@@ -250,5 +250,105 @@ describe('DELETE /api/mascotas/:id (baja logica)', () => {
     const respuesta = await request(app).delete('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
     expect(respuesta.status).toBe(200);
     expect(mascotaModel.desactivar).toHaveBeenCalledWith('m1');
+  });
+});
+
+describe('Especie y raza obligatorias', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('rechaza crear sin raza', async () => {
+    const respuesta = await request(app)
+      .post('/api/mascotas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nombre: 'Luna', especie: 'Canino' });
+    expect(respuesta.status).toBe(400);
+    expect(mascotaModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('rechaza crear sin especie', async () => {
+    const respuesta = await request(app)
+      .post('/api/mascotas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nombre: 'Luna', raza: 'Pug' });
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('al editar, no deja vaciar la especie ni la raza', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: ID_CLIENTE, nombre: 'Luna' });
+    for (const cuerpo of [{ especie: '' }, { raza: '   ' }]) {
+      const respuesta = await request(app).put('/api/mascotas/m1').set('Authorization', `Bearer ${TOKEN_CLIENTE}`).send(cuerpo);
+      expect(respuesta.status).toBe(400);
+    }
+    expect(mascotaModel.actualizar).not.toHaveBeenCalled();
+  });
+
+  test('guarda la informacion medica opcional', async () => {
+    mascotaModel.crear.mockResolvedValue({ id: 'm1' });
+    const respuesta = await request(app)
+      .post('/api/mascotas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nombre: 'Luna', especie: 'Felino', raza: 'Persa', alergias: 'Pollo', condicionesMedicas: 'Asma' });
+    expect(respuesta.status).toBe(201);
+    expect(mascotaModel.crear).toHaveBeenCalledWith(expect.objectContaining({ alergias: 'Pollo', condicionesMedicas: 'Asma' }));
+  });
+});
+
+describe('POST /api/mascotas/:id/foto', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const CARPETA = path.join(__dirname, '..', 'uploads', 'mascotas');
+  // PNG valido de 1x1 pixel
+  const PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+    'base64'
+  );
+  let archivosAntes;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    archivosAntes = new Set(fs.existsSync(CARPETA) ? fs.readdirSync(CARPETA) : []);
+  });
+
+  // Ninguna prueba debe dejar archivos en uploads/ (ni los rechazados
+  // ni el del caso exitoso, cuyo modelo esta mockeado).
+  afterEach(() => {
+    if (!fs.existsSync(CARPETA)) return;
+    fs.readdirSync(CARPETA)
+      .filter((f) => !archivosAntes.has(f))
+      .forEach((f) => fs.unlinkSync(path.join(CARPETA, f)));
+  });
+
+  function subir(token, contenido = PNG, tipo = 'image/png') {
+    return request(app)
+      .post('/api/mascotas/m1/foto')
+      .set('Authorization', `Bearer ${token}`)
+      .attach('foto', contenido, { filename: 'foto.png', contentType: tipo });
+  }
+
+  test('rechaza un archivo que no es JPG/PNG', async () => {
+    const respuesta = await subir(TOKEN_CLIENTE, Buffer.from('hola'), 'text/plain');
+    expect(respuesta.status).toBe(400);
+    expect(mascotaModel.actualizarFoto).not.toHaveBeenCalled();
+  });
+
+  test('rechaza si no se adjunta archivo', async () => {
+    const respuesta = await request(app).post('/api/mascotas/m1/foto').set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(400);
+  });
+
+  test('responde 403 si la mascota es de otro cliente y no deja el archivo en disco', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: 'otro' });
+    const respuesta = await subir(TOKEN_CLIENTE);
+    expect(respuesta.status).toBe(403);
+    const nuevos = fs.readdirSync(CARPETA).filter((f) => !archivosAntes.has(f));
+    expect(nuevos).toHaveLength(0);
+  });
+
+  test('guarda la ruta publica de la foto de una mascota propia', async () => {
+    mascotaModel.buscarPorId.mockResolvedValue({ id: 'm1', cliente_id: ID_CLIENTE });
+    mascotaModel.actualizarFoto.mockImplementation((id, fotoUrl) => ({ mascota: { id, foto_url: fotoUrl }, fotoAnterior: null }));
+    const respuesta = await subir(TOKEN_CLIENTE);
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.mascota.foto_url).toMatch(/^\/uploads\/mascotas\/[0-9a-f-]+\.png$/);
   });
 });

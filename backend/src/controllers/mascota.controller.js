@@ -4,12 +4,42 @@
 // Pacientes del panel administrativo).
 const mascotaModel = require('../models/mascota.model');
 const usuarioModel = require('../models/usuario.model');
+const fs = require('fs/promises');
+const path = require('path');
+const { CARPETA_FOTOS_MASCOTAS, RUTA_PUBLICA_FOTOS_MASCOTAS } = require('../middlewares/subirFoto.middleware');
 
 const SEXOS_VALIDOS = ['macho', 'hembra'];
 
 function pesoValido(peso) {
   const numero = Number(peso);
   return Number.isFinite(numero) && numero > 0;
+}
+
+function textoVacio(valor) {
+  return typeof valor !== 'string' || valor.trim() === '';
+}
+
+// Especie y raza son obligatorias (decision de la usuaria). Al crear se
+// exigen; al editar, si vienen, no pueden quedar vacias. La lista de
+// razas es un catalogo del frontend (utils/razas.js): aqui se guarda
+// el texto tal cual, igual que antes.
+function errorEspecieRaza({ especie, raza }, { alCrear }) {
+  if (alCrear || especie !== undefined) {
+    if (textoVacio(especie)) return 'La especie de la mascota es obligatoria.';
+  }
+  if (alCrear || raza !== undefined) {
+    if (textoVacio(raza)) return 'La raza de la mascota es obligatoria (puedes elegir "No sé la raza").';
+  }
+  return null;
+}
+
+// Borra del disco una foto anterior, solo si es un archivo nuestro de
+// uploads/mascotas (nunca una URL externa escrita a mano). Si falla, no
+// interrumpe la respuesta: el archivo huerfano no afecta al sistema.
+async function borrarFotoLocal(fotoUrl) {
+  if (!fotoUrl || !fotoUrl.startsWith(`${RUTA_PUBLICA_FOTOS_MASCOTAS}/`)) return;
+  const archivo = path.join(CARPETA_FOTOS_MASCOTAS, path.basename(fotoUrl));
+  await fs.unlink(archivo).catch((error) => console.error('No se pudo borrar la foto anterior:', error.message));
 }
 
 // GET /api/mascotas/mias — solo cliente
@@ -52,11 +82,19 @@ async function crear(req, res, next) {
       color,
       pesoKg,
       caracteristicas,
+      alergias,
+      medicamentos,
+      condicionesMedicas,
+      observaciones,
       clienteId: clienteIdBody,
     } = req.body;
 
     if (!nombre) {
       return res.status(400).json({ mensaje: 'El nombre de la mascota es obligatorio.' });
+    }
+    const errorEspecie = errorEspecieRaza({ especie, raza }, { alCrear: true });
+    if (errorEspecie) {
+      return res.status(400).json({ mensaje: errorEspecie });
     }
     if (sexo && !SEXOS_VALIDOS.includes(sexo)) {
       return res.status(400).json({ mensaje: `El sexo debe ser uno de: ${SEXOS_VALIDOS.join(', ')}.` });
@@ -88,6 +126,10 @@ async function crear(req, res, next) {
       color,
       pesoKg: pesoKg || null,
       caracteristicas,
+      alergias,
+      medicamentos,
+      condicionesMedicas,
+      observaciones,
     });
     return res.status(201).json({ mascota });
   } catch (error) {
@@ -100,8 +142,30 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const { id } = req.params;
-    const { nombre, especie, raza, fotoUrl, fechaNacimiento, sexo, color, pesoKg, caracteristicas } = req.body;
+    const {
+      nombre,
+      especie,
+      raza,
+      fotoUrl,
+      fechaNacimiento,
+      sexo,
+      color,
+      pesoKg,
+      caracteristicas,
+      alergias,
+      medicamentos,
+      condicionesMedicas,
+      observaciones,
+    } = req.body;
     const esAdmin = req.usuario.rol === 'administrador';
+
+    if (nombre !== undefined && textoVacio(nombre)) {
+      return res.status(400).json({ mensaje: 'El nombre de la mascota es obligatorio.' });
+    }
+    const errorEspecie = errorEspecieRaza({ especie, raza }, { alCrear: false });
+    if (errorEspecie) {
+      return res.status(400).json({ mensaje: errorEspecie });
+    }
 
     if (sexo && !SEXOS_VALIDOS.includes(sexo)) {
       return res.status(400).json({ mensaje: `El sexo debe ser uno de: ${SEXOS_VALIDOS.join(', ')}.` });
@@ -128,6 +192,10 @@ async function actualizar(req, res, next) {
       color,
       pesoKg: pesoKg || null,
       caracteristicas,
+      alergias,
+      medicamentos,
+      condicionesMedicas,
+      observaciones,
     });
     return res.status(200).json({ mascota: actualizada });
   } catch (error) {
@@ -163,4 +231,33 @@ async function eliminar(req, res, next) {
   }
 }
 
-module.exports = { misMascotas, listarDeCliente, crear, actualizar, eliminar };
+// POST /api/mascotas/:id/foto — multipart, campo "foto" (JPG/PNG, max
+// 5 MB; lo valida subirFotoMascota antes de llegar aqui). El recorte,
+// zoom y rotacion ya se hicieron en el navegador: llega la imagen final.
+// Dueño o administrador. Reemplaza la foto anterior y la borra del disco.
+async function subirFoto(req, res, next) {
+  const archivoNuevo = req.file ? `${RUTA_PUBLICA_FOTOS_MASCOTAS}/${req.file.filename}` : null;
+  try {
+    if (!archivoNuevo) {
+      return res.status(400).json({ mensaje: 'Adjunta una imagen JPG o PNG en el campo "foto".' });
+    }
+
+    const mascota = await mascotaModel.buscarPorId(req.params.id);
+    const esAdmin = req.usuario.rol === 'administrador';
+    if (!mascota || (!esAdmin && mascota.cliente_id !== req.usuario.id)) {
+      await borrarFotoLocal(archivoNuevo);
+      return mascota
+        ? res.status(403).json({ mensaje: 'No puedes cambiar la foto de una mascota que no es tuya.' })
+        : res.status(404).json({ mensaje: 'Mascota no encontrada.' });
+    }
+
+    const resultado = await mascotaModel.actualizarFoto(mascota.id, archivoNuevo);
+    await borrarFotoLocal(resultado.fotoAnterior);
+    return res.status(200).json({ mascota: resultado.mascota });
+  } catch (error) {
+    await borrarFotoLocal(archivoNuevo);
+    next(error);
+  }
+}
+
+module.exports = { misMascotas, listarDeCliente, crear, actualizar, eliminar, subirFoto };
