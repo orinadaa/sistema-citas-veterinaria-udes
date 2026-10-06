@@ -1,15 +1,13 @@
 // components/layout/Navbar.jsx
-// Topbar azul institucional (brand.blue): logo blanco, texto blanco y
-// el boton "Agendar cita" en ambar (brand.amber, texto slate-900 --
-// mismo color de texto que el boton equivalente del Hero). En la
-// landing (unica pagina con Hero), brand.blue tambien es el primer
-// stop del degradado del Hero (from-brand-blue-500), asi que el
-// navbar solido se continua sin costura visible hacia el degradado de
-// abajo.
+// Topbar publica (landing, /agendar y /panel del cliente): texto blanco
+// y el boton "Agendar cita" en ambar (brand.amber, texto slate-900).
+// Cada pagina que la usa empieza con un banner en degradado azul que
+// pasa por detras de ella (-mt-24 pt-24): el Hero en la landing y el
+// banner de encabezado en /agendar y /panel.
 //
-// Topbar tipo pildora (solo en la landing), con 2 estados:
+// Topbar tipo pildora, con 2 estados:
 // - Estado 1 (scroll = 0): fondo transparente, sin borde, sin sombra y
-//   sin blur. El Hero pasa por detras (-mt-24), asi que lo que se ve es
+//   sin blur. El banner pasa por detras (-mt-24), asi que lo que se ve es
 //   su propio degradado continuo: no hay un bloque "topbar" que delimitar.
 //   Solo el contenido (enlaces, logo grande, botones) flota encima.
 // - Estado 2: se despega 12px del borde, se angosta (maximo ~68rem,
@@ -19,15 +17,15 @@
 // El paso entre ambos es progresivo: `t` va de 0 a 1 en los primeros
 // DISTANCIA_FLOW_PX de scroll y se aplica directo al estilo (via ref,
 // dentro de requestAnimationFrame) sin re-renderizar React. El <header>
-// mide siempre 96px (el Hero se mete por debajo con -mt-24) y es
+// mide siempre 96px (el banner se mete por debajo con -mt-24) y es
 // pointer-events-none: solo la pildora recibe clicks, asi el espacio
 // transparente alrededor no bloquea el contenido que pasa por detras.
 //
 // Layout en 3 columnas (grid 1fr | auto | 1fr): enlaces de seccion a la
 // izquierda, logo al centro y acciones a la derecha. Al ser las dos
 // columnas laterales 1fr, el logo queda centrado respecto al ancho total
-// de la barra aunque ambos grupos midan distinto. En la landing el logo
-// arranca grande (logoblanco.png, el que antes estaba en el Hero) y con
+// de la barra aunque ambos grupos midan distinto. El logo arranca
+// grande (logoblanco.png, el que antes estaba en el Hero) y con
 // el scroll se cruza con el logo corto: ambos leen la variable CSS
 // --flow (0..1) que escribe aplicarFlow, asi que no hay un segundo
 // listener de scroll.
@@ -137,7 +135,7 @@ export function Navbar() {
   // continuo. Con prefers-reduced-motion se aplica directo, sin suavizar.
   useLayoutEffect(() => {
     const barra = barraRef.current;
-    if (!enLanding || !barra) return undefined;
+    if (!barra) return undefined;
     const sinAnimacion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const progresoDelScroll = () => Math.min(window.scrollY / DISTANCIA_FLOW_PX, 1);
     let objetivo = progresoDelScroll();
@@ -176,7 +174,7 @@ export function Navbar() {
       if (cuadro !== null) cancelAnimationFrame(cuadro);
       barra.removeAttribute('style');
     };
-  }, [enLanding]);
+  }, []);
 
   const iniciales = usuario?.nombreCompleto
     ?.split(' ')
@@ -200,8 +198,8 @@ export function Navbar() {
   }
 
   return (
-    <header ref={headerRef} className={enLanding ? 'pointer-events-none sticky top-0 z-40 h-24' : 'sticky top-0 z-40 h-20'}>
-      <div ref={barraRef} className={`absolute inset-0 ${enLanding ? 'pointer-events-auto' : 'bg-brand-blue'}`}>
+    <header ref={headerRef} className="pointer-events-none sticky top-0 z-40 h-24">
+      <div ref={barraRef} className="pointer-events-auto absolute inset-0">
         <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:gap-x-10 lg:gap-x-12">
           {/* La columna izquierda siempre existe (aunque el nav se oculte en
               movil) para que el grid no corra el logo hacia la izquierda.
@@ -228,13 +226,12 @@ export function Navbar() {
           <Link
             to="/"
             aria-label="Clínica Veterinaria UDES, ir al inicio"
-            className={`relative flex items-center justify-center ${enLanding ? 'h-10 w-[126px]' : ''}`}
+            className="relative flex h-10 w-[126px] items-center justify-center"
             // --viaje (0..1): avance del isotipo hacia el centro, compartido
             // por el logo grande y el isotipo blanco para que se muevan juntos.
-            style={enLanding ? { '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)' } : undefined}
+            style={{ '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)' }}
           >
-            {enLanding ? (
-              <>
+            <>
                 {/* Transicion en 3 pasos, todo derivado de --flow (0..1):
                     1. flow 0.1 -> 0.35: aparece el isotipo blanco
                        (logocortoblanco) encima del isotipo del logo grande
@@ -286,10 +283,7 @@ export function Navbar() {
                     style={{ opacity: 'clamp(0, (var(--flow, 0) - 0.75) / 0.25, 1)' }}
                   />
                 </div>
-              </>
-            ) : (
-              <img src={logoCorto} alt="" className="h-12 w-auto object-contain" />
-            )}
+            </>
           </Link>
 
           <div className="flex items-center gap-2 justify-self-end md:justify-self-start">

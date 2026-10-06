@@ -196,7 +196,9 @@ export function AgendarCitaPage() {
       <Navbar />
 
       <div inert={panelMascotaAbierto} aria-hidden={panelMascotaAbierto}>
-        <section className="bg-gradient-to-b from-brand-blue-500 to-brand-blue-800">
+        {/* -mt-24 pt-24: el banner pasa por detras de la topbar (transparente
+            arriba, ver Navbar.jsx), igual que el Hero del landing. */}
+        <section className="-mt-24 bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 pt-24">
           <div className="mx-auto max-w-7xl px-4 pb-20 pt-10 sm:px-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-blue-100">Agendar cita</p>
             <h1 className="mt-2 text-3xl font-bold text-white">Agenda una cita para tu mascota</h1>

@@ -61,7 +61,9 @@ export function PanelClientePage() {
     <div className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800">
+      {/* -mt-24 pt-24: el banner pasa por detras de la topbar (transparente
+          arriba, ver Navbar.jsx), igual que el Hero del landing. */}
+      <section className="relative -mt-24 overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 pt-24">
         <div className="relative mx-auto grid max-w-7xl gap-6 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-blue-100">Mi cuenta</p>
