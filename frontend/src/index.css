@@ -60,3 +60,74 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
+
+/* ---------------------------------------------------------------------
+   Landing paginado (LandingPage.jsx agrega la clase snap-landing a
+   <html> mientras esta montado). Solo desde lg (computadoras con mouse):
+   en movil las secciones son mas altas que la pantalla y el salto forzado
+   dejaria contenido inaccesible. Cada seccion es un punto de snap con
+   scroll-snap-stop: always, asi una vuelta de rueda avanza una seccion y
+   nunca se saltea ninguna. Teclado y trackpad funcionan igual (es scroll
+   nativo, no se intercepta la rueda).
+   --------------------------------------------------------------------- */
+@media (min-width: 64rem) {
+  html.snap-landing {
+    scroll-snap-type: y mandatory;
+  }
+}
+
+/* Entrada y salida de cada "slide" atadas al scroll (scroll-driven
+   animations, sin JS): view() mide cuanto del elemento entro o salio del
+   viewport.
+   - slide-card: la tarjeta de Servicios sube deslizandose y se agranda
+     al entrar, y se desvanece al salir.
+   - slide-contenido: el contenido de Sedes, Horarios y el cierre aparece
+     con un fundido al entrar y se desvanece al salir.
+   - slide-sale: solo salida (el Hero, que ya esta visible al cargar).
+   Navegadores sin soporte o con reduced-motion: todo queda visible y
+   quieto (el paginado sigue funcionando). */
+@keyframes slide-card-entra {
+  from {
+    opacity: 0;
+    transform: translateY(14vh) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slide-entra {
+  from {
+    opacity: 0;
+    transform: translateY(6vh);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slide-sale {
+  to {
+    opacity: 0;
+    transform: translateY(-4vh) scale(0.97);
+  }
+}
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .slide-card {
+      animation: slide-card-entra linear both, slide-sale linear both;
+      animation-timeline: view(), view();
+      animation-range: entry 0% entry 100%, exit 10% exit 90%;
+    }
+    .slide-contenido {
+      animation: slide-entra linear both, slide-sale linear both;
+      animation-timeline: view(), view();
+      animation-range: entry 0% entry 100%, exit 10% exit 90%;
+    }
+    .slide-sale {
+      animation: slide-sale linear both;
+      animation-timeline: view();
+      animation-range: exit 10% exit 90%;
+    }
+  }
+}

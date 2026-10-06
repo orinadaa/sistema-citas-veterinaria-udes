@@ -140,7 +140,7 @@ export function ServicioSlider({ slides }) {
         onPointerLeave={(e) => e.pointerType === 'mouse' && setPausadoHover(false)}
         onFocus={() => setPausadoFoco(true)}
         onBlur={alSalirFoco}
-        className="relative aspect-[4/5] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl bg-slate-900 shadow-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-[16/10] lg:aspect-[2/1] lg:rounded-3xl"
+        className="relative aspect-[4/5] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl bg-slate-900 shadow-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-[16/10] lg:aspect-auto lg:h-[clamp(18rem,calc(100svh-27rem),36rem)] lg:rounded-3xl"
       >
         {slides.map((slide, i) => {
           const activa = i === indice;

@@ -30,9 +30,9 @@ export function Hero() {
   // pt-24: el contenedor del fondo sube por detras de la topbar (96px,
   // -mt-24 en LandingPage.jsx); el contenido del Hero empieza debajo.
   return (
-    <section className="relative pt-24">
+    <section data-slide className="relative pt-24 lg:flex lg:min-h-svh lg:snap-start lg:snap-always lg:flex-col lg:justify-center">
       <FondoAmbientalHero />
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
+      <div className="slide-sale relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-10">
         <div className="max-w-xl">
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
             Cuidamos de quienes hacen parte de <span className="text-brand-amber">tu familia</span>

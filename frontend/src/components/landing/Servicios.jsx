@@ -124,7 +124,7 @@ export function Servicios() {
   return (
     // Sin fondo propio: la base es el degradado continuo Hero + Servicios
     // (LandingPage.jsx); aca solo van los halos.
-    <section id="servicios" className="relative py-20">
+    <section id="servicios" data-slide className="relative py-20 lg:flex lg:min-h-svh lg:snap-start lg:snap-always lg:flex-col lg:justify-center lg:pb-8 lg:pt-24">
       <FondoAmbientalServicios />
       {/* Sombra azul oscura detras del encabezado: garantiza contraste AA del
           texto blanco sobre los halos. A todo el ancho de la pantalla y mas
@@ -138,31 +138,37 @@ export function Servicios() {
             'radial-gradient(ellipse 75% 42% at 28% 50%, color-mix(in oklab, var(--color-brand-blue-800) 85%, transparent) 0%, color-mix(in oklab, var(--color-brand-blue-800) 55%, transparent) 40%, color-mix(in oklab, var(--color-brand-blue-800) 20%, transparent) 70%, transparent 100%)',
         }}
       />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <Revelar>
-          <SectionHeading
-            titulo="Servicios veterinarios"
-            subtitulo="Contamos con una amplia gama de servicios para el cuidado integral de tu mascota."
-            sobreFondoOscuro
-          />
-        </Revelar>
-
-        {estado === ESTADOS.CARGANDO && (
-          <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-[16/10] lg:aspect-[2/1] lg:rounded-3xl" />
-        )}
-
-        {estado === ESTADOS.ERROR && (
-          <div className="mt-10 flex items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
-            <IconoAlerta className="h-5 w-5 shrink-0" />
-            <p className="text-sm">No pudimos cargar los servicios en este momento.</p>
-          </div>
-        )}
-
-        {estado === ESTADOS.LISTO && slides.length > 0 && (
-          <Revelar retraso={120} className="mt-10">
-            <ServicioSlider slides={slides} />
+      {/* Desde lg la seccion es una tarjeta de bordes redondeados con fondo
+          oscuro translucido (blur del fondo ambiental de atras) que sube
+          deslizandose al entrar y se desvanece al salir (slide-card,
+          index.css). */}
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+        <div className="slide-card lg:rounded-[2rem] lg:bg-brand-blue-800/50 lg:p-10 lg:shadow-[0_30px_80px_-30px_rgb(0_0_0/0.6)] lg:ring-1 lg:ring-white/10 lg:backdrop-blur-xl">
+          <Revelar>
+            <SectionHeading
+              titulo="Servicios veterinarios"
+              subtitulo="Contamos con una amplia gama de servicios para el cuidado integral de tu mascota."
+              sobreFondoOscuro
+            />
           </Revelar>
-        )}
+
+          {estado === ESTADOS.CARGANDO && (
+            <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-[16/10] lg:aspect-auto lg:h-[clamp(18rem,calc(100svh-27rem),36rem)] lg:rounded-3xl" />
+          )}
+
+          {estado === ESTADOS.ERROR && (
+            <div className="mt-10 flex items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
+              <IconoAlerta className="h-5 w-5 shrink-0" />
+              <p className="text-sm">No pudimos cargar los servicios en este momento.</p>
+            </div>
+          )}
+
+          {estado === ESTADOS.LISTO && slides.length > 0 && (
+            <Revelar retraso={120} className="mt-10">
+              <ServicioSlider slides={slides} />
+            </Revelar>
+          )}
+        </div>
       </div>
     </section>
   );
