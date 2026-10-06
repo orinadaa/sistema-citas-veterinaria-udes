@@ -8,6 +8,7 @@ import { OlvideClavePage } from './pages/OlvideClavePage';
 import { PanelClientePage } from './pages/PanelClientePage';
 import { PanelAdminPage } from './pages/PanelAdminPage';
 import { AgendarCitaPage } from './pages/AgendarCitaPage';
+import { GuiaVetuiPage } from './pages/GuiaVetuiPage';
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
           <Route path="/iniciar-sesion" element={<LoginPage />} />
           <Route path="/registrarse" element={<RegistroPage />} />
           <Route path="/olvide-clave" element={<OlvideClavePage />} />
+          {/* Guia visual del sistema de diseño vetUI (publica, solo referencia). */}
+          <Route path="/vetui" element={<GuiaVetuiPage />} />
           <Route
             path="/panel"
             element={

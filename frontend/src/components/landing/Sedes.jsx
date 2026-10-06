@@ -66,7 +66,7 @@ export function Sedes() {
               {sedes.map((sede, posicion) => {
                 return (
                   <Revelar key={sede.id} retraso={120 + posicion * 120}>
-                    {/* Cristal blanco flotante (mismo tratamiento que las tarjetas
+                    {/* Cristal de vetUI (utilidad cristal, styles/vetui.css; mismo que las tarjetas
                         de Horarios): blanco al 60% con el backdrop aclarado para
                         que no se agrise sobre el azul, reflejo, borde de luz y
                         sombra. La foto es opaca; el cristal se ve en la franja
@@ -77,7 +77,7 @@ export function Sedes() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Ver ${sede.nombre} en Google Maps (abre en una pestaña nueva)`}
-                      className="hover-ilumina-claro block h-full overflow-hidden rounded-2xl bg-white/60 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.45),rgb(255_255_255/0)_45%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.9),inset_0_0_0_1px_rgb(255_255_255/0.55),0_18px_40px_-16px_rgb(0_0_0/0.5)] backdrop-blur-[16px] backdrop-saturate-150 backdrop-brightness-[1.4]">
+                      className="cristal hover-ilumina-claro block h-full overflow-hidden rounded-tarjeta">
                       {sede.foto_url ? (
                         <img src={sede.foto_url} alt={sede.nombre} className="h-80 w-full object-cover sm:h-96 lg:h-[clamp(12rem,calc(100svh-28rem),34rem)]" />
                       ) : (
