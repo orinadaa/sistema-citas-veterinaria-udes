@@ -7,6 +7,7 @@
 import { useEffect, useState } from 'react';
 import { obtenerSedes, obtenerHorarios } from '../../api/client';
 import { IconoUbicacion, IconoReloj, IconoAlerta, IconoSede } from '../icons';
+import { Revelar } from './Revelar';
 import { SectionHeading } from './SectionHeading';
 import { agruparHorario } from '../../utils/horarioTexto';
 
@@ -33,10 +34,12 @@ export function Sedes() {
   return (
     <section id="sedes" className="bg-slate-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <SectionHeading
-          titulo="Nuestras sedes"
-          subtitulo="Atendemos en dos ciudades. Elige la que te quede más cerca al agendar tu cita."
-        />
+        <Revelar>
+          <SectionHeading
+            titulo="Nuestras sedes"
+            subtitulo="Atendemos en dos ciudades. Elige la que te quede más cerca al agendar tu cita."
+          />
+        </Revelar>
 
         {estado === ESTADOS.CARGANDO && (
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
@@ -57,34 +60,36 @@ export function Sedes() {
 
         {estado === ESTADOS.LISTO && (
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
-            {sedes.map((sede) => {
+            {sedes.map((sede, posicion) => {
               const lineas = agruparHorario(horariosPorSede[sede.id] || []).slice(0, 3);
               return (
-                <div key={sede.id} className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-                  {sede.foto_url ? (
-                    <img src={sede.foto_url} alt={sede.nombre} className="h-72 w-full object-cover sm:h-80" />
-                  ) : (
-                    <div className="flex h-72 w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 sm:h-80">
-                      <IconoSede className="h-12 w-12 text-brand-blue/40" />
-                    </div>
-                  )}
-
-                  <div className="p-6">
-                    <div className="flex items-start gap-3">
-                      <IconoUbicacion className="mt-0.5 h-6 w-6 shrink-0 text-blue-600" />
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-900">{sede.nombre}</h3>
-                        <p className="text-sm text-slate-500">{sede.direccion || sede.ciudad}</p>
+                <Revelar key={sede.id} retraso={120 + posicion * 120}>
+                  <div className="h-full overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                    {sede.foto_url ? (
+                      <img src={sede.foto_url} alt={sede.nombre} className="h-72 w-full object-cover sm:h-80" />
+                    ) : (
+                      <div className="flex h-72 w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 sm:h-80">
+                        <IconoSede className="h-12 w-12 text-brand-blue/40" />
                       </div>
-                    </div>
-                    <div className="mt-5 flex items-start gap-3 border-t border-slate-100 pt-5">
-                      <IconoReloj className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
-                      <div className="text-sm text-slate-600">
-                        {lineas.length > 0 ? lineas.map((linea) => <p key={linea}>{linea}</p>) : <p>Horario no configurado.</p>}
+                    )}
+
+                    <div className="p-6">
+                      <div className="flex items-start gap-3">
+                        <IconoUbicacion className="mt-0.5 h-6 w-6 shrink-0 text-blue-600" />
+                        <div>
+                          <h3 className="text-lg font-semibold text-slate-900">{sede.nombre}</h3>
+                          <p className="text-sm text-slate-500">{sede.direccion || sede.ciudad}</p>
+                        </div>
+                      </div>
+                      <div className="mt-5 flex items-start gap-3 border-t border-slate-100 pt-5">
+                        <IconoReloj className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
+                        <div className="text-sm text-slate-600">
+                          {lineas.length > 0 ? lineas.map((linea) => <p key={linea}>{linea}</p>) : <p>Horario no configurado.</p>}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </Revelar>
               );
             })}
           </div>

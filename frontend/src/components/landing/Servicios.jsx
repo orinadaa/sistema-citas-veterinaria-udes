@@ -10,6 +10,7 @@ import { obtenerServicios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { IconoAlerta } from '../icons';
+import { Revelar } from './Revelar';
 import { SectionHeading } from './SectionHeading';
 import { ServicioSlider } from './ServicioSlider';
 import imgConsulta from '../../assets/servicios-foto/consulta.png';
@@ -122,10 +123,12 @@ export function Servicios() {
   return (
     <section id="servicios" className="bg-slate-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <SectionHeading
-          titulo="Servicios veterinarios"
-          subtitulo="Contamos con una amplia gama de servicios para el cuidado integral de tu mascota."
-        />
+        <Revelar>
+          <SectionHeading
+            titulo="Servicios veterinarios"
+            subtitulo="Contamos con una amplia gama de servicios para el cuidado integral de tu mascota."
+          />
+        </Revelar>
 
         {estado === ESTADOS.CARGANDO && (
           <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-slate-200 sm:aspect-[16/10] lg:aspect-[2/1] lg:rounded-3xl" />
@@ -139,9 +142,9 @@ export function Servicios() {
         )}
 
         {estado === ESTADOS.LISTO && slides.length > 0 && (
-          <div className="mt-10">
+          <Revelar retraso={120} className="mt-10">
             <ServicioSlider slides={slides} />
-          </div>
+          </Revelar>
         )}
       </div>
     </section>
