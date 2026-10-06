@@ -9,8 +9,8 @@ import { IconoMas } from '../icons';
 export function PageHeader({ title, subtitle, actionLabel, onAction, actionColor = 'amber' }) {
   const colorClases =
     actionColor === 'blue'
-      ? 'bg-brand-blue text-white hover:bg-blue-600'
-      : 'bg-brand-amber text-brand-navy hover:brightness-95';
+      ? 'bg-brand-blue text-white shadow-sm hover:bg-blue-600'
+      : 'boton-glass-ambar text-brand-navy';
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -22,7 +22,7 @@ export function PageHeader({ title, subtitle, actionLabel, onAction, actionColor
         <button
           type="button"
           onClick={onAction}
-          className={`inline-flex shrink-0 items-center gap-2 rounded-boton px-4 py-2.5 text-sm font-semibold shadow-sm transition active:scale-[0.98] ${colorClases}`}
+          className={`inline-flex shrink-0 items-center gap-2 rounded-boton px-4 py-2.5 text-sm font-semibold transition active:scale-[0.98] ${colorClases}`}
         >
           <IconoMas className="h-4 w-4" />
           {actionLabel}

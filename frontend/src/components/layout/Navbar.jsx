@@ -347,7 +347,7 @@ export function Navbar() {
               type="button"
               onClick={irAAgendar}
               aria-label="Agendar cita"
-              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-3 py-2 sm:px-4 text-base font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
+              className="boton-glass-ambar inline-flex items-center gap-2 rounded-boton px-3 py-2 sm:px-4 text-base font-semibold text-slate-900 transition active:scale-[0.98]"
             >
               <IconoCalendario className="h-4 w-4" />
               {/* Texto desde lg: en tablet (md) el grupo derecho con el texto
