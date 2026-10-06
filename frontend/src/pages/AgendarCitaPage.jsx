@@ -7,7 +7,7 @@
 // Todo el estado de las selecciones vive aqui (no en cada pagina) para
 // que "Cambiar" en el resumen lateral regrese a una pagina sin perder
 // lo ya elegido en las demas.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { BookingStepper, BookingStepperLateral } from '../components/agendar/BookingStepper';
@@ -15,6 +15,7 @@ import { BookingSummarySidebar } from '../components/agendar/BookingSummarySideb
 import { PaginaMascotaServicio } from '../components/agendar/PaginaMascotaServicio';
 import { PaginaSedeFecha } from '../components/agendar/PaginaSedeFecha';
 import { PaginaConfirmacion } from '../components/agendar/PaginaConfirmacion';
+import { DialogoSalirAgendar } from '../components/agendar/DialogoSalirAgendar';
 import { FormularioMascotaPanel } from '../components/cliente/FormularioMascotaPanel';
 import {
   obtenerMisMascotas,
@@ -27,41 +28,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { IconoFlechaDerecha } from '../components/icons';
 
-// La pildora de la topbar ocupa hasta ~76px desde arriba (12px de
-// separacion + 64px de alto). Apenas el borde superior de la tarjeta del
-// stepper toca esa franja (con 8px de margen), el stepper se muda al
-// costado: si se esperara a que quede totalmente tapada, se la veria
-// difuminada detras de la pildora translucida mientras pasa por debajo.
-const LIMITE_TOPBAR_PX = 84;
-
 export function AgendarCitaPage() {
-  const tarjetaStepperRef = useRef(null);
-  const [stepperOculto, setStepperOculto] = useState(false);
-
-  // Cuando la tarjeta horizontal del stepper llega a la topbar, se oculta
-  // y aparece la version lateral (BookingStepperLateral). Se mide la caja
-  // externa de la tarjeta (sin transform), asi su animacion de salida no
-  // altera la medicion.
-  useEffect(() => {
-    let cuadro = null;
-    const medir = () => {
-      cuadro = null;
-      const tarjeta = tarjetaStepperRef.current;
-      if (tarjeta) setStepperOculto(tarjeta.getBoundingClientRect().top < LIMITE_TOPBAR_PX);
-    };
-    const alHacerScroll = () => {
-      if (cuadro === null) cuadro = requestAnimationFrame(medir);
-    };
-    medir();
-    window.addEventListener('scroll', alHacerScroll, { passive: true });
-    window.addEventListener('resize', alHacerScroll);
-    return () => {
-      window.removeEventListener('scroll', alHacerScroll);
-      window.removeEventListener('resize', alHacerScroll);
-      if (cuadro !== null) cancelAnimationFrame(cuadro);
-    };
-  }, []);
-
   const { token } = useAuth();
   const navigate = useNavigate();
   const [parametros] = useSearchParams();
@@ -98,6 +65,7 @@ export function AgendarCitaPage() {
   const [correoEnviado, setCorreoEnviado] = useState(false);
 
   const [panelMascotaAbierto, setPanelMascotaAbierto] = useState(false);
+  const [confirmarSalida, setConfirmarSalida] = useState(false);
 
   // Sin setState sincronico al inicio: el primer render ya arranca en
   // cargando=true, y "Reintentar" (reintentar()) lo vuelve a poner.
@@ -176,6 +144,16 @@ export function AgendarCitaPage() {
     setFranja(null);
   }
 
+  // "Cancelar" (abajo en la pagina 1 y en el stepper lateral): si ya hay
+  // algo elegido mas alla de la mascota, se confirma antes de salir para
+  // no perder el progreso sin avisar.
+  const hayProgreso = pagina > 1 || Boolean(servicioId || fecha || franja || motivo.trim());
+  function cancelarAgendamiento() {
+    if (hayProgreso) setConfirmarSalida(true);
+    else navigate('/panel');
+  }
+  const seguirAgendando = useCallback(() => setConfirmarSalida(false), []);
+
   function irAPagina(numero) {
     setErrorConfirmar('');
     setPagina(numero);
@@ -240,25 +218,24 @@ export function AgendarCitaPage() {
           </div>
         </section>
 
-        {/* Entre lg y 1359px el margen lateral no alcanza para el stepper
-            lateral (48px + 12px): se reserva ese espacio a la izquierda
-            del contenido para que no lo tape. Desde 1360px ya hay margen. */}
-        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[76px] min-[1360px]:pl-6">
-          {/* Caja externa (medida, sin transform) + tarjeta interna que, desde
-              lg, se desvanece y se encoge hacia la izquierda cuando el stepper
-              se muda al costado. Debajo de lg no hay version lateral, asi que
-              la tarjeta no cambia. */}
-          <div ref={tarjetaStepperRef} className="-mt-12">
-            <div
-              aria-hidden={stepperOculto || undefined}
-              className={`origin-left rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 transition-[opacity,translate,scale] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:px-8 ${
-                stepperOculto ? 'lg:-translate-x-10 lg:scale-95 lg:opacity-0' : ''
-              }`}
-            >
-              <BookingStepper paginaActual={pagina} />
-            </div>
+        {/* Entre lg y 1479px el margen lateral no alcanza para el stepper
+            lateral (columna de 96px + 12px al borde + 16px de aire): se
+            reserva ese espacio a la izquierda del contenido para que no lo
+            tape. Desde 1480px ya hay margen libre. */}
+        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[124px] min-[1480px]:pl-6">
+          {/* Desde lg, crossfade con el stepper lateral atado al progreso de
+              la topbar (--flow en <html>, ver Navbar.jsx): esta tarjeta se
+              desvanece (1 - flow) mientras el lateral aparece (flow). Con
+              reduced-motion el cambio es directo (round). Cuando la topbar
+              termino su transicion queda invisible (fuera del arbol de
+              accesibilidad). Debajo de lg no hay lateral: no cambia. */}
+          <div className="-mt-12 rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 sm:px-8 lg:[opacity:calc(1_-_var(--flow,0))] motion-reduce:lg:[opacity:calc(1_-_round(var(--flow,0)))] lg:[[data-topbar-progreso=fin]_&]:invisible">
+            <BookingStepper paginaActual={pagina} />
           </div>
-          <BookingStepperLateral paginaActual={pagina} visible={stepperOculto} origenRef={tarjetaStepperRef} />
+          <BookingStepperLateral
+            paginaActual={pagina}
+            onCancelar={pagina === 3 && citaCreada ? undefined : cancelarAgendamiento}
+          />
 
           {pagina === 3 && citaCreada ? (
             <div className="mt-8">
@@ -306,7 +283,7 @@ export function AgendarCitaPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <button
                     type="button"
-                    onClick={() => (pagina === 1 ? navigate('/panel') : irAPagina(pagina - 1))}
+                    onClick={() => (pagina === 1 ? cancelarAgendamiento() : irAPagina(pagina - 1))}
                     className="rounded-boton border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
                   >
                     {pagina === 1 ? 'Cancelar' : 'Volver'}
@@ -335,6 +312,8 @@ export function AgendarCitaPage() {
           )}
         </main>
       </div>
+
+      <DialogoSalirAgendar abierto={confirmarSalida} onSeguir={seguirAgendando} onSalir={() => navigate('/panel')} />
 
       <FormularioMascotaPanel
         isOpen={panelMascotaAbierto}

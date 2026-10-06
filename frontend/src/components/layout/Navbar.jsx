@@ -68,6 +68,13 @@ function aplicarFlow(elemento, t) {
   const [r, g, b, alfa] = FONDO_ESTADO_1.map((c, i) => interpolar(c, FONDO_ESTADO_2[i], t));
   const estilo = elemento.style;
   estilo.setProperty('--flow', String(t));
+  // El mismo progreso se publica en <html> para que otros elementos de la
+  // pagina se animen sincronizados con la topbar sin un segundo listener
+  // de scroll (ej. el stepper de /agendar). data-topbar-progreso permite
+  // sacar de la interaccion/lectura lo que esta en opacidad ~0.
+  const raiz = document.documentElement;
+  raiz.style.setProperty('--flow', String(t));
+  raiz.dataset.topbarProgreso = t < 0.02 ? 'inicio' : t > 0.98 ? 'fin' : 'medio';
   estilo.top = `${t * SEPARACION_SUPERIOR}px`;
   estilo.bottom = `${t * (ALTO_HEADER - SEPARACION_SUPERIOR - ALTO_PILDORA)}px`;
   // Margen lateral: al menos 16px y, en pantallas anchas, el necesario
@@ -173,6 +180,8 @@ export function Navbar() {
       window.removeEventListener('scroll', alHacerScroll);
       if (cuadro !== null) cancelAnimationFrame(cuadro);
       barra.removeAttribute('style');
+      document.documentElement.style.removeProperty('--flow');
+      delete document.documentElement.dataset.topbarProgreso;
     };
   }, []);
 

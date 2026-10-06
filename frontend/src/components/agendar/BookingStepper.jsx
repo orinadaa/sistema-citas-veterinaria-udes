@@ -4,11 +4,7 @@
 // todos los hitos de la pagina activa se resaltan juntos (decision
 // confirmada con la usuaria -- el mockup resaltaba solo el primero) y
 // los de paginas ya completadas muestran check.
-import { useLayoutEffect, useRef } from 'react';
 import { IconoCheck } from '../icons';
-
-const DURACION_MUDANZA_MS = 550;
-const CURVA_MUDANZA = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 const HITOS = [
   { numero: 1, etiqueta: 'Mascota', pagina: 1 },
@@ -71,60 +67,26 @@ export function BookingStepper({ paginaActual }) {
   );
 }
 
-// Variante vertical y compacta, fija al costado izquierdo de la pantalla.
-// Aparece cuando la tarjeta horizontal llega a la topbar (al bajar para
-// tocar "Continuar"). Para que se lea como el MISMO stepper mudandose al
-// costado (y no como un elemento nuevo), entra con una animacion FLIP:
-// arranca encima de la tarjeta horizontal (`origenRef`), achicado y
-// transparente, y viaja hasta su lugar mientras la tarjeta se desvanece
-// hacia la izquierda. Al volver arriba hace el camino inverso. Mismo lenguaje visual que la pildora de
-// la topbar (brand-blue-800 al 75% con blur, forma de capsula). Solo
-// circulos: la etiqueta de cada hito va en aria-label y en el tooltip.
-export function BookingStepperLateral({ paginaActual, visible, origenRef }) {
-  const railRef = useRef(null);
-  const primeraVez = useRef(true);
-
-  useLayoutEffect(() => {
-    const rail = railRef.current;
-    const origen = origenRef?.current;
-    // Sin animacion en el primer render, con reduced-motion o si el rail
-    // esta oculto por breakpoint (display: none debajo de lg).
-    if (primeraVez.current) {
-      primeraVez.current = false;
-      return undefined;
-    }
-    // (offsetParent no sirve para detectar display:none: en un elemento
-    // position:fixed siempre es null.)
-    if (!rail || !origen || getComputedStyle(rail).display === 'none') return undefined;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    // Desplazamiento desde el lugar del rail hasta el inicio (lado
-    // izquierdo, centro vertical) de la tarjeta horizontal.
-    const r = rail.getBoundingClientRect();
-    const o = origen.getBoundingClientRect();
-    const dx = o.left + 24 - (r.left + r.width / 2);
-    const dy = o.top + o.height / 2 - (r.top + r.height / 2);
-    const enTarjeta = { transform: `translate(${dx}px, ${dy}px) scale(0.5)`, opacity: 0 };
-    const enSuLugar = { transform: 'translate(0, 0) scale(1)', opacity: 1 };
-    const animacion = rail.animate(visible ? [enTarjeta, enSuLugar] : [enSuLugar, enTarjeta], {
-      duration: DURACION_MUDANZA_MS,
-      easing: CURVA_MUDANZA,
-    });
-    return () => animacion.cancel();
-  }, [visible, origenRef]);
-
+// Variante vertical, fija al costado izquierdo (el resumen de la cita ocupa
+// el derecho). Suelta sobre el fondo de la pagina: sin tarjeta, borde ni
+// sombra; solo circulos, linea conectora y el boton Cancelar.
+// - Activo: circulo mas grande (48px), brand-blue, numero blanco en negrita.
+// - Completado: mismo estilo que el horizontal (verde con check), 40px.
+// - Pendiente: 40px, fondo blanco, borde gris claro, numero gris.
+//
+// Crossfade con la tarjeta horizontal atado al progreso de la topbar
+// (--flow en <html>, ver Navbar.jsx): opacidad = --flow, sin listener
+// propio. Con reduced-motion el cambio es directo (round()). Mientras esta
+// casi transparente (data-topbar-progreso="inicio") queda invisible: no
+// recibe clicks ni foco. Solo desde lg.
+export function BookingStepperLateral({ paginaActual, onCancelar }) {
   return (
     <nav
-      ref={railRef}
       aria-label="Progreso de la cita"
-      aria-hidden={!visible}
-      inert={!visible}
-      className={`fixed top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-brand-blue-800/75 px-2 py-3 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5)] ring-1 ring-white/12 backdrop-blur-[20px] lg:block ${
-        visible ? 'opacity-100' : 'pointer-events-none opacity-0'
-      }`}
-      // Pegado al borde del contenido (max-w-7xl = 80rem) cuando hay margen
-      // libre; si no, a 12px del borde de la pantalla.
-      style={{ left: 'max(12px, calc((100vw - 80rem) / 2 - 64px))' }}
+      className="invisible fixed top-1/2 z-30 hidden -translate-y-1/2 flex-col items-center gap-5 [opacity:var(--flow,0)] motion-reduce:[opacity:round(var(--flow,0))] lg:flex [[data-topbar-progreso=fin]_&]:visible [[data-topbar-progreso=medio]_&]:visible"
+      // Columna de 96px (ancho del boton Cancelar) pegada al borde del
+      // contenido (max-w-7xl = 80rem) cuando hay margen; si no, a 12px.
+      style={{ left: 'max(12px, calc((100vw - 80rem) / 2 - 96px))', width: '96px' }}
     >
       <ol className="flex flex-col items-center">
         {HITOS.map((hito, indice) => {
@@ -140,23 +102,32 @@ export function BookingStepperLateral({ paginaActual, visible, origenRef }) {
               <span
                 title={hito.etiqueta}
                 aria-label={`${hito.numero}. ${hito.etiqueta}${estado === 'completado' ? ' (completado)' : estado === 'activo' ? ' (paso actual)' : ''}`}
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition ${
-                  estado === 'completado'
-                    ? 'bg-brand-green text-white'
-                    : estado === 'activo'
-                      ? 'bg-white text-brand-blue ring-4 ring-white/25'
-                      : 'border-2 border-white/30 text-white/60'
+                className={`flex items-center justify-center rounded-full font-semibold transition-colors ${
+                  estado === 'activo'
+                    ? 'h-12 w-12 bg-brand-blue text-base font-bold text-white shadow-sm'
+                    : estado === 'completado'
+                      ? 'h-10 w-10 bg-brand-green text-sm text-white'
+                      : 'h-10 w-10 border border-slate-200 bg-white text-sm text-slate-400'
                 }`}
               >
                 {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : hito.numero}
               </span>
               {siguiente && (
-                <span aria-hidden="true" className={`my-1 h-5 w-0.5 rounded-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`} />
+                <span aria-hidden="true" className={`my-1.5 h-6 w-0.5 rounded-full ${lineaAlcanzada ? 'bg-brand-blue' : 'bg-slate-200'}`} />
               )}
             </li>
           );
         })}
       </ol>
+      {onCancelar && (
+        <button
+          type="button"
+          onClick={onCancelar}
+          className="rounded-boton border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+        >
+          Cancelar
+        </button>
+      )}
     </nav>
   );
 }
