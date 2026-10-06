@@ -5,7 +5,7 @@
 // fuera del contenido `inert`; la mascota nueva queda seleccionada.
 import { SelectableCard } from './SelectableCard';
 import { Seccion } from './Seccion';
-import { EstadoError } from '../ui/EstadoError';
+import { EstadoError, EstadoVacio, Esqueleto as Bloque } from '../vetui';
 import { especieYRaza, edadYPeso } from '../../utils/mascota';
 import { iconoDeServicio } from '../../utils/iconoServicio';
 import { IconoMas } from '../icons';
@@ -15,7 +15,7 @@ function Esqueleto({ cantidad = 3 }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: cantidad }, (_, i) => (
-        <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+        <Bloque key={i} />
       ))}
     </div>
   );
@@ -52,8 +52,8 @@ export function PaginaMascotaServicio({
                   <AvatarMascota mascota={mascota} />
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
-                    <p className="truncate text-sm text-slate-500">{especieYRaza(mascota) || 'Sin especie registrada'}</p>
-                    {edadYPeso(mascota) && <p className="text-xs text-slate-400">{edadYPeso(mascota)}</p>}
+                    <p className="truncate text-sm text-slate-700">{especieYRaza(mascota) || 'Sin especie registrada'}</p>
+                    {edadYPeso(mascota) && <p className="text-xs font-medium text-slate-700">{edadYPeso(mascota)}</p>}
                   </div>
                 </div>
               </SelectableCard>
@@ -62,7 +62,7 @@ export function PaginaMascotaServicio({
             <button
               type="button"
               onClick={onAgregarMascota}
-              className="hover-ilumina flex min-h-[5.5rem] items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 p-4 text-sm font-semibold text-slate-500 transition hover:border-brand-blue hover:text-brand-blue"
+              className="hover-ilumina-claro flex min-h-[5.5rem] items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-white/45 p-4 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
             >
               <IconoMas className="h-5 w-5" />
               Agregar mascota
@@ -75,9 +75,7 @@ export function PaginaMascotaServicio({
         {cargando ? (
           <Esqueleto cantidad={6} />
         ) : servicios.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-            No hay servicios disponibles en este momento.
-          </p>
+          <EstadoVacio>No hay servicios disponibles en este momento.</EstadoVacio>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {servicios.map((servicio) => {
@@ -89,13 +87,13 @@ export function PaginaMascotaServicio({
                   onSeleccionar={() => onSeleccionarServicio(servicio.id)}
                 >
                   <div className="flex items-start gap-3 pr-6">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-brand-blue">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-brand-blue-700">
                       <Icono className="h-5 w-5" />
                     </span>
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-900">{servicio.nombre}</p>
                       {servicio.descripcion && (
-                        <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{servicio.descripcion}</p>
+                        <p className="mt-0.5 line-clamp-2 text-xs text-slate-700">{servicio.descripcion}</p>
                       )}
                     </div>
                   </div>

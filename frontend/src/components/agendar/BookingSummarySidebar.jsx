@@ -4,6 +4,8 @@
 // sin perder las demas selecciones (el estado vive en AgendarCitaPage).
 // top-24: el Navbar publico es sticky (h ~ 4.5rem, z-40), el resumen
 // queda debajo de el en vez de pasar por detras.
+// Material: Superficie de vidrio de vetUI (texto blanco).
+import { Superficie } from '../vetui';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { especieYRaza } from '../../utils/mascota';
 import { IconoCalendario, IconoEstetoscopio, IconoPata, IconoReloj, IconoUbicacion } from '../icons';
@@ -11,25 +13,25 @@ import { IconoCalendario, IconoEstetoscopio, IconoPata, IconoReloj, IconoUbicaci
 function Fila({ icono: Icono, etiqueta, valor, detalle, placeholder, onCambiar }) {
   return (
     <div className="flex items-start gap-3 py-3.5">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
         <Icono className="h-4.5 w-4.5" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{etiqueta}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-blue-100">{etiqueta}</p>
         {valor ? (
           <>
-            <p className="truncate text-sm font-semibold text-slate-900">{valor}</p>
-            {detalle && <p className="text-xs text-slate-500">{detalle}</p>}
+            <p className="truncate text-sm font-semibold text-white">{valor}</p>
+            {detalle && <p className="text-xs text-blue-100">{detalle}</p>}
           </>
         ) : (
-          <p className="text-sm text-slate-400">{placeholder}</p>
+          <p className="text-sm text-blue-100">{placeholder}</p>
         )}
       </div>
       {valor && onCambiar && (
         <button
           type="button"
           onClick={onCambiar}
-          className="shrink-0 text-xs font-semibold text-brand-blue transition hover:text-brand-blue-700 hover:underline"
+          className="hover-texto-ilumina shrink-0 text-xs font-semibold text-white underline underline-offset-2"
         >
           Cambiar
         </button>
@@ -40,10 +42,10 @@ function Fila({ icono: Icono, etiqueta, valor, detalle, placeholder, onCambiar }
 
 export function BookingSummarySidebar({ mascota, servicio, sede, fechaHora, sedeSugerida, onIrAPagina }) {
   return (
-    <aside className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 lg:sticky lg:top-24">
-      <h2 className="font-heading text-base font-semibold text-brand-navy">Resumen de tu cita</h2>
+    <Superficie as="aside" className="lg:sticky lg:top-24">
+      <h2 className="text-base font-bold text-white">Resumen de tu cita</h2>
 
-      <div className="mt-2 divide-y divide-slate-100">
+      <div className="mt-2 divide-y divide-white/15">
         <Fila
           icono={IconoPata}
           etiqueta="Mascota"
@@ -77,6 +79,6 @@ export function BookingSummarySidebar({ mascota, servicio, sede, fechaHora, sede
           onCambiar={() => onIrAPagina(2)}
         />
       </div>
-    </aside>
+    </Superficie>
   );
 }

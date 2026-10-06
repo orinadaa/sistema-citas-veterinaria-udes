@@ -18,7 +18,7 @@ import { crearMascota, actualizarMascota, eliminarMascota, subirFotoMascota } fr
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
-import { SidePanel } from '../ui/SidePanel';
+import { Boton, PanelLateral } from '../vetui';
 import { AvatarMascota } from './AvatarMascota';
 import { FotoMascotaModal } from './FotoMascotaModal';
 import { IconoCamara, IconoPapelera } from '../icons';
@@ -192,28 +192,19 @@ export function FormularioMascotaPanel({
 
   return (
     <>
-      <SidePanel
+      <PanelLateral
         isOpen={isOpen}
         // Con el editor de foto abierto, Escape/clic afuera solo cierran el editor.
         onClose={() => !editorFotoAbierto && onClose()}
         title={mascota ? 'Editar mascota' : 'Agregar mascota'}
         footer={
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-boton border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-            >
+            <Boton variante="contorno" onClick={onClose}>
               Cancelar
-            </button>
-            <button
-              type="submit"
-              form="form-mascota-cliente"
-              disabled={guardando}
-              className="boton-glass-ambar flex-1 rounded-boton px-4 py-2 text-sm font-semibold text-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60"
-            >
+            </Boton>
+            <Boton type="submit" form="form-mascota-cliente" disabled={guardando} className="flex-1">
               {guardando ? 'Guardando...' : 'Guardar mascota'}
-            </button>
+            </Boton>
           </div>
         }
       >
@@ -350,7 +341,7 @@ export function FormularioMascotaPanel({
             </div>
           )}
         </form>
-      </SidePanel>
+      </PanelLateral>
 
       {/* Fuera del SidePanel: el panel usa transform, y un ancestro con
           transform encerraria el position:fixed del modal dentro de el. */}

@@ -27,6 +27,7 @@ import {
 } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { IconoFlechaDerecha } from '../components/icons';
+import { Aviso, Boton, EncabezadoPagina, FondoVetui } from '../components/vetui';
 
 export function AgendarCitaPage() {
   const { token } = useAuth();
@@ -227,19 +228,18 @@ export function AgendarCitaPage() {
     }[pagina] ?? false;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    // vetUI: fondo de marca con halos (FondoVetui, tambien detras de la
+    // topbar), secciones de vidrio y tarjetas de cristal.
+    <FondoVetui>
       <Navbar />
 
       <div inert={panelMascotaAbierto} aria-hidden={panelMascotaAbierto}>
-        {/* -mt-24 pt-24: el banner pasa por detras de la topbar (transparente
-            arriba, ver Navbar.jsx), igual que el Hero del landing. */}
-        <section className="-mt-24 bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 pt-24">
-          <div className="mx-auto max-w-7xl px-4 pb-20 pt-10 sm:px-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-100">Agendar cita</p>
-            <h1 className="mt-2 text-3xl font-bold text-white">Agenda una cita para tu mascota</h1>
-            <p className="mt-2 max-w-xl text-blue-50">Completa los pasos y confirma. Te toma menos de un minuto.</p>
-          </div>
-        </section>
+        <EncabezadoPagina
+          antetitulo="Agendar cita"
+          titulo="Agenda una cita para tu mascota"
+          descripcion="Completa los pasos y confirma. Te toma menos de un minuto."
+          className="pb-6 lg:pl-[76px] min-[1360px]:pl-6"
+        />
 
         {/* Entre lg y 1359px el margen lateral no alcanza para el stepper
             lateral (48px + 12px al borde + 16px de aire): se reserva ese
@@ -253,7 +253,7 @@ export function AgendarCitaPage() {
               de irse. Desde la decima 8 queda invisible (sin clicks ni foco).
               Con reduced-motion no hay fundido: solo cambia la visibilidad.
               Debajo de lg no hay lateral: no cambia. */}
-          <div className="-mt-12 rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 sm:px-8 lg:[opacity:clamp(0,calc(1_-_var(--flow,0)_/_0.8),1)] motion-reduce:lg:[opacity:1] lg:[[data-topbar-decima='8']_&]:invisible lg:[[data-topbar-decima='9']_&]:invisible lg:[[data-topbar-decima='10']_&]:invisible">
+          <div className="vidrio rounded-superficie px-4 py-5 sm:px-8 lg:[opacity:clamp(0,calc(1_-_var(--flow,0)_/_0.8),1)] motion-reduce:lg:[opacity:1] lg:[[data-topbar-decima='8']_&]:invisible lg:[[data-topbar-decima='9']_&]:invisible lg:[[data-topbar-decima='10']_&]:invisible">
             <BookingStepper paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />
           </div>
           <BookingStepperLateral paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />
@@ -297,41 +297,30 @@ export function AgendarCitaPage() {
                   />
                 )}
 
-                {errorConfirmar && (
-                  <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200">{errorConfirmar}</p>
-                )}
+                {errorConfirmar && <Aviso tono="error">{errorConfirmar}</Aviso>}
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   {/* Volver (desde la pagina 2) + Cancelar, que se mantiene en
-                      todas las paginas del flujo, en rojo por ser la accion de
-                      salida. */}
+                      todas las paginas del flujo (peligro: es la accion de
+                      salida). Continuar/Confirmar es la accion primaria. */}
                   <div className="flex flex-wrap items-center gap-3">
                     {pagina > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => irAPagina(pagina - 1)}
-                        className="rounded-boton border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                      >
+                      <Boton variante="secundario" onClick={() => irAPagina(pagina - 1)}>
                         Volver
-                      </button>
+                      </Boton>
                     )}
-                    <button
-                      type="button"
-                      onClick={cancelarAgendamiento}
-                      className="rounded-boton border border-red-500 bg-white px-5 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                    >
+                    <Boton variante="peligro" onClick={cancelarAgendamiento}>
                       Cancelar
-                    </button>
+                    </Boton>
                   </div>
-                  <button
-                    type="button"
+                  <Boton
                     disabled={!paginaCompleta || enviando}
                     onClick={pagina === 2 ? confirmarCita : () => irAPagina(pagina + 1)}
-                    className="inline-flex items-center gap-2 rounded-boton bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                    iconoFinal={IconoFlechaDerecha}
+                    className="px-6"
                   >
                     {pagina === 2 ? (enviando ? 'Agendando...' : 'Confirmar cita') : 'Continuar'}
-                    <IconoFlechaDerecha className="h-4 w-4" />
-                  </button>
+                  </Boton>
                 </div>
               </div>
 
@@ -360,6 +349,6 @@ export function AgendarCitaPage() {
           setMascotaId(nueva.id);
         }}
       />
-    </div>
+    </FondoVetui>
   );
 }
