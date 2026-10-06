@@ -11,8 +11,9 @@
 //   + Formas organicas: dos ondas grandes difuminadas (solo desde md).
 //   3. Halos azules secundarios: inferior izquierdo brand-blue-400 y
 //      lateral derecho brand-blue-600.
-//   4. Halos ambar: abajo a la derecha (el mas fuerte), lateral izquierdo
-//      a media altura y uno chico abajo al centro. Lejos del encabezado,
+//   4. Halos ambar en brand-amber (el color del boton "Agendar cita"):
+//      abajo a la derecha (el mas fuerte), lateral izquierdo a media
+//      altura, abajo al centro y lateral derecho. Lejos del encabezado,
 //      que queda arriba a la izquierda.
 //   5. Union con el Hero: brand-blue-800 opaco en el borde superior que se
 //      desvanece hacia abajo. El Hero termina exactamente en ese color,
@@ -29,10 +30,12 @@ const HALOS_AZULES = [
   `radial-gradient(ellipse 40% 55% at 100% 55%, ${color('brand-blue-600', 85)} 0%, transparent 72%)`,
 ].join(', ');
 
+// brand-amber (#F7A71C) es el mismo color del boton "Agendar cita".
 const HALOS_AMBAR = [
-  `radial-gradient(ellipse 34% 32% at 98% 96%, ${color('brand-amber-400', 60)} 0%, transparent 72%)`,
-  `radial-gradient(ellipse 22% 30% at 0% 60%, ${color('brand-amber-500', 45)} 0%, transparent 72%)`,
-  `radial-gradient(ellipse 25% 18% at 50% 104%, ${color('brand-amber-400', 40)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 45% 42% at 100% 100%, ${color('brand-amber', 95)} 0%, ${color('brand-amber', 45)} 40%, transparent 72%)`,
+  `radial-gradient(ellipse 30% 40% at 0% 62%, ${color('brand-amber', 85)} 0%, ${color('brand-amber', 35)} 40%, transparent 72%)`,
+  `radial-gradient(ellipse 38% 26% at 50% 106%, ${color('brand-amber', 80)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 22% 30% at 100% 42%, ${color('brand-amber-400', 55)} 0%, transparent 72%)`,
 ].join(', ');
 
 const UNION_CON_HERO = `linear-gradient(to bottom, var(--color-brand-blue-800) 0%, ${color('brand-blue-800', 85)} 8%, transparent 30%)`;
