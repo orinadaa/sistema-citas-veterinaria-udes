@@ -1,6 +1,7 @@
 // components/landing/CtaBanner.jsx
-// Banda de cierre: azul de marca solido (brand.blue) con formas ambar en las
-// esquinas y un patron sutil de huellas de fondo. Las formas y las
+// Banda de cierre: sin fondo propio (va sobre el degradado continuo del
+// landing, ver LandingPage.jsx), con un halo azul central, formas ambar en
+// las esquinas y un patron sutil de huellas de fondo. Las formas y las
 // huellas se generan con CSS/el icono de pata ya existente (sin
 // inventar un asset de imagen nuevo para algo puramente decorativo).
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +28,19 @@ export function CtaBanner() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-blue">
+    // Sin overflow-hidden: con fondo transparente, las manchas ambar de
+    // las esquinas se verian cortadas en seco en el borde superior. El
+    // contenedor del landing ya recorta lo que sale por los costados.
+    <section className="relative">
+      {/* Halo azul central: se desvanece antes de los bordes de la seccion. */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse 45% 45% at 50% 50%, color-mix(in oklab, var(--color-brand-blue-500) 55%, transparent) 0%, transparent 72%)',
+        }}
+      />
       <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-amber-400/30 blur-2xl" aria-hidden="true" />
       <div className="pointer-events-none absolute -bottom-20 -right-10 h-64 w-64 rounded-full bg-amber-400/30 blur-2xl" aria-hidden="true" />
 

@@ -12,6 +12,7 @@ import { rutaAgendarCita } from '../../utils/rutas';
 import { IconoAlerta } from '../icons';
 import { Revelar } from './Revelar';
 import { SectionHeading } from './SectionHeading';
+import { FondoAmbientalServicios } from './FondoAmbientalServicios';
 import { ServicioSlider } from './ServicioSlider';
 import imgConsulta from '../../assets/servicios-foto/consulta.png';
 import imgCirugia from '../../assets/servicios-foto/cirugia.webp';
@@ -121,17 +122,33 @@ export function Servicios() {
     });
 
   return (
-    <section id="servicios" className="bg-slate-50 py-20">
+    // Sin fondo propio: la base es el degradado continuo Hero + Servicios
+    // (LandingPage.jsx); aca solo van los halos.
+    <section id="servicios" className="relative py-20">
+      <FondoAmbientalServicios />
+      {/* Sombra azul oscura detras del encabezado: garantiza contraste AA del
+          texto blanco sobre los halos. A todo el ancho de la pantalla y mas
+          alta que el encabezado, con caida muy gradual, para que no se lea
+          como una franja con bordes. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 -top-24 -z-10 h-[30rem]"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse 75% 42% at 28% 50%, color-mix(in oklab, var(--color-brand-blue-800) 85%, transparent) 0%, color-mix(in oklab, var(--color-brand-blue-800) 55%, transparent) 40%, color-mix(in oklab, var(--color-brand-blue-800) 20%, transparent) 70%, transparent 100%)',
+        }}
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <Revelar>
           <SectionHeading
             titulo="Servicios veterinarios"
             subtitulo="Contamos con una amplia gama de servicios para el cuidado integral de tu mascota."
+            sobreFondoOscuro
           />
         </Revelar>
 
         {estado === ESTADOS.CARGANDO && (
-          <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-slate-200 sm:aspect-[16/10] lg:aspect-[2/1] lg:rounded-3xl" />
+          <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-[16/10] lg:aspect-[2/1] lg:rounded-3xl" />
         )}
 
         {estado === ESTADOS.ERROR && (

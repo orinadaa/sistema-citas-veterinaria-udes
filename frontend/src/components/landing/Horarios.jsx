@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { obtenerSedes, obtenerHorarios } from '../../api/client';
 import { IconoReloj, IconoAlerta } from '../icons';
 import { SectionHeading } from './SectionHeading';
+import { HalosAmbientales } from './HalosAmbientales';
 import { detalleHorarioPorDia } from '../../utils/horarioTexto';
 import horariosMascotas from '../../assets/horarios-mascotas.png';
 
@@ -37,15 +38,17 @@ export function Horarios() {
   }, []);
 
   return (
-    <section id="horarios" className="bg-slate-50 py-20">
+    // Sin fondo propio: va sobre el degradado continuo del landing.
+    <section id="horarios" className="relative py-20">
+      <HalosAmbientales variante="horarios" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <SectionHeading titulo="Horarios de atención" subtitulo="Conoce nuestros horarios en cada sede." />
+        <SectionHeading titulo="Horarios de atención" subtitulo="Conoce nuestros horarios en cada sede." sobreFondoOscuro />
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
           {estado === ESTADOS.CARGANDO && (
             <div className="grid gap-6 sm:grid-cols-2">
               {[0, 1].map((clave) => (
-                <div key={clave} className="h-56 animate-pulse rounded-2xl bg-slate-100" />
+                <div key={clave} className="h-56 animate-pulse rounded-2xl bg-white/10" />
               ))}
             </div>
           )}
