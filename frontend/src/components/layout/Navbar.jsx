@@ -36,7 +36,7 @@ import logoGrande from '../../assets/logoblanco.png';
 import logoCortoBlanco from '../../assets/logocortoblanco.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
-import { IconoCalendario, IconoCampana, IconoChevronAbajo } from '../icons';
+import { IconoCalendario, IconoCampana, IconoChevronAbajo, IconoSalir } from '../icons';
 
 // 260px de scroll para toda la transicion: con 160px una sola vuelta de
 // la rueda del mouse (~100px) se comia mas de media transicion de golpe.
@@ -387,7 +387,17 @@ export function Navbar() {
       {menuAbierto && (
         <div
           ref={menuRef}
-          className="pointer-events-auto absolute w-48 overflow-hidden rounded-2xl bg-brand-blue-800/50 py-1.5 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5),inset_0_1px_0_rgb(255_255_255/0.22)] ring-1 ring-white/14 backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]"
+          // Mismo material que la pildora de esta pagina (MATERIALES en
+          // aplicarFlow): vidrio claro en el landing, vidrio azul en /agendar
+          // y /panel; mismo borde gris claro tenue y brillo superior. En el
+          // landing oscurece mas lo de atras (58% vs 78% de la pildora): el
+          // menu se abre tambien arriba de todo, sobre la parte mas clara del
+          // Hero, y con 78% el texto blanco quedaba en 3.5:1.
+          className={`pointer-events-auto absolute w-52 overflow-hidden rounded-2xl py-1.5 ${
+            enLanding
+              ? 'bg-white/12 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),rgb(255_255_255/0)_60%)] shadow-[0_10px_26px_-10px_rgb(0_0_0/0.35),inset_0_0_0_1px_rgb(203_213_225/0.25),inset_0_1px_0_rgb(226_232_240/0.3)] backdrop-blur-[12px] backdrop-saturate-150 backdrop-brightness-[.58]'
+              : 'bg-brand-blue-800/50 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5),inset_0_0_0_1px_rgb(203_213_225/0.2),inset_0_1px_0_rgb(226_232_240/0.25)] backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]'
+          }`}
         >
           {/* Atajos para volver al panel propio despues de
               navegar a una seccion del landing (Servicios/Sedes/
@@ -421,8 +431,13 @@ export function Navbar() {
           <button
             type="button"
             onClick={salir}
-            className="w-full border-t border-white/10 px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+            // Icono de salida en rojo + fondo rojizo en hover: es la unica
+            // accion del menu que saca de la cuenta. El texto queda blanco:
+            // ningun rojo llega a contraste AA sobre el vidrio azul (el rojo
+            // claro daba 2.3-3.0:1); el icono acompana al texto, es acento.
+            className="flex w-full items-center gap-2 border-t border-white/10 px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-red-500/25 hover-texto-ilumina"
           >
+            <IconoSalir className="h-4 w-4 shrink-0 text-red-300" />
             Cerrar sesión
           </button>
         </div>

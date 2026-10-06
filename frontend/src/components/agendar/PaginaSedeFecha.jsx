@@ -12,10 +12,7 @@ import { SedeListCard } from './SedeListCard';
 import { DatePickerCalendar } from './DatePickerCalendar';
 import { TimeSlotPicker } from './TimeSlotPicker';
 import { IconoUbicacion } from '../icons';
-
-function consultaMaps(sede) {
-  return encodeURIComponent([sede.nombre, sede.direccion, sede.ciudad, 'Colombia'].filter(Boolean).join(', '));
-}
+import { urlComoLlegar, urlVerEnMaps } from '../../utils/mapas';
 
 function Ubicacion({ sede }) {
   if (!sede) {
@@ -27,7 +24,6 @@ function Ubicacion({ sede }) {
     );
   }
 
-  const q = consultaMaps(sede);
   return (
     <div className="flex h-full flex-col gap-4 rounded-2xl bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 p-5 text-white">
       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/15">
@@ -40,7 +36,7 @@ function Ubicacion({ sede }) {
       </div>
       <div className="mt-auto flex flex-col gap-2">
         <a
-          href={`https://www.google.com/maps/dir/?api=1&destination=${q}`}
+          href={urlComoLlegar(sede)}
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-boton bg-white px-4 py-2 text-center text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
@@ -48,7 +44,7 @@ function Ubicacion({ sede }) {
           Cómo llegar
         </a>
         <a
-          href={`https://www.google.com/maps/search/?api=1&query=${q}`}
+          href={urlVerEnMaps(sede)}
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-boton px-4 py-2 text-center text-sm font-semibold text-white ring-1 ring-white/40 transition hover:bg-white/10"

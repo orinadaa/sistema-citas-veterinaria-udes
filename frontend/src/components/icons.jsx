@@ -129,6 +129,15 @@ export function IconoPata({ className }) {
   );
 }
 
+// Cerrar sesion: puerta con flecha saliendo.
+export function IconoSalir({ className }) {
+  return (
+    <Icono className={className}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+    </Icono>
+  );
+}
+
 export function IconoFlechaDerecha({ className }) {
   return (
     <Icono className={className}>

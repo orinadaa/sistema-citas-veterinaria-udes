@@ -169,17 +169,18 @@ input[type="password"]::-ms-clear {
   background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 60%);
   -webkit-backdrop-filter: blur(14px) saturate(160%) brightness(140%);
   backdrop-filter: blur(14px) saturate(160%) brightness(140%);
+  /* Resplandor con la misma forma e intensidad relativa que el del boton
+     ambar (0 10px 28px -8px, que crece en hover). */
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.9),
     inset 0 0 0 1px rgb(255 255 255 / 0.5),
-    0 12px 30px -10px rgb(0 0 0 / 0.4);
+    0 10px 28px -8px rgb(255 255 255 / 0.18);
   &:hover {
-    background-color: rgb(255 255 255);
-    filter: drop-shadow(0 6px 18px rgb(255 255 255 / 0.35));
+    background-color: rgb(255 255 255 / 0.85);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.9),
       inset 0 0 0 1px rgb(255 255 255 / 0.6),
-      0 16px 36px -10px rgb(0 0 0 / 0.45);
+      0 14px 32px -8px rgb(255 255 255 / 0.28);
   }
 }
 /* Secundario transparente (ej. "Conoce nuestros servicios" del Hero):
@@ -235,6 +236,13 @@ input[type="password"]::-ms-clear {
     filter: brightness(1.03) drop-shadow(0 10px 22px color-mix(in oklab, var(--color-brand-blue) 35%, transparent));
   }
 }
+/* Tarjetas claras sobre fondo oscuro (sedes): el resplandor azul no se ve
+   sobre azul, asi que brillan en blanco. */
+@utility hover-ilumina-claro {
+  &:hover {
+    filter: brightness(1.04) drop-shadow(0 10px 22px rgb(255 255 255 / 0.22));
+  }
+}
 @utility hover-texto-ilumina {
   &:hover {
     text-shadow: 0 0 14px rgb(255 255 255 / 0.75);
@@ -243,9 +251,31 @@ input[type="password"]::-ms-clear {
 
 /* Transiciones suaves del hover (filter, text-shadow) en todo lo anterior,
    sin animacion con reduced-motion. */
+/* Respaldo: cualquier enlace o boton que no tenga uno de los hovers
+   anteriores igual se ilumina al pasar el mouse (se aclara y su contorno
+   o su texto emiten un resplandor de su propio color). :where() deja la
+   especificidad en 0 y @layer base la pone debajo de las utilidades de
+   Tailwind (que viven en @layer utilities): asi los hovers especificos
+   (rounded-boton, hover-ilumina, boton-glass-*) siempre ganan. */
+@layer base {
+  /* Se excluyen los que ya tienen hover propio: aunque algunos (glass) no
+     usan filter, no deben sumar este resplandor al suyo. */
+  :where(a[href], button:not(:disabled), [role="button"], summary, label[for]):where(:not(.rounded-boton, .hover-ilumina, .hover-ilumina-claro, .hover-texto-ilumina, [class*="boton-glass"])):hover {
+    filter: brightness(1.06) drop-shadow(0 4px 10px color-mix(in oklab, currentColor 30%, transparent));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :where(a[href], button, [role="button"], summary, label[for]) {
+      transition-property: color, background-color, border-color, box-shadow, filter, text-shadow, transform, opacity;
+      transition-duration: 200ms;
+      transition-timing-function: ease-out;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .rounded-boton,
   .hover-ilumina,
+  .hover-ilumina-claro,
   .hover-texto-ilumina {
     transition-property: color, background-color, border-color, box-shadow, filter, text-shadow, transform, opacity;
     transition-duration: 200ms;
