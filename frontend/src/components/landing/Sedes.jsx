@@ -9,6 +9,7 @@ import { obtenerSedes, obtenerHorarios } from '../../api/client';
 import { IconoUbicacion, IconoReloj, IconoAlerta, IconoSede } from '../icons';
 import { Revelar } from './Revelar';
 import { SectionHeading } from './SectionHeading';
+import { HalosAmbientales } from './HalosAmbientales';
 import { agruparHorario } from '../../utils/horarioTexto';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
@@ -32,19 +33,22 @@ export function Sedes() {
   }, []);
 
   return (
-    <section id="sedes" className="bg-slate-50 py-20">
+    // Sin fondo propio: va sobre el degradado continuo del landing.
+    <section id="sedes" className="relative py-20">
+      <HalosAmbientales variante="sedes" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <Revelar>
           <SectionHeading
             titulo="Nuestras sedes"
             subtitulo="Atendemos en dos ciudades. Elige la que te quede más cerca al agendar tu cita."
+            sobreFondoOscuro
           />
         </Revelar>
 
         {estado === ESTADOS.CARGANDO && (
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
             {[0, 1].map((clave) => (
-              <div key={clave} className="h-[26rem] animate-pulse rounded-2xl bg-slate-100" />
+              <div key={clave} className="h-[26rem] animate-pulse rounded-2xl bg-white/10" />
             ))}
           </div>
         )}

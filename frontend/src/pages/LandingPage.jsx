@@ -28,20 +28,22 @@ export function LandingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       <main>
-        {/* Hero + Servicios comparten un solo fondo: degradado continuo desde
-            brand-blue-500 (el azul de la topbar, arriba) hasta brand-blue-800
-            al final de Servicios. Ninguna de las dos secciones tiene fondo
-            propio (solo halos), asi que no hay union visible entre ellas.
+        {/* Hero, Servicios, Sedes, Horarios y la banda de cierre comparten un
+            solo fondo (el footer no). Degradado continuo que arranca en
+            brand-blue-500 (el azul de la topbar) y oscurece rapido: el azul
+            claro queda solo en la parte alta del Hero y desde Servicios
+            predomina brand-blue-800. Ninguna seccion tiene fondo propio
+            (solo halos), asi que no hay uniones visibles entre ellas.
             -mt-24: el fondo sube por detras de la topbar (96px, transparente
             arriba; el Hero compensa con pt-24). overflow-hidden: los halos
             que se salen a los costados no generan scroll horizontal. */}
-        <div className="relative isolate -mt-24 overflow-hidden bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_0%,var(--color-brand-blue-600)_38%,var(--color-brand-blue-700)_68%,var(--color-brand-blue-800)_100%)]">
+        <div className="relative isolate -mt-24 overflow-hidden bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_0%,var(--color-brand-blue-600)_8%,var(--color-brand-blue-700)_17%,var(--color-brand-blue-800)_30%,var(--color-brand-blue-800)_100%)]">
           <Hero />
           <Servicios />
+          <Sedes />
+          <Horarios />
+          <CtaBanner />
         </div>
-        <Sedes />
-        <Horarios />
-        <CtaBanner />
       </main>
       <Footer />
     </div>

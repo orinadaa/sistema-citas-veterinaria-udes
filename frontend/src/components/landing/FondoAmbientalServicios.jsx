@@ -45,10 +45,11 @@ const AMBAR_LATERAL_DERECHO = `radial-gradient(ellipse 22% 30% at 100% 42%, ${co
 
 export function FondoAmbientalServicios() {
   return (
-    // mask-image: la capa aparece de a poco en su tramo superior (la parte
-    // que se extiende sobre el Hero), sin un borde recto visible.
+    // La capa se extiende sobre el Hero (-top-[20%]) y sobre Sedes
+    // (-bottom-[15%]); mask-image la hace aparecer y desaparecer de a poco
+    // en esos tramos, sin bordes rectos visibles en las uniones.
     <div
-      className="pointer-events-none absolute inset-x-0 -top-[20%] bottom-0 -z-10 [mask-image:linear-gradient(to_bottom,transparent_0%,black_22%)]"
+      className="pointer-events-none absolute inset-x-0 -top-[20%] -bottom-[15%] -z-10 [mask-image:linear-gradient(to_bottom,transparent_0%,black_20%,black_82%,transparent_100%)]"
       aria-hidden="true"
     >
       {/* 2. Halo central (mas grande que la seccion para que la deriva no
