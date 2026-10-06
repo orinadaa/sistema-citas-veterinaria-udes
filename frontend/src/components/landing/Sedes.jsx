@@ -34,9 +34,9 @@ export function Sedes() {
 
   return (
     // Sin fondo propio: va sobre el degradado continuo del landing.
-    <section id="sedes" className="relative py-20">
+    <section id="sedes" data-slide className="relative py-20 lg:flex lg:min-h-svh lg:snap-start lg:snap-always lg:flex-col lg:justify-center lg:pb-8 lg:pt-24">
       <HalosAmbientales variante="sedes" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="slide-contenido mx-auto w-full max-w-7xl px-4 sm:px-6">
         <Revelar>
           <SectionHeading
             titulo="Nuestras sedes"
@@ -70,9 +70,9 @@ export function Sedes() {
                 <Revelar key={sede.id} retraso={120 + posicion * 120}>
                   <div className="h-full overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
                     {sede.foto_url ? (
-                      <img src={sede.foto_url} alt={sede.nombre} className="h-72 w-full object-cover sm:h-80" />
+                      <img src={sede.foto_url} alt={sede.nombre} className="h-72 w-full object-cover sm:h-80 lg:h-[clamp(9rem,calc(100svh-33rem),20rem)]" />
                     ) : (
-                      <div className="flex h-72 w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 sm:h-80">
+                      <div className="flex h-72 w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 sm:h-80 lg:h-[clamp(9rem,calc(100svh-33rem),20rem)]">
                         <IconoSede className="h-12 w-12 text-brand-blue/40" />
                       </div>
                     )}

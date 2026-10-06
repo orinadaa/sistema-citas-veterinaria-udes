@@ -9,9 +9,18 @@ import { Servicios } from '../components/landing/Servicios';
 import { Sedes } from '../components/landing/Sedes';
 import { Horarios } from '../components/landing/Horarios';
 import { CtaBanner } from '../components/landing/CtaBanner';
+import { usePaginadoPorRueda } from '../hooks/usePaginadoPorRueda';
 
 export function LandingPage() {
   const { hash } = useLocation();
+
+  // Paginado por secciones solo mientras el landing esta montado (las
+  // reglas viven en index.css, bajo html.snap-landing).
+  useEffect(() => {
+    document.documentElement.classList.add('snap-landing');
+    return () => document.documentElement.classList.remove('snap-landing');
+  }, []);
+  usePaginadoPorRueda();
 
   // Los links de Servicios/Sedes/Horarios del navbar navegan a "/#id"
   // desde cualquier pagina (Navbar.jsx) -- al llegar aqui (recien
@@ -35,9 +44,12 @@ export function LandingPage() {
             predomina brand-blue-800. Ninguna seccion tiene fondo propio
             (solo halos), asi que no hay uniones visibles entre ellas.
             -mt-24: el fondo sube por detras de la topbar (96px, transparente
-            arriba; el Hero compensa con pt-24). overflow-hidden: los halos
-            que se salen a los costados no generan scroll horizontal. */}
-        <div className="relative isolate -mt-24 overflow-hidden bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_0%,var(--color-brand-blue-600)_8%,var(--color-brand-blue-700)_17%,var(--color-brand-blue-800)_30%,var(--color-brand-blue-800)_100%)]">
+            arriba; el Hero compensa con pt-24). overflow-clip (no hidden):
+            recorta los halos que se salen a los costados sin crear un
+            contenedor de scroll; con overflow-hidden las secciones quedaban
+            enganchadas a este div en vez de a la pagina y el scroll snap del
+            landing paginado (index.css) no funcionaba. */}
+        <div className="relative isolate -mt-24 overflow-clip bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_0%,var(--color-brand-blue-600)_8%,var(--color-brand-blue-700)_17%,var(--color-brand-blue-800)_30%,var(--color-brand-blue-800)_100%)]">
           <Hero />
           <Servicios />
           <Sedes />

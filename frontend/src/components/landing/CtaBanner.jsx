@@ -31,7 +31,7 @@ export function CtaBanner() {
     // Sin overflow-hidden: con fondo transparente, las manchas ambar de
     // las esquinas se verian cortadas en seco en el borde superior. El
     // contenedor del landing ya recorta lo que sale por los costados.
-    <section className="relative">
+    <section data-slide className="relative lg:snap-start lg:snap-always">
       {/* Halo azul central: se desvanece antes de los bordes de la seccion. */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -55,7 +55,7 @@ export function CtaBanner() {
         </span>
       ))}
 
-      <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-16 text-center sm:px-6">
+      <div className="slide-contenido relative mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-16 text-center sm:px-6">
         <h2 className="max-w-xl text-3xl font-bold tracking-tight text-white">
           ¿Tu mascota necesita una cita?
         </h2>

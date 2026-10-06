@@ -39,9 +39,9 @@ export function Horarios() {
 
   return (
     // Sin fondo propio: va sobre el degradado continuo del landing.
-    <section id="horarios" className="relative py-20">
+    <section id="horarios" data-slide className="relative py-20 lg:flex lg:min-h-svh lg:snap-start lg:snap-always lg:flex-col lg:justify-center lg:pb-8 lg:pt-24">
       <HalosAmbientales variante="horarios" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="slide-contenido mx-auto w-full max-w-7xl px-4 sm:px-6">
         <SectionHeading titulo="Horarios de atención" subtitulo="Conoce nuestros horarios en cada sede." sobreFondoOscuro />
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
