@@ -1,11 +1,12 @@
 // components/landing/FondoAmbientalServicios.jsx
 // Fondo de la seccion "Servicios veterinarios": iluminacion ambiental en
-// capas sobre brand-blue-800 (la base la pone la <section>), solo con los
+// capas sobre el degradado base continuo Hero + Servicios (LandingPage.jsx,
+// termina en brand-blue-800 al final de esta seccion), solo con los
 // tokens de marca. Va detras de todo (absolute, aria-hidden, sin
 // interaccion) y no toca el slider, que mantiene su propio overlay.
 //
 // Capas, de atras hacia adelante:
-//   1. Base brand-blue-800 (en la <section>).
+//   1. Base: el degradado continuo del contenedor (no va aca).
 //   2. Halo central brand-blue-500 a pleno, el mas luminoso; deriva muy
 //      lento (32s ida y vuelta) y se detiene con prefers-reduced-motion.
 //   + Formas organicas: dos ondas grandes difuminadas (solo desde md).
@@ -13,12 +14,12 @@
 //      lateral derecho brand-blue-600.
 //   4. Halos ambar en brand-amber (el color del boton "Agendar cita"):
 //      abajo a la derecha (el mas fuerte), lateral izquierdo a media
-//      altura, abajo al centro y lateral derecho. Lejos del encabezado,
+//      altura, abajo al centro y lateral derecho (este solo desde md). Lejos del encabezado,
 //      que queda arriba a la izquierda.
-//   5. Union con el Hero: brand-blue-800 opaco en el borde superior que se
-//      desvanece hacia abajo. El Hero termina exactamente en ese color,
-//      asi que no se ve linea entre las dos secciones; ademas oscurece
-//      detras del titulo y el subtitulo, reforzando su contraste.
+//   (La profundidad detras del encabezado va pegada al encabezado, en
+//   Servicios.jsx, para que lo siga en cualquier ancho.)
+// El contenedor se extiende hacia arriba (-top-[20%]) para que estos halos
+// se mezclen con los del Hero sin un corte en el borde entre secciones.
 // Todos los halos se mezclan con color-mix(in oklab) y llegan a
 // transparente en el 70-75% de su radio: no se ven bordes duros.
 const color = (token, porcentaje) => `color-mix(in oklab, var(--color-${token}) ${porcentaje}%, transparent)`;
@@ -35,14 +36,21 @@ const HALOS_AMBAR = [
   `radial-gradient(ellipse 45% 42% at 100% 100%, ${color('brand-amber', 95)} 0%, ${color('brand-amber', 45)} 40%, transparent 72%)`,
   `radial-gradient(ellipse 30% 40% at 0% 62%, ${color('brand-amber', 85)} 0%, ${color('brand-amber', 35)} 40%, transparent 72%)`,
   `radial-gradient(ellipse 38% 26% at 50% 106%, ${color('brand-amber', 80)} 0%, transparent 72%)`,
-  `radial-gradient(ellipse 22% 30% at 100% 42%, ${color('brand-amber-400', 55)} 0%, transparent 72%)`,
 ].join(', ');
 
-const UNION_CON_HERO = `linear-gradient(to bottom, var(--color-brand-blue-800) 0%, ${color('brand-blue-800', 85)} 8%, transparent 30%)`;
+// Lateral derecho a media altura: solo desde md. En movil queda junto al
+// final de las lineas del subtitulo y lo agrisa.
+const AMBAR_LATERAL_DERECHO = `radial-gradient(ellipse 22% 30% at 100% 42%, ${color('brand-amber-400', 55)} 0%, transparent 72%)`;
+
 
 export function FondoAmbientalServicios() {
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    // mask-image: la capa aparece de a poco en su tramo superior (la parte
+    // que se extiende sobre el Hero), sin un borde recto visible.
+    <div
+      className="pointer-events-none absolute inset-x-0 -top-[20%] bottom-0 -z-10 [mask-image:linear-gradient(to_bottom,transparent_0%,black_22%)]"
+      aria-hidden="true"
+    >
       {/* 2. Halo central (mas grande que la seccion para que la deriva no
           deje ver sus bordes). */}
       <div
@@ -71,9 +79,8 @@ export function FondoAmbientalServicios() {
 
       {/* 4. Ambar. */}
       <div className="absolute inset-0" style={{ backgroundImage: HALOS_AMBAR }} />
+      <div className="absolute inset-0 hidden md:block" style={{ backgroundImage: AMBAR_LATERAL_DERECHO }} />
 
-      {/* 5. Union con el Hero (va encima de todo lo anterior). */}
-      <div className="absolute inset-0" style={{ backgroundImage: UNION_CON_HERO }} />
     </div>
   );
 }

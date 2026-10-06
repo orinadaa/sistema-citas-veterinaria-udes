@@ -1,19 +1,14 @@
 // components/landing/Hero.jsx
-// Fondo = degradado de marca (brand.blue.500 -> brand.blue.800, ver
-// index.css) en vez de una imagen de fondo fija: permite compartir el
-// mismo degradado con el navbar (topbar integrado, ver Navbar.jsx) sin
-// depender de donde caiga el recorte de una imagen de fondo en cada
-// ancho de pantalla. Degradado vertical (to-b), no diagonal: con
-// diagonal el borde superior derecho ya sale mas oscuro que el navbar
-// (flat brand.blue) y se nota una linea de union; vertical hace que
-// TODO el borde superior, de punta a punta, arranque exactamente en
-// brand.blue.500 -- igual al navbar solido de arriba, sin costura.
+// Sin fondo propio: el degradado base es continuo con Servicios y vive en
+// el contenedor que envuelve a ambos (LandingPage.jsx). Aca solo van los
+// halos del Hero (FondoAmbientalHero.jsx).
 // La veterinaria + mascota + iconos flotantes son una sola imagen con
 // transparencia (identidadmarca/fotomain.png), ya compuesta -- se
 // ubica como <img> normal en la columna derecha, no como
 // background-image, asi que no hay riesgo de recorte responsivo.
 import { useNavigate } from 'react-router-dom';
 import fotoMain from '../../assets/foto-main.png';
+import { FondoAmbientalHero } from './FondoAmbientalHero';
 import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
@@ -32,13 +27,11 @@ export function Hero() {
     navegar(rutaAgendarCita(estaAutenticado));
   }
 
-  // -mt-24 pt-24: el Hero sube por debajo del topbar (96px, ver
-  // Navbar.jsx) para que, cuando la topbar se vuelve pildora, lo que se
-  // vea alrededor sea el degradado del Hero y no el fondo de la pagina.
-  // La topbar es transparente arriba, asi que el degradado corre continuo
-  // desde el borde superior de la pantalla, por detras de ella.
+  // pt-24: el contenedor del fondo sube por detras de la topbar (96px,
+  // -mt-24 en LandingPage.jsx); el contenido del Hero empieza debajo.
   return (
-    <section className="relative -mt-24 overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 pt-24">
+    <section className="relative pt-24">
+      <FondoAmbientalHero />
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="max-w-xl">
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">

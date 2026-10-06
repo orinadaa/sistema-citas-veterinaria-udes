@@ -122,10 +122,22 @@ export function Servicios() {
     });
 
   return (
-    // isolate: el fondo (-z-10) queda detras del contenido pero dentro de
-    // la seccion, sin irse detras de la pagina.
-    <section id="servicios" className="relative isolate overflow-hidden bg-brand-blue-800 py-20">
+    // Sin fondo propio: la base es el degradado continuo Hero + Servicios
+    // (LandingPage.jsx); aca solo van los halos.
+    <section id="servicios" className="relative py-20">
       <FondoAmbientalServicios />
+      {/* Sombra azul oscura detras del encabezado: garantiza contraste AA del
+          texto blanco sobre los halos. A todo el ancho de la pantalla y mas
+          alta que el encabezado, con caida muy gradual, para que no se lea
+          como una franja con bordes. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 -top-24 -z-10 h-[30rem]"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse 75% 42% at 28% 50%, color-mix(in oklab, var(--color-brand-blue-800) 85%, transparent) 0%, color-mix(in oklab, var(--color-brand-blue-800) 55%, transparent) 40%, color-mix(in oklab, var(--color-brand-blue-800) 20%, transparent) 70%, transparent 100%)',
+        }}
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <Revelar>
           <SectionHeading
