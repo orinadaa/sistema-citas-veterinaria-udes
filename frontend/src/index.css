@@ -79,8 +79,11 @@ input[type="password"]::-ms-clear {
 /* Entrada y salida de cada "slide" atadas al scroll (scroll-driven
    animations, sin JS): view() mide cuanto del elemento entro o salio del
    viewport.
-   - slide-card: la tarjeta de Servicios sube deslizandose y se agranda
-     al entrar, y se desvanece al salir.
+   - slide-card: las tarjetas (TarjetaSlide) suben deslizandose y se
+     agrandan al entrar, y se desvanecen al salir. La salida termina antes
+     (exit 45%) que la del contenido: en la ultima slide (cierre + footer)
+     la pagina no alcanza a bajar hasta el inicio del cierre y el final
+     de la tarjeta de Horarios quedaria asomandose arriba.
    - slide-contenido: el contenido de Sedes, Horarios y el cierre aparece
      con un fundido al entrar y se desvanece al salir.
    - slide-sale: solo salida (el Hero, que ya esta visible al cargar).
@@ -117,7 +120,7 @@ input[type="password"]::-ms-clear {
     .slide-card {
       animation: slide-card-entra linear both, slide-sale linear both;
       animation-timeline: view(), view();
-      animation-range: entry 0% entry 100%, exit 10% exit 90%;
+      animation-range: entry 0% entry 100%, exit 0% exit 45%;
     }
     .slide-contenido {
       animation: slide-entra linear both, slide-sale linear both;
