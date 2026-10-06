@@ -210,7 +210,7 @@ export function FormularioMascotaPanel({
               type="submit"
               form="form-mascota-cliente"
               disabled={guardando}
-              className="flex-1 rounded-boton bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="boton-glass-ambar flex-1 rounded-boton px-4 py-2 text-sm font-semibold text-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               {guardando ? 'Guardando...' : 'Guardar mascota'}
             </button>

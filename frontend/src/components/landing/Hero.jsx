@@ -46,14 +46,14 @@ export function Hero() {
             <button
               type="button"
               onClick={irAAgendar}
-              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-6 py-3 text-base font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
+              className="boton-glass-ambar inline-flex items-center gap-2 rounded-boton px-6 py-3 text-base font-semibold text-slate-900 transition active:scale-[0.98]"
             >
               Agendar cita
               <IconoFlechaDerecha className="h-4 w-4" />
             </button>
             <a
               href="#servicios"
-              className="rounded-boton border border-white/70 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10"
+              className="boton-glass-claro rounded-boton px-6 py-3 text-base font-semibold text-white transition active:scale-[0.98]"
             >
               Conoce nuestros servicios
             </a>

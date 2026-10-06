@@ -140,7 +140,7 @@ export function ServicioSlider({ slides }) {
         onPointerLeave={(e) => e.pointerType === 'mouse' && setPausadoHover(false)}
         onFocus={() => setPausadoFoco(true)}
         onBlur={alSalirFoco}
-        className="relative aspect-[4/5] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl bg-slate-900 shadow-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-[16/10] lg:aspect-auto lg:h-[clamp(18rem,calc(100svh-27rem),36rem)] lg:rounded-3xl"
+        className="relative aspect-[4/5] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl bg-slate-900 shadow-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-[4/3] lg:aspect-auto lg:h-[clamp(20rem,calc(100svh-23rem),42rem)] lg:rounded-3xl"
       >
         {slides.map((slide, i) => {
           const activa = i === indice;
@@ -188,7 +188,7 @@ export function ServicioSlider({ slides }) {
                 {slide.href && (
                   <Link
                     to={slide.href}
-                    className="mt-5 inline-flex items-center rounded-boton bg-brand-amber px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-md transition hover:bg-brand-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="boton-glass-ambar mt-5 inline-flex items-center rounded-boton px-5 py-2.5 text-sm font-semibold text-slate-900 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     Agendar cita
                   </Link>
@@ -205,7 +205,7 @@ export function ServicioSlider({ slides }) {
         </p>
       </div>
 
-      <div className="mt-5 flex justify-center gap-1">
+      <div className="mt-3 flex justify-center gap-1">
         {slides.map((slide, i) => {
           const activa = i === indice;
           return (

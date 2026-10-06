@@ -323,7 +323,7 @@ export function PanelCitasSeguimiento() {
               type="submit"
               form="form-nueva-cita-admin"
               disabled={guardandoNueva}
-              className="w-full rounded-boton bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:opacity-60"
+              className="boton-glass-ambar w-full rounded-boton px-4 py-2 text-sm font-semibold text-brand-navy transition disabled:opacity-60"
             >
               {guardandoNueva ? 'Agendando...' : 'Agendar cita'}
             </button>

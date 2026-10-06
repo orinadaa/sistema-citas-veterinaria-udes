@@ -172,7 +172,7 @@ export function PanelConfiguracion() {
             <button
               type="button"
               onClick={abrirCrear}
-              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-4 py-2.5 text-sm font-semibold text-brand-navy shadow-sm transition hover:brightness-95"
+              className="boton-glass-ambar inline-flex items-center gap-2 rounded-boton px-4 py-2.5 text-sm font-semibold text-brand-navy transition"
             >
               + Nuevo usuario
             </button>

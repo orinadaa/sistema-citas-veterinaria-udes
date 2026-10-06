@@ -152,7 +152,7 @@ export function Servicios() {
           </Revelar>
 
           {estado === ESTADOS.CARGANDO && (
-            <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-[16/10] lg:aspect-auto lg:h-[clamp(18rem,calc(100svh-27rem),36rem)] lg:rounded-3xl" />
+            <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-[4/3] lg:aspect-auto lg:h-[clamp(20rem,calc(100svh-23rem),42rem)] lg:rounded-3xl" />
           )}
 
           {estado === ESTADOS.ERROR && (
@@ -163,7 +163,7 @@ export function Servicios() {
           )}
 
           {estado === ESTADOS.LISTO && slides.length > 0 && (
-            <Revelar retraso={120} className="mt-10">
+            <Revelar retraso={120} className="mt-10 lg:mt-6">
               <ServicioSlider slides={slides} />
             </Revelar>
           )}
