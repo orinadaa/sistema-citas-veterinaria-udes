@@ -35,11 +35,23 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoCorto from '../../assets/logocorto.png';
 import logoGrande from '../../assets/logoblanco.png';
+import logoCortoBlanco from '../../assets/logocortoblanco.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
 import { IconoCalendario, IconoCampana, IconoChevronAbajo } from '../icons';
 
-const DISTANCIA_FLOW_PX = 160;
+// 260px de scroll para toda la transicion: con 160px una sola vuelta de
+// la rueda del mouse (~100px) se comia mas de media transicion de golpe.
+const DISTANCIA_FLOW_PX = 260;
+// Constante de tiempo del suavizado: la barra persigue al scroll y en
+// ~110ms recorre ~63% de lo que le falta, en vez de saltar al valor nuevo.
+const SUAVIZADO_MS = 110;
+
+// Curva ease-in-out (smoothstep): la transicion arranca y termina suave
+// en vez de avanzar a velocidad constante.
+function suavizarCurva(v) {
+  return v * v * (3 - 2 * v);
+}
 const ALTO_HEADER = 96;
 const SEPARACION_SUPERIOR = 12;
 const ALTO_PILDORA = 64;
@@ -88,22 +100,51 @@ export function Navbar() {
 
   // useLayoutEffect: el estado 1 se aplica antes del primer pintado (sin
   // un frame del navbar viejo).
+  //
+  // `objetivo` es el progreso que corresponde al scroll actual y `actual`
+  // el que se esta mostrando: en cada frame `actual` se acerca a
+  // `objetivo` (suavizado exponencial por tiempo, independiente de los
+  // fps), asi los saltos de la rueda del mouse se ven como un movimiento
+  // continuo. Con prefers-reduced-motion se aplica directo, sin suavizar.
   useLayoutEffect(() => {
     const barra = barraRef.current;
     if (!enLanding || !barra) return undefined;
-    let pendiente = null;
-    const actualizar = () => {
-      pendiente = null;
-      aplicarFlow(barra, Math.min(window.scrollY / DISTANCIA_FLOW_PX, 1));
+    const sinAnimacion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const progresoDelScroll = () => Math.min(window.scrollY / DISTANCIA_FLOW_PX, 1);
+    let objetivo = progresoDelScroll();
+    let actual = objetivo;
+    let cuadro = null;
+    let instanteAnterior = null;
+
+    const pintar = () => aplicarFlow(barra, suavizarCurva(actual));
+    const avanzar = (instante) => {
+      const dt = instanteAnterior === null ? 16 : instante - instanteAnterior;
+      instanteAnterior = instante;
+      actual += (objetivo - actual) * (1 - Math.exp(-dt / SUAVIZADO_MS));
+      if (Math.abs(objetivo - actual) < 0.001) actual = objetivo;
+      pintar();
+      if (actual === objetivo) {
+        cuadro = null;
+        instanteAnterior = null;
+      } else {
+        cuadro = requestAnimationFrame(avanzar);
+      }
     };
     const alHacerScroll = () => {
-      if (pendiente === null) pendiente = requestAnimationFrame(actualizar);
+      objetivo = progresoDelScroll();
+      if (sinAnimacion) {
+        actual = objetivo;
+        pintar();
+      } else if (cuadro === null) {
+        cuadro = requestAnimationFrame(avanzar);
+      }
     };
-    actualizar();
+
+    pintar();
     window.addEventListener('scroll', alHacerScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', alHacerScroll);
-      if (pendiente !== null) cancelAnimationFrame(pendiente);
+      if (cuadro !== null) cancelAnimationFrame(cuadro);
       barra.removeAttribute('style');
     };
   }, [enLanding]);
@@ -162,26 +203,43 @@ export function Navbar() {
           >
             {enLanding ? (
               <>
-                {/* Grande -> corto: el grande se apaga entre t=0 y t~0.7 y el
-                    corto se enciende entre t~0.3 y t=1. Se solapan en el
-                    tramo medio para que nunca quede la barra sin logo (en
-                    t=0.5 ambos estan al 30%). Ambos centrados en el mismo
-                    punto; solo cambia cual se ve y su escala. */}
+                {/* Transicion en 3 pasos, todo derivado de --flow (0..1):
+                    1. flow 0 -> 0.4: el logo grande se desvanece.
+                    2. flow 0.1 -> 0.35: aparece el isotipo blanco
+                       (logocortoblanco) encima del isotipo del logo grande
+                       (72px de alto, 26px a la izquierda, 2px abajo: donde
+                       calza la luna) y entre 0.1 y 0.75 viaja al centro
+                       mientras baja a 40px.
+                    3. flow 0.65 -> 1: encima aparece el logo corto a color;
+                       como esta alineado al pixel con el blanco, el efecto es
+                       que la luna se pinta de ambar. */}
                 <img
                   src={logoGrande}
                   alt=""
                   className="absolute left-1/2 top-1/2 h-[84px] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
+                  style={{ opacity: 'clamp(0, 1 - var(--flow, 0) / 0.4, 1)' }}
+                />
+                <div
+                  className="absolute left-1/2 top-1/2 h-10 -translate-x-1/2 -translate-y-1/2"
                   style={{
-                    opacity: 'calc(1 - var(--flow, 0) * 1.4)',
-                    scale: 'calc(1 - var(--flow, 0) * 0.25)',
+                    '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.65, 1)',
+                    transform:
+                      'translate(calc(-26px * (1 - var(--viaje))), calc(2px * (1 - var(--viaje)))) scale(calc(1.8 - 0.8 * var(--viaje)))',
                   }}
-                />
-                <img
-                  src={logoCorto}
-                  alt=""
-                  className="absolute left-1/2 top-1/2 h-10 w-auto -translate-x-1/2 -translate-y-1/2 object-contain"
-                  style={{ opacity: 'calc(var(--flow, 0) * 1.4 - 0.4)' }}
-                />
+                >
+                  <img
+                    src={logoCortoBlanco}
+                    alt=""
+                    className="h-10 w-auto max-w-none object-contain"
+                    style={{ opacity: 'clamp(0, (var(--flow, 0) - 0.1) / 0.25, 1)' }}
+                  />
+                  <img
+                    src={logoCorto}
+                    alt=""
+                    className="absolute inset-0 h-10 w-auto max-w-none object-contain"
+                    style={{ opacity: 'clamp(0, (var(--flow, 0) - 0.65) / 0.35, 1)' }}
+                  />
+                </div>
               </>
             ) : (
               <img src={logoCorto} alt="" className="h-12 w-auto object-contain" />
