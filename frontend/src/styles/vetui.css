@@ -1,0 +1,350 @@
+/* =====================================================================
+   vetUI — sistema de diseño del sistema de citas de la Clínica
+   Veterinaria UDES. Estética "floating glass": superficies de vidrio que
+   flotan sobre un fondo azul de marca con halos de luz.
+   Documentación completa: docs/vetui.md. Guía visual viva: ruta /vetui.
+
+   Capas, de atrás hacia adelante:
+     0. Fondo      degradado de marca + halos (FondoVetui.jsx).
+     1. Vidrio     contenedores sobre el fondo. Texto blanco.
+     2. Cristal    tarjetas de contenido u objetos. Texto oscuro.
+     3. Controles  botones glass, campos, chips.
+     4. Superpuestos  cristal fuerte (paneles laterales, diálogos).
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. Fundamentos (tokens). brand.blue/brand.amber son los colores de
+   marca definitivos; la escala 400-800 está derivada por HSL.
+   --------------------------------------------------------------------- */
+@theme {
+  /* Color */
+  --color-brand-navy: #0b3c74;
+  --color-brand-blue: #4280f7;
+  --color-brand-blue-400: #78a4f9;
+  --color-brand-blue-500: #4280f7;
+  --color-brand-blue-600: #0c5cf5;
+  --color-brand-blue-700: #0847c0;
+  --color-brand-blue-800: #06338a;
+  --color-brand-amber: #f7a71c;
+  --color-brand-amber-400: #f8b644;
+  --color-brand-amber-500: #f7a71c;
+  --color-brand-amber-600: #da8d08;
+  --color-brand-amber-700: #aa6e06;
+  --color-brand-green: #16a34a;
+  --color-brand-red: #e4434b;
+
+  --color-category-blue: #4897f6;
+  --color-category-amber: #fdd369;
+  --color-category-teal: #51a79c;
+  --color-category-purple: #9a63ee;
+  --color-category-pink: #f788bb;
+  --color-category-cyan: #51caeb;
+  --color-category-orange: #d98a3d;
+
+  /* Tipografía: Manrope en todo el sistema (font-sans es la del body). */
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+
+  /* Radios
+     rounded-boton       botones, chips y opciones (píldora completa).
+     rounded-tarjeta     tarjetas de cristal (16px).
+     rounded-superficie  superficies de vidrio y superpuestos (28px). */
+  --radius-boton: 9999px;
+  --radius-tarjeta: 1rem;
+  --radius-superficie: 1.75rem;
+
+  /* Elevación (sombras de flotación) */
+  --shadow-flotante: 0 24px 60px -30px rgb(0 0 0 / 0.45);
+  --shadow-tarjeta: 0 18px 40px -16px rgb(0 0 0 / 0.5);
+  --shadow-superpuesto: 0 30px 80px -20px rgb(6 51 138 / 0.55);
+
+  /* Movimiento: deriva lenta de los halos del fondo. */
+  --animate-halo-deriva: halo-deriva 32s ease-in-out infinite alternate;
+  @keyframes halo-deriva {
+    from {
+      transform: translate3d(-2%, -1.5%, 0) scale(1);
+    }
+    to {
+      transform: translate3d(2%, 2%, 0) scale(1.06);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------
+   2. Materiales
+   --------------------------------------------------------------------- */
+
+/* Vidrio: contenedor sobre el fondo azul (secciones, resúmenes, la
+   píldora de la topbar en el landing). Blanco al 12% con reflejo arriba,
+   borde gris claro tenue y brillo de 1px. Oscurece un poco lo de atrás
+   (brightness 75%) para que el texto blanco quede en AA aunque detrás
+   haya un halo luminoso. */
+@utility vidrio {
+  color: white;
+  background-color: rgb(255 255 255 / 0.12);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0) 30%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%) brightness(75%);
+  backdrop-filter: blur(12px) saturate(150%) brightness(75%);
+  box-shadow:
+    inset 0 0 0 1px rgb(203 213 225 / 0.25),
+    inset 0 1px 0 rgb(226 232 240 / 0.3),
+    var(--shadow-flotante);
+}
+
+/* Vidrio azul: para lo que flota sobre contenido que puede ser claro
+   (la píldora fuera del landing, menús). Azul de marca al 50% que
+   oscurece lo de atrás: el texto blanco se lee sobre cualquier fondo. */
+@utility vidrio-azul {
+  color: white;
+  background-color: rgb(6 51 138 / 0.5);
+  -webkit-backdrop-filter: blur(24px) saturate(150%) brightness(65%);
+  backdrop-filter: blur(24px) saturate(150%) brightness(65%);
+  box-shadow:
+    inset 0 0 0 1px rgb(203 213 225 / 0.2),
+    inset 0 1px 0 rgb(226 232 240 / 0.25),
+    0 12px 32px -12px rgb(6 51 138 / 0.5);
+}
+
+/* Cristal: tarjeta de contenido (sede, horario, mascota, cita, opción
+   seleccionable). Claro translúcido con texto oscuro. Aclara lo de atrás
+   (brightness 140%): un color claro translúcido sobre azul se agrisaría.
+   Tintes: cristal-celeste, cristal-crema. Texto: slate-700 o más oscuro
+   (slate-500/600 no llegan a AA sobre cristal). */
+@utility cristal {
+  color: var(--color-slate-900);
+  background-color: var(--cristal-fondo, rgb(255 255 255 / 0.6));
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.45), rgb(255 255 255 / 0) 45%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%) brightness(140%);
+  backdrop-filter: blur(16px) saturate(150%) brightness(140%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 0 0 1px rgb(255 255 255 / 0.55),
+    var(--shadow-tarjeta);
+}
+@utility cristal-celeste {
+  --cristal-fondo: rgb(232 241 253 / 0.55);
+}
+@utility cristal-crema {
+  --cristal-fondo: rgb(254 250 241 / 0.62);
+}
+/* Cristal seleccionado: más opaco + anillo ámbar (el ámbar es el color
+   de "activo" en todo vetUI: punto del slider, opción elegida). */
+@utility cristal-seleccionado {
+  --cristal-fondo: rgb(255 255 255 / 0.88);
+  box-shadow:
+    inset 0 0 0 2px var(--color-brand-amber),
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 18px 40px -16px color-mix(in oklab, var(--color-brand-amber) 45%, transparent);
+}
+
+/* Cristal fuerte: superpuestos (panel lateral, diálogo). Casi opaco para
+   formularios largos, con el desenfoque de vidrio de fondo. */
+@utility cristal-fuerte {
+  color: var(--color-slate-900);
+  background-color: rgb(255 255 255 / 0.88);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 30%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 0 0 1px rgb(255 255 255 / 0.6),
+    var(--shadow-superpuesto);
+}
+
+/* Velo: lo que oscurece la página detrás de un superpuesto. */
+@utility velo {
+  background-color: rgb(6 51 138 / 0.35);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* ---------------------------------------------------------------------
+   3. Controles
+   --------------------------------------------------------------------- */
+
+/* Botones glass. Mantienen la jerarquía por color: ámbar = acción
+   principal, blanco = acción principal sobre una banda azul, claro =
+   secundaria. Incluyen su propio hover (más opaco y más resplandor). El
+   ámbar va al 95%: con más transparencia quedaba mostaza y perdía fuerza. */
+@utility boton-glass-ambar {
+  background-color: color-mix(in oklab, var(--color-brand-amber) 95%, transparent);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0) 55%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.65),
+    inset 0 0 0 1px rgb(255 255 255 / 0.3),
+    0 10px 28px -8px color-mix(in oklab, var(--color-brand-amber) 75%, transparent);
+  &:hover:not(:disabled) {
+    background-color: var(--color-brand-amber);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.7),
+      inset 0 0 0 1px rgb(255 255 255 / 0.35),
+      0 14px 32px -8px color-mix(in oklab, var(--color-brand-amber) 80%, transparent);
+  }
+}
+@utility boton-glass-blanco {
+  background-color: rgb(255 255 255 / 0.72);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 60%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%) brightness(140%);
+  backdrop-filter: blur(14px) saturate(160%) brightness(140%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    0 10px 28px -8px rgb(255 255 255 / 0.18);
+  &:hover:not(:disabled) {
+    background-color: rgb(255 255 255 / 0.85);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      inset 0 0 0 1px rgb(255 255 255 / 0.6),
+      0 14px 32px -8px rgb(255 255 255 / 0.28);
+  }
+}
+@utility boton-glass-claro {
+  background-color: rgb(255 255 255 / 0.12);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0) 60%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 0 0 1px rgb(255 255 255 / 0.35),
+    0 10px 26px -10px rgb(0 0 0 / 0.35);
+  &:hover:not(:disabled) {
+    background-color: rgb(255 255 255 / 0.2);
+    filter: drop-shadow(0 6px 18px rgb(255 255 255 / 0.3));
+  }
+}
+/* Anidado en vidrio: dentro de una superficie de vidrio, los controles de
+   vidrio claro (botón secundario, chips) y un vidrio anidado usan relleno
+   azul profundo. Sobre un vidrio ya aclarado, el blanco al 12% dejaba el
+   texto blanco en 3.6-4.2:1 (por debajo de AA). Sin capa: gana sobre la
+   utilidad; fuera de una superficie (ej. botón del Hero) no cambia nada. */
+.vidrio :where(.boton-glass-claro, .vidrio) {
+  background-color: rgb(6 51 138 / 0.4);
+}
+.vidrio :where(.boton-glass-claro):hover:not(:disabled) {
+  background-color: rgb(6 51 138 / 0.25);
+}
+
+/* Contorno: secundaria sobre cristal (superficies claras). */
+@utility boton-contorno {
+  color: var(--color-brand-blue-700);
+  background-color: rgb(255 255 255 / 0.55);
+  box-shadow: inset 0 0 0 1.5px var(--color-brand-blue);
+  &:hover:not(:disabled) {
+    background-color: rgb(255 255 255 / 0.9);
+  }
+}
+/* Peligro sobre fondo oscuro (vidrio / fondo): rojo al 50% con texto blanco.
+   Más transparente, el rojo sobre azul se veía morado; un rojo saturado
+   como color de texto no llega a AA sobre azul. */
+@utility boton-peligro {
+  color: white;
+  background-color: rgb(220 38 38 / 0.5);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 0 0 1px rgb(252 165 165 / 0.6),
+    inset 0 1px 0 rgb(255 255 255 / 0.2);
+  &:hover:not(:disabled) {
+    background-color: rgb(220 38 38 / 0.65);
+  }
+}
+/* Peligro sobre cristal (superficies claras). */
+@utility boton-peligro-claro {
+  color: var(--color-red-700);
+  background-color: rgb(255 255 255 / 0.55);
+  box-shadow: inset 0 0 0 1.5px var(--color-red-500);
+  &:hover:not(:disabled) {
+    background-color: rgb(254 242 242 / 0.9);
+  }
+}
+
+/* Campo de texto sobre vidrio: casi blanco con texto oscuro (los campos
+   siempre se leen en oscuro sobre claro). Foco: anillo ámbar. */
+@utility campo-vetui {
+  color: var(--color-slate-900);
+  background-color: rgb(255 255 255 / 0.88);
+  border-radius: 0.75rem;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.6);
+  &::placeholder {
+    color: var(--color-slate-500);
+  }
+  &:focus {
+    outline: none;
+    box-shadow:
+      inset 0 0 0 1px white,
+      0 0 0 3px color-mix(in oklab, var(--color-brand-amber) 70%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   4. Interacción: hover "se ilumina" (el gesto del botón ámbar llevado a
+   todo lo clicable). El resplandor es filter: drop-shadow (sigue la forma
+   y no pisa los anillos de foco, que son box-shadow).
+   - rounded-boton: se aclara y brilla en su color (--brillo).
+   - hover-ilumina: tarjetas clicables sobre fondo claro (brillo azul).
+   - hover-ilumina-claro: tarjetas clicables sobre fondo oscuro (blanco).
+   - hover-texto-ilumina: enlaces de texto sobre fondo oscuro.
+   --------------------------------------------------------------------- */
+.rounded-boton {
+  --brillo: color-mix(in oklab, currentColor 45%, transparent);
+}
+.rounded-boton[class*="bg-brand-blue"],
+.rounded-boton[class*="bg-blue-"] {
+  --brillo: color-mix(in oklab, var(--color-brand-blue) 65%, transparent);
+}
+.rounded-boton[class*="bg-red-"] {
+  --brillo: color-mix(in oklab, var(--color-red-500) 60%, transparent);
+}
+.rounded-boton[class*="bg-brand-green"] {
+  --brillo: color-mix(in oklab, var(--color-brand-green) 60%, transparent);
+}
+.rounded-boton:not(:disabled):not([class*="boton-glass"]):hover {
+  filter: brightness(1.08) drop-shadow(0 6px 14px var(--brillo));
+}
+
+@utility hover-ilumina {
+  &:hover {
+    filter: brightness(1.03) drop-shadow(0 10px 22px color-mix(in oklab, var(--color-brand-blue) 35%, transparent));
+  }
+}
+@utility hover-ilumina-claro {
+  &:hover {
+    filter: brightness(1.04) drop-shadow(0 10px 22px rgb(255 255 255 / 0.22));
+  }
+}
+@utility hover-texto-ilumina {
+  &:hover {
+    text-shadow: 0 0 14px rgb(255 255 255 / 0.75);
+  }
+}
+
+/* Respaldo: cualquier enlace o botón sin hover propio igual se ilumina.
+   :where() deja la especificidad en 0 y @layer base lo pone debajo de las
+   utilidades: los hovers específicos siempre ganan. */
+@layer base {
+  :where(a[href], button:not(:disabled), [role="button"], summary, label[for]):where(:not(.rounded-boton, .hover-ilumina, .hover-ilumina-claro, .hover-texto-ilumina, [class*="boton-glass"])):hover {
+    filter: brightness(1.06) drop-shadow(0 4px 10px color-mix(in oklab, currentColor 30%, transparent));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :where(a[href], button, [role="button"], summary, label[for]) {
+      transition-property: color, background-color, border-color, box-shadow, filter, text-shadow, transform, opacity;
+      transition-duration: 200ms;
+      transition-timing-function: ease-out;
+    }
+  }
+}
+
+/* 5. Movimiento: 200ms ease-out en todo lo interactivo; nada se anima con
+   prefers-reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .rounded-boton,
+  .hover-ilumina,
+  .hover-ilumina-claro,
+  .hover-texto-ilumina {
+    transition-property: color, background-color, border-color, box-shadow, filter, text-shadow, transform, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
+}
