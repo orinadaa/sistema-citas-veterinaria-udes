@@ -11,13 +11,14 @@ import { Seccion } from './Seccion';
 import { SedeListCard } from './SedeListCard';
 import { DatePickerCalendar } from './DatePickerCalendar';
 import { TimeSlotPicker } from './TimeSlotPicker';
+import { AreaTexto, Boton, Tarjeta } from '../vetui';
 import { IconoUbicacion } from '../icons';
 import { urlComoLlegar, urlVerEnMaps } from '../../utils/mapas';
 
 function Ubicacion({ sede }) {
   if (!sede) {
     return (
-      <div className="flex h-full min-h-40 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-center text-sm text-slate-400">
+      <div className="flex h-full min-h-40 flex-col items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-white/35 p-5 text-center text-sm text-blue-50">
         <IconoUbicacion className="h-7 w-7" />
         Selecciona una sede para ver cómo llegar.
       </div>
@@ -25,34 +26,24 @@ function Ubicacion({ sede }) {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 rounded-2xl bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 p-5 text-white">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/15">
+    <Tarjeta tono="celeste" className="flex h-full flex-col gap-4 p-5">
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-brand-blue-700">
         <IconoUbicacion className="h-6 w-6" />
       </span>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-blue-100">Ubicación</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-700">Ubicación</p>
         <p className="mt-1 font-semibold">{sede.nombre}</p>
-        <p className="mt-1 text-sm text-blue-50">{sede.direccion ? `${sede.direccion}, ${sede.ciudad}` : sede.ciudad}</p>
+        <p className="mt-1 text-sm text-slate-700">{sede.direccion ? `${sede.direccion}, ${sede.ciudad}` : sede.ciudad}</p>
       </div>
       <div className="mt-auto flex flex-col gap-2">
-        <a
-          href={urlComoLlegar(sede)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-boton bg-white px-4 py-2 text-center text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
-        >
+        <Boton as="a" variante="contorno" tamano="sm" href={urlComoLlegar(sede)} target="_blank" rel="noopener noreferrer">
           Cómo llegar
-        </a>
-        <a
-          href={urlVerEnMaps(sede)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-boton px-4 py-2 text-center text-sm font-semibold text-white ring-1 ring-white/40 transition hover:bg-white/10"
-        >
+        </Boton>
+        <Boton as="a" variante="contorno" tamano="sm" href={urlVerEnMaps(sede)} target="_blank" rel="noopener noreferrer">
           Ver en Google Maps
-        </a>
+        </Boton>
       </div>
-    </div>
+    </Tarjeta>
   );
 }
 
@@ -95,12 +86,12 @@ export function PaginaSedeFecha({
 
       <Seccion numero={4} titulo="Selecciona la fecha y hora" descripcion="Solo se muestran los horarios con médicos disponibles.">
         {!sede ? (
-          <p className="text-sm text-slate-500">Selecciona primero una sede.</p>
+          <p className="text-sm text-blue-100">Selecciona primero una sede.</p>
         ) : (
           <div className="grid gap-8 md:grid-cols-2">
-            <DatePickerCalendar valor={fecha} onChange={onSeleccionarFecha} diasAbiertos={diasAbiertos} />
+            <DatePickerCalendar valor={fecha} onChange={onSeleccionarFecha} diasAbiertos={diasAbiertos} sobreVidrio />
             <div>
-              <p className="mb-4 font-heading text-base font-semibold text-brand-navy">Horarios disponibles</p>
+              <p className="mb-4 font-heading text-base font-semibold text-white">Horarios disponibles</p>
               <TimeSlotPicker
                 key={refrescoDisponibilidad}
                 sedeId={sedeId}
@@ -108,23 +99,21 @@ export function PaginaSedeFecha({
                 fecha={fecha}
                 valor={franja}
                 onChange={onSeleccionarFranja}
+                sobreVidrio
               />
             </div>
           </div>
         )}
 
-        <div className="mt-6 flex flex-col gap-1.5 border-t border-slate-100 pt-5">
-          <label htmlFor="motivo-cita" className="text-sm font-medium text-slate-700">
-            Motivo de la consulta (opcional)
-          </label>
-          <textarea
+        <div className="mt-6 border-t border-white/15 pt-5">
+          <AreaTexto
             id="motivo-cita"
+            etiqueta="Motivo de la consulta (opcional)"
             rows={2}
             maxLength={255}
             value={motivo}
             onChange={(e) => onCambiarMotivo(e.target.value)}
             placeholder="Ej. Revisión anual, vómito desde ayer, refuerzo de vacuna..."
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
           />
         </div>
       </Seccion>

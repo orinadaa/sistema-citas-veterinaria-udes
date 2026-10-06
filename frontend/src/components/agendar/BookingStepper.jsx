@@ -65,7 +65,7 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
             {siguiente && (
               <span
                 aria-hidden="true"
-                className={`absolute left-1/2 top-4 h-0.5 w-full ${lineaAlcanzada ? 'bg-brand-blue' : 'bg-slate-200'}`}
+                className={`absolute left-1/2 top-4 h-0.5 w-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`}
               />
             )}
             <Hito
@@ -73,7 +73,7 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
               onClick={() => onIrAHito?.(hito)}
               etiqueta={etiquetaAccesible(hito, estado, navegable)}
               className={`group relative z-10 flex flex-col items-center gap-2 text-center ${
-                navegable ? 'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand-blue' : ''
+                navegable ? 'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-white' : ''
               }`}
             >
               <span
@@ -81,15 +81,15 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
                   estado === 'completado'
                     ? 'bg-brand-green text-white'
                     : estado === 'activo'
-                      ? 'bg-brand-blue text-white ring-4 ring-blue-100'
-                      : 'border-2 border-slate-200 bg-white text-slate-400'
+                      ? 'bg-white text-brand-blue-800 ring-4 ring-brand-amber/70'
+                      : 'border-2 border-white/45 bg-white/5 text-blue-50'
                 } ${navegable ? 'group-hover:scale-110' : ''}`}
               >
                 {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : hito.numero}
               </span>
               <span
                 className={`text-xs font-medium sm:text-sm ${
-                  estado === 'pendiente' ? 'text-slate-400' : estado === 'activo' ? 'text-brand-blue' : 'text-slate-700'
+                  estado === 'pendiente' ? 'text-blue-100' : estado === 'activo' ? 'font-semibold text-white' : 'text-blue-50'
                 } ${navegable ? 'group-hover:underline' : ''}`}
               >
                 {hito.etiqueta}
@@ -103,11 +103,12 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
 }
 
 // Variante vertical, fija al costado izquierdo (el resumen de la cita ocupa
-// el derecho). Suelta sobre el fondo de la pagina: sin tarjeta, borde ni
-// sombra; solo circulos y linea conectora.
-// - Activo: circulo mas grande (48px), brand-blue, numero blanco en negrita.
+// el derecho). Suelta sobre el fondo de la pagina: sin tarjeta, solo
+// circulos y linea conectora (vetUI, fondo oscuro).
+// - Activo: circulo mas grande (48px), blanco con anillo ambar (el ambar
+//   es el color de "activo" en vetUI) y numero azul en negrita.
 // - Completado: mismo estilo que el horizontal (verde con check), 40px.
-// - Pendiente: 40px, fondo blanco, borde gris claro, numero gris.
+// - Pendiente: 40px, circulo de vidrio con numero claro.
 //
 // Relevo con la tarjeta horizontal atado al progreso de la topbar (--flow
 // en <html>, ver Navbar.jsx), sin listener propio: aparece entre flow 0.7
@@ -141,16 +142,16 @@ export function BookingStepperLateral({ paginaActual, puedeIrAHito = () => false
                 etiqueta={etiquetaAccesible(hito, estado, navegable)}
                 className={`flex items-center justify-center rounded-full font-semibold transition ${
                   estado === 'activo'
-                    ? 'h-12 w-12 bg-brand-blue text-base font-bold text-white shadow-sm'
+                    ? 'h-12 w-12 bg-white text-base font-bold text-brand-blue-800 shadow-sm ring-4 ring-brand-amber/70'
                     : estado === 'completado'
                       ? 'h-10 w-10 bg-brand-green text-sm text-white'
-                      : 'h-10 w-10 border border-slate-200 bg-white text-sm text-slate-400'
-                } ${navegable ? 'cursor-pointer outline-none hover:scale-110 focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2' : ''}`}
+                      : 'vidrio h-10 w-10 text-sm text-blue-50'
+                } ${navegable ? 'cursor-pointer outline-none hover:scale-110 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-blue-800' : ''}`}
               >
                 {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : hito.numero}
               </Hito>
               {siguiente && (
-                <span aria-hidden="true" className={`my-1.5 h-6 w-0.5 rounded-full ${lineaAlcanzada ? 'bg-brand-blue' : 'bg-slate-200'}`} />
+                <span aria-hidden="true" className={`my-1.5 h-6 w-0.5 rounded-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`} />
               )}
             </li>
           );

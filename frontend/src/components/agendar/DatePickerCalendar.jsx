@@ -10,6 +10,30 @@ import { IconoFlechaDerecha } from '../icons';
 
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
+// Dos tonos: claro (por defecto; panel del medico, fondo blanco) y
+// sobreVidrio (flujo del cliente, dentro de una Superficie de vetUI:
+// texto blanco, dia elegido en blanco con anillo ambar).
+const TONOS = {
+  claro: {
+    titulo: 'text-brand-navy',
+    flecha: 'text-slate-500 hover:bg-slate-100',
+    semana: 'text-slate-400',
+    elegido: 'bg-brand-blue font-semibold text-white shadow-sm',
+    deshabilitado: 'cursor-not-allowed text-slate-300',
+    hoy: 'font-semibold text-brand-blue ring-1 ring-brand-blue/40 hover:bg-blue-50',
+    normal: 'text-slate-700 hover:bg-blue-50 hover:text-brand-blue',
+  },
+  vidrio: {
+    titulo: 'text-white',
+    flecha: 'text-blue-50 hover:bg-white/10',
+    semana: 'text-blue-100',
+    elegido: 'bg-white font-bold text-brand-blue-800 shadow-sm ring-2 ring-brand-amber',
+    deshabilitado: 'cursor-not-allowed text-white/35',
+    hoy: 'font-semibold text-white ring-1 ring-white/60 hover:bg-white/15',
+    normal: 'text-white hover:bg-white/15',
+  },
+};
+
 function inicioDeMes(fecha) {
   return new Date(fecha.getFullYear(), fecha.getMonth(), 1);
 }
@@ -24,7 +48,8 @@ function generarCeldas(mes) {
 
 // diasAbiertos: Set de dia_semana (0=domingo..6=sabado) con horario, o
 // null mientras carga (en ese caso no se deshabilita por dia de semana).
-export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
+export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio = false }) {
+  const t = sobreVidrio ? TONOS.vidrio : TONOS.claro;
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
   const seleccionada = valor ? desdeFechaLocal(valor) : null;
@@ -36,14 +61,14 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <p className="font-heading text-base font-semibold text-brand-navy">{formatearMesAnio(mes)}</p>
+        <p className={`font-heading text-base font-semibold ${t.titulo}`}>{formatearMesAnio(mes)}</p>
         <div className="flex gap-1">
           <button
             type="button"
             aria-label="Mes anterior"
             disabled={esMesActual}
             onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-            className="rounded-boton p-1.5 text-slate-500 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+            className={`rounded-boton p-1.5 transition disabled:cursor-not-allowed disabled:opacity-30 ${t.flecha}`}
           >
             <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
           </button>
@@ -51,7 +76,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
             type="button"
             aria-label="Mes siguiente"
             onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-            className="rounded-boton p-1.5 text-slate-500 transition hover:bg-slate-100"
+            className={`rounded-boton p-1.5 transition ${t.flecha}`}
           >
             <IconoFlechaDerecha className="h-4 w-4" />
           </button>
@@ -60,7 +85,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
 
       <div className="mt-4 grid grid-cols-7 gap-1 text-center">
         {DIAS_SEMANA.map((dia) => (
-          <span key={dia} className="pb-1 text-xs font-medium text-slate-400">
+          <span key={dia} className={`pb-1 text-xs font-medium ${t.semana}`}>
             {dia}
           </span>
         ))}
@@ -83,13 +108,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
               aria-pressed={Boolean(esElegido)}
               title={cerrado && !pasado ? 'La sede no atiende este día' : undefined}
               className={`mx-auto flex h-10 w-10 items-center justify-center rounded-boton text-sm transition ${
-                esElegido
-                  ? 'bg-brand-blue font-semibold text-white shadow-sm'
-                  : deshabilitado
-                    ? 'cursor-not-allowed text-slate-300'
-                    : esHoy
-                      ? 'font-semibold text-brand-blue ring-1 ring-brand-blue/40 hover:bg-blue-50'
-                      : 'text-slate-700 hover:bg-blue-50 hover:text-brand-blue'
+                esElegido ? t.elegido : deshabilitado ? t.deshabilitado : esHoy ? t.hoy : t.normal
               }`}
             >
               {celda.getDate()}

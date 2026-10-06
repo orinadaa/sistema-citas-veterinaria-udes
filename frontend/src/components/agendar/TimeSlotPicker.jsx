@@ -22,10 +22,44 @@ function turnoDeFranja(iso) {
   return TURNOS.find((t) => hora >= t.desde && hora < t.hasta).id;
 }
 
-function Aviso({ children }) {
+// Dos tonos, como DatePickerCalendar: claro (panel del medico) y
+// sobreVidrio (flujo del cliente en vetUI). En vidrio las horas libres son
+// pildoras de cristal y la elegida es blanca con anillo ambar.
+const TONOS = {
+  claro: {
+    aviso: 'bg-slate-50 text-slate-600 ring-slate-200',
+    avisoIcono: 'text-slate-400',
+    esqueleto: 'bg-slate-100',
+    reintentar: 'text-brand-blue',
+    pestanas: 'bg-slate-100',
+    pestanaActiva: 'bg-white text-brand-blue shadow-sm',
+    pestanaVacia: 'cursor-not-allowed text-slate-300',
+    pestana: 'text-slate-500 hover:text-slate-700',
+    conteo: 'text-slate-400',
+    elegida: 'border-brand-blue bg-brand-blue text-white shadow-sm',
+    libre: 'border-slate-200 bg-white text-slate-700 hover:border-brand-blue hover:text-brand-blue',
+    ocupada: 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300 line-through',
+  },
+  vidrio: {
+    aviso: 'bg-brand-blue-800/40 text-blue-50 ring-white/30',
+    avisoIcono: 'text-blue-100',
+    esqueleto: 'bg-white/12',
+    reintentar: 'text-white underline',
+    pestanas: 'bg-brand-blue-800/40 ring-1 ring-white/20',
+    pestanaActiva: 'bg-white text-brand-blue-800 shadow-sm',
+    pestanaVacia: 'cursor-not-allowed text-white/35',
+    pestana: 'text-blue-50 hover:text-white',
+    conteo: 'opacity-80',
+    elegida: 'border-transparent bg-white font-bold text-brand-blue-800 shadow-sm ring-2 ring-brand-amber',
+    libre: 'cristal hover-ilumina-claro border-transparent text-slate-900',
+    ocupada: 'cursor-not-allowed border-white/15 bg-white/5 text-white/40 line-through',
+  },
+};
+
+function Aviso({ children, t }) {
   return (
-    <p className="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-200">
-      <IconoAlerta className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+    <p className={`flex items-start gap-2 rounded-xl px-4 py-3 text-sm ring-1 ${t.aviso}`}>
+      <IconoAlerta className={`mt-0.5 h-4 w-4 shrink-0 ${t.avisoIcono}`} />
       {children}
     </p>
   );
@@ -33,7 +67,8 @@ function Aviso({ children }) {
 
 // medicoId (opcional): disponibilidad de un solo medico (el medico que
 // agenda desde su panel) en vez del agregado de la sede.
-export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, medicoId }) {
+export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, medicoId, sobreVidrio = false }) {
+  const t = sobreVidrio ? TONOS.vidrio : TONOS.claro;
   const { token } = useAuth();
   const clave = sedeId && servicioId && fecha ? `${sedeId}|${servicioId}|${fecha}|${medicoId || ''}` : null;
 
@@ -55,14 +90,14 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
     };
   }, [clave, sedeId, servicioId, fecha, medicoId, token, intento]);
 
-  if (!fecha) return <Aviso>Selecciona un día en el calendario para ver los horarios.</Aviso>;
+  if (!fecha) return <Aviso t={t}>Selecciona un día en el calendario para ver los horarios.</Aviso>;
 
   const cargando = resultado.clave !== clave;
   if (cargando) {
     return (
       <div className="grid grid-cols-3 gap-2">
         {Array.from({ length: 9 }, (_, i) => (
-          <div key={i} className="h-11 animate-pulse rounded-xl bg-slate-100" />
+          <div key={i} className={`h-11 animate-pulse rounded-xl ${t.esqueleto}`} />
         ))}
       </div>
     );
@@ -71,14 +106,14 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
   if (resultado.error) {
     return (
       <div className="flex flex-col items-start gap-2">
-        <Aviso>{resultado.error}</Aviso>
+        <Aviso t={t}>{resultado.error}</Aviso>
         <button
           type="button"
           onClick={() => {
             setResultado({ clave: null, datos: null, error: '' });
             setIntento((n) => n + 1);
           }}
-          className="text-sm font-semibold text-brand-blue hover:underline"
+          className={`text-sm font-semibold hover:underline ${t.reintentar}`}
         >
           Reintentar
         </button>
@@ -87,14 +122,14 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
   }
 
   const { franjas, medicosDisponiblesEnSede, medicosEnSede } = resultado.datos;
-  if (franjas.length === 0) return <Aviso>La sede no atiende este día. Elige otra fecha.</Aviso>;
+  if (franjas.length === 0) return <Aviso t={t}>La sede no atiende este día. Elige otra fecha.</Aviso>;
   // medicosEnSede: prestan el servicio en la sede algun dia; si hay pero
   // ninguno ese dia (horario propio del medico), se sugiere otra fecha.
   if ((medicosEnSede ?? medicosDisponiblesEnSede) === 0) {
-    return <Aviso>Este servicio no se presta en la sede seleccionada. Elige otra sede.</Aviso>;
+    return <Aviso t={t}>Este servicio no se presta en la sede seleccionada. Elige otra sede.</Aviso>;
   }
   if (medicosDisponiblesEnSede === 0) {
-    return <Aviso>Ningún médico atiende este servicio ese día. Prueba con otra fecha.</Aviso>;
+    return <Aviso t={t}>Ningún médico atiende este servicio ese día. Prueba con otra fecha.</Aviso>;
   }
 
   const porTurno = Object.fromEntries(TURNOS.map((t) => [t.id, franjas.filter((f) => turnoDeFranja(f.horaInicio) === t.id)]));
@@ -110,7 +145,7 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex rounded-xl bg-slate-100 p-1" role="tablist">
+      <div className={`flex rounded-boton p-1 ${t.pestanas}`} role="tablist">
         {TURNOS.map((turno) => {
           const cantidad = porTurno[turno.id].filter((f) => f.disponible).length;
           const vacio = porTurno[turno.id].length === 0;
@@ -123,21 +158,17 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
               disabled={vacio}
               onClick={() => setTurnoElegido({ clave, turno: turno.id })}
               className={`flex-1 rounded-boton px-2 py-2 text-sm font-medium transition ${
-                turnoActivo === turno.id
-                  ? 'bg-white text-brand-blue shadow-sm'
-                  : vacio
-                    ? 'cursor-not-allowed text-slate-300'
-                    : 'text-slate-500 hover:text-slate-700'
+                turnoActivo === turno.id ? t.pestanaActiva : vacio ? t.pestanaVacia : t.pestana
               }`}
             >
               {turno.etiqueta}
-              {!vacio && <span className="ml-1 text-xs text-slate-400">({cantidad})</span>}
+              {!vacio && <span className={`ml-1 text-xs ${t.conteo}`}>({cantidad})</span>}
             </button>
           );
         })}
       </div>
 
-      {!hayDisponibles && <Aviso>No quedan horarios disponibles este día. Prueba con otra fecha.</Aviso>}
+      {!hayDisponibles && <Aviso t={t}>No quedan horarios disponibles este día. Prueba con otra fecha.</Aviso>}
 
       <div className="grid grid-cols-3 gap-2">
         {porTurno[turnoActivo].map((franja) => {
@@ -151,11 +182,7 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
               aria-pressed={elegida}
               title={franja.disponible ? undefined : 'No disponible'}
               className={`rounded-boton border px-2 py-2.5 text-sm font-medium transition ${
-                elegida
-                  ? 'border-brand-blue bg-brand-blue text-white shadow-sm'
-                  : franja.disponible
-                    ? 'border-slate-200 bg-white text-slate-700 hover:border-brand-blue hover:text-brand-blue'
-                    : 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300 line-through'
+                elegida ? t.elegida : franja.disponible ? t.libre : t.ocupada
               }`}
             >
               {formatearHora(franja.horaInicio)}
