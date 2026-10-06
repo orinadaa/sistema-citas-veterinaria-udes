@@ -204,25 +204,33 @@ export function Navbar() {
             {enLanding ? (
               <>
                 {/* Transicion en 3 pasos, todo derivado de --flow (0..1):
-                    1. flow 0 -> 0.4: el logo grande se desvanece.
-                    2. flow 0.1 -> 0.35: aparece el isotipo blanco
+                    1. flow 0.1 -> 0.35: aparece el isotipo blanco
                        (logocortoblanco) encima del isotipo del logo grande
                        (72px de alto, 26px a la izquierda, 2px abajo: donde
-                       calza la luna) y entre 0.1 y 0.75 viaja al centro
+                       calza la luna) y entre 0.1 y 0.7 viaja al centro
                        mientras baja a 40px.
-                    3. flow 0.65 -> 1: encima aparece el logo corto a color;
-                       como esta alineado al pixel con el blanco, el efecto es
-                       que la luna se pinta de ambar. */}
+                    2. El logo grande baja gradual de 100% a 25% mientras el
+                       blanco viaja (0 -> 0.7): sigue perceptible hasta que el
+                       blanco llega al centro. Ahi se apaga de 25% a 0%
+                       (0.7 -> 0.78).
+                    3. flow 0.75 -> 1: con el blanco ya centrado, encima
+                       aparece el logo corto a color; como esta alineado al
+                       pixel con el blanco, la luna se pinta de ambar. */}
                 <img
                   src={logoGrande}
                   alt=""
                   className="absolute left-1/2 top-1/2 h-[84px] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
-                  style={{ opacity: 'clamp(0, 1 - var(--flow, 0) / 0.4, 1)' }}
+                  style={{
+                    // min() de dos rectas: 1 -> 0.25 entre 0 y 0.7, y
+                    // 0.25 -> 0 entre 0.7 y 0.78 (se cruzan en 0.7).
+                    opacity:
+                      'clamp(0, min(1 - var(--flow, 0) * 0.75 / 0.7, (0.78 - var(--flow, 0)) / 0.08 * 0.25), 1)',
+                  }}
                 />
                 <div
                   className="absolute left-1/2 top-1/2 h-10 -translate-x-1/2 -translate-y-1/2"
                   style={{
-                    '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.65, 1)',
+                    '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)',
                     transform:
                       'translate(calc(-26px * (1 - var(--viaje))), calc(2px * (1 - var(--viaje)))) scale(calc(1.8 - 0.8 * var(--viaje)))',
                   }}
@@ -237,7 +245,7 @@ export function Navbar() {
                     src={logoCorto}
                     alt=""
                     className="absolute inset-0 h-10 w-auto max-w-none object-contain"
-                    style={{ opacity: 'clamp(0, (var(--flow, 0) - 0.65) / 0.35, 1)' }}
+                    style={{ opacity: 'clamp(0, (var(--flow, 0) - 0.75) / 0.25, 1)' }}
                   />
                 </div>
               </>
