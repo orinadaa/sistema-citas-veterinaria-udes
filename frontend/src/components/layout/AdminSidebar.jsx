@@ -111,7 +111,7 @@ export function AdminSidebar({ activo, onCambiar }) {
               title={colapsado ? item.etiqueta : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                 colapsado ? 'justify-center px-0' : ''
-              } ${esActivo ? 'bg-brand-amber text-brand-navy' : 'text-white/80 hover:bg-white/15 hover:text-white'}`}
+              } ${esActivo ? 'bg-brand-amber text-brand-navy' : 'hover-texto-ilumina text-white/80 hover:bg-white/15 hover:text-white'}`}
             >
               <Icono className="h-5 w-5 shrink-0" />
               {!colapsado && item.etiqueta}

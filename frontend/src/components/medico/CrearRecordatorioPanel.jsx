@@ -169,7 +169,7 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
                     type="button"
                     aria-pressed={elegido}
                     onClick={() => elegirTipo(t.id)}
-                    className={`relative flex items-start gap-2.5 rounded-xl p-3 text-left transition ${
+                    className={`hover-ilumina relative flex items-start gap-2.5 rounded-xl p-3 text-left transition ${
                       elegido ? 'border-2 border-brand-blue bg-blue-50/40' : 'border-2 border-slate-200 hover:border-brand-blue-400'
                     }`}
                   >

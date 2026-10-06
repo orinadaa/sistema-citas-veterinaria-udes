@@ -24,7 +24,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2 text-sm text-slate-400">
             {ENLACES_RAPIDOS.map((enlace) => (
               <li key={enlace.href}>
-                <a href={enlace.href} className="transition hover:text-white">
+                <a href={enlace.href} className="hover-texto-ilumina transition hover:text-white">
                   {enlace.etiqueta}
                 </a>
               </li>

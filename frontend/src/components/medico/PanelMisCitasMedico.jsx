@@ -337,7 +337,7 @@ function VistaAgenda({ dias, citas, onSeleccionar }) {
                     key={cita.id}
                     type="button"
                     onClick={() => onSeleccionar(cita)}
-                    className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition hover:bg-slate-50"
+                    className="hover-ilumina flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition hover:bg-slate-50"
                   >
                     <span className="w-1 self-stretch rounded-full" style={{ backgroundColor: tono.dot }} aria-hidden="true" />
                     <span className="w-20 shrink-0 text-sm font-semibold text-slate-700">{formatearHora(cita.fecha_hora)}</span>

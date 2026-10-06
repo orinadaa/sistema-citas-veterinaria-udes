@@ -10,7 +10,7 @@ export function SelectableCard({ seleccionada, onSeleccionar, children, classNam
       type="button"
       onClick={onSeleccionar}
       aria-pressed={seleccionada}
-      className={`relative flex w-full rounded-2xl bg-white p-4 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 ${
+      className={`hover-ilumina relative flex w-full rounded-2xl bg-white p-4 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 ${
         seleccionada
           ? 'border-2 border-brand-blue bg-blue-50/40 shadow-sm'
           : 'border-2 border-slate-200 hover:border-brand-blue-400 hover:shadow-sm'
