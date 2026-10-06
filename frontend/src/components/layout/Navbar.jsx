@@ -97,6 +97,35 @@ export function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const esCliente = usuario?.rol === 'cliente';
   const barraRef = useRef(null);
+  const headerRef = useRef(null);
+  const perfilRef = useRef(null);
+  const menuRef = useRef(null);
+
+  // Menu del perfil con el mismo aspecto que la pildora (azul profundo al
+  // 75% con blur). Vive fuera de la pildora, como hermano dentro del
+  // <header>: si estuviera dentro, su backdrop-filter quedaria anidado en
+  // el de la pildora y el navegador solo difuminaria lo que hay dentro de
+  // ella, no el contenido de la pagina (se veria translucido pero nitido).
+  // Mientras esta abierto se reubica en cada frame debajo del boton del
+  // perfil, asi acompana a la pildora cuando se encoge con el scroll.
+  useLayoutEffect(() => {
+    if (!menuAbierto) return undefined;
+    let cuadro = null;
+    const ubicar = () => {
+      const header = headerRef.current;
+      const boton = perfilRef.current;
+      const menu = menuRef.current;
+      if (header && boton && menu) {
+        const h = header.getBoundingClientRect();
+        const b = boton.getBoundingClientRect();
+        menu.style.top = `${b.bottom - h.top + 8}px`;
+        menu.style.right = `${h.right - b.right}px`;
+      }
+      cuadro = requestAnimationFrame(ubicar);
+    };
+    ubicar();
+    return () => cancelAnimationFrame(cuadro);
+  }, [menuAbierto]);
 
   // useLayoutEffect: el estado 1 se aplica antes del primer pintado (sin
   // un frame del navbar viejo).
@@ -171,7 +200,7 @@ export function Navbar() {
   }
 
   return (
-    <header className={enLanding ? 'pointer-events-none sticky top-0 z-40 h-24' : 'sticky top-0 z-40 h-20'}>
+    <header ref={headerRef} className={enLanding ? 'pointer-events-none sticky top-0 z-40 h-24' : 'sticky top-0 z-40 h-20'}>
       <div ref={barraRef} className={`absolute inset-0 ${enLanding ? 'pointer-events-auto' : 'bg-brand-blue'}`}>
         <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:gap-x-10 lg:gap-x-12">
           {/* La columna izquierda siempre existe (aunque el nav se oculte en
@@ -273,6 +302,7 @@ export function Navbar() {
                 <div className="relative">
                   <button
                     type="button"
+                    ref={perfilRef}
                     onClick={() => setMenuAbierto((v) => !v)}
                     className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-white/10"
                   >
@@ -287,46 +317,6 @@ export function Navbar() {
                     <IconoChevronAbajo className="h-4 w-4 text-white/70" />
                   </button>
 
-                  {menuAbierto && (
-                    <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-white py-1.5 shadow-lg ring-1 ring-slate-200">
-                      {/* Atajos para volver al panel propio despues de
-                          navegar a una seccion del landing (Servicios/Sedes/
-                          Horarios) sin perder la sesion. */}
-                      {esCliente ? (
-                        <>
-                          <Link
-                            to="/panel?tab=citas"
-                            onClick={() => setMenuAbierto(false)}
-                            className="block px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
-                          >
-                            Mis citas
-                          </Link>
-                          <Link
-                            to="/panel?tab=mascotas"
-                            onClick={() => setMenuAbierto(false)}
-                            className="block px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
-                          >
-                            Mis mascotas
-                          </Link>
-                        </>
-                      ) : (
-                        <Link
-                          to={rutaPanelPorRol(usuario?.rol)}
-                          onClick={() => setMenuAbierto(false)}
-                          className="block px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
-                        >
-                          Ir al panel
-                        </Link>
-                      )}
-                      <button
-                        type="button"
-                        onClick={salir}
-                        className="w-full border-t border-slate-100 px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
-                      >
-                        Cerrar sesión
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             ) : (
@@ -359,6 +349,50 @@ export function Navbar() {
           </div>
         </div>
       </div>
+
+      {menuAbierto && (
+        <div
+          ref={menuRef}
+          className="pointer-events-auto absolute w-48 overflow-hidden rounded-2xl bg-brand-blue-800/75 py-1.5 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5)] ring-1 ring-white/12 backdrop-blur-[20px]"
+        >
+          {/* Atajos para volver al panel propio despues de
+              navegar a una seccion del landing (Servicios/Sedes/
+              Horarios) sin perder la sesion. */}
+          {esCliente ? (
+            <>
+              <Link
+                to="/panel?tab=citas"
+                onClick={() => setMenuAbierto(false)}
+                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+              >
+                Mis citas
+              </Link>
+              <Link
+                to="/panel?tab=mascotas"
+                onClick={() => setMenuAbierto(false)}
+                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+              >
+                Mis mascotas
+              </Link>
+            </>
+          ) : (
+            <Link
+              to={rutaPanelPorRol(usuario?.rol)}
+              onClick={() => setMenuAbierto(false)}
+              className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+            >
+              Ir al panel
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={salir}
+            className="w-full border-t border-white/10 px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      )}
     </header>
   );
 }
