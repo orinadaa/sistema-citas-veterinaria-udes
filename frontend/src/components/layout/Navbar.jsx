@@ -54,21 +54,44 @@ const ALTO_HEADER = 96;
 const SEPARACION_SUPERIOR = 12;
 const ALTO_PILDORA = 64;
 const RADIO_PILDORA = 32;
-// Mismo azul que el estado 2 con alfa 0: al interpolar, el color no pasa
-// por tonos intermedios raros, solo va ganando opacidad.
-const FONDO_ESTADO_1 = [6, 51, 138, 0]; // transparente: se ve el degradado del Hero
-// Vidrio: brand-blue-800 (#06338A) al 50%; el backdrop (blur + saturate +
-// brightness, ver aplicarFlow) completa el efecto glass y mantiene el
-// texto blanco legible aunque detras haya contenido claro.
-const FONDO_ESTADO_2 = [6, 51, 138, 0.5];
+// Material de la pildora (estado 2). Arriba (estado 1) siempre es
+// transparente: el color de partida es el mismo del final con alfa 0, asi
+// al interpolar solo gana opacidad, sin tonos intermedios raros.
+// - claro (landing): el mismo vidrio claro del boton "Conoce nuestros
+//   servicios" (utilidad boton-glass-claro en index.css): blanco al 12%
+//   con reflejo arriba, borde de luz y sombra. En el landing la pildora
+//   siempre queda sobre el fondo azul.
+// - azul (/agendar y /panel): brand-blue-800 al 50% con el backdrop
+//   oscurecido. Ahi la pildora pasa sobre contenido blanco al bajar y el
+//   vidrio claro dejaria el texto blanco ilegible (blanco sobre blanco).
+const MATERIALES = {
+  claro: {
+    fondo: [255, 255, 255, 0.12],
+    // brightness 78%: en el landing hay zonas de fondo muy luminosas (halo
+    // central de Servicios) donde el blanco al 12% dejaba el texto blanco
+    // por debajo de AA; se ve igual de claro pero sobre un fondo mas hondo.
+    backdrop: (t) => `blur(${t * 12}px) saturate(${100 + t * 50}%) brightness(${100 - t * 22}%)`,
+    reflejo: (t) => `linear-gradient(to bottom, rgb(255 255 255 / ${(t * 0.18).toFixed(3)}), rgb(255 255 255 / 0) 60%)`,
+    sombra: (t) =>
+      `0 10px 26px -10px rgb(0 0 0 / ${(t * 0.35).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.35).toFixed(3)}), inset 0 1px 0 rgb(255 255 255 / ${(t * 0.45).toFixed(3)})`,
+  },
+  azul: {
+    fondo: [6, 51, 138, 0.5],
+    backdrop: (t) => `blur(${t * 24}px) saturate(${100 + t * 50}%) brightness(${100 - t * 35}%)`,
+    reflejo: () => 'none',
+    sombra: (t) =>
+      `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.14).toFixed(3)}), inset 0 1px 0 rgb(255 255 255 / ${(t * 0.22).toFixed(3)})`,
+  },
+};
 
 function interpolar(desde, hasta, t) {
   return desde + (hasta - desde) * t;
 }
 
 // Aplica el estado intermedio de la pildora para un progreso 0..1.
-function aplicarFlow(elemento, t) {
-  const [r, g, b, alfa] = FONDO_ESTADO_1.map((c, i) => interpolar(c, FONDO_ESTADO_2[i], t));
+function aplicarFlow(elemento, t, material) {
+  const [r, g, b] = material.fondo;
+  const alfa = interpolar(0, material.fondo[3], t);
   const estilo = elemento.style;
   estilo.setProperty('--flow', String(t));
   // El mismo progreso se publica en <html> para que otros elementos de la
@@ -93,10 +116,11 @@ function aplicarFlow(elemento, t) {
   // redondos que un semicirculo.
   estilo.borderRadius = `${RADIO_PILDORA}px`;
   estilo.backgroundColor = `rgb(${Math.round(r)} ${Math.round(g)} ${Math.round(b)} / ${alfa.toFixed(3)})`;
-  estilo.backdropFilter = `blur(${t * 24}px) saturate(${100 + t * 50}%) brightness(${100 - t * 35}%)`;
+  estilo.backgroundImage = material.reflejo(t);
+  estilo.backdropFilter = material.backdrop(t);
   estilo.webkitBackdropFilter = estilo.backdropFilter;
-  // Sombra exterior + borde blanco sutil + brillo de 1px arriba (vidrio).
-  estilo.boxShadow = `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.14).toFixed(3)}), inset 0 1px 0 rgb(255 255 255 / ${(t * 0.22).toFixed(3)})`;
+  // Sombra exterior + borde de luz + brillo de 1px arriba (vidrio).
+  estilo.boxShadow = material.sombra(t);
 }
 
 export function Navbar() {
@@ -155,7 +179,8 @@ export function Navbar() {
     let cuadro = null;
     let instanteAnterior = null;
 
-    const pintar = () => aplicarFlow(barra, suavizarCurva(actual));
+    const material = enLanding ? MATERIALES.claro : MATERIALES.azul;
+    const pintar = () => aplicarFlow(barra, suavizarCurva(actual), material);
     const avanzar = (instante) => {
       const dt = instanteAnterior === null ? 16 : instante - instanteAnterior;
       instanteAnterior = instante;
@@ -188,7 +213,7 @@ export function Navbar() {
       document.documentElement.style.removeProperty('--flow');
       delete document.documentElement.dataset.topbarDecima;
     };
-  }, []);
+  }, [enLanding]);
 
   const iniciales = usuario?.nombreCompleto
     ?.split(' ')
