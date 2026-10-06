@@ -65,7 +65,12 @@ export function Sedes() {
               {sedes.map((sede, posicion) => {
                 return (
                   <Revelar key={sede.id} retraso={120 + posicion * 120}>
-                    <div className="h-full overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                    {/* Cristal blanco flotante (mismo tratamiento que las tarjetas
+                        de Horarios): blanco al 80% con el backdrop aclarado para
+                        que no se agrise sobre el azul, reflejo, borde de luz y
+                        sombra. La foto es opaca; el cristal se ve en la franja
+                        del nombre. */}
+                    <div className="h-full overflow-hidden rounded-2xl bg-white/80 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.45),rgb(255_255_255/0)_45%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.9),inset_0_0_0_1px_rgb(255_255_255/0.55),0_18px_40px_-16px_rgb(0_0_0/0.5)] backdrop-blur-[16px] backdrop-saturate-150 backdrop-brightness-[1.4]">
                       {sede.foto_url ? (
                         <img src={sede.foto_url} alt={sede.nombre} className="h-80 w-full object-cover sm:h-96 lg:h-[clamp(12rem,calc(100svh-28rem),34rem)]" />
                       ) : (
@@ -78,7 +83,7 @@ export function Sedes() {
                         <IconoUbicacion className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                         <div>
                           <h3 className="font-semibold text-slate-900">{sede.nombre}</h3>
-                          <p className="text-sm text-slate-500">{sede.direccion || sede.ciudad}</p>
+                          <p className="text-sm text-slate-700">{sede.direccion || sede.ciudad}</p>
                         </div>
                       </div>
                     </div>

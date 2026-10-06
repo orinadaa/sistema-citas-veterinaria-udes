@@ -15,15 +15,17 @@ import { detalleHorarioPorDia } from '../../utils/horarioTexto';
 import horariosMascotas from '../../assets/horarios-mascotas.png';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
-// Vidrio flotante del color claro de cada tarjeta (celeste #E8F1FD y crema
-// #FEFAF1) al 94%: deja intuir la tarjeta azul de atras sin que el color
-// claro se vuelva gris (con mas transparencia el crema se agrisaba). Reflejo blanco arriba, borde de luz y sombra.
+// Cristal flotante del color claro de cada tarjeta (celeste #E8F1FD y crema
+// #FEFAF1) al 75% y 82% (el crema necesita un poco mas de opacidad para
+// no tomar un tono lavanda del azul de atras). El backdrop aclara lo de atras (brightness 140%): asi
+// el color sigue claro y no se agrisa sobre el fondo azul, y a traves del
+// cristal se intuyen los halos difuminados. Reflejo blanco arriba, borde de luz y sombra.
 const TINTES = [
-  { tarjeta: 'bg-[#E8F1FD]/94', icono: 'text-brand-blue' },
-  { tarjeta: 'bg-[#FEFAF1]/94', icono: 'text-amber-600' },
+  { tarjeta: 'bg-[#E8F1FD]/75', icono: 'text-brand-blue' },
+  { tarjeta: 'bg-[#FEFAF1]/82', icono: 'text-amber-600' },
 ];
 const VIDRIO_TARJETA =
-  'bg-[linear-gradient(to_bottom,rgb(255_255_255/0.45),rgb(255_255_255/0)_45%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.9),inset_0_0_0_1px_rgb(255_255_255/0.5),0_18px_40px_-16px_rgb(0_0_0/0.5)] backdrop-blur-[16px] backdrop-saturate-150';
+  'bg-[linear-gradient(to_bottom,rgb(255_255_255/0.45),rgb(255_255_255/0)_45%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.9),inset_0_0_0_1px_rgb(255_255_255/0.5),0_18px_40px_-16px_rgb(0_0_0/0.5)] backdrop-blur-[16px] backdrop-saturate-150 backdrop-brightness-[1.4]';
 
 export function Horarios() {
   const [estado, setEstado] = useState(ESTADOS.CARGANDO);
@@ -78,11 +80,11 @@ export function Horarios() {
                         <IconoReloj className={`h-5 w-5 shrink-0 ${tinte.icono}`} />
                         <h3 className="font-semibold text-slate-900">Sede {sede.nombre.replace(/^Cl[ií]nica Veterinaria UDES\s*/i, '') || sede.ciudad}</h3>
                       </div>
-                      <ul className="mt-4 space-y-1.5 text-sm text-slate-600">
+                      <ul className="mt-4 space-y-1.5 text-sm text-slate-700">
                         {dias.map((d) => (
                           <li key={d.dia} className="flex justify-between gap-4">
                             <span>{d.dia}</span>
-                            <span className={d.texto === 'Cerrado' ? 'text-slate-600' : 'font-medium text-slate-700'}>{d.texto}</span>
+                            <span className={d.texto === 'Cerrado' ? 'text-slate-700' : 'font-medium text-slate-800'}>{d.texto}</span>
                           </li>
                         ))}
                       </ul>
