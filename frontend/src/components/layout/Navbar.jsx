@@ -200,6 +200,9 @@ export function Navbar() {
             to="/"
             aria-label="Clínica Veterinaria UDES, ir al inicio"
             className={`relative flex items-center justify-center ${enLanding ? 'h-10 w-[126px]' : ''}`}
+            // --viaje (0..1): avance del isotipo hacia el centro, compartido
+            // por el logo grande y el isotipo blanco para que se muevan juntos.
+            style={enLanding ? { '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)' } : undefined}
           >
             {enLanding ? (
               <>
@@ -221,6 +224,13 @@ export function Navbar() {
                   alt=""
                   className="absolute left-1/2 top-1/2 h-[84px] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
                   style={{
+                    // Se achica y se corre junto con el isotipo blanco: escala
+                    // 1 -> 0.556 (72px -> 40px, mismo factor que el blanco) y
+                    // como su luna esta 26px a la izquierda del centro, se
+                    // desplaza 14.4px a la derecha (= 26 * (1 - 0.556)) para
+                    // que la luna siga debajo del isotipo blanco todo el viaje.
+                    transform:
+                      'translate(calc(14.44px * var(--viaje)), calc(-1.11px * var(--viaje))) scale(calc(1 - 0.444 * var(--viaje)))',
                     // min() de dos rectas: 1 -> 0.25 entre 0 y 0.7, y
                     // 0.25 -> 0 entre 0.7 y 0.78 (se cruzan en 0.7).
                     opacity:
@@ -230,7 +240,6 @@ export function Navbar() {
                 <div
                   className="absolute left-1/2 top-1/2 h-10 -translate-x-1/2 -translate-y-1/2"
                   style={{
-                    '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)',
                     transform:
                       'translate(calc(-26px * (1 - var(--viaje))), calc(2px * (1 - var(--viaje)))) scale(calc(1.8 - 0.8 * var(--viaje)))',
                   }}
