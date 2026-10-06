@@ -57,7 +57,10 @@ const RADIO_PILDORA = 32;
 // Mismo azul que el estado 2 con alfa 0: al interpolar, el color no pasa
 // por tonos intermedios raros, solo va ganando opacidad.
 const FONDO_ESTADO_1 = [6, 51, 138, 0]; // transparente: se ve el degradado del Hero
-const FONDO_ESTADO_2 = [6, 51, 138, 0.75]; // brand-blue-800 (#06338A) al 75%
+// Vidrio: brand-blue-800 (#06338A) al 50%; el backdrop (blur + saturate +
+// brightness, ver aplicarFlow) completa el efecto glass y mantiene el
+// texto blanco legible aunque detras haya contenido claro.
+const FONDO_ESTADO_2 = [6, 51, 138, 0.5];
 
 function interpolar(desde, hasta, t) {
   return desde + (hasta - desde) * t;
@@ -90,9 +93,10 @@ function aplicarFlow(elemento, t) {
   // redondos que un semicirculo.
   estilo.borderRadius = `${RADIO_PILDORA}px`;
   estilo.backgroundColor = `rgb(${Math.round(r)} ${Math.round(g)} ${Math.round(b)} / ${alfa.toFixed(3)})`;
-  estilo.backdropFilter = `blur(${t * 20}px)`;
+  estilo.backdropFilter = `blur(${t * 24}px) saturate(${100 + t * 50}%) brightness(${100 - t * 35}%)`;
   estilo.webkitBackdropFilter = estilo.backdropFilter;
-  estilo.boxShadow = `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.12).toFixed(3)})`;
+  // Sombra exterior + borde blanco sutil + brillo de 1px arriba (vidrio).
+  estilo.boxShadow = `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.14).toFixed(3)}), inset 0 1px 0 rgb(255 255 255 / ${(t * 0.22).toFixed(3)})`;
 }
 
 export function Navbar() {
@@ -357,7 +361,7 @@ export function Navbar() {
       {menuAbierto && (
         <div
           ref={menuRef}
-          className="pointer-events-auto absolute w-48 overflow-hidden rounded-2xl bg-brand-blue-800/75 py-1.5 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5)] ring-1 ring-white/12 backdrop-blur-[20px]"
+          className="pointer-events-auto absolute w-48 overflow-hidden rounded-2xl bg-brand-blue-800/50 py-1.5 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5),inset_0_1px_0_rgb(255_255_255/0.22)] ring-1 ring-white/14 backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]"
         >
           {/* Atajos para volver al panel propio despues de
               navegar a una seccion del landing (Servicios/Sedes/
