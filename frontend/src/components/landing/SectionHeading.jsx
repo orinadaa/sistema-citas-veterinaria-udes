@@ -5,13 +5,18 @@
 // la derecha del titulo (ej. "Ver todos los servicios →").
 import { AccentBar } from '../AccentBar';
 
-export function SectionHeading({ titulo, subtitulo, accion }) {
+// `sobreFondoOscuro`: version para secciones con fondo azul oscuro (ej.
+// Servicios): titulo blanco, subtitulo blue-50 (mismos colores de texto
+// que el Hero) y AccentBar con su mitad azul en blanco.
+export function SectionHeading({ titulo, subtitulo, accion, sobreFondoOscuro = false }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">{titulo}</h2>
-        <AccentBar />
-        {subtitulo && <p className="mt-4 max-w-[60ch] text-slate-600">{subtitulo}</p>}
+        <h2 className={`text-3xl font-bold tracking-tight ${sobreFondoOscuro ? 'text-white' : 'text-slate-900'}`}>{titulo}</h2>
+        <AccentBar sobreFondoAzul={sobreFondoOscuro} />
+        {subtitulo && (
+          <p className={`mt-4 max-w-[60ch] ${sobreFondoOscuro ? 'text-blue-50' : 'text-slate-600'}`}>{subtitulo}</p>
+        )}
       </div>
       {accion}
     </div>

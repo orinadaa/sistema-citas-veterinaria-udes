@@ -215,11 +215,11 @@ export function ServicioSlider({ slides }) {
               onClick={() => navegar(i)}
               aria-label={`Ver ${slide.titulo}`}
               aria-current={activa ? 'true' : undefined}
-              className="group rounded-full p-1.5 outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+              className="group rounded-full p-1.5 outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <span
                 className={`block h-2 rounded-full transition-all duration-300 motion-reduce:transition-none ${
-                  activa ? 'w-7 bg-brand-amber' : 'w-2 bg-slate-300 group-hover:bg-slate-400'
+                  activa ? 'w-7 bg-brand-amber' : 'w-2 bg-slate-300 group-hover:bg-slate-200'
                 }`}
               />
             </button>

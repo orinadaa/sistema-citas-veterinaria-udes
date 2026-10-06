@@ -12,6 +12,7 @@ import { rutaAgendarCita } from '../../utils/rutas';
 import { IconoAlerta } from '../icons';
 import { Revelar } from './Revelar';
 import { SectionHeading } from './SectionHeading';
+import { FondoAmbientalServicios } from './FondoAmbientalServicios';
 import { ServicioSlider } from './ServicioSlider';
 import imgConsulta from '../../assets/servicios-foto/consulta.png';
 import imgCirugia from '../../assets/servicios-foto/cirugia.webp';
@@ -121,17 +122,21 @@ export function Servicios() {
     });
 
   return (
-    <section id="servicios" className="bg-slate-50 py-20">
+    // isolate: el fondo (-z-10) queda detras del contenido pero dentro de
+    // la seccion, sin irse detras de la pagina.
+    <section id="servicios" className="relative isolate overflow-hidden bg-brand-blue-800 py-20">
+      <FondoAmbientalServicios />
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <Revelar>
           <SectionHeading
             titulo="Servicios veterinarios"
             subtitulo="Contamos con una amplia gama de servicios para el cuidado integral de tu mascota."
+            sobreFondoOscuro
           />
         </Revelar>
 
         {estado === ESTADOS.CARGANDO && (
-          <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-slate-200 sm:aspect-[16/10] lg:aspect-[2/1] lg:rounded-3xl" />
+          <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-[16/10] lg:aspect-[2/1] lg:rounded-3xl" />
         )}
 
         {estado === ESTADOS.ERROR && (
