@@ -33,10 +33,14 @@ export function Hero() {
   }
 
   // -mt-24 pt-24: el Hero sube por debajo del topbar (96px, ver
-  // Navbar.jsx) para que las esquinas redondeadas del topbar se vean sobre
-  // el degradado y no sobre el fondo de la pagina.
+  // Navbar.jsx) para que, cuando la topbar se vuelve pildora, lo que se
+  // vea alrededor sea el degradado del Hero y no el fondo de la pagina.
+  // Los primeros 6rem (lo que queda detras de la topbar) son brand-blue
+  // plano y el degradado arranca recien ahi: si arrancara desde arriba,
+  // al borde inferior de la topbar el Hero ya estaria mas oscuro que ella
+  // y se veria una linea de union.
   return (
-    <section className="relative -mt-24 overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 pt-24">
+    <section className="relative -mt-24 overflow-hidden bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_6rem,var(--color-brand-blue-800))] pt-24">
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="max-w-xl">
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">

@@ -8,11 +8,9 @@
 // abajo.
 //
 // Topbar tipo pildora (solo en la landing), con 2 estados:
-// - Estado 1 (scroll = 0): ancho completo, pegado al borde superior,
-//   solo las esquinas inferiores redondeadas (24px, el radio grande de
-//   contenedores). Vidrio blanco translucido sobre el Hero: si fuera
-//   brand-blue solido, las esquinas no se verian (el Hero arranca en el
-//   mismo azul).
+// - Estado 1 (scroll = 0): la topbar de siempre -- brand-blue solido, a
+//   todo el ancho, sin borde ni radio: se funde sin costura con el Hero
+//   (que arranca en el mismo azul). Solo el logo es distinto (grande).
 // - Estado 2: se despega 12px del borde, se angosta (maximo ~60rem,
 //   centrado) y baja a 64px de alto, con las 4 esquinas en 32px (mitad
 //   del alto = pildora real, mismo principio que rounded-boton), azul
@@ -44,8 +42,7 @@ const DISTANCIA_FLOW_PX = 160;
 const ALTO_HEADER = 96;
 const SEPARACION_SUPERIOR = 12;
 const ALTO_PILDORA = 64;
-const RADIO_ESTADO_1 = 24;
-const FONDO_ESTADO_1 = [255, 255, 255, 0.1]; // vidrio sobre el Hero
+const FONDO_ESTADO_1 = [66, 128, 247, 1]; // brand-blue (#4280F7) solido, igual al Hero
 const FONDO_ESTADO_2 = [6, 51, 138, 0.75]; // brand-blue-800 (#06338A) al 75%
 
 function interpolar(desde, hasta, t) {
@@ -55,8 +52,7 @@ function interpolar(desde, hasta, t) {
 // Aplica el estado intermedio de la pildora para un progreso 0..1.
 function aplicarFlow(elemento, t) {
   const [r, g, b, alfa] = FONDO_ESTADO_1.map((c, i) => interpolar(c, FONDO_ESTADO_2[i], t));
-  const radioSuperior = t * (ALTO_PILDORA / 2);
-  const radioInferior = interpolar(RADIO_ESTADO_1, ALTO_PILDORA / 2, t);
+  const radio = t * (ALTO_PILDORA / 2);
   const estilo = elemento.style;
   estilo.setProperty('--flow', String(t));
   estilo.top = `${t * SEPARACION_SUPERIOR}px`;
@@ -65,11 +61,11 @@ function aplicarFlow(elemento, t) {
   // para que la pildora no supere ~60rem de ancho.
   estilo.left = `calc(${t} * max(16px, (100% - 60rem) / 2))`;
   estilo.right = estilo.left;
-  estilo.borderRadius = `${radioSuperior}px ${radioSuperior}px ${radioInferior}px ${radioInferior}px`;
+  estilo.borderRadius = `${radio}px`;
   estilo.backgroundColor = `rgb(${Math.round(r)} ${Math.round(g)} ${Math.round(b)} / ${alfa.toFixed(3)})`;
-  estilo.backdropFilter = `blur(${12 + t * 8}px)`;
+  estilo.backdropFilter = `blur(${t * 20}px)`;
   estilo.webkitBackdropFilter = estilo.backdropFilter;
-  estilo.boxShadow = `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / 0.12)`;
+  estilo.boxShadow = `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.12).toFixed(3)})`;
 }
 
 export function Navbar() {
@@ -142,7 +138,16 @@ export function Navbar() {
             </nav>
           </div>
 
-          <Link to="/" aria-label="Clínica Veterinaria UDES, ir al inicio" className="relative flex items-center justify-center">
+          {/* Caja de tamano fijo (40px de alto, el del logo corto) con ambos
+              logos absolutos y centrados: el logo grande se sale de la caja
+              hacia arriba y abajo por igual, pero no agranda la fila. Si
+              ocupara sus 72px en el flujo, la fila quedaria mas alta que la
+              pildora (64px) y todo el contenido se veria corrido hacia abajo. */}
+          <Link
+            to="/"
+            aria-label="Clínica Veterinaria UDES, ir al inicio"
+            className={`relative flex items-center justify-center ${enLanding ? 'h-10 w-[108px]' : ''}`}
+          >
             {enLanding ? (
               <>
                 {/* Grande -> corto: el grande se apaga entre t=0 y t~0.7 y el
@@ -153,10 +158,10 @@ export function Navbar() {
                 <img
                   src={logoGrande}
                   alt=""
-                  className="h-[72px] w-auto object-contain"
+                  className="absolute left-1/2 top-1/2 h-[72px] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
                   style={{
                     opacity: 'calc(1 - var(--flow, 0) * 1.4)',
-                    transform: 'scale(calc(1 - var(--flow, 0) * 0.25))',
+                    scale: 'calc(1 - var(--flow, 0) * 0.25)',
                   }}
                 />
                 <img
