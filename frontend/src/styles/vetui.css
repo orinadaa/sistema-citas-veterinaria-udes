@@ -137,6 +137,15 @@
     0 18px 40px -16px color-mix(in oklab, var(--color-brand-amber) 45%, transparent);
 }
 
+/* Cristal destacado: anillo ámbar conservando el tinte (ej. la próxima
+   cita). A diferencia de seleccionado, no indica una elección del usuario. */
+@utility cristal-destacado {
+  box-shadow:
+    inset 0 0 0 2px var(--color-brand-amber),
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    var(--shadow-tarjeta);
+}
+
 /* Cristal fuerte: superpuestos (panel lateral, diálogo). Casi opaco para
    formularios largos, con el desenfoque de vidrio de fondo. */
 @utility cristal-fuerte {

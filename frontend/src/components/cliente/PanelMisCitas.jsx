@@ -3,10 +3,12 @@
 // RF-08 y cancelar RF-09 vía DetalleCitaPanel). Filtros por estado
 // como pills con conteo real -- nunca un numero inventado. Cada fila:
 // foto, mascota, fecha/hora, servicio/sede/medico, estado y "Ver
-// detalles" (especificacion final de la usuaria).
+// detalles" (especificacion final de la usuaria). vetUI: chips de vidrio
+// para filtrar, cada cita en una Tarjeta de cristal (la proxima mas
+// cercana en cristal celeste con anillo ambar).
 import { useMemo, useState } from 'react';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
-import { StatusBadge } from '../ui/StatusBadge';
+import { Boton, Chips, EstadoVacio, Esqueleto, Insignia, Tarjeta } from '../vetui';
 import { DetalleCitaPanel, estadoDeCita } from '../citas/DetalleCitaPanel';
 import { IconoCalendario, IconoEstetoscopio, IconoFlechaDerecha } from '../icons';
 import { AvatarMascota } from './AvatarMascota';
@@ -51,48 +53,34 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
     <div className="flex flex-col gap-6" inert={Boolean(citaDetalle)} aria-hidden={Boolean(citaDetalle)}>
       {/* "Agendar nueva cita" vive en la fila de tabs (PanelClientePage.jsx). */}
       <div>
-        <h2 className="font-heading text-xl font-bold text-brand-navy">Mis citas</h2>
-        <p className="text-sm text-slate-500">Consulta, reprograma o cancela tus citas veterinarias.</p>
+        <h2 className="text-xl font-bold text-white">Mis citas</h2>
+        <p className="text-sm text-blue-100">Consulta, reprograma o cancela tus citas veterinarias.</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {FILTROS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            onClick={() => setFiltro(f.id)}
-            aria-pressed={filtro === f.id}
-            className={`rounded-boton px-4 py-1.5 text-sm font-medium ring-1 transition ${
-              filtro === f.id
-                ? 'bg-[#EAF4FD] text-brand-blue ring-transparent'
-                : 'bg-white text-slate-500 ring-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            {f.etiqueta} ({conteos[f.id]})
-          </button>
-        ))}
-      </div>
+      <Chips
+        items={FILTROS.map((f) => ({ ...f, conteo: conteos[f.id] }))}
+        activo={filtro}
+        onCambiar={setFiltro}
+      />
 
       {cargando ? (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((clave) => (
-            <div key={clave} className="h-20 animate-pulse rounded-xl bg-slate-100" />
+            <Esqueleto key={clave} className="h-20" />
           ))}
         </div>
       ) : citasFiltradas.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-          No tienes citas en esta categoría.
-        </p>
+        <EstadoVacio>No tienes citas en esta categoría.</EstadoVacio>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {citasFiltradas.map((cita) => {
             const destacada = cita.id === idDestacada;
             return (
-              <div
+              <Tarjeta
                 key={cita.id}
-                className={`grid grid-cols-1 items-center gap-4 rounded-xl border p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.3fr)_auto_auto] ${
-                  destacada ? 'border-brand-blue-400 bg-[#EAF4FD]' : 'border-slate-200 bg-white'
-                }`}
+                tono={destacada ? 'celeste' : 'blanco'}
+                destacada={destacada}
+                className="grid grid-cols-1 items-center gap-4 p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.3fr)_auto_auto]"
               >
                 {/* 1-2. Foto + nombre y especie/raza */}
                 <div className="flex min-w-0 items-center gap-3">
@@ -102,7 +90,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
                   />
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-slate-900">{cita.mascota_nombre}</p>
-                    <p className="truncate text-sm text-slate-500">
+                    <p className="truncate text-sm text-slate-700">
                       {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}
                     </p>
                   </div>
@@ -110,38 +98,33 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
 
                 {/* 3. Fecha y hora */}
                 <div className="flex min-w-0 items-start gap-2.5">
-                  <IconoCalendario className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
+                  <IconoCalendario className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue-700" />
                   <div className="min-w-0">
                     <p className="font-semibold text-slate-900">{formatearFechaLarga(cita.fecha_hora)}</p>
-                    <p className="text-sm text-slate-500">{formatearHora(cita.fecha_hora)}</p>
+                    <p className="text-sm text-slate-700">{formatearHora(cita.fecha_hora)}</p>
                   </div>
                 </div>
 
                 {/* 4. Servicio, sede y medico */}
                 <div className="flex min-w-0 items-start gap-2.5">
-                  <IconoEstetoscopio className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
+                  <IconoEstetoscopio className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue-700" />
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-slate-900">{cita.servicio_nombre}</p>
-                    <p className="truncate text-sm text-slate-500">{cita.sede_nombre}</p>
-                    <p className="truncate text-sm text-slate-500">{cita.medico_nombre}</p>
+                    <p className="truncate text-sm text-slate-700">{cita.sede_nombre}</p>
+                    <p className="truncate text-sm text-slate-700">{cita.medico_nombre}</p>
                   </div>
                 </div>
 
                 {/* 5. Estado */}
                 <div>
-                  <StatusBadge status={estadoDeCita(cita)} />
+                  <Insignia estado={estadoDeCita(cita)} />
                 </div>
 
                 {/* 6. Ver detalles */}
-                <button
-                  type="button"
-                  onClick={() => setCitaDetalle(cita)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-boton border border-brand-blue bg-white px-3 py-1.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
-                >
+                <Boton variante="contorno" tamano="sm" iconoFinal={IconoFlechaDerecha} onClick={() => setCitaDetalle(cita)}>
                   Ver detalles
-                  <IconoFlechaDerecha className="h-4 w-4" />
-                </button>
-              </div>
+                </Boton>
+              </Tarjeta>
             );
           })}
         </div>

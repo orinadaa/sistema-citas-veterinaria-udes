@@ -13,7 +13,8 @@
 //
 // Tarjeta: cristal. Contenido u objeto (mascota, cita, sede, horario).
 // Texto oscuro. `tono` celeste/crema, `seleccionada` (anillo ámbar +
-// check) e `interactiva` (hover que ilumina) para opciones elegibles.
+// check) e `interactiva` (hover que ilumina) para opciones elegibles;
+// `destacada` (anillo ámbar sin check) para resaltar sin indicar elección.
 import { IconoCheck } from '../icons';
 
 const color = (token, porcentaje) => `color-mix(in oklab, var(--color-${token}) ${porcentaje}%, transparent)`;
@@ -59,6 +60,7 @@ export function Tarjeta({
   as: Componente = 'div',
   tono = 'blanco',
   seleccionada = false,
+  destacada = false,
   interactiva = false,
   className = '',
   children,
@@ -66,7 +68,7 @@ export function Tarjeta({
 }) {
   return (
     <Componente
-      className={`cristal relative rounded-tarjeta ${TONOS[tono] ?? ''} ${seleccionada ? 'cristal-seleccionado' : ''} ${
+      className={`cristal relative rounded-tarjeta ${TONOS[tono] ?? ''} ${seleccionada ? 'cristal-seleccionado' : destacada ? 'cristal-destacado' : ''} ${
         interactiva ? 'hover-ilumina-claro cursor-pointer text-left outline-none focus-visible:ring-4 focus-visible:ring-white/60' : ''
       } ${className}`}
       {...resto}

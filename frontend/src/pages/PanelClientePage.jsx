@@ -1,15 +1,13 @@
 // pages/PanelClientePage.jsx
 // Panel del cliente autenticado (Incremento 4, modulo de Clientes):
 // "Mis citas" (RF-06/RF-08/RF-09/RF-15) y "Mis mascotas" (RF-14),
-// con el mismo lenguaje visual del panel administrativo (PageHeader,
-// KPICard, Tabs, colores de marca) en vez del layout generico anterior.
-// El banner reutiliza el mismo degradado + foto del Hero del landing
-// (fotomain.png), sin inventar formas decorativas que no existen ahi.
+// con vetUI (floating glass): fondo de marca, encabezado con la foto del
+// Hero, indicadores en cristal (TarjetaDato), pestañas de vidrio y la
+// accion primaria "Agendar nueva cita" en ambar.
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
-import { Tabs } from '../components/ui/Tabs';
-import { KPICard } from '../components/ui/KPICard';
+import { Boton, EncabezadoPagina, FondoVetui, Pestanas, TarjetaDato } from '../components/vetui';
 import { PanelMisCitas } from '../components/cliente/PanelMisCitas';
 import { PanelMisMascotas } from '../components/cliente/PanelMisMascotas';
 import { estadoDeCita } from '../components/citas/DetalleCitaPanel';
@@ -20,8 +18,8 @@ import fotoMain from '../assets/foto-main.png';
 import { IconoCalendario, IconoPata, IconoCorazon, IconoMas } from '../components/icons';
 
 const TABS = [
-  { id: 'citas', label: 'Mis citas', icon: IconoCalendario },
-  { id: 'mascotas', label: 'Mis mascotas', icon: IconoPata },
+  { id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario },
+  { id: 'mascotas', etiqueta: 'Mis mascotas', icono: IconoPata },
 ];
 
 export function PanelClientePage() {
@@ -58,65 +56,50 @@ export function PanelClientePage() {
   const citasCompletadas = citas.filter((cita) => estadoDeCita(cita) === 'completada').length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <FondoVetui>
       <Navbar />
 
-      {/* -mt-24 pt-24: el banner pasa por detras de la topbar (transparente
-          arriba, ver Navbar.jsx), igual que el Hero del landing. */}
-      <section className="relative -mt-24 overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 pt-24">
-        <div className="relative mx-auto grid max-w-7xl gap-6 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-100">Mi cuenta</p>
-            <h1 className="mt-2 text-3xl font-bold text-white md:text-4xl">
-              Hola, {usuario?.nombreCompleto?.split(' ')[0]} 👋
-            </h1>
-            <p className="mt-2 max-w-md text-blue-50">
-              Aquí puedes gestionar tus citas y las mascotas de tu cuenta de forma rápida y sencilla.
-            </p>
-          </div>
-          <img src={fotoMain} alt="" className="mx-auto hidden w-full max-w-[360px] drop-shadow-2xl lg:block" />
-        </div>
-      </section>
+      <EncabezadoPagina
+        antetitulo="Mi cuenta"
+        titulo={`Hola, ${usuario?.nombreCompleto?.split(' ')[0] ?? ''} 👋`}
+        descripcion="Aquí puedes gestionar tus citas y las mascotas de tu cuenta de forma rápida y sencilla."
+        className="py-6"
+        imagen={<img src={fotoMain} alt="" className="mx-auto hidden w-full max-w-[300px] drop-shadow-2xl lg:block" />}
+      />
 
       <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-        <div className="-mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <KPICard
-            icon={IconoCalendario}
-            color="blue"
-            value={proximaCita ? formatearFechaLarga(proximaCita.fecha_hora) : 'Sin citas próximas'}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <TarjetaDato
+            icono={IconoCalendario}
+            tono="azul"
+            valor={proximaCita ? formatearFechaLarga(proximaCita.fecha_hora) : 'Sin citas próximas'}
             detalle={proximaCita ? formatearHora(proximaCita.fecha_hora) : undefined}
-            label="Próxima cita"
+            etiqueta="Próxima cita"
             onClick={() => setPestana('citas')}
           />
-          <KPICard
-            icon={IconoPata}
-            color="amber"
-            value={mascotas.length}
-            label="Mascotas registradas"
+          <TarjetaDato
+            icono={IconoPata}
+            tono="ambar"
+            valor={mascotas.length}
+            etiqueta="Mascotas registradas"
             onClick={() => setPestana('mascotas')}
           />
-          <KPICard
-            icon={IconoCorazon}
-            color="pink"
-            value={citasCompletadas}
-            label="Citas realizadas"
+          <TarjetaDato
+            icono={IconoCorazon}
+            tono="rosa"
+            valor={citasCompletadas}
+            etiqueta="Citas realizadas"
             onClick={() => setPestana('citas')}
           />
         </div>
 
-        {/* Tabs + "Agendar nueva cita" a la misma altura (solo en Mis citas) */}
-        <div className="mt-10 flex flex-wrap items-end justify-between gap-3 border-b border-slate-200">
-          <div className="-mb-px">
-            <Tabs items={TABS} activeItem={pestana} onChange={setPestana} />
-          </div>
+        {/* Pestañas + "Agendar nueva cita" (accion primaria) a la misma altura. */}
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
+          <Pestanas items={TABS} activo={pestana} onCambiar={setPestana} etiqueta="Mi cuenta" />
           {pestana === 'citas' && (
-            <Link
-              to="/agendar"
-              className="mb-2 inline-flex items-center gap-1.5 rounded-boton bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600"
-            >
-              <IconoMas className="h-4 w-4" />
+            <Boton as={Link} to="/agendar" icono={IconoMas}>
               Agendar nueva cita
-            </Link>
+            </Boton>
           )}
         </div>
 
@@ -132,6 +115,6 @@ export function PanelClientePage() {
           )}
         </div>
       </main>
-    </div>
+    </FondoVetui>
   );
 }
