@@ -66,3 +66,57 @@ export function BookingStepper({ paginaActual }) {
     </ol>
   );
 }
+
+// Variante vertical y compacta, fija al costado izquierdo de la pantalla.
+// Aparece cuando la tarjeta horizontal queda escondida debajo de la topbar
+// (al bajar para tocar "Continuar"): entra deslizandose desde la izquierda
+// y sale igual al volver arriba. Mismo lenguaje visual que la pildora de
+// la topbar (brand-blue-800 al 75% con blur, forma de capsula). Solo
+// circulos: la etiqueta de cada hito va en aria-label y en el tooltip.
+export function BookingStepperLateral({ paginaActual, visible }) {
+  return (
+    <nav
+      aria-label="Progreso de la cita"
+      aria-hidden={!visible}
+      inert={!visible}
+      className={`fixed top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-brand-blue-800/75 px-2 py-3 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5)] ring-1 ring-white/12 backdrop-blur-[20px] transition-[opacity,translate] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none lg:block ${
+        visible ? 'translate-x-0 opacity-100' : 'pointer-events-none -translate-x-8 opacity-0'
+      }`}
+      // Pegado al borde del contenido (max-w-7xl = 80rem) cuando hay margen
+      // libre; si no, a 12px del borde de la pantalla.
+      style={{ left: 'max(12px, calc((100vw - 80rem) / 2 - 64px))' }}
+    >
+      <ol className="flex flex-col items-center">
+        {HITOS.map((hito, indice) => {
+          const estado = estadoDelHito(hito, paginaActual);
+          const siguiente = HITOS[indice + 1];
+          const lineaAlcanzada = siguiente && estadoDelHito(siguiente, paginaActual) !== 'pendiente';
+          return (
+            <li
+              key={hito.numero}
+              className="flex flex-col items-center"
+              aria-current={estado === 'activo' ? 'step' : undefined}
+            >
+              <span
+                title={hito.etiqueta}
+                aria-label={`${hito.numero}. ${hito.etiqueta}${estado === 'completado' ? ' (completado)' : estado === 'activo' ? ' (paso actual)' : ''}`}
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition ${
+                  estado === 'completado'
+                    ? 'bg-brand-green text-white'
+                    : estado === 'activo'
+                      ? 'bg-white text-brand-blue ring-4 ring-white/25'
+                      : 'border-2 border-white/30 text-white/60'
+                }`}
+              >
+                {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : hito.numero}
+              </span>
+              {siguiente && (
+                <span aria-hidden="true" className={`my-1 h-5 w-0.5 rounded-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`} />
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}

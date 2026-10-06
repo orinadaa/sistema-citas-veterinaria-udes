@@ -7,10 +7,10 @@
 // Todo el estado de las selecciones vive aqui (no en cada pagina) para
 // que "Cambiar" en el resumen lateral regrese a una pagina sin perder
 // lo ya elegido en las demas.
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
-import { BookingStepper } from '../components/agendar/BookingStepper';
+import { BookingStepper, BookingStepperLateral } from '../components/agendar/BookingStepper';
 import { BookingSummarySidebar } from '../components/agendar/BookingSummarySidebar';
 import { PaginaMascotaServicio } from '../components/agendar/PaginaMascotaServicio';
 import { PaginaSedeFecha } from '../components/agendar/PaginaSedeFecha';
@@ -27,7 +27,28 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { IconoFlechaDerecha } from '../components/icons';
 
+// La pildora de la topbar ocupa hasta ~76px desde arriba (12px de
+// separacion + 64px de alto): la tarjeta del stepper cuenta como "visible"
+// solo si algo de ella queda por debajo de esa franja.
+const MARGEN_TOPBAR = '-80px 0px 0px 0px';
+
 export function AgendarCitaPage() {
+  const tarjetaStepperRef = useRef(null);
+  const [stepperOculto, setStepperOculto] = useState(false);
+
+  // Cuando la tarjeta horizontal del stepper queda escondida debajo de la
+  // topbar, se muestra la version lateral (BookingStepperLateral).
+  useEffect(() => {
+    const tarjeta = tarjetaStepperRef.current;
+    if (!tarjeta || typeof IntersectionObserver === 'undefined') return undefined;
+    const observador = new IntersectionObserver(
+      ([entrada]) => setStepperOculto(!entrada.isIntersecting && entrada.boundingClientRect.top < 0),
+      { rootMargin: MARGEN_TOPBAR }
+    );
+    observador.observe(tarjeta);
+    return () => observador.disconnect();
+  }, []);
+
   const { token } = useAuth();
   const navigate = useNavigate();
   const [parametros] = useSearchParams();
@@ -206,10 +227,14 @@ export function AgendarCitaPage() {
           </div>
         </section>
 
-        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-          <div className="-mt-12 rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 sm:px-8">
+        {/* Entre lg y 1359px el margen lateral no alcanza para el stepper
+            lateral (48px + 12px): se reserva ese espacio a la izquierda
+            del contenido para que no lo tape. Desde 1360px ya hay margen. */}
+        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[76px] min-[1360px]:pl-6">
+          <div ref={tarjetaStepperRef} className="-mt-12 rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 sm:px-8">
             <BookingStepper paginaActual={pagina} />
           </div>
+          <BookingStepperLateral paginaActual={pagina} visible={stepperOculto} />
 
           {pagina === 3 && citaCreada ? (
             <div className="mt-8">
