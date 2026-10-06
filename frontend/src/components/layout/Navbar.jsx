@@ -135,32 +135,50 @@ export function Navbar() {
   const headerRef = useRef(null);
   const perfilRef = useRef(null);
   const menuRef = useRef(null);
+  const nombrePerfilRef = useRef(null);
 
-  // Menu del perfil con el mismo aspecto que la pildora (azul profundo al
-  // 75% con blur). Vive fuera de la pildora, como hermano dentro del
-  // <header>: si estuviera dentro, su backdrop-filter quedaria anidado en
-  // el de la pildora y el navegador solo difuminaria lo que hay dentro de
-  // ella, no el contenido de la pagina (se veria translucido pero nitido).
-  // Mientras esta abierto se reubica en cada frame debajo del boton del
-  // perfil, asi acompana a la pildora cuando se encoge con el scroll.
+  // Menu del perfil: mismo material que la pildora. Vive fuera de ella,
+  // como hermano dentro del <header>: si estuviera dentro, su
+  // backdrop-filter quedaria anidado en el de la pildora y el navegador
+  // solo difuminaria lo que hay dentro de ella, no la pagina.
+  // Mientras esta abierto se reubica en cada frame:
+  // - mismo ancho que el boton del perfil y alineado con el;
+  // - con la pildora formada (flow >= 0.5) "nace" de ella: pegado a su
+  //   borde inferior, sin esquinas ni borde arriba (se funde con la
+  //   pildora) y redondeado solo abajo. Arriba de todo del landing la
+  //   pildora todavia es transparente, asi que flota debajo del boton con
+  //   todas las esquinas redondeadas;
+  // - --sangria alinea el texto de las opciones con "Hola, usuario".
   useLayoutEffect(() => {
     if (!menuAbierto) return undefined;
     let cuadro = null;
+    const borde = enLanding ? 'rgb(203 213 225 / 0.25)' : 'rgb(203 213 225 / 0.2)';
+    const sombra = enLanding ? '0 10px 26px -10px rgb(0 0 0 / 0.35)' : '0 12px 32px -12px rgb(6 51 138 / 0.5)';
     const ubicar = () => {
       const header = headerRef.current;
       const boton = perfilRef.current;
+      const nombre = nombrePerfilRef.current;
+      const barra = barraRef.current;
       const menu = menuRef.current;
-      if (header && boton && menu) {
+      if (header && boton && menu && barra) {
         const h = header.getBoundingClientRect();
         const b = boton.getBoundingClientRect();
-        menu.style.top = `${b.bottom - h.top + 8}px`;
-        menu.style.right = `${h.right - b.right}px`;
+        const unido = parseFloat(barra.style.getPropertyValue('--flow') || '0') >= 0.5;
+        menu.style.left = `${b.left - h.left}px`;
+        menu.style.width = `${b.width}px`;
+        menu.style.top = unido ? `${barra.getBoundingClientRect().bottom - h.top}px` : `${b.bottom - h.top + 8}px`;
+        menu.style.borderRadius = unido ? '0 0 1rem 1rem' : '1rem';
+        // Unido: borde solo a los costados y abajo (arriba continua la pildora).
+        menu.style.boxShadow = unido
+          ? `${sombra}, inset 1px 0 0 ${borde}, inset -1px 0 0 ${borde}, inset 0 -1px 0 ${borde}`
+          : `${sombra}, inset 0 0 0 1px ${borde}, inset 0 1px 0 rgb(226 232 240 / 0.3)`;
+        if (nombre) menu.style.setProperty('--sangria', `${nombre.getBoundingClientRect().left - b.left}px`);
       }
       cuadro = requestAnimationFrame(ubicar);
     };
     ubicar();
     return () => cancelAnimationFrame(cuadro);
-  }, [menuAbierto]);
+  }, [menuAbierto, enLanding]);
 
   // useLayoutEffect: el estado 1 se aplica antes del primer pintado (sin
   // un frame del navbar viejo).
@@ -343,7 +361,7 @@ export function Navbar() {
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
                       {iniciales || '·'}
                     </span>
-                    <span className="text-left text-base font-medium text-white">
+                    <span ref={nombrePerfilRef} className="text-left text-base font-medium text-white">
                       {/* "Hola, " solo en el landing -- en /panel el Hero ya
                           saluda por su nombre, seria redundante repetirlo aqui. */}
                       {enLanding ? `Hola, ${usuario?.nombreCompleto?.split(' ')[0]}` : usuario?.nombreCompleto?.split(' ')[0]}
@@ -393,10 +411,15 @@ export function Navbar() {
           // landing oscurece mas lo de atras (58% vs 78% de la pildora): el
           // menu se abre tambien arriba de todo, sobre la parte mas clara del
           // Hero, y con 78% el texto blanco quedaba en 3.5:1.
-          className={`pointer-events-auto absolute w-52 overflow-hidden rounded-2xl py-1.5 ${
+          // Ancho, posicion, esquinas y bordes los fija el efecto de arriba
+          // (segun si la pildora esta formada). min-w-max + nowrap: si el
+          // boton es mas angosto que las opciones (en /agendar y /panel dice
+          // solo el nombre), el menu se estira hacia la derecha en vez de
+          // partir "Mis mascotas" en dos lineas.
+          className={`pointer-events-auto absolute min-w-max overflow-hidden whitespace-nowrap py-1.5 ${
             enLanding
-              ? 'bg-white/12 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),rgb(255_255_255/0)_60%)] shadow-[0_10px_26px_-10px_rgb(0_0_0/0.35),inset_0_0_0_1px_rgb(203_213_225/0.25),inset_0_1px_0_rgb(226_232_240/0.3)] backdrop-blur-[12px] backdrop-saturate-150 backdrop-brightness-[.58]'
-              : 'bg-brand-blue-800/50 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5),inset_0_0_0_1px_rgb(203_213_225/0.2),inset_0_1px_0_rgb(226_232_240/0.25)] backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]'
+              ? 'bg-white/12 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),rgb(255_255_255/0)_60%)] backdrop-blur-[12px] backdrop-saturate-150 backdrop-brightness-[.58]'
+              : 'bg-brand-blue-800/50 backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]'
           }`}
         >
           {/* Atajos para volver al panel propio despues de
@@ -407,14 +430,14 @@ export function Navbar() {
               <Link
                 to="/panel?tab=citas"
                 onClick={() => setMenuAbierto(false)}
-                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+                className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
               >
                 Mis citas
               </Link>
               <Link
                 to="/panel?tab=mascotas"
                 onClick={() => setMenuAbierto(false)}
-                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+                className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
               >
                 Mis mascotas
               </Link>
@@ -423,7 +446,7 @@ export function Navbar() {
             <Link
               to={rutaPanelPorRol(usuario?.rol)}
               onClick={() => setMenuAbierto(false)}
-              className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+              className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
             >
               Ir al panel
             </Link>
@@ -435,9 +458,11 @@ export function Navbar() {
             // accion del menu que saca de la cuenta. El texto queda blanco:
             // ningun rojo llega a contraste AA sobre el vidrio azul (el rojo
             // claro daba 2.3-3.0:1); el icono acompana al texto, es acento.
-            className="flex w-full items-center gap-2 border-t border-white/10 px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-red-500/25 hover-texto-ilumina"
+            // El texto se alinea con el de las otras opciones; el icono va a
+            // su izquierda, debajo del avatar.
+            className="relative block w-full border-t border-white/10 py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm font-medium text-white transition hover:bg-red-500/25 hover-texto-ilumina"
           >
-            <IconoSalir className="h-4 w-4 shrink-0 text-red-300" />
+            <IconoSalir className="absolute left-[calc(var(--sangria,2.5rem)-1.5rem)] top-1/2 h-4 w-4 -translate-y-1/2 text-red-300" />
             Cerrar sesión
           </button>
         </div>

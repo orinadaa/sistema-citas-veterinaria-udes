@@ -123,7 +123,7 @@ export function ServicioSlider({ slides }) {
   const actual = slides[indice];
 
   return (
-    <div>
+    <div className="relative">
       <div
         role="region"
         aria-roledescription="carrusel"
@@ -140,7 +140,7 @@ export function ServicioSlider({ slides }) {
         onPointerLeave={(e) => e.pointerType === 'mouse' && setPausadoHover(false)}
         onFocus={() => setPausadoFoco(true)}
         onBlur={alSalirFoco}
-        className="relative aspect-[4/5] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl bg-slate-900 shadow-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-[4/3] lg:aspect-auto lg:h-[clamp(20rem,calc(100svh-23rem),42rem)] lg:rounded-3xl"
+        className="relative aspect-[3/4] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl bg-slate-900 shadow-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-square lg:aspect-auto lg:h-[clamp(22rem,calc(100svh-18.5rem),46rem)] lg:rounded-3xl"
       >
         {slides.map((slide, i) => {
           const activa = i === indice;
@@ -205,7 +205,7 @@ export function ServicioSlider({ slides }) {
         </p>
       </div>
 
-      <div className="mt-3 flex justify-center gap-1">
+      <div className="mt-3 flex justify-center gap-1 lg:absolute lg:inset-x-0 lg:bottom-3 lg:z-20 lg:mt-0">
         {slides.map((slide, i) => {
           const activa = i === indice;
           return (
@@ -219,7 +219,7 @@ export function ServicioSlider({ slides }) {
             >
               <span
                 className={`block h-2 rounded-full transition-all duration-300 motion-reduce:transition-none ${
-                  activa ? 'w-7 bg-brand-amber' : 'w-2 bg-slate-300 group-hover:bg-slate-200'
+                  activa ? 'w-7 bg-brand-amber' : 'w-2 bg-slate-300 group-hover:bg-slate-200 lg:bg-white/60 lg:group-hover:bg-white'
                 }`}
               />
             </button>
