@@ -1,11 +1,12 @@
 // components/landing/TarjetaSlide.jsx
 // Tarjeta de las secciones-slide del landing (Servicios, Sedes, Horarios)
-// desde lg: mismo vidrio azul que la pildora de la topbar (brand-blue-800
-// al 50%; backdrop blur 24px + saturate 150% + brightness 65%; borde
-// blanco sutil y brillo de 1px arriba; ver aplicarFlow en Navbar.jsx), para
-// que topbar y tarjetas se lean como la misma familia de elementos
-// flotantes de vidrio. Un degradado blanco muy suave en la parte alta
-// refuerza el reflejo del vidrio.
+// desde lg: el mismo vidrio claro que el boton "Conoce nuestros servicios"
+// y que la pildora de la topbar en el landing (blanco al 12%, reflejo
+// arriba, borde de luz al 35%, brillo de 1px, blur 12px + saturate 150%;
+// ver boton-glass-claro en index.css), para que topbar, tarjetas y boton
+// se lean como la misma familia de elementos flotantes de vidrio. Ademas
+// oscurece un poco lo de atras (brightness 75%): el fondo de Servicios es
+// muy luminoso y con el vidrio claro el titulo blanco no llegaba a AA.
 // Deja ver el fondo arriba y a los costados, pero por abajo llega hasta el
 // borde de la seccion (sin margen ni esquinas inferiores redondeadas): da
 // la impresion de una hoja que continua hacia la seccion siguiente, como
@@ -21,7 +22,7 @@
 // las secciones, aunque tengan distinta cantidad de contenido.
 export function TarjetaSlide({ children }) {
   return (
-    <div className="slide-card lg:flex lg:flex-1 lg:flex-col lg:rounded-t-[2rem] lg:border-x lg:border-t lg:border-white/14 lg:bg-brand-blue-800/50 lg:bg-[linear-gradient(to_bottom,rgb(255_255_255/0.07),transparent_30%)] lg:px-10 lg:py-10 lg:shadow-[0_-24px_60px_-30px_rgb(0_0_0/0.55),inset_0_1px_0_rgb(255_255_255/0.22)] lg:backdrop-blur-[24px] lg:backdrop-saturate-150 lg:backdrop-brightness-[.65]">
+    <div className="slide-card lg:flex lg:flex-1 lg:flex-col lg:rounded-t-[2rem] lg:border-x lg:border-t lg:border-white/35 lg:bg-white/12 lg:bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),transparent_30%)] lg:px-10 lg:py-10 lg:shadow-[0_-24px_60px_-30px_rgb(0_0_0/0.45),inset_0_1px_0_rgb(255_255_255/0.45)] lg:backdrop-blur-[12px] lg:backdrop-saturate-150 lg:backdrop-brightness-[.75]">
       {children}
     </div>
   );

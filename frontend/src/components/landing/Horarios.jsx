@@ -16,13 +16,13 @@ import horariosMascotas from '../../assets/horarios-mascotas.png';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
 // Cristal flotante del color claro de cada tarjeta (celeste #E8F1FD y crema
-// #FEFAF1) al 75% y 82% (el crema necesita un poco mas de opacidad para
+// #FEFAF1) al 55% y 62% (el crema necesita un poco mas de opacidad para
 // no tomar un tono lavanda del azul de atras). El backdrop aclara lo de atras (brightness 140%): asi
 // el color sigue claro y no se agrisa sobre el fondo azul, y a traves del
 // cristal se intuyen los halos difuminados. Reflejo blanco arriba, borde de luz y sombra.
 const TINTES = [
-  { tarjeta: 'bg-[#E8F1FD]/75', icono: 'text-brand-blue' },
-  { tarjeta: 'bg-[#FEFAF1]/82', icono: 'text-amber-600' },
+  { tarjeta: 'bg-[#E8F1FD]/55', icono: 'text-brand-blue' },
+  { tarjeta: 'bg-[#FEFAF1]/62', icono: 'text-amber-600' },
 ];
 const VIDRIO_TARJETA =
   'bg-[linear-gradient(to_bottom,rgb(255_255_255/0.45),rgb(255_255_255/0)_45%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.9),inset_0_0_0_1px_rgb(255_255_255/0.5),0_18px_40px_-16px_rgb(0_0_0/0.5)] backdrop-blur-[16px] backdrop-saturate-150 backdrop-brightness-[1.4]';
