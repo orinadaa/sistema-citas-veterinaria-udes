@@ -65,7 +65,7 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
             {siguiente && (
               <span
                 aria-hidden="true"
-                className={`absolute left-1/2 top-4 h-0.5 w-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`}
+                className={`absolute left-1/2 top-4 h-0.5 w-full ${lineaAlcanzada ? 'bg-brand-blue' : 'bg-slate-300'}`}
               />
             )}
             <Hito
@@ -73,7 +73,7 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
               onClick={() => onIrAHito?.(hito)}
               etiqueta={etiquetaAccesible(hito, estado, navegable)}
               className={`group relative z-10 flex flex-col items-center gap-2 text-center ${
-                navegable ? 'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-white' : ''
+                navegable ? 'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand-blue' : ''
               }`}
             >
               <span
@@ -81,15 +81,15 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
                   estado === 'completado'
                     ? 'bg-brand-green text-white'
                     : estado === 'activo'
-                      ? 'bg-white text-brand-blue-800 ring-4 ring-brand-amber/70'
-                      : 'border-2 border-white/45 bg-white/5 text-blue-50'
+                      ? 'bg-brand-blue text-white ring-4 ring-brand-amber/60'
+                      : 'border-2 border-slate-300 bg-white text-slate-600'
                 } ${navegable ? 'group-hover:scale-110' : ''}`}
               >
                 {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : hito.numero}
               </span>
               <span
                 className={`text-xs font-medium sm:text-sm ${
-                  estado === 'pendiente' ? 'text-blue-100' : estado === 'activo' ? 'font-semibold text-white' : 'text-blue-50'
+                  estado === 'pendiente' ? 'text-slate-600' : estado === 'activo' ? 'font-semibold text-brand-blue-700' : 'text-slate-800'
                 } ${navegable ? 'group-hover:underline' : ''}`}
               >
                 {hito.etiqueta}

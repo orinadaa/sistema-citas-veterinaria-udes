@@ -62,7 +62,7 @@ export function PaginaMascotaServicio({
             <button
               type="button"
               onClick={onAgregarMascota}
-              className="hover-ilumina-claro flex min-h-[5.5rem] items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-white/45 p-4 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+              className="hover-ilumina flex min-h-[5.5rem] items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-slate-300 p-4 text-sm font-semibold text-slate-700 transition hover:border-brand-blue hover:text-brand-blue-700"
             >
               <IconoMas className="h-5 w-5" />
               Agregar mascota

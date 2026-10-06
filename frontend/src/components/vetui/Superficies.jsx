@@ -8,13 +8,17 @@
 // desplazan con el scroll), que son lo que el vidrio deja ver difuminado.
 // Envuelve la página completa, incluida la topbar (transparente arriba).
 //
-// Superficie: vidrio. Contenedor sobre el fondo (secciones, resúmenes).
-// Texto blanco; adentro van tarjetas de cristal y controles.
+// Superficie: contenedor sobre el fondo (secciones, resúmenes).
+//   tono="vidrio" (por defecto) vidrio claro, texto blanco (landing).
+//   tono="blanco"  vidrio blanco, texto oscuro (pantallas de la app: corta
+//                  el azul del fondo). Lo de adentro se adapta solo.
 //
 // Tarjeta: objeto o contenido. Regla de material (como el landing):
 //   material="vidrio"   tarjetas que van directo sobre el fondo (indicadores,
 //                       citas, mascotas): el mismo vidrio de las tarjetas de
 //                       seccion del landing, texto blanco, radio 28px.
+//   material="blanco"   igual pero en vidrio blanco (texto oscuro): las
+//                       tarjetas de Mis citas / Mis mascotas.
 //   material="cristal"  (por defecto) tarjetas DENTRO de una superficie de
 //                       vidrio (opciones de agendar, sedes): texto oscuro,
 //                       como las tarjetas de sedes/horarios del landing. `tono` celeste/crema, `seleccionada` (anillo ámbar +
@@ -51,9 +55,9 @@ export function FondoVetui({ children, className = '' }) {
   );
 }
 
-export function Superficie({ as: Componente = 'section', className = '', children, ...resto }) {
+export function Superficie({ as: Componente = 'section', tono = 'vidrio', className = '', children, ...resto }) {
   return (
-    <Componente className={`vidrio rounded-superficie p-5 sm:p-6 ${className}`} {...resto}>
+    <Componente className={`${tono === 'blanco' ? 'vidrio-blanco' : 'vidrio'} rounded-superficie p-5 sm:p-6 ${className}`} {...resto}>
       {children}
     </Componente>
   );
@@ -62,6 +66,9 @@ export function Superficie({ as: Componente = 'section', className = '', childre
 const TONOS = { blanco: '', celeste: 'cristal-celeste', crema: 'cristal-crema' };
 
 function clasesMaterial({ material, tono, seleccionada, destacada }) {
+  if (material === 'blanco') {
+    return `vidrio-blanco rounded-superficie ${seleccionada || destacada ? 'vidrio-blanco-destacado' : ''}`;
+  }
   if (material === 'vidrio') {
     return `vidrio rounded-superficie ${seleccionada || destacada ? 'vidrio-destacado' : ''}`;
   }

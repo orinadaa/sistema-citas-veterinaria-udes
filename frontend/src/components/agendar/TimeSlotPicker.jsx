@@ -32,12 +32,13 @@ const TONOS = {
     esqueleto: 'bg-slate-100',
     reintentar: 'text-brand-blue',
     pestanas: 'bg-slate-100',
-    pestanaActiva: 'bg-white text-brand-blue shadow-sm',
+    // Tonos -600/-700: slate-400/500 y brand-blue (500) no llegaban a AA.
+    pestanaActiva: 'bg-white text-brand-blue-700 shadow-sm',
     pestanaVacia: 'cursor-not-allowed text-slate-300',
-    pestana: 'text-slate-500 hover:text-slate-700',
-    conteo: 'text-slate-400',
-    elegida: 'border-brand-blue bg-brand-blue text-white shadow-sm',
-    libre: 'border-slate-200 bg-white text-slate-700 hover:border-brand-blue hover:text-brand-blue',
+    pestana: 'text-slate-700 hover:text-slate-900',
+    conteo: 'opacity-80',
+    elegida: 'border-brand-blue-700 bg-brand-blue-700 text-white shadow-sm ring-2 ring-brand-amber',
+    libre: 'border-slate-300 bg-white text-slate-800 hover:border-brand-blue hover:text-brand-blue-700',
     ocupada: 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300 line-through',
   },
   vidrio: {

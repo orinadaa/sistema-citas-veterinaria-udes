@@ -6,7 +6,7 @@
 // form/Campo.jsx, que ya son oscuros sobre claro.
 export function Etiqueta({ htmlFor, children, requerido }) {
   return (
-    <label htmlFor={htmlFor} className="text-sm font-semibold text-white">
+    <label htmlFor={htmlFor} className="vt-etiqueta text-sm font-semibold text-white">
       {children}
       {requerido && (
         <span className="ml-0.5 text-amber-300" aria-hidden="true">

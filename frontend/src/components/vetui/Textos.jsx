@@ -27,15 +27,15 @@ export function TituloSeccion({ numero, titulo, descripcion, accion, id }) {
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="flex items-center gap-3">
         {numero !== undefined && (
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-brand-blue-800">
+          <span className="vt-numero flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-brand-blue-800">
             {numero}
           </span>
         )}
         <div>
-          <h2 id={id} className="text-lg font-bold text-white sm:text-xl">
+          <h2 id={id} className="vt-titulo text-lg font-bold text-white sm:text-xl">
             {titulo}
           </h2>
-          {descripcion && <p className="text-sm text-blue-100">{descripcion}</p>}
+          {descripcion && <p className="vt-subtitulo text-sm text-blue-100">{descripcion}</p>}
         </div>
       </div>
       {accion}

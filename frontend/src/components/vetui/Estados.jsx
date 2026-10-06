@@ -31,7 +31,7 @@ export function Aviso({ tono = 'info', children, className = '' }) {
 
 export function EstadoVacio({ children, accion }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-tarjeta border border-dashed border-white/35 p-8 text-center text-sm text-blue-50">
+    <div className="vt-vacio flex flex-col items-center gap-3 rounded-tarjeta border border-dashed border-white/35 p-8 text-center text-sm text-blue-50">
       <p>{children}</p>
       {accion}
     </div>
@@ -53,5 +53,5 @@ export function EstadoError({ mensaje, onReintentar }) {
 }
 
 export function Esqueleto({ className = 'h-24' }) {
-  return <div aria-hidden="true" className={`animate-pulse rounded-tarjeta bg-white/12 ${className}`} />;
+  return <div aria-hidden="true" className={`vt-esqueleto animate-pulse rounded-tarjeta bg-white/12 ${className}`} />;
 }

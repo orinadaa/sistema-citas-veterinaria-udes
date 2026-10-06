@@ -211,7 +211,7 @@ export function FormularioMascotaPanel({
         <form id="form-mascota-cliente" onSubmit={guardar} className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2 pb-2">
             <div className="relative">
-              <AvatarMascota mascota={mascota} fotoUrl={fotoMostrada} className="h-24 w-24" iconoClassName="h-10 w-10" />
+              <AvatarMascota mascota={mascota} fotoUrl={fotoMostrada} className="h-32 w-32 shadow-lg ring-4 ring-white" iconoClassName="h-14 w-14" />
               <button
                 type="button"
                 onClick={() => setEditorFotoAbierto(true)}
@@ -221,7 +221,7 @@ export function FormularioMascotaPanel({
                 <IconoCamara className="h-4.5 w-4.5" />
               </button>
             </div>
-            <p className="text-xs text-slate-400">{fotoPendiente ? 'Foto nueva: se guardará con la mascota' : 'Foto (opcional)'}</p>
+            <p className="text-xs text-slate-600">{fotoPendiente ? 'Foto nueva: se guardará con la mascota' : 'Foto (opcional)'}</p>
           </div>
 
           <Campo id="nombre-mascota-cliente" label="Nombre" value={form.nombre} onChange={actualizar('nombre')} required />

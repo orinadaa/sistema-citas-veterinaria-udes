@@ -18,7 +18,7 @@ import { urlComoLlegar, urlVerEnMaps } from '../../utils/mapas';
 function Ubicacion({ sede }) {
   if (!sede) {
     return (
-      <div className="flex h-full min-h-40 flex-col items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-white/35 p-5 text-center text-sm text-blue-50">
+      <div className="flex h-full min-h-40 flex-col items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-slate-300 p-5 text-center text-sm text-slate-700">
         <IconoUbicacion className="h-7 w-7" />
         Selecciona una sede para ver cómo llegar.
       </div>
@@ -86,12 +86,12 @@ export function PaginaSedeFecha({
 
       <Seccion numero={4} titulo="Selecciona la fecha y hora" descripcion="Solo se muestran los horarios con médicos disponibles.">
         {!sede ? (
-          <p className="text-sm text-blue-100">Selecciona primero una sede.</p>
+          <p className="text-sm text-slate-700">Selecciona primero una sede.</p>
         ) : (
           <div className="grid gap-8 md:grid-cols-2">
-            <DatePickerCalendar valor={fecha} onChange={onSeleccionarFecha} diasAbiertos={diasAbiertos} sobreVidrio />
+            <DatePickerCalendar valor={fecha} onChange={onSeleccionarFecha} diasAbiertos={diasAbiertos} />
             <div>
-              <p className="mb-4 font-heading text-base font-semibold text-white">Horarios disponibles</p>
+              <p className="mb-4 font-heading text-base font-semibold text-brand-navy">Horarios disponibles</p>
               <TimeSlotPicker
                 key={refrescoDisponibilidad}
                 sedeId={sedeId}
@@ -99,13 +99,12 @@ export function PaginaSedeFecha({
                 fecha={fecha}
                 valor={franja}
                 onChange={onSeleccionarFranja}
-                sobreVidrio
               />
             </div>
           </div>
         )}
 
-        <div className="mt-6 border-t border-white/15 pt-5">
+        <div className="mt-6 border-t border-slate-200 pt-5">
           <AreaTexto
             id="motivo-cita"
             etiqueta="Motivo de la consulta (opcional)"

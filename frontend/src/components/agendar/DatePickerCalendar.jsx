@@ -17,11 +17,12 @@ const TONOS = {
   claro: {
     titulo: 'text-brand-navy',
     flecha: 'text-slate-500 hover:bg-slate-100',
-    semana: 'text-slate-400',
-    elegido: 'bg-brand-blue font-semibold text-white shadow-sm',
+    // Tonos -600/-700: slate-400 y brand-blue (500) no llegaban a AA.
+    semana: 'text-slate-600',
+    elegido: 'bg-brand-blue-700 font-semibold text-white shadow-sm ring-2 ring-brand-amber',
     deshabilitado: 'cursor-not-allowed text-slate-300',
-    hoy: 'font-semibold text-brand-blue ring-1 ring-brand-blue/40 hover:bg-blue-50',
-    normal: 'text-slate-700 hover:bg-blue-50 hover:text-brand-blue',
+    hoy: 'font-semibold text-brand-blue-700 ring-1 ring-brand-blue/50 hover:bg-blue-50',
+    normal: 'text-slate-800 hover:bg-blue-50 hover:text-brand-blue-700',
   },
   vidrio: {
     titulo: 'text-white',
