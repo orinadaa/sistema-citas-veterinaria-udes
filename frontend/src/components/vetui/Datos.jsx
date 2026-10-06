@@ -1,7 +1,7 @@
 // components/vetui/Datos.jsx
 // Piezas para mostrar datos:
-//   TarjetaDato  indicador (KPI) en vidrio (va sobre el fondo, como las
-//                tarjetas de seccion del landing): icono, valor, etiqueta.
+//   TarjetaDato  indicador (KPI) en vidrio blanco (como las tarjetas de
+//                contenido de la app): icono, valor, etiqueta.
 //                Si recibe onClick, toda la tarjeta es un botón.
 //   Insignia     etiqueta de estado de solo lectura. Para citas:
 //                estado="proxima" | "completada" | "cancelada"; o un
@@ -22,18 +22,18 @@ export function TarjetaDato({ icono: Icono, tono = 'azul', valor, detalle, etiqu
   return (
     <Componente
       {...(onClick ? { type: 'button', onClick } : {})}
-      className={`vidrio relative flex w-full flex-col items-start rounded-superficie p-5 text-left ${
+      className={`vidrio-blanco relative flex w-full flex-col items-start rounded-superficie p-5 text-left ${
         onClick ? 'hover-ilumina-claro outline-none focus-visible:ring-4 focus-visible:ring-white/60' : ''
       }`}
     >
       <span className={`flex h-10 w-10 items-center justify-center rounded-full ${TONOS_ICONO[tono] ?? TONOS_ICONO.azul}`}>
         {Icono && <Icono className="h-5 w-5" />}
       </span>
-      <span className="mt-4 text-2xl font-bold text-white">{valor}</span>
-      {detalle && <span className="text-xs font-medium text-blue-50">{detalle}</span>}
-      <span className="mt-0.5 text-sm text-blue-100">{etiqueta}</span>
+      <span className="mt-4 text-2xl font-bold text-slate-900">{valor}</span>
+      {detalle && <span className="text-xs font-medium text-slate-700">{detalle}</span>}
+      <span className="mt-0.5 text-sm text-slate-700">{etiqueta}</span>
       {onClick && (
-        <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white">
+        <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/5 text-slate-700">
           <IconoFlechaDerecha className="h-3.5 w-3.5" />
         </span>
       )}

@@ -253,7 +253,7 @@ export function AgendarCitaPage() {
               de irse. Desde la decima 8 queda invisible (sin clicks ni foco).
               Con reduced-motion no hay fundido: solo cambia la visibilidad.
               Debajo de lg no hay lateral: no cambia. */}
-          <div className="vidrio rounded-superficie px-4 py-5 sm:px-8 lg:[opacity:clamp(0,calc(1_-_var(--flow,0)_/_0.8),1)] motion-reduce:lg:[opacity:1] lg:[[data-topbar-decima='8']_&]:invisible lg:[[data-topbar-decima='9']_&]:invisible lg:[[data-topbar-decima='10']_&]:invisible">
+          <div className="vidrio-blanco rounded-superficie px-4 py-5 sm:px-8 lg:[opacity:clamp(0,calc(1_-_var(--flow,0)_/_0.8),1)] motion-reduce:lg:[opacity:1] lg:[[data-topbar-decima='8']_&]:invisible lg:[[data-topbar-decima='9']_&]:invisible lg:[[data-topbar-decima='10']_&]:invisible">
             <BookingStepper paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />
           </div>
           <BookingStepperLateral paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />

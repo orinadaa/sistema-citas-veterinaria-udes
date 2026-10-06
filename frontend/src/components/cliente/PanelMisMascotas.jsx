@@ -4,7 +4,7 @@
 // cita (MascotaSelector.jsx); aqui se pueden ver todas y editarlas.
 // El formulario (SidePanel) vive en FormularioMascotaPanel.jsx, compartido
 // con el flujo de agendamiento. vetUI: cada mascota en una Tarjeta de
-// vidrio (como las tarjetas de seccion del landing); "Agregar mascota" es la accion primaria (ambar).
+// vidrio blanco (corta el azul del fondo); "Agregar mascota" es la accion primaria (ambar).
 import { useEffect, useState } from 'react';
 import { obtenerMisMascotas } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -77,26 +77,26 @@ export function PanelMisMascotas() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {mascotas.map((mascota) => (
-            <Tarjeta key={mascota.id} material="vidrio" className="flex items-start justify-between gap-3 p-5">
-              <div className="flex min-w-0 items-center gap-3">
-                <AvatarMascota mascota={mascota} className="h-14 w-14" />
+            <Tarjeta key={mascota.id} material="blanco" className="flex items-start justify-between gap-3 p-5">
+              <div className="flex min-w-0 items-center gap-4">
+                <AvatarMascota mascota={mascota} className="h-16 w-16 shadow-md ring-4 ring-white" iconoClassName="h-8 w-8" />
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-white">{mascota.nombre}</p>
-                  <p className="truncate text-sm text-blue-100">
+                  <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
+                  <p className="truncate text-sm text-slate-700">
                     {[mascota.especie, mascota.raza].filter(Boolean).join(' · ') || 'Sin datos adicionales'}
                   </p>
-                  {edadYPeso(mascota) && <p className="text-xs font-medium text-blue-100">{edadYPeso(mascota)}</p>}
+                  {edadYPeso(mascota) && <p className="text-xs font-medium text-slate-700">{edadYPeso(mascota)}</p>}
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-1">
-                <Boton variante="secundario" tamano="sm" onClick={() => abrirEditar(mascota)}>
+                <Boton variante="contorno" tamano="sm" onClick={() => abrirEditar(mascota)}>
                   Ver detalles
                 </Boton>
                 <button
                   type="button"
                   onClick={() => abrirEditar(mascota, { eliminar: true })}
                   aria-label={`Eliminar a ${mascota.nombre}`}
-                  className="rounded-boton p-2 text-blue-100 transition hover:bg-red-500/30 hover:text-white"
+                  className="rounded-boton p-2 text-slate-700 transition hover:bg-red-50 hover:text-red-700"
                 >
                   <IconoPapelera className="h-4 w-4" />
                 </button>

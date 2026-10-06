@@ -100,6 +100,29 @@
     var(--shadow-flotante);
 }
 
+/* Vidrio blanco: tarjetas de contenido de las pantallas de la app (Mis
+   citas, Mis mascotas, Agendar). Blanco al 80% con desenfoque fuerte,
+   reflejo, borde de luz y sombra flotante: corta el azul del fondo sin
+   perder el floating glass. Texto oscuro. Lo de adentro se adapta solo
+   (ver "Dentro de un vidrio blanco" más abajo). */
+@utility vidrio-blanco {
+  color: var(--color-slate-900);
+  background-color: rgb(255 255 255 / 0.8);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.6), rgb(255 255 255 / 0) 35%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 0 0 1px rgb(255 255 255 / 0.7),
+    var(--shadow-flotante);
+}
+@utility vidrio-blanco-destacado {
+  box-shadow:
+    inset 0 0 0 2px var(--color-brand-amber),
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    0 24px 60px -30px color-mix(in oklab, var(--color-brand-amber) 55%, transparent);
+}
+
 /* Vidrio azul: para lo que flota sobre contenido que puede ser claro
    (la píldora fuera del landing, menús). Azul de marca al 50% que
    oscurece lo de atrás: el texto blanco se lee sobre cualquier fondo. */
@@ -242,6 +265,47 @@
 }
 .vidrio :where(.boton-glass-claro):hover:not(:disabled) {
   background-color: rgb(6 51 138 / 0.25);
+}
+
+/* Dentro de un vidrio blanco: las piezas pensadas para fondo oscuro pasan
+   a su versión clara sin tocar cada pantalla (CSS sin capa: gana sobre las
+   utilidades). Marcadores: vt-titulo, vt-subtitulo, vt-numero,
+   vt-etiqueta, vt-esqueleto, vt-vacio (los ponen los componentes). */
+.vidrio-blanco :where(.vt-titulo) {
+  color: var(--color-brand-navy);
+}
+.vidrio-blanco :where(.vt-subtitulo, .vt-etiqueta) {
+  color: var(--color-slate-700);
+}
+.vidrio-blanco :where(.vt-numero) {
+  background-color: var(--color-brand-blue);
+  color: white;
+}
+.vidrio-blanco :where(.vt-esqueleto) {
+  background-color: rgb(148 163 184 / 0.25);
+}
+.vidrio-blanco :where(.vt-vacio) {
+  border-color: var(--color-slate-300);
+  color: var(--color-slate-700);
+}
+.vidrio-blanco :where(.campo-vetui) {
+  box-shadow: inset 0 0 0 1px var(--color-slate-300);
+}
+.vidrio-blanco :where(.campo-vetui):focus {
+  box-shadow:
+    inset 0 0 0 1px white,
+    0 0 0 3px color-mix(in oklab, var(--color-brand-amber) 70%, transparent);
+}
+/* Cristal anidado en blanco: su borde blanco no se vería; borde gris y
+   sombra corta (sin tocar los estados seleccionado/destacado). */
+.vidrio-blanco :where(.cristal:not(.cristal-seleccionado, .cristal-destacado)) {
+  box-shadow:
+    inset 0 0 0 1px rgb(148 163 184 / 0.4),
+    0 10px 24px -14px rgb(15 23 42 / 0.3);
+}
+/* El brillo blanco no se ve sobre blanco: ahí las tarjetas brillan en azul. */
+.vidrio-blanco :where(.hover-ilumina-claro):hover {
+  filter: brightness(1.02) drop-shadow(0 10px 22px color-mix(in oklab, var(--color-brand-blue) 30%, transparent));
 }
 
 /* Contorno: secundaria sobre cristal (superficies claras). */

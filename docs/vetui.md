@@ -85,6 +85,7 @@ Manrope (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/manrope`
 |---|---|---|---|---|
 | 0. Fondo | — | `FondoVetui` | Degradado de marca + halos fijos (azules y ámbar) | — |
 | 1. Vidrio | `vidrio` | `Superficie` | Blanco 12 %, reflejo arriba, borde gris claro tenue, blur 12 px, oscurece lo de atrás (75 %) | Blanco |
+| 1d. Vidrio blanco | `vidrio-blanco` (+ `vidrio-blanco-destacado`) | `Superficie tono="blanco"`, `Tarjeta material="blanco"`, `TarjetaDato` | Blanco 80 %, blur 20 px, reflejo y borde de luz. Contenido de las pantallas de la app (Agendar, Mis citas, Mis mascotas): corta el azul del fondo sin perder el floating glass | Oscuro |
 | 1b. Vidrio azul | `vidrio-azul` | — | Azul de marca 50 %, oscurece 65 %. Para lo que flota sobre contenido que puede ser claro (topbar fuera del landing, menú del perfil) | Blanco |
 | 1c. Vidrio destacado | `vidrio-destacado` | `Tarjeta material="vidrio" destacada` | Vidrio con anillo ámbar 2 px (la próxima cita) | Blanco |
 | 2. Cristal | `cristal` (+ `cristal-celeste`, `cristal-crema`) | `Tarjeta` | Blanco 60 % (celeste 55 %, crema 62 %), aclara lo de atrás (140 %) para no agrisarse | Oscuro |
@@ -94,7 +95,8 @@ Manrope (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/manrope`
 
 **Reglas de anidación**
 
-- **Lo que va directo sobre el fondo es vidrio** (secciones, resúmenes, indicadores, tarjetas de citas y mascotas): el mismo material que las tarjetas de sección del landing, con texto blanco. Se usa `Superficie` o `Tarjeta material="vidrio"`.
+- **Pantallas de la app (Agendar, Mis citas, Mis mascotas): el contenido va en vidrio blanco**, para que corte el azul del fondo. Dentro de un vidrio blanco, los títulos de sección, etiquetas, campos, esqueletos, estados vacíos y tarjetas de cristal anidadas cambian solos a su versión clara (marcadores `vt-*` en `vetui.css`).
+- **En el landing, lo que va directo sobre el fondo es vidrio claro** (secciones, resúmenes, indicadores, tarjetas de citas y mascotas): el mismo material que las tarjetas de sección del landing, con texto blanco. Se usa `Superficie` o `Tarjeta material="vidrio"`.
 - **Lo que va dentro de un vidrio es cristal** (opciones elegibles de agendar, sedes, horarios), igual que las tarjetas de sedes y horarios dentro de su sección en el landing.
 - No se anida vidrio dentro de vidrio. Si ocurre, o si un botón secundario o chip de vidrio claro queda dentro de una superficie de vidrio, vetUI le aplica automáticamente un relleno azul profundo para mantener el texto en AA.
 - Un `backdrop-filter` dentro de otro solo difumina lo que hay dentro del padre, no la página. Por eso los menús que deben difuminar la página se renderizan fuera de la topbar (ver `Navbar.jsx`).

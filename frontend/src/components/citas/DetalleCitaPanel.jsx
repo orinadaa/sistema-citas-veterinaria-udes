@@ -198,15 +198,15 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     <PanelLateral isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={footer}>
       {cita && (
         <div className="flex flex-col gap-6">
-          {/* 2. Resumen de la mascota */}
-          <div className="flex items-start gap-4">
+          {/* 2. Resumen de la mascota: foto grande y centrada */}
+          <div className="flex flex-col items-center gap-3 text-center">
             <AvatarMascota
               mascota={{ nombre: cita.mascota_nombre, foto_url: cita.mascota_foto_url }}
-              className="h-16 w-16"
-              iconoClassName="h-7 w-7"
+              className="h-32 w-32 shadow-lg ring-4 ring-white"
+              iconoClassName="h-14 w-14"
             />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
+            <div className="w-full min-w-0">
+              <div className="flex flex-col items-center gap-2">
                 <p className="truncate font-heading text-lg font-bold text-brand-navy">{cita.mascota_nombre}</p>
                 <StatusBadge status={estado} />
               </div>
@@ -215,7 +215,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
                   {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}
                 </p>
               )}
-              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+              <div className="mt-1.5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-slate-600">
                 {cita.mascota_sexo && (
                   <span className="inline-flex items-center gap-1">
                     <span aria-hidden="true" className="text-base leading-none text-brand-blue">

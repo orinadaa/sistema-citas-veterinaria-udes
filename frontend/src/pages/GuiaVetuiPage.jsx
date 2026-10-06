@@ -110,6 +110,10 @@ export function GuiaVetuiPage() {
                 <p className="font-semibold">Cristal crema</p>
                 <p className="text-sm text-slate-700">Segundo tinte (horarios).</p>
               </Tarjeta>
+              <div className="vidrio-blanco rounded-tarjeta p-4">
+                <p className="font-semibold">Vidrio blanco</p>
+                <p className="text-sm text-slate-700">Tarjetas de contenido de la app. Texto oscuro.</p>
+              </div>
               <div className="vidrio-azul rounded-tarjeta p-4">
                 <p className="font-semibold">Vidrio azul</p>
                 <p className="text-sm text-blue-100">Sobre contenido que puede ser claro.</p>
@@ -165,14 +169,18 @@ export function GuiaVetuiPage() {
               vidrio real; anidado en otro vidrio usaria el relleno profundo. */}
           <section className="flex flex-col gap-4 py-2">
             <TituloSeccion titulo="Tarjetas" descripcion="Sobre el fondo: vidrio, como las secciones del landing. Dentro de un vidrio: cristal." />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               <Tarjeta material="vidrio" className="p-5">
                 <p className="font-semibold">Tarjeta de vidrio</p>
                 <p className="text-sm text-blue-100">Citas, mascotas, indicadores: van directo sobre el fondo.</p>
               </Tarjeta>
-              <Tarjeta material="vidrio" destacada className="p-5">
-                <p className="font-semibold">Vidrio destacado</p>
-                <p className="text-sm text-blue-100">Anillo ámbar: la próxima cita.</p>
+              <Tarjeta material="blanco" className="p-5">
+                <p className="font-semibold">Tarjeta de vidrio blanco</p>
+                <p className="text-sm text-slate-700">Citas, mascotas, indicadores en la app.</p>
+              </Tarjeta>
+              <Tarjeta material="blanco" destacada className="p-5">
+                <p className="font-semibold">Vidrio blanco destacado</p>
+                <p className="text-sm text-slate-700">Anillo ámbar: la próxima cita.</p>
               </Tarjeta>
             </div>
           </section>

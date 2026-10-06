@@ -4,8 +4,9 @@
 // como pills con conteo real -- nunca un numero inventado. Cada fila:
 // foto, mascota, fecha/hora, servicio/sede/medico, estado y "Ver
 // detalles" (especificacion final de la usuaria). vetUI: chips de vidrio
-// para filtrar, cada cita en una Tarjeta de vidrio (mismo material que las
-// tarjetas de seccion del landing; la proxima mas cercana con anillo ambar).
+// para filtrar, cada cita en una Tarjeta de vidrio blanco (corta el azul del
+// fondo; la proxima mas cercana con anillo ambar). La foto de la mascota va
+// grande, arriba del nombre y la raza.
 import { useMemo, useState } from 'react';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { Boton, Chips, EstadoVacio, Esqueleto, Insignia, Tarjeta } from '../vetui';
@@ -78,19 +79,20 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
             return (
               <Tarjeta
                 key={cita.id}
-                material="vidrio"
+                material="blanco"
                 destacada={destacada}
                 className="grid grid-cols-1 items-center gap-4 p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.3fr)_auto_auto]"
               >
-                {/* 1-2. Foto + nombre y especie/raza */}
-                <div className="flex min-w-0 items-center gap-3">
+                {/* 1-2. Foto grande arriba + nombre y especie/raza */}
+                <div className="flex min-w-0 flex-col items-start gap-2">
                   <AvatarMascota
                     mascota={{ nombre: cita.mascota_nombre, foto_url: cita.mascota_foto_url }}
-                    className="h-12 w-12"
+                    className="h-20 w-20 shadow-md ring-4 ring-white"
+                    iconoClassName="h-9 w-9"
                   />
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-white">{cita.mascota_nombre}</p>
-                    <p className="truncate text-sm text-blue-100">
+                  <div className="min-w-0 max-w-full">
+                    <p className="truncate font-semibold text-slate-900">{cita.mascota_nombre}</p>
+                    <p className="truncate text-sm text-slate-700">
                       {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}
                     </p>
                   </div>
@@ -98,20 +100,20 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
 
                 {/* 3. Fecha y hora */}
                 <div className="flex min-w-0 items-start gap-2.5">
-                  <IconoCalendario className="mt-0.5 h-5 w-5 shrink-0 text-blue-100" />
+                  <IconoCalendario className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue-700" />
                   <div className="min-w-0">
-                    <p className="font-semibold text-white">{formatearFechaLarga(cita.fecha_hora)}</p>
-                    <p className="text-sm text-blue-100">{formatearHora(cita.fecha_hora)}</p>
+                    <p className="font-semibold text-slate-900">{formatearFechaLarga(cita.fecha_hora)}</p>
+                    <p className="text-sm text-slate-700">{formatearHora(cita.fecha_hora)}</p>
                   </div>
                 </div>
 
                 {/* 4. Servicio, sede y medico */}
                 <div className="flex min-w-0 items-start gap-2.5">
-                  <IconoEstetoscopio className="mt-0.5 h-5 w-5 shrink-0 text-blue-100" />
+                  <IconoEstetoscopio className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue-700" />
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-white">{cita.servicio_nombre}</p>
-                    <p className="truncate text-sm text-blue-100">{cita.sede_nombre}</p>
-                    <p className="truncate text-sm text-blue-100">{cita.medico_nombre}</p>
+                    <p className="truncate font-semibold text-slate-900">{cita.servicio_nombre}</p>
+                    <p className="truncate text-sm text-slate-700">{cita.sede_nombre}</p>
+                    <p className="truncate text-sm text-slate-700">{cita.medico_nombre}</p>
                   </div>
                 </div>
 
@@ -121,7 +123,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
                 </div>
 
                 {/* 6. Ver detalles */}
-                <Boton variante="secundario" tamano="sm" iconoFinal={IconoFlechaDerecha} onClick={() => setCitaDetalle(cita)}>
+                <Boton variante="contorno" tamano="sm" iconoFinal={IconoFlechaDerecha} onClick={() => setCitaDetalle(cita)}>
                   Ver detalles
                 </Boton>
               </Tarjeta>
