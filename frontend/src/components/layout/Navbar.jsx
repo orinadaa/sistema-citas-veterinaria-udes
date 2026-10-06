@@ -14,9 +14,8 @@
 //   Solo el contenido (enlaces, logo grande, botones) flota encima.
 // - Estado 2: se despega 12px del borde, se angosta (maximo ~64rem,
 //   centrado) y baja a 64px de alto, azul profundo translucido con blur
-//   y sombra. Radio 9999px durante todo el recorrido (= mitad del alto de
-//   cada frame, mismo principio que rounded-boton): es capsula siempre,
-//   no solo al final.
+//   y sombra. Radio fijo de 32px en todo el recorrido (= mitad del alto
+//   final, asi que al llegar es una capsula exacta).
 // El paso entre ambos es progresivo: `t` va de 0 a 1 en los primeros
 // DISTANCIA_FLOW_PX de scroll y se aplica directo al estilo (via ref,
 // dentro de requestAnimationFrame) sin re-renderizar React. El <header>
@@ -44,6 +43,7 @@ const DISTANCIA_FLOW_PX = 160;
 const ALTO_HEADER = 96;
 const SEPARACION_SUPERIOR = 12;
 const ALTO_PILDORA = 64;
+const RADIO_PILDORA = 32;
 // Mismo azul que el estado 2 con alfa 0: al interpolar, el color no pasa
 // por tonos intermedios raros, solo va ganando opacidad.
 const FONDO_ESTADO_1 = [6, 51, 138, 0]; // transparente: se ve el degradado del Hero
@@ -65,11 +65,12 @@ function aplicarFlow(elemento, t) {
   // ambos grupos + logo quepan sin que el texto se parta en 2 lineas).
   estilo.left = `calc(${t} * max(16px, (100% - 64rem) / 2))`;
   estilo.right = estilo.left;
-  // 9999px desde que empieza el scroll: el navegador lo recorta a la
-  // mitad del alto real de ese frame, asi que la barra es una capsula
-  // perfecta en todo el recorrido (no solo al llegar a los 64px). En t=0
-  // va en 0, aunque con el fondo transparente no se nota.
-  estilo.borderRadius = t > 0 ? '9999px' : '0';
+  // Radio fijo de 32px en todo el recorrido (decision de Oriana): no
+  // cambia con el scroll. Al llegar a 64px de alto coincide con la mitad
+  // del alto, asi que el estado final es una capsula exacta; durante la
+  // transicion (barra mas alta) los extremos se ven un poco menos
+  // redondos que un semicirculo.
+  estilo.borderRadius = `${RADIO_PILDORA}px`;
   estilo.backgroundColor = `rgb(${Math.round(r)} ${Math.round(g)} ${Math.round(b)} / ${alfa.toFixed(3)})`;
   estilo.backdropFilter = `blur(${t * 20}px)`;
   estilo.webkitBackdropFilter = estilo.backdropFilter;
