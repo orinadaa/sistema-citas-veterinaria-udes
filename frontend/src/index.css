@@ -33,8 +33,11 @@
   --color-category-cyan: #51caeb;
   --color-category-orange: #d98a3d;
 
-  --font-heading: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Manrope es la fuente de todo el sistema. --font-sans es la fuente por
+     defecto del body en Tailwind v4; font-heading (titulos, antes Poppins)
+     apunta al mismo token para no tener dos tipografias. */
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
 }
 
 /* Apaga el icono nativo de "mostrar contraseña" de Edge/IE (::-ms-reveal)
