@@ -28,25 +28,38 @@ import { useAuth } from '../context/AuthContext';
 import { IconoFlechaDerecha } from '../components/icons';
 
 // La pildora de la topbar ocupa hasta ~76px desde arriba (12px de
-// separacion + 64px de alto): la tarjeta del stepper cuenta como "visible"
-// solo si algo de ella queda por debajo de esa franja.
-const MARGEN_TOPBAR = '-80px 0px 0px 0px';
+// separacion + 64px de alto). Apenas el borde superior de la tarjeta del
+// stepper toca esa franja (con 8px de margen), el stepper se muda al
+// costado: si se esperara a que quede totalmente tapada, se la veria
+// difuminada detras de la pildora translucida mientras pasa por debajo.
+const LIMITE_TOPBAR_PX = 84;
 
 export function AgendarCitaPage() {
   const tarjetaStepperRef = useRef(null);
   const [stepperOculto, setStepperOculto] = useState(false);
 
-  // Cuando la tarjeta horizontal del stepper queda escondida debajo de la
-  // topbar, se muestra la version lateral (BookingStepperLateral).
+  // Cuando la tarjeta horizontal del stepper llega a la topbar, se oculta
+  // y aparece la version lateral (BookingStepperLateral). Se mide la caja
+  // externa de la tarjeta (sin transform), asi su animacion de salida no
+  // altera la medicion.
   useEffect(() => {
-    const tarjeta = tarjetaStepperRef.current;
-    if (!tarjeta || typeof IntersectionObserver === 'undefined') return undefined;
-    const observador = new IntersectionObserver(
-      ([entrada]) => setStepperOculto(!entrada.isIntersecting && entrada.boundingClientRect.top < 0),
-      { rootMargin: MARGEN_TOPBAR }
-    );
-    observador.observe(tarjeta);
-    return () => observador.disconnect();
+    let cuadro = null;
+    const medir = () => {
+      cuadro = null;
+      const tarjeta = tarjetaStepperRef.current;
+      if (tarjeta) setStepperOculto(tarjeta.getBoundingClientRect().top < LIMITE_TOPBAR_PX);
+    };
+    const alHacerScroll = () => {
+      if (cuadro === null) cuadro = requestAnimationFrame(medir);
+    };
+    medir();
+    window.addEventListener('scroll', alHacerScroll, { passive: true });
+    window.addEventListener('resize', alHacerScroll);
+    return () => {
+      window.removeEventListener('scroll', alHacerScroll);
+      window.removeEventListener('resize', alHacerScroll);
+      if (cuadro !== null) cancelAnimationFrame(cuadro);
+    };
   }, []);
 
   const { token } = useAuth();
@@ -231,10 +244,21 @@ export function AgendarCitaPage() {
             lateral (48px + 12px): se reserva ese espacio a la izquierda
             del contenido para que no lo tape. Desde 1360px ya hay margen. */}
         <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[76px] min-[1360px]:pl-6">
-          <div ref={tarjetaStepperRef} className="-mt-12 rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 sm:px-8">
-            <BookingStepper paginaActual={pagina} />
+          {/* Caja externa (medida, sin transform) + tarjeta interna que, desde
+              lg, se desvanece y se encoge hacia la izquierda cuando el stepper
+              se muda al costado. Debajo de lg no hay version lateral, asi que
+              la tarjeta no cambia. */}
+          <div ref={tarjetaStepperRef} className="-mt-12">
+            <div
+              aria-hidden={stepperOculto || undefined}
+              className={`origin-left rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 transition-[opacity,translate,scale] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:px-8 ${
+                stepperOculto ? 'lg:-translate-x-10 lg:scale-95 lg:opacity-0' : ''
+              }`}
+            >
+              <BookingStepper paginaActual={pagina} />
+            </div>
           </div>
-          <BookingStepperLateral paginaActual={pagina} visible={stepperOculto} />
+          <BookingStepperLateral paginaActual={pagina} visible={stepperOculto} origenRef={tarjetaStepperRef} />
 
           {pagina === 3 && citaCreada ? (
             <div className="mt-8">

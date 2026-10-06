@@ -4,7 +4,11 @@
 // todos los hitos de la pagina activa se resaltan juntos (decision
 // confirmada con la usuaria -- el mockup resaltaba solo el primero) y
 // los de paginas ya completadas muestran check.
+import { useLayoutEffect, useRef } from 'react';
 import { IconoCheck } from '../icons';
+
+const DURACION_MUDANZA_MS = 550;
+const CURVA_MUDANZA = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 const HITOS = [
   { numero: 1, etiqueta: 'Mascota', pagina: 1 },
@@ -68,19 +72,55 @@ export function BookingStepper({ paginaActual }) {
 }
 
 // Variante vertical y compacta, fija al costado izquierdo de la pantalla.
-// Aparece cuando la tarjeta horizontal queda escondida debajo de la topbar
-// (al bajar para tocar "Continuar"): entra deslizandose desde la izquierda
-// y sale igual al volver arriba. Mismo lenguaje visual que la pildora de
+// Aparece cuando la tarjeta horizontal llega a la topbar (al bajar para
+// tocar "Continuar"). Para que se lea como el MISMO stepper mudandose al
+// costado (y no como un elemento nuevo), entra con una animacion FLIP:
+// arranca encima de la tarjeta horizontal (`origenRef`), achicado y
+// transparente, y viaja hasta su lugar mientras la tarjeta se desvanece
+// hacia la izquierda. Al volver arriba hace el camino inverso. Mismo lenguaje visual que la pildora de
 // la topbar (brand-blue-800 al 75% con blur, forma de capsula). Solo
 // circulos: la etiqueta de cada hito va en aria-label y en el tooltip.
-export function BookingStepperLateral({ paginaActual, visible }) {
+export function BookingStepperLateral({ paginaActual, visible, origenRef }) {
+  const railRef = useRef(null);
+  const primeraVez = useRef(true);
+
+  useLayoutEffect(() => {
+    const rail = railRef.current;
+    const origen = origenRef?.current;
+    // Sin animacion en el primer render, con reduced-motion o si el rail
+    // esta oculto por breakpoint (display: none debajo de lg).
+    if (primeraVez.current) {
+      primeraVez.current = false;
+      return undefined;
+    }
+    // (offsetParent no sirve para detectar display:none: en un elemento
+    // position:fixed siempre es null.)
+    if (!rail || !origen || getComputedStyle(rail).display === 'none') return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    // Desplazamiento desde el lugar del rail hasta el inicio (lado
+    // izquierdo, centro vertical) de la tarjeta horizontal.
+    const r = rail.getBoundingClientRect();
+    const o = origen.getBoundingClientRect();
+    const dx = o.left + 24 - (r.left + r.width / 2);
+    const dy = o.top + o.height / 2 - (r.top + r.height / 2);
+    const enTarjeta = { transform: `translate(${dx}px, ${dy}px) scale(0.5)`, opacity: 0 };
+    const enSuLugar = { transform: 'translate(0, 0) scale(1)', opacity: 1 };
+    const animacion = rail.animate(visible ? [enTarjeta, enSuLugar] : [enSuLugar, enTarjeta], {
+      duration: DURACION_MUDANZA_MS,
+      easing: CURVA_MUDANZA,
+    });
+    return () => animacion.cancel();
+  }, [visible, origenRef]);
+
   return (
     <nav
+      ref={railRef}
       aria-label="Progreso de la cita"
       aria-hidden={!visible}
       inert={!visible}
-      className={`fixed top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-brand-blue-800/75 px-2 py-3 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5)] ring-1 ring-white/12 backdrop-blur-[20px] transition-[opacity,translate] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none lg:block ${
-        visible ? 'translate-x-0 opacity-100' : 'pointer-events-none -translate-x-8 opacity-0'
+      className={`fixed top-1/2 z-30 hidden -translate-y-1/2 rounded-full bg-brand-blue-800/75 px-2 py-3 shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5)] ring-1 ring-white/12 backdrop-blur-[20px] lg:block ${
+        visible ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
       // Pegado al borde del contenido (max-w-7xl = 80rem) cuando hay margen
       // libre; si no, a 12px del borde de la pantalla.
