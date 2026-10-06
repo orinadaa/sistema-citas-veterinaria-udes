@@ -15,7 +15,7 @@ export function SectionHeading({ titulo, subtitulo, accion, sobreFondoOscuro = f
         <h2 className={`text-3xl font-bold tracking-tight ${sobreFondoOscuro ? 'text-white' : 'text-slate-900'}`}>{titulo}</h2>
         <AccentBar sobreFondoAzul={sobreFondoOscuro} />
         {subtitulo && (
-          <p className={`mt-4 max-w-[60ch] ${sobreFondoOscuro ? 'text-blue-50' : 'text-slate-600'}`}>{subtitulo}</p>
+          <p className={`mt-4 max-w-[60ch] lg:max-w-[90ch] ${sobreFondoOscuro ? 'text-blue-50' : 'text-slate-600'}`}>{subtitulo}</p>
         )}
       </div>
       {accion}

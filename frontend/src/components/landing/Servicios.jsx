@@ -152,7 +152,7 @@ export function Servicios() {
           </Revelar>
 
           {estado === ESTADOS.CARGANDO && (
-            <div className="mt-10 aspect-[4/5] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-[4/3] lg:aspect-auto lg:h-[clamp(20rem,calc(100svh-23rem),42rem)] lg:rounded-3xl" />
+            <div className="mt-10 aspect-[3/4] w-full animate-pulse rounded-2xl bg-white/10 sm:aspect-square lg:aspect-auto lg:h-[clamp(22rem,calc(100svh-18.5rem),46rem)] lg:rounded-3xl" />
           )}
 
           {estado === ESTADOS.ERROR && (
