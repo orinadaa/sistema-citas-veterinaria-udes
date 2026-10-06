@@ -8,9 +8,10 @@
 // abajo.
 //
 // Topbar tipo pildora (solo en la landing), con 2 estados:
-// - Estado 1 (scroll = 0): la topbar de siempre -- brand-blue solido, a
-//   todo el ancho, sin borde ni radio: se funde sin costura con el Hero
-//   (que arranca en el mismo azul). Solo el logo es distinto (grande).
+// - Estado 1 (scroll = 0): fondo transparente, sin borde, sin sombra y
+//   sin blur. El Hero pasa por detras (-mt-24), asi que lo que se ve es
+//   su propio degradado continuo: no hay un bloque "topbar" que delimitar.
+//   Solo el contenido (enlaces, logo grande, botones) flota encima.
 // - Estado 2: se despega 12px del borde, se angosta (maximo ~60rem,
 //   centrado) y baja a 64px de alto, con las 4 esquinas en 32px (mitad
 //   del alto = pildora real, mismo principio que rounded-boton), azul
@@ -42,7 +43,9 @@ const DISTANCIA_FLOW_PX = 160;
 const ALTO_HEADER = 96;
 const SEPARACION_SUPERIOR = 12;
 const ALTO_PILDORA = 64;
-const FONDO_ESTADO_1 = [66, 128, 247, 1]; // brand-blue (#4280F7) solido, igual al Hero
+// Mismo azul que el estado 2 con alfa 0: al interpolar, el color no pasa
+// por tonos intermedios raros, solo va ganando opacidad.
+const FONDO_ESTADO_1 = [6, 51, 138, 0]; // transparente: se ve el degradado del Hero
 const FONDO_ESTADO_2 = [6, 51, 138, 0.75]; // brand-blue-800 (#06338A) al 75%
 
 function interpolar(desde, hasta, t) {
