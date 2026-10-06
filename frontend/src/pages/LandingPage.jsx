@@ -40,8 +40,8 @@ export function LandingPage() {
         {/* Hero, Servicios, Sedes, Horarios y la banda de cierre comparten un
             solo fondo (el footer no). Degradado continuo que arranca en
             brand-blue-500 (el azul de la topbar) y oscurece rapido: el azul
-            claro queda solo en la parte alta del Hero y desde Servicios
-            predomina brand-blue-800. Ninguna seccion tiene fondo propio
+            claro queda solo en la parte alta del Hero y brand-blue-800 llega
+            al terminar el Hero (20%), asi Servicios ya arranca oscuro. Ninguna seccion tiene fondo propio
             (solo halos), asi que no hay uniones visibles entre ellas.
             -mt-24: el fondo sube por detras de la topbar (96px, transparente
             arriba; el Hero compensa con pt-24). overflow-clip (no hidden):
@@ -49,7 +49,7 @@ export function LandingPage() {
             contenedor de scroll; con overflow-hidden las secciones quedaban
             enganchadas a este div en vez de a la pagina y el scroll snap del
             landing paginado (index.css) no funcionaba. */}
-        <div className="relative isolate -mt-24 overflow-clip bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_0%,var(--color-brand-blue-600)_8%,var(--color-brand-blue-700)_17%,var(--color-brand-blue-800)_30%,var(--color-brand-blue-800)_100%)]">
+        <div className="relative isolate -mt-24 overflow-clip bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_0%,var(--color-brand-blue-600)_7%,var(--color-brand-blue-700)_13%,var(--color-brand-blue-800)_20%,var(--color-brand-blue-800)_100%)]">
           <Hero />
           <Servicios />
           <Sedes />

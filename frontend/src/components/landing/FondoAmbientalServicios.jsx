@@ -7,7 +7,8 @@
 //
 // Capas, de atras hacia adelante:
 //   1. Base: el degradado continuo del contenedor (no va aca).
-//   2. Halo central brand-blue-500 a pleno, el mas luminoso; deriva muy
+//   2. Halo central brand-blue-500 al 45% (a pleno se veia demasiado
+//      claro al pasar del Hero a Servicios), el mas luminoso; deriva muy
 //      lento (32s ida y vuelta) y se detiene con prefers-reduced-motion.
 //   + Formas organicas: dos ondas grandes difuminadas (solo desde md).
 //   3. Halos azules secundarios: inferior izquierdo brand-blue-400 y
@@ -24,10 +25,10 @@
 // transparente en el 70-75% de su radio: no se ven bordes duros.
 const color = (token, porcentaje) => `color-mix(in oklab, var(--color-${token}) ${porcentaje}%, transparent)`;
 
-const HALO_CENTRAL = `radial-gradient(ellipse 65% 55% at 50% 50%, ${color('brand-blue-500', 100)} 0%, ${color('brand-blue-500', 60)} 40%, transparent 75%)`;
+const HALO_CENTRAL = `radial-gradient(ellipse 65% 55% at 50% 50%, ${color('brand-blue-500', 45)} 0%, ${color('brand-blue-500', 20)} 40%, transparent 75%)`;
 
 const HALOS_AZULES = [
-  `radial-gradient(ellipse 55% 50% at 4% 100%, ${color('brand-blue-400', 80)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 55% 50% at 4% 100%, ${color('brand-blue-400', 55)} 0%, transparent 72%)`,
   `radial-gradient(ellipse 40% 55% at 100% 55%, ${color('brand-blue-600', 85)} 0%, transparent 72%)`,
 ].join(', ');
 
