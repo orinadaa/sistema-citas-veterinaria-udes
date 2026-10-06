@@ -12,10 +12,11 @@
 //   sin blur. El Hero pasa por detras (-mt-24), asi que lo que se ve es
 //   su propio degradado continuo: no hay un bloque "topbar" que delimitar.
 //   Solo el contenido (enlaces, logo grande, botones) flota encima.
-// - Estado 2: se despega 12px del borde, se angosta (maximo ~60rem,
-//   centrado) y baja a 64px de alto, con las 4 esquinas en 32px (mitad
-//   del alto = pildora real, mismo principio que rounded-boton), azul
-//   profundo translucido con blur y sombra.
+// - Estado 2: se despega 12px del borde, se angosta (maximo ~64rem,
+//   centrado) y baja a 64px de alto, azul profundo translucido con blur
+//   y sombra. Radio 9999px durante todo el recorrido (= mitad del alto de
+//   cada frame, mismo principio que rounded-boton): es capsula siempre,
+//   no solo al final.
 // El paso entre ambos es progresivo: `t` va de 0 a 1 en los primeros
 // DISTANCIA_FLOW_PX de scroll y se aplica directo al estilo (via ref,
 // dentro de requestAnimationFrame) sin re-renderizar React. El <header>
@@ -55,16 +56,20 @@ function interpolar(desde, hasta, t) {
 // Aplica el estado intermedio de la pildora para un progreso 0..1.
 function aplicarFlow(elemento, t) {
   const [r, g, b, alfa] = FONDO_ESTADO_1.map((c, i) => interpolar(c, FONDO_ESTADO_2[i], t));
-  const radio = t * (ALTO_PILDORA / 2);
   const estilo = elemento.style;
   estilo.setProperty('--flow', String(t));
   estilo.top = `${t * SEPARACION_SUPERIOR}px`;
   estilo.bottom = `${t * (ALTO_HEADER - SEPARACION_SUPERIOR - ALTO_PILDORA)}px`;
   // Margen lateral: al menos 16px y, en pantallas anchas, el necesario
-  // para que la pildora no supere ~60rem de ancho.
-  estilo.left = `calc(${t} * max(16px, (100% - 60rem) / 2))`;
+  // para que la pildora no supere ~64rem de ancho (lo minimo para que
+  // ambos grupos + logo quepan sin que el texto se parta en 2 lineas).
+  estilo.left = `calc(${t} * max(16px, (100% - 64rem) / 2))`;
   estilo.right = estilo.left;
-  estilo.borderRadius = `${radio}px`;
+  // 9999px desde que empieza el scroll: el navegador lo recorta a la
+  // mitad del alto real de ese frame, asi que la barra es una capsula
+  // perfecta en todo el recorrido (no solo al llegar a los 64px). En t=0
+  // va en 0, aunque con el fondo transparente no se nota.
+  estilo.borderRadius = t > 0 ? '9999px' : '0';
   estilo.backgroundColor = `rgb(${Math.round(r)} ${Math.round(g)} ${Math.round(b)} / ${alfa.toFixed(3)})`;
   estilo.backdropFilter = `blur(${t * 20}px)`;
   estilo.webkitBackdropFilter = estilo.backdropFilter;
@@ -126,10 +131,13 @@ export function Navbar() {
   return (
     <header className={enLanding ? 'pointer-events-none sticky top-0 z-40 h-24' : 'sticky top-0 z-40 h-20'}>
       <div ref={barraRef} className={`absolute inset-0 ${enLanding ? 'pointer-events-auto' : 'bg-brand-blue'}`}>
-        <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6">
+        <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:gap-x-10 lg:gap-x-12">
           {/* La columna izquierda siempre existe (aunque el nav se oculte en
-              movil) para que el grid no corra el logo hacia la izquierda. */}
-          <div className="justify-self-start">
+              movil) para que el grid no corra el logo hacia la izquierda.
+              Desde md los dos grupos se pegan al logo (justify-self hacia el
+              centro) y los extremos de la barra quedan vacios a proposito:
+              el contenido se lee agrupado alrededor del logo. */}
+          <div className="justify-self-start md:justify-self-end">
             <nav className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
               {/* Link (no <a>) para que funcionen desde cualquier pagina, no
                   solo desde el landing: si el usuario esta en /panel, primero
@@ -149,7 +157,7 @@ export function Navbar() {
           <Link
             to="/"
             aria-label="Clínica Veterinaria UDES, ir al inicio"
-            className={`relative flex items-center justify-center ${enLanding ? 'h-10 w-[108px]' : ''}`}
+            className={`relative flex items-center justify-center ${enLanding ? 'h-10 w-[126px]' : ''}`}
           >
             {enLanding ? (
               <>
@@ -161,7 +169,7 @@ export function Navbar() {
                 <img
                   src={logoGrande}
                   alt=""
-                  className="absolute left-1/2 top-1/2 h-[72px] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
+                  className="absolute left-1/2 top-1/2 h-[84px] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
                   style={{
                     opacity: 'calc(1 - var(--flow, 0) * 1.4)',
                     scale: 'calc(1 - var(--flow, 0) * 0.25)',
@@ -179,7 +187,7 @@ export function Navbar() {
             )}
           </Link>
 
-          <div className="flex items-center gap-3 justify-self-end">
+          <div className="flex items-center gap-3 justify-self-end md:justify-self-start">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
                 <button type="button" className="relative hidden rounded-boton p-2 lg:inline-flex text-white/80 transition hover:bg-white/10 hover:text-white">
