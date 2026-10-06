@@ -12,7 +12,7 @@
 //   sin blur. El Hero pasa por detras (-mt-24), asi que lo que se ve es
 //   su propio degradado continuo: no hay un bloque "topbar" que delimitar.
 //   Solo el contenido (enlaces, logo grande, botones) flota encima.
-// - Estado 2: se despega 12px del borde, se angosta (maximo ~64rem,
+// - Estado 2: se despega 12px del borde, se angosta (maximo ~68rem,
 //   centrado) y baja a 64px de alto, azul profundo translucido con blur
 //   y sombra. Radio fijo de 32px en todo el recorrido (= mitad del alto
 //   final, asi que al llegar es una capsula exacta).
@@ -61,9 +61,9 @@ function aplicarFlow(elemento, t) {
   estilo.top = `${t * SEPARACION_SUPERIOR}px`;
   estilo.bottom = `${t * (ALTO_HEADER - SEPARACION_SUPERIOR - ALTO_PILDORA)}px`;
   // Margen lateral: al menos 16px y, en pantallas anchas, el necesario
-  // para que la pildora no supere ~64rem de ancho (lo minimo para que
-  // ambos grupos + logo quepan sin que el texto se parta en 2 lineas).
-  estilo.left = `calc(${t} * max(16px, (100% - 64rem) / 2))`;
+  // para que la pildora no supere ~68rem de ancho (lo minimo para que
+  // ambos grupos + logo quepan con el texto en 16px sin descentrar el logo).
+  estilo.left = `calc(${t} * max(16px, (100% - 68rem) / 2))`;
   estilo.right = estilo.left;
   // Radio fijo de 32px en todo el recorrido (decision de Oriana): no
   // cambia con el scroll. Al llegar a 64px de alto coincide con la mitad
@@ -139,7 +139,7 @@ export function Navbar() {
               centro) y los extremos de la barra quedan vacios a proposito:
               el contenido se lee agrupado alrededor del logo. */}
           <div className="justify-self-start md:justify-self-end">
-            <nav className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
+            <nav className="hidden items-center gap-8 text-base font-medium text-white/90 md:flex">
               {/* Link (no <a>) para que funcionen desde cualquier pagina, no
                   solo desde el landing: si el usuario esta en /panel, primero
                   navega a "/" y LandingPage.jsx hace scroll al hash una vez
@@ -188,10 +188,10 @@ export function Navbar() {
             )}
           </Link>
 
-          <div className="flex items-center gap-3 justify-self-end md:justify-self-start">
+          <div className="flex items-center gap-2 justify-self-end md:justify-self-start">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
-                <button type="button" className="relative hidden rounded-boton p-2 lg:inline-flex text-white/80 transition hover:bg-white/10 hover:text-white">
+                <button type="button" className="relative hidden rounded-boton p-2 xl:inline-flex text-white/80 transition hover:bg-white/10 hover:text-white">
                   <IconoCampana className="h-5 w-5" />
                 </button>
 
@@ -204,7 +204,7 @@ export function Navbar() {
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
                       {iniciales || '·'}
                     </span>
-                    <span className="text-left text-sm font-medium text-white">
+                    <span className="text-left text-base font-medium text-white">
                       {/* "Hola, " solo en el landing -- en /panel el Hero ya
                           saluda por su nombre, seria redundante repetirlo aqui. */}
                       {enLanding ? `Hola, ${usuario?.nombreCompleto?.split(' ')[0]}` : usuario?.nombreCompleto?.split(' ')[0]}
@@ -258,13 +258,13 @@ export function Navbar() {
               <div className="hidden items-center gap-1 md:flex">
                 <Link
                   to="/iniciar-sesion"
-                  className="rounded-boton px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+                  className="rounded-boton px-3 py-2 text-base font-medium text-white transition hover:bg-white/10"
                 >
                   Iniciar sesión
                 </Link>
                 <Link
                   to="/registrarse"
-                  className="hidden rounded-boton px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10 lg:inline-block"
+                  className="hidden rounded-boton px-3 py-2 text-base font-medium text-white transition hover:bg-white/10 xl:inline-block"
                 >
                   Registrarse
                 </Link>
@@ -274,10 +274,12 @@ export function Navbar() {
               type="button"
               onClick={irAAgendar}
               aria-label="Agendar cita"
-              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-3 py-2 sm:px-4 text-sm font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-3 py-2 sm:px-4 text-base font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
             >
               <IconoCalendario className="h-4 w-4" />
-              <span className="hidden sm:inline">Agendar cita</span>
+              {/* Texto desde lg: en tablet (md) el grupo derecho con el texto
+                  no cabe en su columna y descentraria el logo. */}
+              <span className="hidden lg:inline">Agendar cita</span>
             </button>
           </div>
         </div>
