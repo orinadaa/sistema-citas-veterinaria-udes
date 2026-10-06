@@ -161,7 +161,23 @@ export function GuiaVetuiPage() {
             />
           </Bloque>
 
-          <Bloque titulo="Tarjetas y selección" descripcion="Opciones elegibles: anillo y check ámbar.">
+          {/* Directo sobre el fondo (no dentro de un Bloque): asi se ve el
+              vidrio real; anidado en otro vidrio usaria el relleno profundo. */}
+          <section className="flex flex-col gap-4 py-2">
+            <TituloSeccion titulo="Tarjetas" descripcion="Sobre el fondo: vidrio, como las secciones del landing. Dentro de un vidrio: cristal." />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Tarjeta material="vidrio" className="p-5">
+                <p className="font-semibold">Tarjeta de vidrio</p>
+                <p className="text-sm text-blue-100">Citas, mascotas, indicadores: van directo sobre el fondo.</p>
+              </Tarjeta>
+              <Tarjeta material="vidrio" destacada className="p-5">
+                <p className="font-semibold">Vidrio destacado</p>
+                <p className="text-sm text-blue-100">Anillo ámbar: la próxima cita.</p>
+              </Tarjeta>
+            </div>
+          </section>
+
+          <Bloque titulo="Tarjetas y selección" descripcion="Opciones elegibles dentro de un vidrio: cristal con anillo y check ámbar.">
             <div className="grid gap-3 sm:grid-cols-3">
               {[1, 2, 3].map((n) => (
                 <Tarjeta

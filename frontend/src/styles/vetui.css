@@ -91,6 +91,15 @@
     var(--shadow-flotante);
 }
 
+/* Vidrio destacado: anillo ámbar sobre una tarjeta de vidrio (ej. la
+   próxima cita en Mis citas). */
+@utility vidrio-destacado {
+  box-shadow:
+    inset 0 0 0 2px var(--color-brand-amber),
+    inset 0 1px 0 rgb(226 232 240 / 0.3),
+    var(--shadow-flotante);
+}
+
 /* Vidrio azul: para lo que flota sobre contenido que puede ser claro
    (la píldora fuera del landing, menús). Azul de marca al 50% que
    oscurece lo de atrás: el texto blanco se lee sobre cualquier fondo. */

@@ -86,6 +86,7 @@ Manrope (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/manrope`
 | 0. Fondo | — | `FondoVetui` | Degradado de marca + halos fijos (azules y ámbar) | — |
 | 1. Vidrio | `vidrio` | `Superficie` | Blanco 12 %, reflejo arriba, borde gris claro tenue, blur 12 px, oscurece lo de atrás (75 %) | Blanco |
 | 1b. Vidrio azul | `vidrio-azul` | — | Azul de marca 50 %, oscurece 65 %. Para lo que flota sobre contenido que puede ser claro (topbar fuera del landing, menú del perfil) | Blanco |
+| 1c. Vidrio destacado | `vidrio-destacado` | `Tarjeta material="vidrio" destacada` | Vidrio con anillo ámbar 2 px (la próxima cita) | Blanco |
 | 2. Cristal | `cristal` (+ `cristal-celeste`, `cristal-crema`) | `Tarjeta` | Blanco 60 % (celeste 55 %, crema 62 %), aclara lo de atrás (140 %) para no agrisarse | Oscuro |
 | 2b. Seleccionado | `cristal-seleccionado` | `Tarjeta seleccionada` | Blanco 88 % + anillo ámbar 2 px + check ámbar | Oscuro |
 | 3. Cristal fuerte | `cristal-fuerte` | `PanelLateral`, `Dialogo` | Blanco 88 %, blur 28 px, sombra profunda | Oscuro |
@@ -93,7 +94,8 @@ Manrope (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/manrope`
 
 **Reglas de anidación**
 
-- El vidrio va sobre el fondo; el cristal va sobre el vidrio o sobre el fondo.
+- **Lo que va directo sobre el fondo es vidrio** (secciones, resúmenes, indicadores, tarjetas de citas y mascotas): el mismo material que las tarjetas de sección del landing, con texto blanco. Se usa `Superficie` o `Tarjeta material="vidrio"`.
+- **Lo que va dentro de un vidrio es cristal** (opciones elegibles de agendar, sedes, horarios), igual que las tarjetas de sedes y horarios dentro de su sección en el landing.
 - No se anida vidrio dentro de vidrio. Si ocurre, o si un botón secundario o chip de vidrio claro queda dentro de una superficie de vidrio, vetUI le aplica automáticamente un relleno azul profundo para mantener el texto en AA.
 - Un `backdrop-filter` dentro de otro solo difumina lo que hay dentro del padre, no la página. Por eso los menús que deben difuminar la página se renderizan fuera de la topbar (ver `Navbar.jsx`).
 
@@ -123,7 +125,7 @@ Tamaños: `sm`, `md` (por defecto), `lg`, `icono`. Deshabilitado: 50 % de opacid
 
 - `FondoVetui`: envuelve la página completa, incluida la topbar.
 - `Superficie` (vidrio, `as="section"` por defecto): contenedor con `rounded-superficie` y padding de 20–24 px.
-- `Tarjeta` (cristal): `tono="blanco|celeste|crema"`, `seleccionada`, `interactiva` (hover que ilumina). Para opciones elegibles se usa con `as="button"` y `aria-pressed`.
+- `Tarjeta`: `material="vidrio"` para tarjetas sobre el fondo (texto blanco, radio 28 px) o `material="cristal"` (por defecto) para tarjetas dentro de un vidrio; `tono="blanco|celeste|crema"` (cristal), `seleccionada` (anillo y check ámbar), `destacada` (anillo ámbar sin check), `interactiva` (hover que ilumina). Para opciones elegibles se usa con `as="button"` y `aria-pressed`.
 
 ### Textos
 
@@ -137,7 +139,7 @@ Tamaños: `sm`, `md` (por defecto), `lg`, `icono`. Deshabilitado: 50 % de opacid
 
 ### Datos
 
-- `TarjetaDato`: indicador en cristal (icono en círculo de color, valor, detalle, etiqueta). Con `onClick` toda la tarjeta es un botón.
+- `TarjetaDato`: indicador en vidrio (icono en círculo de color, valor, detalle, etiqueta). Con `onClick` toda la tarjeta es un botón.
 - `Insignia`: estado de solo lectura. `estado="proxima|completada|cancelada"` o `tono` genérico con texto.
 
 ### Estados
@@ -175,7 +177,7 @@ Tamaños: `sm`, `md` (por defecto), `lg`, `icono`. Deshabilitado: 50 % de opacid
 1. Envolver la página en `FondoVetui` y poner `<Navbar />` como primer hijo.
 2. Encabezado con `EncabezadoPagina`.
 3. Agrupar el contenido en `Superficie` (vidrio) con `TituloSeccion`.
-4. Dentro, cada objeto en una `Tarjeta` (cristal).
+4. Objetos sueltos sobre el fondo (listas de citas, mascotas, indicadores) en `Tarjeta material="vidrio"`; objetos dentro de una superficie en `Tarjeta` (cristal).
 5. Una sola acción `primario`; el resto `secundario` (sobre vidrio) o `contorno` (sobre cristal).
 6. Formularios y detalles en `PanelLateral`; confirmaciones en `Dialogo`.
 7. Estados de carga, vacío y error con `Esqueleto`, `EstadoVacio` y `EstadoError`.
