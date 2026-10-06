@@ -2,7 +2,8 @@
 // Tarjeta de las secciones-slide del landing (Servicios, Sedes, Horarios)
 // desde lg: el mismo vidrio claro que el boton "Conoce nuestros servicios"
 // y que la pildora de la topbar en el landing (blanco al 12%, reflejo
-// arriba, borde de luz al 35%, brillo de 1px, blur 12px + saturate 150%;
+// arriba, borde gris claro tenue (slate-300 al 25%, se disimula mas que
+// el blanco), brillo de 1px, blur 12px + saturate 150%;
 // ver boton-glass-claro en index.css), para que topbar, tarjetas y boton
 // se lean como la misma familia de elementos flotantes de vidrio. Ademas
 // oscurece un poco lo de atras (brightness 75%): el fondo de Servicios es
@@ -22,7 +23,7 @@
 // las secciones, aunque tengan distinta cantidad de contenido.
 export function TarjetaSlide({ children }) {
   return (
-    <div className="slide-card lg:flex lg:flex-1 lg:flex-col lg:rounded-t-[2rem] lg:border-x lg:border-t lg:border-white/35 lg:bg-white/12 lg:bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),transparent_30%)] lg:px-10 lg:py-10 lg:shadow-[0_-24px_60px_-30px_rgb(0_0_0/0.45),inset_0_1px_0_rgb(255_255_255/0.45)] lg:backdrop-blur-[12px] lg:backdrop-saturate-150 lg:backdrop-brightness-[.75]">
+    <div className="slide-card lg:flex lg:flex-1 lg:flex-col lg:rounded-t-[2rem] lg:border-x lg:border-t lg:border-slate-300/25 lg:bg-white/12 lg:bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),transparent_30%)] lg:px-10 lg:py-10 lg:shadow-[0_-24px_60px_-30px_rgb(0_0_0/0.45),inset_0_1px_0_rgb(226_232_240/0.3)] lg:backdrop-blur-[12px] lg:backdrop-saturate-150 lg:backdrop-brightness-[.75]">
       {children}
     </div>
   );

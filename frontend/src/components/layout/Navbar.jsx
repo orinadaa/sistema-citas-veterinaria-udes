@@ -54,7 +54,8 @@ const ALTO_HEADER = 96;
 const SEPARACION_SUPERIOR = 12;
 const ALTO_PILDORA = 64;
 const RADIO_PILDORA = 32;
-// Material de la pildora (estado 2). Arriba (estado 1) siempre es
+// Material de la pildora (estado 2). El borde y el brillo superior son gris
+// claro (slate-300/200) tenue, no blanco, para que se disimulen. Arriba (estado 1) siempre es
 // transparente: el color de partida es el mismo del final con alfa 0, asi
 // al interpolar solo gana opacidad, sin tonos intermedios raros.
 // - claro (landing): el mismo vidrio claro del boton "Conoce nuestros
@@ -73,14 +74,14 @@ const MATERIALES = {
     backdrop: (t) => `blur(${t * 12}px) saturate(${100 + t * 50}%) brightness(${100 - t * 22}%)`,
     reflejo: (t) => `linear-gradient(to bottom, rgb(255 255 255 / ${(t * 0.18).toFixed(3)}), rgb(255 255 255 / 0) 60%)`,
     sombra: (t) =>
-      `0 10px 26px -10px rgb(0 0 0 / ${(t * 0.35).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.35).toFixed(3)}), inset 0 1px 0 rgb(255 255 255 / ${(t * 0.45).toFixed(3)})`,
+      `0 10px 26px -10px rgb(0 0 0 / ${(t * 0.35).toFixed(3)}), inset 0 0 0 1px rgb(203 213 225 / ${(t * 0.25).toFixed(3)}), inset 0 1px 0 rgb(226 232 240 / ${(t * 0.3).toFixed(3)})`,
   },
   azul: {
     fondo: [6, 51, 138, 0.5],
     backdrop: (t) => `blur(${t * 24}px) saturate(${100 + t * 50}%) brightness(${100 - t * 35}%)`,
     reflejo: () => 'none',
     sombra: (t) =>
-      `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(255 255 255 / ${(t * 0.14).toFixed(3)}), inset 0 1px 0 rgb(255 255 255 / ${(t * 0.22).toFixed(3)})`,
+      `0 12px 32px -12px rgb(6 51 138 / ${(t * 0.5).toFixed(3)}), inset 0 0 0 1px rgb(203 213 225 / ${(t * 0.2).toFixed(3)}), inset 0 1px 0 rgb(226 232 240 / ${(t * 0.25).toFixed(3)})`,
   },
 };
 
