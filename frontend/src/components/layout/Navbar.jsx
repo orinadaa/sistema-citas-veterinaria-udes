@@ -252,9 +252,9 @@ export function Navbar() {
                   solo desde el landing: si el usuario esta en /panel, primero
                   navega a "/" y LandingPage.jsx hace scroll al hash una vez
                   montada (ver su useEffect sobre location.hash). */}
-              <Link to="/#servicios" className="transition hover:text-white">Servicios</Link>
-              <Link to="/#sedes" className="transition hover:text-white">Sedes</Link>
-              <Link to="/#horarios" className="transition hover:text-white">Horarios</Link>
+              <Link to="/#servicios" className="hover-texto-ilumina transition hover:text-white">Servicios</Link>
+              <Link to="/#sedes" className="hover-texto-ilumina transition hover:text-white">Sedes</Link>
+              <Link to="/#horarios" className="hover-texto-ilumina transition hover:text-white">Horarios</Link>
             </nav>
           </div>
 
@@ -397,14 +397,14 @@ export function Navbar() {
               <Link
                 to="/panel?tab=citas"
                 onClick={() => setMenuAbierto(false)}
-                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
               >
                 Mis citas
               </Link>
               <Link
                 to="/panel?tab=mascotas"
                 onClick={() => setMenuAbierto(false)}
-                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+                className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
               >
                 Mis mascotas
               </Link>
@@ -413,7 +413,7 @@ export function Navbar() {
             <Link
               to={rutaPanelPorRol(usuario?.rol)}
               onClick={() => setMenuAbierto(false)}
-              className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+              className="block px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
             >
               Ir al panel
             </Link>
@@ -421,7 +421,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={salir}
-            className="w-full border-t border-white/10 px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white"
+            className="w-full border-t border-white/10 px-4 py-2 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
           >
             Cerrar sesión
           </button>

@@ -175,6 +175,7 @@ input[type="password"]::-ms-clear {
     0 12px 30px -10px rgb(0 0 0 / 0.4);
   &:hover {
     background-color: rgb(255 255 255);
+    filter: drop-shadow(0 6px 18px rgb(255 255 255 / 0.35));
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.9),
       inset 0 0 0 1px rgb(255 255 255 / 0.6),
@@ -194,5 +195,60 @@ input[type="password"]::-ms-clear {
     0 10px 26px -10px rgb(0 0 0 / 0.35);
   &:hover {
     background-color: rgb(255 255 255 / 0.2);
+    filter: drop-shadow(0 6px 18px rgb(255 255 255 / 0.3));
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Hover "se ilumina", el mismo gesto del boton ambar (que al pasar el
+   mouse se vuelve mas opaco y su resplandor crece), llevado al resto de
+   elementos interactivos. El resplandor usa filter: drop-shadow (sigue
+   la forma del elemento y no pisa los anillos de foco, que son
+   box-shadow).
+   - Botones (todos llevan rounded-boton): se aclaran y emiten un
+     resplandor de su color. --brillo toma el color del texto (botones de
+     borde: azul, rojo, gris) y se fija explicitamente para los rellenos
+     (azul, rojo, verde), cuyo texto es blanco. Los botones glass tienen
+     su propio hover (utilidades boton-glass-*).
+   - hover-ilumina: tarjetas clicables (resplandor azul suave + brillo).
+   - hover-texto-ilumina: enlaces sobre fondo oscuro (el texto brilla).
+   --------------------------------------------------------------------- */
+.rounded-boton {
+  --brillo: color-mix(in oklab, currentColor 45%, transparent);
+}
+.rounded-boton[class*="bg-brand-blue"],
+.rounded-boton[class*="bg-blue-"] {
+  --brillo: color-mix(in oklab, var(--color-brand-blue) 65%, transparent);
+}
+.rounded-boton[class*="bg-red-"] {
+  --brillo: color-mix(in oklab, var(--color-red-500) 60%, transparent);
+}
+.rounded-boton[class*="bg-brand-green"] {
+  --brillo: color-mix(in oklab, var(--color-brand-green) 60%, transparent);
+}
+.rounded-boton:not(:disabled):not([class*="boton-glass"]):hover {
+  filter: brightness(1.08) drop-shadow(0 6px 14px var(--brillo));
+}
+
+@utility hover-ilumina {
+  &:hover {
+    filter: brightness(1.03) drop-shadow(0 10px 22px color-mix(in oklab, var(--color-brand-blue) 35%, transparent));
+  }
+}
+@utility hover-texto-ilumina {
+  &:hover {
+    text-shadow: 0 0 14px rgb(255 255 255 / 0.75);
+  }
+}
+
+/* Transiciones suaves del hover (filter, text-shadow) en todo lo anterior,
+   sin animacion con reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .rounded-boton,
+  .hover-ilumina,
+  .hover-texto-ilumina {
+    transition-property: color, background-color, border-color, box-shadow, filter, text-shadow, transform, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
   }
 }

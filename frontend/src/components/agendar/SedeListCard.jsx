@@ -25,7 +25,7 @@ export function SedeListCard({ sede, horario, seleccionada, onSeleccionar }) {
       type="button"
       onClick={onSeleccionar}
       aria-pressed={seleccionada}
-      className={`relative flex w-full flex-col gap-4 rounded-2xl bg-white p-4 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 sm:flex-row ${
+      className={`hover-ilumina relative flex w-full flex-col gap-4 rounded-2xl bg-white p-4 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 sm:flex-row ${
         seleccionada
           ? 'border-2 border-brand-blue bg-blue-50/40 shadow-sm'
           : 'border-2 border-slate-200 hover:border-brand-blue-400 hover:shadow-sm'
