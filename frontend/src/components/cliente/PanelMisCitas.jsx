@@ -81,10 +81,12 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
                 key={cita.id}
                 material="blanco"
                 destacada={destacada}
-                className="grid grid-cols-1 items-center gap-4 p-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.3fr)_auto_auto]"
+                className="grid grid-cols-1 items-center gap-4 p-4 md:grid-cols-[12rem_minmax(0,1fr)_minmax(0,1.3fr)_auto_auto] md:gap-6"
               >
-                {/* 1-2. Foto grande arriba + nombre y especie/raza */}
-                <div className="flex min-w-0 flex-col items-start gap-2">
+                {/* 1-2. Foto grande arriba + nombre y especie/raza, centrados en
+                    una columna angosta (12rem) para no dejar un hueco grande
+                    hasta la fecha. */}
+                <div className="flex min-w-0 flex-col items-center gap-2 text-center">
                   <AvatarMascota
                     mascota={{ nombre: cita.mascota_nombre, foto_url: cita.mascota_foto_url }}
                     className="h-20 w-20 shadow-md ring-4 ring-white"
@@ -92,7 +94,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
                   />
                   <div className="min-w-0 max-w-full">
                     <p className="truncate font-semibold text-slate-900">{cita.mascota_nombre}</p>
-                    <p className="truncate text-sm text-slate-700">
+                    <p className="line-clamp-2 text-sm text-slate-700">
                       {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}
                     </p>
                   </div>

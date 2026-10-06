@@ -65,9 +65,9 @@ export function PanelMisMascotas() {
       {aviso.texto && <Aviso tono={aviso.tipo === 'ok' ? 'ok' : 'alerta'}>{aviso.texto}</Aviso>}
 
       {cargando ? (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[0, 1].map((clave) => (
-            <Esqueleto key={clave} />
+            <Esqueleto key={clave} className="h-64" />
           ))}
         </div>
       ) : errorCarga ? (
@@ -75,20 +75,21 @@ export function PanelMisMascotas() {
       ) : mascotas.length === 0 ? (
         <EstadoVacio>Aún no has registrado mascotas.</EstadoVacio>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        // Tarjetas verticales: foto grande arriba y datos centrados debajo.
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {mascotas.map((mascota) => (
-            <Tarjeta key={mascota.id} material="blanco" className="flex items-start justify-between gap-3 p-5">
-              <div className="flex min-w-0 items-center gap-4">
-                <AvatarMascota mascota={mascota} className="h-16 w-16 shadow-md ring-4 ring-white" iconoClassName="h-8 w-8" />
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
+            <Tarjeta key={mascota.id} material="blanco" className="flex flex-col items-center gap-4 p-6 text-center">
+              <div className="flex w-full min-w-0 flex-col items-center gap-3">
+                <AvatarMascota mascota={mascota} className="h-28 w-28 shadow-lg ring-4 ring-white" iconoClassName="h-12 w-12" />
+                <div className="w-full min-w-0">
+                  <p className="truncate text-lg font-bold text-slate-900">{mascota.nombre}</p>
                   <p className="truncate text-sm text-slate-700">
                     {[mascota.especie, mascota.raza].filter(Boolean).join(' · ') || 'Sin datos adicionales'}
                   </p>
                   {edadYPeso(mascota) && <p className="text-xs font-medium text-slate-700">{edadYPeso(mascota)}</p>}
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="mt-auto flex items-center justify-center gap-1">
                 <Boton variante="contorno" tamano="sm" onClick={() => abrirEditar(mascota)}>
                   Ver detalles
                 </Boton>
