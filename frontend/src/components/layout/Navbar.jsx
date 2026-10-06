@@ -15,9 +15,19 @@
 // re-renderizar React en cada evento de scroll. El <header> conserva
 // siempre su alto de 80px y la pildora es absoluta dentro de el: el
 // contenido de la pagina nunca se desplaza al cambiar de estado.
+//
+// Layout en 3 columnas (grid 1fr | auto | 1fr): enlaces de seccion a la
+// izquierda, logo al centro y acciones a la derecha. Al ser las dos
+// columnas laterales 1fr, el logo queda centrado respecto al ancho total
+// de la barra aunque ambos grupos midan distinto. En la landing el logo
+// arranca grande (logoblanco.png, el que antes estaba en el Hero) y con
+// el scroll se cruza con el logo corto: ambos leen la variable CSS
+// --flow (0..1) que escribe aplicarFlow, asi que no hay un segundo
+// listener de scroll.
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logoCorto from '../../assets/logocorto.png';
+import logoGrande from '../../assets/logoblanco.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
 import { IconoCalendario, IconoCampana, IconoChevronAbajo } from '../icons';
@@ -36,6 +46,7 @@ function aplicarFlow(elemento, t) {
   const [r, g, b] = AZUL_MARCA.map((c, i) => Math.round(interpolar(c, AZUL_PROFUNDO[i], t)));
   const alfa = interpolar(1, OPACIDAD_FLOTANTE, t);
   const estilo = elemento.style;
+  estilo.setProperty('--flow', String(t));
   estilo.top = `${t * 10}px`;
   estilo.bottom = `${t * 10}px`;
   // Margen lateral: al menos 12px y, en pantallas anchas, el necesario
@@ -102,25 +113,53 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 h-20">
       <div ref={barraRef} className="absolute inset-0 bg-brand-blue">
-        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logoCorto} alt="Clínica Veterinaria UDES" className="h-12 w-auto object-contain" />
+        <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6">
+          {/* La columna izquierda siempre existe (aunque el nav se oculte en
+              movil) para que el grid no corra el logo hacia la izquierda. */}
+          <div className="justify-self-start">
+            <nav className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
+              {/* Link (no <a>) para que funcionen desde cualquier pagina, no
+                  solo desde el landing: si el usuario esta en /panel, primero
+                  navega a "/" y LandingPage.jsx hace scroll al hash una vez
+                  montada (ver su useEffect sobre location.hash). */}
+              <Link to="/#servicios" className="transition hover:text-white">Servicios</Link>
+              <Link to="/#sedes" className="transition hover:text-white">Sedes</Link>
+              <Link to="/#horarios" className="transition hover:text-white">Horarios</Link>
+            </nav>
+          </div>
+
+          <Link to="/" aria-label="Clínica Veterinaria UDES, ir al inicio" className="relative flex items-center justify-center">
+            {enLanding ? (
+              <>
+                {/* Grande -> corto: el grande se desvanece en la primera mitad
+                    del recorrido y el corto aparece en la segunda (sin
+                    superponerse a media opacidad). Ambos centrados en el
+                    mismo punto; solo cambia cual se ve y su escala. */}
+                <img
+                  src={logoGrande}
+                  alt=""
+                  className="h-16 w-auto object-contain"
+                  style={{
+                    opacity: 'calc(1 - var(--flow, 0) * 2)',
+                    transform: 'scale(calc(1 - var(--flow, 0) * 0.25))',
+                  }}
+                />
+                <img
+                  src={logoCorto}
+                  alt=""
+                  className="absolute left-1/2 top-1/2 h-10 w-auto -translate-x-1/2 -translate-y-1/2 object-contain"
+                  style={{ opacity: 'calc(var(--flow, 0) * 2 - 1)' }}
+                />
+              </>
+            ) : (
+              <img src={logoCorto} alt="" className="h-12 w-auto object-contain" />
+            )}
           </Link>
 
-          <nav className="hidden items-center gap-8 text-sm font-medium text-white/90 md:flex">
-            {/* Link (no <a>) para que funcionen desde cualquier pagina, no
-                solo desde el landing: si el usuario esta en /panel, primero
-                navega a "/" y LandingPage.jsx hace scroll al hash una vez
-                montada (ver su useEffect sobre location.hash). */}
-            <Link to="/#servicios" className="transition hover:text-white">Servicios</Link>
-            <Link to="/#sedes" className="transition hover:text-white">Sedes</Link>
-            <Link to="/#horarios" className="transition hover:text-white">Horarios</Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-self-end">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
-                <button type="button" className="relative rounded-boton p-2 text-white/80 transition hover:bg-white/10 hover:text-white">
+                <button type="button" className="relative hidden rounded-boton p-2 lg:inline-flex text-white/80 transition hover:bg-white/10 hover:text-white">
                   <IconoCampana className="h-5 w-5" />
                 </button>
 
@@ -184,7 +223,7 @@ export function Navbar() {
                 </div>
               </div>
             ) : (
-              <div className="hidden items-center gap-1 sm:flex">
+              <div className="hidden items-center gap-1 md:flex">
                 <Link
                   to="/iniciar-sesion"
                   className="rounded-boton px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
@@ -193,7 +232,7 @@ export function Navbar() {
                 </Link>
                 <Link
                   to="/registrarse"
-                  className="rounded-boton px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+                  className="hidden rounded-boton px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10 lg:inline-block"
                 >
                   Registrarse
                 </Link>
@@ -202,10 +241,11 @@ export function Navbar() {
             <button
               type="button"
               onClick={irAAgendar}
-              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
+              aria-label="Agendar cita"
+              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-3 py-2 sm:px-4 text-sm font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
             >
               <IconoCalendario className="h-4 w-4" />
-              Agendar cita
+              <span className="hidden sm:inline">Agendar cita</span>
             </button>
           </div>
         </div>

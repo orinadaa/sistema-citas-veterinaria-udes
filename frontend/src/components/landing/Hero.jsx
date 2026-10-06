@@ -14,7 +14,6 @@
 // background-image, asi que no hay riesgo de recorte responsivo.
 import { useNavigate } from 'react-router-dom';
 import fotoMain from '../../assets/foto-main.png';
-import logoBlanco from '../../assets/logoblanco.png';
 import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
@@ -37,9 +36,7 @@ export function Hero() {
     <section className="relative overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800">
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="max-w-xl">
-          <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-20 w-auto object-contain" />
-
-          <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
+          <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
             Cuidamos de quienes hacen parte de <span className="text-brand-amber">tu familia</span>
           </h1>
 
