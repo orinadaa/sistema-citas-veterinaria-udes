@@ -13,6 +13,7 @@ import { IconoAlerta } from '../icons';
 import { Revelar } from './Revelar';
 import { SectionHeading } from './SectionHeading';
 import { FondoAmbientalServicios } from './FondoAmbientalServicios';
+import { TarjetaSlide } from './TarjetaSlide';
 import { ServicioSlider } from './ServicioSlider';
 import imgConsulta from '../../assets/servicios-foto/consulta.png';
 import imgCirugia from '../../assets/servicios-foto/cirugia.webp';
@@ -124,7 +125,7 @@ export function Servicios() {
   return (
     // Sin fondo propio: la base es el degradado continuo Hero + Servicios
     // (LandingPage.jsx); aca solo van los halos.
-    <section id="servicios" data-slide className="relative py-20 lg:flex lg:min-h-svh lg:snap-start lg:snap-always lg:flex-col lg:justify-center lg:pb-8 lg:pt-24">
+    <section id="servicios" data-slide className="relative py-20 lg:flex lg:min-h-svh lg:snap-start lg:snap-always lg:flex-col lg:pb-0 lg:pt-28">
       <FondoAmbientalServicios />
       {/* Sombra azul oscura detras del encabezado: garantiza contraste AA del
           texto blanco sobre los halos. A todo el ancho de la pantalla y mas
@@ -138,12 +139,10 @@ export function Servicios() {
             'radial-gradient(ellipse 75% 42% at 28% 50%, color-mix(in oklab, var(--color-brand-blue-800) 85%, transparent) 0%, color-mix(in oklab, var(--color-brand-blue-800) 55%, transparent) 40%, color-mix(in oklab, var(--color-brand-blue-800) 20%, transparent) 70%, transparent 100%)',
         }}
       />
-      {/* Desde lg la seccion es una tarjeta de bordes redondeados con fondo
-          oscuro translucido (blur del fondo ambiental de atras) que sube
-          deslizandose al entrar y se desvanece al salir (slide-card,
-          index.css). */}
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-        <div className="slide-card lg:rounded-[2rem] lg:bg-brand-blue-800/50 lg:p-10 lg:shadow-[0_30px_80px_-30px_rgb(0_0_0/0.6)] lg:ring-1 lg:ring-white/10 lg:backdrop-blur-xl">
+      {/* Desde lg la seccion es una tarjeta translucida que llega hasta el
+          borde inferior (TarjetaSlide.jsx). */}
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:flex lg:flex-1 lg:flex-col">
+        <TarjetaSlide>
           <Revelar>
             <SectionHeading
               titulo="Servicios veterinarios"
@@ -168,7 +167,7 @@ export function Servicios() {
               <ServicioSlider slides={slides} />
             </Revelar>
           )}
-        </div>
+        </TarjetaSlide>
       </div>
     </section>
   );
