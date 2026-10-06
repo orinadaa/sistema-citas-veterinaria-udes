@@ -32,8 +32,11 @@ export function Hero() {
     navegar(rutaAgendarCita(estaAutenticado));
   }
 
+  // -mt-24 pt-24: el Hero sube por debajo del topbar (96px, ver
+  // Navbar.jsx) para que las esquinas redondeadas del topbar se vean sobre
+  // el degradado y no sobre el fondo de la pagina.
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800">
+    <section className="relative -mt-24 overflow-hidden bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 pt-24">
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div className="max-w-xl">
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
