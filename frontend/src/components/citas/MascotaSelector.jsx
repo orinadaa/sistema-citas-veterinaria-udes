@@ -103,7 +103,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
               key={mascota.id}
               type="button"
               onClick={() => onSeleccionar(mascota.id)}
-              className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
+              className={`rounded-boton border px-3 py-1.5 text-sm font-medium transition ${
                 mascota.id === valorSeleccionado
                   ? 'border-blue-600 bg-blue-50 text-blue-700'
                   : 'border-slate-300 text-slate-700 hover:border-blue-300'
@@ -116,7 +116,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
           <button
             type="button"
             onClick={() => setMostrarNueva((v) => !v)}
-            className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+            className="rounded-boton border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
           >
             + Nueva mascota
           </button>
@@ -140,7 +140,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
             type="button"
             disabled={creando}
             onClick={crear}
-            className="self-start rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+            className="self-start rounded-boton bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
           >
             {creando ? 'Creando...' : 'Agregar'}
           </button>

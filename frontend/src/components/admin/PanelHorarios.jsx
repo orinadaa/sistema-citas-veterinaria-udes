@@ -282,7 +282,7 @@ export function PanelHorarios() {
             <button
               type="button"
               onClick={() => abrirEditar(sede)}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
             >
               Editar
             </button>
@@ -301,7 +301,7 @@ export function PanelHorarios() {
           type="submit"
           form="form-sede"
           disabled={guardando}
-          className="w-full rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+          className="w-full rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
         >
           {guardando ? 'Guardando...' : sedeEditando ? 'Guardar cambios' : 'Crear sede'}
         </button>
@@ -382,7 +382,7 @@ export function PanelHorarios() {
                         type="button"
                         disabled={guardandoDia === dia.numero}
                         onClick={() => guardarDia(dia)}
-                        className="rounded-lg px-2 py-1 text-xs font-medium text-brand-blue transition hover:bg-blue-50 disabled:opacity-60"
+                        className="rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition hover:bg-blue-50 disabled:opacity-60"
                       >
                         Guardar
                       </button>
@@ -390,7 +390,7 @@ export function PanelHorarios() {
                         type="button"
                         disabled={guardandoDia === dia.numero}
                         onClick={() => cerrarDia(dia)}
-                        className="rounded-lg px-2 py-1 text-xs font-medium text-brand-red transition hover:bg-red-50 disabled:opacity-60"
+                        className="rounded-boton px-2 py-1 text-xs font-medium text-brand-red transition hover:bg-red-50 disabled:opacity-60"
                       >
                         Cerrar
                       </button>
@@ -400,7 +400,7 @@ export function PanelHorarios() {
                       type="button"
                       disabled={guardandoDia === dia.numero}
                       onClick={() => guardarDia(dia)}
-                      className="rounded-lg px-2 py-1 text-xs font-medium text-brand-blue transition hover:bg-blue-50 disabled:opacity-60"
+                      className="rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition hover:bg-blue-50 disabled:opacity-60"
                     >
                       Abrir 08:00–17:00
                     </button>

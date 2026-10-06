@@ -172,7 +172,7 @@ export function PanelConfiguracion() {
             <button
               type="button"
               onClick={abrirCrear}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand-amber px-4 py-2.5 text-sm font-semibold text-brand-navy shadow-sm transition hover:brightness-95"
+              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-4 py-2.5 text-sm font-semibold text-brand-navy shadow-sm transition hover:brightness-95"
             >
               + Nuevo usuario
             </button>
@@ -243,7 +243,7 @@ export function PanelConfiguracion() {
                 <button
                   type="button"
                   onClick={() => abrirEditar(u)}
-                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+                  className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
                 >
                   Editar
                 </button>
@@ -264,7 +264,7 @@ export function PanelConfiguracion() {
           type="submit"
           form="form-usuario-config"
           disabled={guardando}
-          className="w-full rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+          className="w-full rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
         >
           {guardando ? 'Guardando...' : 'Guardar cambios'}
         </button>

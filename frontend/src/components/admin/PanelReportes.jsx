@@ -322,7 +322,7 @@ export function PanelReportes() {
                 type="button"
                 onClick={exportarExcel}
                 disabled={Boolean(exportando)}
-                className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                className="rounded-boton border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
               >
                 {exportando === 'excel' ? 'Generando...' : 'Descargar Excel'}
               </button>
@@ -330,7 +330,7 @@ export function PanelReportes() {
                 type="button"
                 onClick={exportarPDF}
                 disabled={Boolean(exportando)}
-                className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                className="rounded-boton border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
               >
                 {exportando === 'pdf' ? 'Generando...' : 'Descargar PDF'}
               </button>

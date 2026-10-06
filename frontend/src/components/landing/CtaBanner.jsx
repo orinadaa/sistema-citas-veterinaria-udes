@@ -53,7 +53,7 @@ export function CtaBanner() {
         <button
           type="button"
           onClick={irAAgendar}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50 active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-boton bg-white px-6 py-3 text-base font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50 active:scale-[0.98]"
         >
           Agendar cita
           <IconoFlechaDerecha className="h-4 w-4" />

@@ -5,6 +5,11 @@
    escala 400-800 esta derivada matematicamente (HSL) para degradados,
    no inventada a ojo. */
 @theme {
+  /* Radio de todos los botones (accion, solo icono y opciones
+     seleccionables): 9999px = pildora completa sea cual sea la altura del
+     boton (radio = mitad del alto). Clase: rounded-boton. */
+  --radius-boton: 9999px;
+
   --color-brand-navy: #0b3c74;
   --color-brand-blue: #4280f7;
   --color-brand-blue-400: #78a4f9;

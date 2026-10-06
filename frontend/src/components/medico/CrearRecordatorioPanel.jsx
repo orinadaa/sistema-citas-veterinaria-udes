@@ -125,7 +125,7 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            className="rounded-boton border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
           >
             Cancelar
           </button>
@@ -133,7 +133,7 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
             type="submit"
             form="form-recordatorio"
             disabled={guardando}
-            className="flex-1 rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:opacity-60"
+            className="flex-1 rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:opacity-60"
           >
             {guardando ? 'Guardando...' : 'Guardar recordatorio'}
           </button>

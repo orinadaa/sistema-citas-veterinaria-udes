@@ -22,7 +22,7 @@ export function PageHeader({ title, subtitle, actionLabel, onAction, actionColor
         <button
           type="button"
           onClick={onAction}
-          className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition active:scale-[0.98] ${colorClases}`}
+          className={`inline-flex shrink-0 items-center gap-2 rounded-boton px-4 py-2.5 text-sm font-semibold shadow-sm transition active:scale-[0.98] ${colorClases}`}
         >
           <IconoMas className="h-4 w-4" />
           {actionLabel}

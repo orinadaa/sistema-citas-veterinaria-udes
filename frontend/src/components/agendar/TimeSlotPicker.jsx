@@ -122,7 +122,7 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
               aria-selected={turnoActivo === turno.id}
               disabled={vacio}
               onClick={() => setTurnoElegido({ clave, turno: turno.id })}
-              className={`flex-1 rounded-lg px-2 py-2 text-sm font-medium transition ${
+              className={`flex-1 rounded-boton px-2 py-2 text-sm font-medium transition ${
                 turnoActivo === turno.id
                   ? 'bg-white text-brand-blue shadow-sm'
                   : vacio
@@ -150,7 +150,7 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
               onClick={() => onChange(franja.horaInicio)}
               aria-pressed={elegida}
               title={franja.disponible ? undefined : 'No disponible'}
-              className={`rounded-xl border px-2 py-2.5 text-sm font-medium transition ${
+              className={`rounded-boton border px-2 py-2.5 text-sm font-medium transition ${
                 elegida
                   ? 'border-brand-blue bg-brand-blue text-white shadow-sm'
                   : franja.disponible

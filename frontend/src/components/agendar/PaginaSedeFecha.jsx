@@ -43,7 +43,7 @@ function Ubicacion({ sede }) {
           href={`https://www.google.com/maps/dir/?api=1&destination=${q}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-xl bg-white px-4 py-2 text-center text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
+          className="rounded-boton bg-white px-4 py-2 text-center text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
         >
           Cómo llegar
         </a>
@@ -51,7 +51,7 @@ function Ubicacion({ sede }) {
           href={`https://www.google.com/maps/search/?api=1&query=${q}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-xl px-4 py-2 text-center text-sm font-semibold text-white ring-1 ring-white/40 transition hover:bg-white/10"
+          className="rounded-boton px-4 py-2 text-center text-sm font-semibold text-white ring-1 ring-white/40 transition hover:bg-white/10"
         >
           Ver en Google Maps
         </a>

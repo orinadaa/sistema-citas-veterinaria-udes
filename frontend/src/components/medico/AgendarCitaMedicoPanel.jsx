@@ -77,7 +77,7 @@ function TarjetaCliente({ cliente, onQuitar }) {
         <p className="truncate text-xs text-slate-500">{[cliente.correo, cliente.telefono].filter(Boolean).join(' · ')}</p>
       </div>
       {onQuitar && (
-        <button type="button" onClick={onQuitar} aria-label="Quitar paciente" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600">
+        <button type="button" onClick={onQuitar} aria-label="Quitar paciente" className="rounded-boton p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600">
           <IconoX className="h-4 w-4" />
         </button>
       )}
@@ -228,7 +228,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
           <button
             type="button"
             onClick={paso === 1 ? onClose : () => setPaso(paso - 1)}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            className="rounded-boton border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
           >
             {paso === 1 ? 'Cancelar' : 'Atrás'}
           </button>
@@ -236,7 +236,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
             type="button"
             disabled={!pasoCompleto || enviando}
             onClick={paso === 4 ? confirmar : () => setPaso(paso + 1)}
-            className="flex-1 rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {paso === 4 ? (enviando ? 'Agendando...' : 'Confirmar') : 'Siguiente'}
           </button>

@@ -252,7 +252,7 @@ export function PanelDisponibilidadMedico() {
               <button
                 type="button"
                 onClick={personalizar}
-                className="self-start rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600"
+                className="self-start rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600"
               >
                 Personalizar mi horario
               </button>
@@ -373,7 +373,7 @@ export function PanelDisponibilidadMedico() {
                   type="button"
                   disabled={guardando}
                   onClick={() => guardarHorario([], 'Listo: vuelves a usar el horario de tu sede.')}
-                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-60"
+                  className="rounded-boton border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-60"
                 >
                   Volver al horario de la sede
                 </button>
@@ -381,7 +381,7 @@ export function PanelDisponibilidadMedico() {
                   type="button"
                   disabled={guardando}
                   onClick={guardarSemana}
-                  className="rounded-xl bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
+                  className="rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
                 >
                   {guardando ? 'Guardando...' : 'Guardar horario'}
                 </button>
@@ -455,7 +455,7 @@ export function PanelDisponibilidadMedico() {
               className={CLASE_CAMPO}
             />
             <Mensaje estado={estadoBloqueo} />
-            <button type="submit" className="self-end rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600">
+            <button type="submit" className="self-end rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600">
               Agregar bloqueo
             </button>
           </form>
@@ -490,7 +490,7 @@ export function PanelDisponibilidadMedico() {
                         type="button"
                         onClick={() => setConfirmandoEliminar(b.id)}
                         aria-label="Eliminar bloqueo"
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-brand-red"
+                        className="rounded-boton p-1.5 text-slate-400 hover:bg-red-50 hover:text-brand-red"
                       >
                         <IconoPapelera className="h-4 w-4" />
                       </button>

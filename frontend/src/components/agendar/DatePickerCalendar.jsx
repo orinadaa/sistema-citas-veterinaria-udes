@@ -43,7 +43,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
             aria-label="Mes anterior"
             disabled={esMesActual}
             onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+            className="rounded-boton p-1.5 text-slate-500 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
           >
             <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
           </button>
@@ -51,7 +51,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
             type="button"
             aria-label="Mes siguiente"
             onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100"
+            className="rounded-boton p-1.5 text-slate-500 transition hover:bg-slate-100"
           >
             <IconoFlechaDerecha className="h-4 w-4" />
           </button>
@@ -82,7 +82,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos }) {
               onClick={() => onChange(aFechaLocal(celda))}
               aria-pressed={Boolean(esElegido)}
               title={cerrado && !pasado ? 'La sede no atiende este día' : undefined}
-              className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full text-sm transition ${
+              className={`mx-auto flex h-10 w-10 items-center justify-center rounded-boton text-sm transition ${
                 esElegido
                   ? 'bg-brand-blue font-semibold text-white shadow-sm'
                   : deshabilitado

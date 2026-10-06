@@ -188,7 +188,7 @@ export function ServicioSlider({ slides }) {
                 {slide.href && (
                   <Link
                     to={slide.href}
-                    className="mt-5 inline-flex items-center rounded-full bg-brand-amber px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-md transition hover:bg-brand-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="mt-5 inline-flex items-center rounded-boton bg-brand-amber px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-md transition hover:bg-brand-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     Agendar cita
                   </Link>

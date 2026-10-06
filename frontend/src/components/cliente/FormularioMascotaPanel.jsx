@@ -202,7 +202,7 @@ export function FormularioMascotaPanel({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+              className="rounded-boton border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
             >
               Cancelar
             </button>
@@ -210,7 +210,7 @@ export function FormularioMascotaPanel({
               type="submit"
               form="form-mascota-cliente"
               disabled={guardando}
-              className="flex-1 rounded-xl bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-boton bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {guardando ? 'Guardando...' : 'Guardar mascota'}
             </button>
@@ -225,7 +225,7 @@ export function FormularioMascotaPanel({
                 type="button"
                 onClick={() => setEditorFotoAbierto(true)}
                 aria-label="Cambiar foto de la mascota"
-                className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand-blue text-white shadow-md ring-4 ring-white transition hover:bg-brand-blue-600"
+                className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-boton bg-brand-blue text-white shadow-md ring-4 ring-white transition hover:bg-brand-blue-600"
               >
                 <IconoCamara className="h-4.5 w-4.5" />
               </button>
@@ -321,7 +321,7 @@ export function FormularioMascotaPanel({
                       type="button"
                       onClick={eliminar}
                       disabled={eliminando}
-                      className="rounded-lg bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:opacity-60"
+                      className="rounded-boton bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:opacity-60"
                     >
                       {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
                     </button>
@@ -331,7 +331,7 @@ export function FormularioMascotaPanel({
                         setConfirmandoEliminar(false);
                         setErrorEliminar('');
                       }}
-                      className="rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
+                      className="rounded-boton border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
                     >
                       Cancelar
                     </button>

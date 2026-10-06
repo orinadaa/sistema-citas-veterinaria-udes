@@ -85,7 +85,7 @@ export function SelectorFranjas({ sedeId, servicioId, medicoId, valorSeleccionad
                   type="button"
                   disabled={!franja.disponible}
                   onClick={() => onSeleccionar(franja.horaInicio)}
-                  className={`rounded-lg px-2 py-2 text-sm font-medium transition ${
+                  className={`rounded-boton px-2 py-2 text-sm font-medium transition ${
                     seleccionada
                       ? 'bg-blue-600 text-white'
                       : franja.disponible

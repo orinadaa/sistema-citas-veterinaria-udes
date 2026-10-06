@@ -211,7 +211,7 @@ export function PanelPacientes({ busquedaInicial }) {
             <button
               type="button"
               onClick={() => abrirDetalle(p)}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
             >
               Ver
             </button>

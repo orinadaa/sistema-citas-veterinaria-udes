@@ -120,7 +120,7 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
-                <button type="button" className="relative rounded-full p-2 text-white/80 transition hover:bg-white/10 hover:text-white">
+                <button type="button" className="relative rounded-boton p-2 text-white/80 transition hover:bg-white/10 hover:text-white">
                   <IconoCampana className="h-5 w-5" />
                 </button>
 
@@ -187,13 +187,13 @@ export function Navbar() {
               <div className="hidden items-center gap-1 sm:flex">
                 <Link
                   to="/iniciar-sesion"
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+                  className="rounded-boton px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
                 >
                   Iniciar sesión
                 </Link>
                 <Link
                   to="/registrarse"
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+                  className="rounded-boton px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
                 >
                   Registrarse
                 </Link>
@@ -202,7 +202,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={irAAgendar}
-              className="inline-flex items-center gap-2 rounded-lg bg-brand-amber px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:brightness-95 active:scale-[0.98]"
             >
               <IconoCalendario className="h-4 w-4" />
               Agendar cita

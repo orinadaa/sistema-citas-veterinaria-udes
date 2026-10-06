@@ -212,7 +212,7 @@ export function AdminHeader({ onNavegar }) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button type="button" className="relative rounded-full p-2 text-slate-500 transition hover:bg-slate-100">
+        <button type="button" className="relative rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
           <IconoCampana className="h-5 w-5" />
         </button>
 

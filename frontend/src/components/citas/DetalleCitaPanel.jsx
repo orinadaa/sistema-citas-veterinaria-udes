@@ -65,7 +65,7 @@ function FilaInfo({ icono: Icono, etiqueta, valor, detalle, accion }) {
 // Boton outline azul de una fila (boton, o enlace externo si trae href).
 function BotonFila({ icono: Icono, onClick, href, children }) {
   const clase =
-    'inline-flex items-center gap-1.5 rounded-lg border border-brand-blue px-3 py-1.5 text-xs font-semibold text-brand-blue transition hover:bg-blue-50';
+    'inline-flex items-center gap-1.5 rounded-boton border border-brand-blue px-3 py-1.5 text-xs font-semibold text-brand-blue transition hover:bg-blue-50';
   if (href) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className={clase}>
@@ -133,7 +133,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
       <button
         type="button"
         onClick={() => setModo('confirmarCancelar')}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-brand-red px-4 py-2.5 text-sm font-semibold text-brand-red transition hover:bg-red-50"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-boton border border-brand-red px-4 py-2.5 text-sm font-semibold text-brand-red transition hover:bg-red-50"
       >
         <IconoPapelera className="h-4 w-4" />
         Cancelar cita
@@ -146,7 +146,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           type="button"
           disabled={!nuevaFranja || enviando}
           onClick={confirmarReprogramacion}
-          className="flex-1 rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex-1 rounded-boton bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {enviando ? 'Guardando...' : 'Confirmar nueva fecha'}
         </button>
@@ -157,7 +157,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
             setNuevaFranja(null);
             setError('');
           }}
-          className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          className="rounded-boton border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
           Volver
         </button>
@@ -170,14 +170,14 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           type="button"
           disabled={enviando}
           onClick={confirmarCancelacion}
-          className="flex-1 rounded-xl bg-brand-red px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex-1 rounded-boton bg-brand-red px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {enviando ? 'Cancelando...' : 'Sí, cancelar'}
         </button>
         <button
           type="button"
           onClick={() => setModo('vista')}
-          className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          className="rounded-boton border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
           No, mantenerla
         </button>

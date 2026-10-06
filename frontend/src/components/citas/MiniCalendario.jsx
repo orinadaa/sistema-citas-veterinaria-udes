@@ -41,14 +41,14 @@ export function MiniCalendario({ diaSeleccionado, onSeleccionarDia }) {
           <button
             type="button"
             onClick={() => setMesMostrado((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-boton p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
           >
             <IconoFlechaDerecha className="h-3.5 w-3.5 rotate-180" />
           </button>
           <button
             type="button"
             onClick={() => setMesMostrado((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-boton p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
           >
             <IconoFlechaDerecha className="h-3.5 w-3.5" />
           </button>
@@ -70,7 +70,7 @@ export function MiniCalendario({ diaSeleccionado, onSeleccionarDia }) {
               key={celda.toISOString()}
               type="button"
               onClick={() => onSeleccionarDia(celda)}
-              className={`mx-auto flex h-7 w-7 items-center justify-center rounded-full transition ${
+              className={`mx-auto flex h-7 w-7 items-center justify-center rounded-boton transition ${
                 esSeleccionado
                   ? 'bg-brand-blue text-white'
                   : esHoy

@@ -256,7 +256,7 @@ export function AgendarCitaPage() {
                   <button
                     type="button"
                     onClick={() => (pagina === 1 ? navigate('/panel') : irAPagina(pagina - 1))}
-                    className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                    className="rounded-boton border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
                   >
                     {pagina === 1 ? 'Cancelar' : 'Volver'}
                   </button>
@@ -264,7 +264,7 @@ export function AgendarCitaPage() {
                     type="button"
                     disabled={!paginaCompleta || enviando}
                     onClick={pagina === 2 ? confirmarCita : () => irAPagina(pagina + 1)}
-                    className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-boton bg-brand-blue px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {pagina === 2 ? (enviando ? 'Agendando...' : 'Confirmar cita') : 'Continuar'}
                     <IconoFlechaDerecha className="h-4 w-4" />

@@ -62,7 +62,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
             type="button"
             onClick={() => setFiltro(f.id)}
             aria-pressed={filtro === f.id}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium ring-1 transition ${
+            className={`rounded-boton px-4 py-1.5 text-sm font-medium ring-1 transition ${
               filtro === f.id
                 ? 'bg-[#EAF4FD] text-brand-blue ring-transparent'
                 : 'bg-white text-slate-500 ring-slate-200 hover:bg-slate-50'
@@ -136,7 +136,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
                 <button
                   type="button"
                   onClick={() => setCitaDetalle(cita)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-brand-blue bg-white px-3 py-1.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-boton border border-brand-blue bg-white px-3 py-1.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
                 >
                   Ver detalles
                   <IconoFlechaDerecha className="h-4 w-4" />

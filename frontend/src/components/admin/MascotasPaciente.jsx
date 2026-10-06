@@ -93,7 +93,7 @@ function TarjetaMascota({ mascota, onEditar, accionesExtra = [] }) {
             onClick={() => setMenuAbierto((abierto) => !abierto)}
             aria-label={`Acciones para ${mascota.nombre}`}
             aria-expanded={menuAbierto}
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+            className="rounded-boton p-1.5 text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
           >
             <IconoPuntos className="h-5 w-5" />
           </button>
@@ -262,7 +262,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
             setAviso('');
             setFormularioAbierto(true);
           }}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-brand-blue hover:text-brand-blue"
+          className="inline-flex items-center justify-center gap-2 rounded-boton border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-brand-blue hover:text-brand-blue"
         >
           <IconoMas className="h-4 w-4" />
           Agregar mascota
@@ -412,14 +412,14 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
               limpiar();
               setAviso('');
             }}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            className="rounded-boton border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={guardando}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <IconoPata className="h-4 w-4" />
             {guardando ? 'Guardando...' : mascotaEditando ? 'Guardar cambios' : 'Agregar mascota'}

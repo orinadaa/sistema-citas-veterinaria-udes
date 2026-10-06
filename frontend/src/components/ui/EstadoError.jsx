@@ -12,7 +12,7 @@ export function EstadoError({ mensaje, onReintentar }) {
       <button
         type="button"
         onClick={onReintentar}
-        className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+        className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
       >
         Reintentar
       </button>

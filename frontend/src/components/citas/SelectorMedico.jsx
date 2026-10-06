@@ -63,7 +63,7 @@ export function SelectorMedico({ sedeId, servicioId, fechaHora, valorSeleccionad
                 key={medico.id}
                 type="button"
                 onClick={() => onSeleccionar(medico.id)}
-                className={`rounded-lg border px-4 py-2.5 text-left text-sm font-medium transition ${
+                className={`rounded-boton border px-4 py-2.5 text-left text-sm font-medium transition ${
                   seleccionado
                     ? 'border-blue-600 bg-blue-50 text-blue-700'
                     : 'border-slate-300 text-slate-700 hover:border-blue-300'

@@ -29,7 +29,7 @@ export function KPICard({ icon: Icono, color = 'blue', value, detalle, label, on
         <button
           type="button"
           onClick={onClick}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-boton bg-slate-50 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
         >
           <IconoFlechaDerecha className="h-3.5 w-3.5" />
         </button>

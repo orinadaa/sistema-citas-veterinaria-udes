@@ -29,7 +29,7 @@ export function SelectorSexo({ id, valor, onChange, requerido = false, etiqueta 
               role="radio"
               aria-checked={elegida}
               onClick={() => onChange(opcion.valor)}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium ring-1 transition ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-boton px-3 py-2 text-sm font-medium ring-1 transition ${
                 elegida ? `${opcion.activa} ring-2` : 'bg-white text-slate-600 ring-slate-300 hover:bg-slate-50'
               }`}
             >

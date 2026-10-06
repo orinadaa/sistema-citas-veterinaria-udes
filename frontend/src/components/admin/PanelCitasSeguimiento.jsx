@@ -174,16 +174,16 @@ export function PanelCitasSeguimiento() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={irSemanaAnterior} className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100">
+        <button type="button" onClick={irSemanaAnterior} className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
           <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
         </button>
-        <button type="button" onClick={irSemanaSiguiente} className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100">
+        <button type="button" onClick={irSemanaSiguiente} className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
           <IconoFlechaDerecha className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={irHoy}
-          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+          className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
         >
           Hoy
         </button>
@@ -323,7 +323,7 @@ export function PanelCitasSeguimiento() {
               type="submit"
               form="form-nueva-cita-admin"
               disabled={guardandoNueva}
-              className="w-full rounded-xl bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:opacity-60"
+              className="w-full rounded-boton bg-brand-amber px-4 py-2 text-sm font-semibold text-brand-navy transition hover:brightness-95 disabled:opacity-60"
             >
               {guardandoNueva ? 'Agendando...' : 'Agendar cita'}
             </button>

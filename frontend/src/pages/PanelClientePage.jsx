@@ -110,7 +110,7 @@ export function PanelClientePage() {
           {pestana === 'citas' && (
             <Link
               to="/agendar"
-              className="mb-2 inline-flex items-center gap-1.5 rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600"
+              className="mb-2 inline-flex items-center gap-1.5 rounded-boton bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600"
             >
               <IconoMas className="h-4 w-4" />
               Agendar nueva cita

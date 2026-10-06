@@ -46,7 +46,7 @@ function MenuFila({ opciones }) {
         aria-label="Más acciones"
         aria-expanded={abierto}
         onClick={() => setAbierto((a) => !a)}
-        className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+        className="rounded-boton p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
       >
         <IconoPuntos className="h-5 w-5" />
       </button>
@@ -237,7 +237,7 @@ export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
                     <button
                       type="button"
                       onClick={() => agendarCon(p)}
-                      className="rounded-lg border border-brand-blue px-2.5 py-1 text-xs font-semibold text-brand-blue transition hover:bg-blue-50"
+                      className="rounded-boton border border-brand-blue px-2.5 py-1 text-xs font-semibold text-brand-blue transition hover:bg-blue-50"
                     >
                       Agendar
                     </button>
@@ -258,7 +258,7 @@ export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
                 <button
                   type="button"
                   onClick={() => setClienteDetalleId(p.cliente_id)}
-                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
                 >
                   Ver detalles
                 </button>

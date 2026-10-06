@@ -104,7 +104,7 @@ export function RegistroPage() {
         <button
           type="submit"
           disabled={enviando}
-          className="mt-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 rounded-boton bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {enviando ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>

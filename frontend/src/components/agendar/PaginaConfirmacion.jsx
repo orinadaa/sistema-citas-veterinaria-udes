@@ -183,20 +183,20 @@ export function PaginaConfirmacion({ cita, correoEnviado: correoEnviadoInicial, 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
         <Link
           to="/"
-          className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          className="rounded-boton border border-slate-300 bg-white px-5 py-2.5 text-center text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
           Volver al inicio
         </Link>
         <button
           type="button"
           onClick={onAgendarOtra}
-          className="rounded-xl border border-brand-blue bg-white px-5 py-2.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
+          className="rounded-boton border border-brand-blue bg-white px-5 py-2.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
         >
           Agendar otra cita
         </button>
         <Link
           to="/panel"
-          className="rounded-xl bg-brand-blue px-5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600"
+          className="rounded-boton bg-brand-blue px-5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-brand-blue-600"
         >
           Ver mis citas
         </Link>

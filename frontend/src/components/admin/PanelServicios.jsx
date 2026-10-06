@@ -243,7 +243,7 @@ export function PanelServicios({ busquedaInicial }) {
             <button
               type="button"
               onClick={() => abrirEditar(s)}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
             >
               Editar
             </button>
@@ -264,7 +264,7 @@ export function PanelServicios({ busquedaInicial }) {
               type="button"
               disabled={guardando}
               onClick={desactivarDesdeElPanel}
-              className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
+              className="rounded-boton border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
             >
               Desactivar servicio
             </button>
@@ -275,7 +275,7 @@ export function PanelServicios({ busquedaInicial }) {
             type="submit"
             form="form-servicio"
             disabled={guardando}
-            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+            className="rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
           >
             {guardando ? 'Guardando...' : 'Guardar cambios'}
           </button>

@@ -46,7 +46,7 @@ export function SidePanel({ isOpen, onClose, title, children, footer }) {
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          className="rounded-boton p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
         >
           <IconoX className="h-5 w-5" />
         </button>

@@ -341,7 +341,7 @@ export function PanelMedicos({ busquedaInicial }) {
             <button
               type="button"
               onClick={() => abrirEditar(m)}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
             >
               Editar
             </button>
@@ -362,7 +362,7 @@ export function PanelMedicos({ busquedaInicial }) {
               type="button"
               disabled={guardando}
               onClick={desactivarDesdeElPanel}
-              className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
+              className="rounded-boton border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
             >
               Desactivar médico
             </button>
@@ -373,7 +373,7 @@ export function PanelMedicos({ busquedaInicial }) {
             type="submit"
             form="form-medico"
             disabled={guardando}
-            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+            className="rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
           >
             {guardando ? 'Guardando...' : 'Guardar cambios'}
           </button>
@@ -467,7 +467,7 @@ export function PanelMedicos({ busquedaInicial }) {
                       key={s.id}
                       type="button"
                       onClick={() => alternarServicio(medicoActual, s.id)}
-                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                      className={`rounded-boton px-3 py-1.5 text-xs font-medium transition ${
                         activo ? 'bg-brand-blue text-white hover:bg-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >

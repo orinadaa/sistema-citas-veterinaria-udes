@@ -138,7 +138,7 @@ function CambioCorreo({ correoActual, onCambiado }) {
               setPaso('pedir');
               setEstado(null);
             }}
-            className="shrink-0 rounded-lg border border-brand-blue px-3 py-2 text-sm font-semibold text-brand-blue hover:bg-blue-50"
+            className="shrink-0 rounded-boton border border-brand-blue px-3 py-2 text-sm font-semibold text-brand-blue hover:bg-blue-50"
           >
             Cambiar
           </button>
@@ -165,7 +165,7 @@ function CambioCorreo({ correoActual, onCambiado }) {
                 type="button"
                 disabled={enviando || !correoNuevo.trim()}
                 onClick={pedirCodigo}
-                className="shrink-0 rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-50"
+                className="shrink-0 rounded-boton bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-50"
               >
                 {enviando ? 'Enviando...' : 'Enviar código'}
               </button>
@@ -186,7 +186,7 @@ function CambioCorreo({ correoActual, onCambiado }) {
                 type="button"
                 disabled={enviando || codigo.length !== 6}
                 onClick={confirmar}
-                className="shrink-0 rounded-lg bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-50"
+                className="shrink-0 rounded-boton bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-50"
               >
                 {enviando ? 'Verificando...' : 'Confirmar'}
               </button>
@@ -338,7 +338,7 @@ export function PanelMiPerfilMedico() {
                     type="button"
                     onClick={() => setEditorFoto(true)}
                     aria-label="Cambiar foto de perfil"
-                    className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand-blue text-white shadow-md ring-4 ring-white hover:bg-brand-blue-600"
+                    className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-boton bg-brand-blue text-white shadow-md ring-4 ring-white hover:bg-brand-blue-600"
                   >
                     <IconoCamara className="h-4 w-4" />
                   </button>
@@ -402,7 +402,7 @@ export function PanelMiPerfilMedico() {
                       <button
                         type="button"
                         onClick={() => setEditorFoto(true)}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                        className="inline-flex items-center justify-center gap-2 rounded-boton border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                       >
                         <IconoCamara className="h-4 w-4" />
                         Cambiar foto
@@ -432,7 +432,7 @@ export function PanelMiPerfilMedico() {
                   <button
                     type="submit"
                     disabled={guardando === 'personal'}
-                    className="self-end rounded-xl bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
+                    className="self-end rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
                   >
                     {guardando === 'personal' ? 'Guardando...' : 'Guardar cambios'}
                   </button>
@@ -476,7 +476,7 @@ export function PanelMiPerfilMedico() {
                   <button
                     type="submit"
                     disabled={guardando === 'clave'}
-                    className="self-end rounded-xl border border-brand-blue px-5 py-2 text-sm font-semibold text-brand-blue hover:bg-blue-50 disabled:opacity-60"
+                    className="self-end rounded-boton border border-brand-blue px-5 py-2 text-sm font-semibold text-brand-blue hover:bg-blue-50 disabled:opacity-60"
                   >
                     {guardando === 'clave' ? 'Actualizando...' : 'Actualizar contraseña'}
                   </button>
@@ -578,7 +578,7 @@ export function PanelMiPerfilMedico() {
                 <button
                   type="submit"
                   disabled={guardando === 'profesional'}
-                  className="self-end rounded-xl bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
+                  className="self-end rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
                 >
                   {guardando === 'profesional' ? 'Guardando...' : 'Guardar cambios'}
                 </button>

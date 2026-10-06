@@ -59,7 +59,7 @@ export function PanelMisMascotas() {
         <button
           type="button"
           onClick={abrirCrear}
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-amber px-4 py-2.5 text-sm font-semibold text-brand-navy shadow-sm transition hover:brightness-95"
+          className="inline-flex items-center gap-2 rounded-boton bg-brand-amber px-4 py-2.5 text-sm font-semibold text-brand-navy shadow-sm transition hover:brightness-95"
         >
           + Agregar mascota
         </button>
@@ -108,7 +108,7 @@ export function PanelMisMascotas() {
                 <button
                   type="button"
                   onClick={() => abrirEditar(mascota)}
-                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
                 >
                   Ver detalles
                 </button>
@@ -116,7 +116,7 @@ export function PanelMisMascotas() {
                   type="button"
                   onClick={() => abrirEditar(mascota, { eliminar: true })}
                   aria-label={`Eliminar a ${mascota.nombre}`}
-                  className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-brand-red"
+                  className="rounded-boton p-2 text-slate-400 transition hover:bg-red-50 hover:text-brand-red"
                 >
                   <IconoPapelera className="h-4 w-4" />
                 </button>

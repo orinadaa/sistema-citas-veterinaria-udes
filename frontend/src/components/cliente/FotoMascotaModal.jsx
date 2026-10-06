@@ -249,7 +249,7 @@ export function FotoMascotaModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-boton p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
           >
             <IconoX className="h-5 w-5" />
           </button>
@@ -268,7 +268,7 @@ export function FotoMascotaModal({
                   disabled={!habilitado}
                   onClick={() => setPaso(p.id)}
                   aria-current={activo ? 'step' : undefined}
-                  className={`flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition md:flex-none ${
+                  className={`flex flex-1 items-center gap-2 rounded-boton px-3 py-2.5 text-left text-sm font-medium transition md:flex-none ${
                     activo ? 'bg-blue-50 text-brand-blue' : habilitado ? 'text-slate-600 hover:bg-slate-50' : 'text-slate-300'
                   }`}
                 >
@@ -379,7 +379,7 @@ export function FotoMascotaModal({
                 aria-label="Alejar"
                 disabled={!imagen || zoom <= ZOOM_MIN}
                 onClick={() => setZoom((z) => Math.max(ZOOM_MIN, +(z - 0.1).toFixed(2)))}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-lg leading-none text-slate-600 disabled:opacity-40"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-boton border border-slate-300 bg-white text-lg leading-none text-slate-600 disabled:opacity-40"
               >
                 −
               </button>
@@ -399,7 +399,7 @@ export function FotoMascotaModal({
                 aria-label="Acercar"
                 disabled={!imagen || zoom >= ZOOM_MAX}
                 onClick={() => setZoom((z) => Math.min(ZOOM_MAX, +(z + 0.1).toFixed(2)))}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-lg leading-none text-slate-600 disabled:opacity-40"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-boton border border-slate-300 bg-white text-lg leading-none text-slate-600 disabled:opacity-40"
               >
                 +
               </button>
@@ -408,7 +408,7 @@ export function FotoMascotaModal({
               type="button"
               disabled={!imagen}
               onClick={() => setRotacion((r) => (r + 90) % 360)}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
+              className="inline-flex items-center gap-2 rounded-boton border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
             >
               <IconoRotar className="h-4 w-4" />
               Rotar
@@ -420,7 +420,7 @@ export function FotoMascotaModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+            className="rounded-boton border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
           >
             Cancelar
           </button>
@@ -428,7 +428,7 @@ export function FotoMascotaModal({
             type="button"
             disabled={!imagen || guardando}
             onClick={guardar}
-            className="rounded-lg bg-brand-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {guardando ? 'Procesando...' : 'Guardar foto'}
           </button>
