@@ -12,7 +12,9 @@ export function EncabezadoPagina({ antetitulo, titulo, descripcion, acciones, im
       <div>
         {antetitulo && <p className="text-xs font-semibold uppercase tracking-wider text-blue-50">{antetitulo}</p>}
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-white md:text-4xl">{titulo}</h1>
-        {descripcion && <p className="mt-2 max-w-xl text-blue-50">{descripcion}</p>}
+        {/* Blanco (no blue-50): arriba de la pagina hay halos claros y en movil
+            blue-50 quedaba en 4.4:1. */}
+        {descripcion && <p className="mt-2 max-w-xl text-white">{descripcion}</p>}
         {acciones && <div className="mt-5 flex flex-wrap gap-3">{acciones}</div>}
       </div>
       {imagen}

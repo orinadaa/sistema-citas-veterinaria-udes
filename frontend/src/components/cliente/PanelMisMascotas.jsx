@@ -3,12 +3,13 @@
 // solo se podia agregar una mascota de forma inline al agendar una
 // cita (MascotaSelector.jsx); aqui se pueden ver todas y editarlas.
 // El formulario (SidePanel) vive en FormularioMascotaPanel.jsx, compartido
-// con el flujo de agendamiento.
+// con el flujo de agendamiento. vetUI: cada mascota en una Tarjeta de
+// cristal; "Agregar mascota" es la accion primaria (ambar).
 import { useEffect, useState } from 'react';
 import { obtenerMisMascotas } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { EstadoError } from '../ui/EstadoError';
-import { IconoPapelera } from '../icons';
+import { Aviso, Boton, EstadoError, EstadoVacio, Esqueleto, Tarjeta } from '../vetui';
+import { IconoMas, IconoPapelera } from '../icons';
 import { AvatarMascota } from './AvatarMascota';
 import { edadYPeso } from '../../utils/mascota';
 import { FormularioMascotaPanel } from './FormularioMascotaPanel';
@@ -53,75 +54,54 @@ export function PanelMisMascotas() {
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-heading text-lg font-semibold text-brand-navy">Mis mascotas</h2>
-          <p className="text-sm text-slate-500">Registra y edita la información de tus mascotas.</p>
+          <h2 className="text-xl font-bold text-white">Mis mascotas</h2>
+          <p className="text-sm text-blue-100">Registra y edita la información de tus mascotas.</p>
         </div>
-        <button
-          type="button"
-          onClick={abrirCrear}
-          className="boton-glass-ambar inline-flex items-center gap-2 rounded-boton px-4 py-2.5 text-sm font-semibold text-brand-navy transition"
-        >
-          + Agregar mascota
-        </button>
+        <Boton icono={IconoMas} onClick={abrirCrear}>
+          Agregar mascota
+        </Boton>
       </div>
 
-      {aviso.texto && (
-        <p
-          className={`rounded-xl px-4 py-3 text-sm font-medium ring-1 ${
-            aviso.tipo === 'ok' ? 'bg-emerald-50 text-brand-green ring-emerald-200' : 'bg-amber-50 text-amber-800 ring-amber-200'
-          }`}
-        >
-          {aviso.texto}
-        </p>
-      )}
+      {aviso.texto && <Aviso tono={aviso.tipo === 'ok' ? 'ok' : 'alerta'}>{aviso.texto}</Aviso>}
 
       {cargando ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[0, 1].map((clave) => (
-            <div key={clave} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+            <Esqueleto key={clave} />
           ))}
         </div>
       ) : errorCarga ? (
         <EstadoError mensaje={errorCarga} onReintentar={cargar} />
       ) : mascotas.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-          Aún no has registrado mascotas.
-        </p>
+        <EstadoVacio>Aún no has registrado mascotas.</EstadoVacio>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {mascotas.map((mascota) => (
-            <div
-              key={mascota.id}
-              className="flex items-start justify-between gap-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
-            >
+            <Tarjeta key={mascota.id} className="flex items-start justify-between gap-3 p-5">
               <div className="flex min-w-0 items-center gap-3">
                 <AvatarMascota mascota={mascota} className="h-14 w-14" />
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
-                  <p className="truncate text-sm text-slate-500">
+                  <p className="truncate text-sm text-slate-700">
                     {[mascota.especie, mascota.raza].filter(Boolean).join(' · ') || 'Sin datos adicionales'}
                   </p>
-                  {edadYPeso(mascota) && <p className="text-xs text-slate-400">{edadYPeso(mascota)}</p>}
+                  {edadYPeso(mascota) && <p className="text-xs font-medium text-slate-700">{edadYPeso(mascota)}</p>}
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => abrirEditar(mascota)}
-                  className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                >
+                <Boton variante="contorno" tamano="sm" onClick={() => abrirEditar(mascota)}>
                   Ver detalles
-                </button>
+                </Boton>
                 <button
                   type="button"
                   onClick={() => abrirEditar(mascota, { eliminar: true })}
                   aria-label={`Eliminar a ${mascota.nombre}`}
-                  className="rounded-boton p-2 text-slate-400 transition hover:bg-red-50 hover:text-brand-red"
+                  className="rounded-boton p-2 text-slate-700 transition hover:bg-red-50 hover:text-red-700"
                 >
                   <IconoPapelera className="h-4 w-4" />
                 </button>
               </div>
-            </div>
+            </Tarjeta>
           ))}
         </div>
       )}

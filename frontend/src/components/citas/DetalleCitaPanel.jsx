@@ -13,7 +13,7 @@ import { reprogramarCita, cancelarCita } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearFechaCorta, formatearHora } from '../../utils/fecha';
 import { formatearCOP } from '../../utils/moneda';
-import { SidePanel } from '../ui/SidePanel';
+import { PanelLateral } from '../vetui';
 import { StatusBadge } from '../ui/StatusBadge';
 import { SelectorFranjas } from './SelectorFranjas';
 import { AvatarMascota } from '../cliente/AvatarMascota';
@@ -195,7 +195,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     : '';
 
   return (
-    <SidePanel isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={footer}>
+    <PanelLateral isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={footer}>
       {cita && (
         <div className="flex flex-col gap-6">
           {/* 2. Resumen de la mascota */}
@@ -350,6 +350,6 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           )}
         </div>
       )}
-    </SidePanel>
+    </PanelLateral>
   );
 }
