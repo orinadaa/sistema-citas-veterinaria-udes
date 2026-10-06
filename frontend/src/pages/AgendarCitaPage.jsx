@@ -144,7 +144,7 @@ export function AgendarCitaPage() {
     setFranja(null);
   }
 
-  // "Cancelar" (abajo en la pagina 1 y en el stepper lateral): si ya hay
+  // "Cancelar" (abajo, junto a Volver): si ya hay
   // algo elegido mas alla de la mascota, se confirma antes de salir para
   // no perder el progreso sin avisar.
   const hayProgreso = pagina > 1 || Boolean(servicioId || fecha || franja || motivo.trim());
@@ -153,6 +153,29 @@ export function AgendarCitaPage() {
     else navigate('/panel');
   }
   const seguirAgendando = useCallback(() => setConfirmarSalida(false), []);
+
+  // Click en un paso de cualquiera de los dos steppers. Se puede ir a los
+  // pasos ya hechos y a los de la pagina actual; a la pagina 2 desde la 1
+  // solo si la 1 esta completa. El paso 5 (confirmacion) solo se alcanza
+  // confirmando, y con la cita ya creada no se navega.
+  function puedeIrAHito(hito) {
+    if (citaCreada) return false;
+    if (hito.pagina <= pagina) return true;
+    return hito.pagina === 2 && pagina === 1 && paginaCompleta;
+  }
+  function irAHito(hito) {
+    if (!puedeIrAHito(hito)) return;
+    const comportamiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    const desplazar = () => document.getElementById(`paso-${hito.numero}`)?.scrollIntoView({ behavior: comportamiento, block: 'start' });
+    if (hito.pagina === pagina) {
+      desplazar();
+      return;
+    }
+    setErrorConfirmar('');
+    setPagina(hito.pagina);
+    // La seccion destino recien existe despues del render de la pagina nueva.
+    requestAnimationFrame(() => requestAnimationFrame(desplazar));
+  }
 
   function irAPagina(numero) {
     setErrorConfirmar('');
@@ -218,24 +241,22 @@ export function AgendarCitaPage() {
           </div>
         </section>
 
-        {/* Entre lg y 1479px el margen lateral no alcanza para el stepper
-            lateral (columna de 96px + 12px al borde + 16px de aire): se
-            reserva ese espacio a la izquierda del contenido para que no lo
-            tape. Desde 1480px ya hay margen libre. */}
-        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[124px] min-[1480px]:pl-6">
-          {/* Desde lg, crossfade con el stepper lateral atado al progreso de
-              la topbar (--flow en <html>, ver Navbar.jsx): esta tarjeta se
-              desvanece (1 - flow) mientras el lateral aparece (flow). Con
-              reduced-motion el cambio es directo (round). Cuando la topbar
-              termino su transicion queda invisible (fuera del arbol de
-              accesibilidad). Debajo de lg no hay lateral: no cambia. */}
-          <div className="-mt-12 rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 sm:px-8 lg:[opacity:calc(1_-_var(--flow,0))] motion-reduce:lg:[opacity:calc(1_-_round(var(--flow,0)))] lg:[[data-topbar-progreso=fin]_&]:invisible">
-            <BookingStepper paginaActual={pagina} />
+        {/* Entre lg y 1359px el margen lateral no alcanza para el stepper
+            lateral (48px + 12px al borde + 16px de aire): se reserva ese
+            espacio a la izquierda del contenido para que no lo tape. Desde
+            1360px ya hay margen libre. */}
+        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[76px] min-[1360px]:pl-6">
+          {/* Desde lg, relevo con el stepper lateral atado al progreso de la
+              topbar (--flow en <html>, ver Navbar.jsx): esta tarjeta se
+              desvanece entre flow 0 y 0.8 y el lateral aparece entre 0.7 y 1,
+              asi el lateral empieza a verse justo antes de que esta termine
+              de irse. Desde la decima 8 queda invisible (sin clicks ni foco).
+              Con reduced-motion no hay fundido: solo cambia la visibilidad.
+              Debajo de lg no hay lateral: no cambia. */}
+          <div className="-mt-12 rounded-2xl bg-white px-4 py-5 shadow-sm ring-1 ring-slate-200 sm:px-8 lg:[opacity:clamp(0,calc(1_-_var(--flow,0)_/_0.8),1)] motion-reduce:lg:[opacity:1] lg:[[data-topbar-decima='8']_&]:invisible lg:[[data-topbar-decima='9']_&]:invisible lg:[[data-topbar-decima='10']_&]:invisible">
+            <BookingStepper paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />
           </div>
-          <BookingStepperLateral
-            paginaActual={pagina}
-            onCancelar={pagina === 3 && citaCreada ? undefined : cancelarAgendamiento}
-          />
+          <BookingStepperLateral paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />
 
           {pagina === 3 && citaCreada ? (
             <div className="mt-8">
@@ -281,13 +302,27 @@ export function AgendarCitaPage() {
                 )}
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => (pagina === 1 ? cancelarAgendamiento() : irAPagina(pagina - 1))}
-                    className="rounded-boton border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                  >
-                    {pagina === 1 ? 'Cancelar' : 'Volver'}
-                  </button>
+                  {/* Volver (desde la pagina 2) + Cancelar, que se mantiene en
+                      todas las paginas del flujo, en rojo por ser la accion de
+                      salida. */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    {pagina > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => irAPagina(pagina - 1)}
+                        className="rounded-boton border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                      >
+                        Volver
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={cancelarAgendamiento}
+                      className="rounded-boton border border-red-500 bg-white px-5 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
                   <button
                     type="button"
                     disabled={!paginaCompleta || enviando}

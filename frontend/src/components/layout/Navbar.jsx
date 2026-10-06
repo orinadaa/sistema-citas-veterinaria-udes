@@ -70,11 +70,12 @@ function aplicarFlow(elemento, t) {
   estilo.setProperty('--flow', String(t));
   // El mismo progreso se publica en <html> para que otros elementos de la
   // pagina se animen sincronizados con la topbar sin un segundo listener
-  // de scroll (ej. el stepper de /agendar). data-topbar-progreso permite
-  // sacar de la interaccion/lectura lo que esta en opacidad ~0.
+  // de scroll (ej. el stepper de /agendar). data-topbar-decima (0..10) es
+  // el progreso en decimas: permite, solo con CSS, sacar de la interaccion
+  // y del arbol de accesibilidad lo que esta en opacidad 0 en cada tramo.
   const raiz = document.documentElement;
   raiz.style.setProperty('--flow', String(t));
-  raiz.dataset.topbarProgreso = t < 0.02 ? 'inicio' : t > 0.98 ? 'fin' : 'medio';
+  raiz.dataset.topbarDecima = String(Math.floor(t * 10));
   estilo.top = `${t * SEPARACION_SUPERIOR}px`;
   estilo.bottom = `${t * (ALTO_HEADER - SEPARACION_SUPERIOR - ALTO_PILDORA)}px`;
   // Margen lateral: al menos 16px y, en pantallas anchas, el necesario
@@ -181,7 +182,7 @@ export function Navbar() {
       if (cuadro !== null) cancelAnimationFrame(cuadro);
       barra.removeAttribute('style');
       document.documentElement.style.removeProperty('--flow');
-      delete document.documentElement.dataset.topbarProgreso;
+      delete document.documentElement.dataset.topbarDecima;
     };
   }, []);
 
