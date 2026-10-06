@@ -3,7 +3,9 @@
 // la mascota", etc.): el numero coincide con el hito del BookingStepper.
 export function Seccion({ numero, titulo, descripcion, children }) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
+    // id = destino del click en el stepper; scroll-mt deja la seccion por
+    // debajo de la pildora de la topbar (76px) al hacer scroll hasta ella.
+    <section id={`paso-${numero}`} className="scroll-mt-28 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-6">
       <div className="flex items-center gap-3">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-sm font-semibold text-white">
           {numero}
