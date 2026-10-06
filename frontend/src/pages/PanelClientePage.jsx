@@ -2,7 +2,7 @@
 // Panel del cliente autenticado (Incremento 4, modulo de Clientes):
 // "Mis citas" (RF-06/RF-08/RF-09/RF-15) y "Mis mascotas" (RF-14),
 // con vetUI (floating glass): fondo de marca, encabezado con la foto del
-// Hero, indicadores en cristal (TarjetaDato), pestañas de vidrio y la
+// Hero, indicadores en vidrio (TarjetaDato), pestañas de vidrio y la
 // accion primaria "Agendar nueva cita" en ambar.
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';

@@ -11,8 +11,13 @@
 // Superficie: vidrio. Contenedor sobre el fondo (secciones, resúmenes).
 // Texto blanco; adentro van tarjetas de cristal y controles.
 //
-// Tarjeta: cristal. Contenido u objeto (mascota, cita, sede, horario).
-// Texto oscuro. `tono` celeste/crema, `seleccionada` (anillo ámbar +
+// Tarjeta: objeto o contenido. Regla de material (como el landing):
+//   material="vidrio"   tarjetas que van directo sobre el fondo (indicadores,
+//                       citas, mascotas): el mismo vidrio de las tarjetas de
+//                       seccion del landing, texto blanco, radio 28px.
+//   material="cristal"  (por defecto) tarjetas DENTRO de una superficie de
+//                       vidrio (opciones de agendar, sedes): texto oscuro,
+//                       como las tarjetas de sedes/horarios del landing. `tono` celeste/crema, `seleccionada` (anillo ámbar +
 // check) e `interactiva` (hover que ilumina) para opciones elegibles;
 // `destacada` (anillo ámbar sin check) para resaltar sin indicar elección.
 import { IconoCheck } from '../icons';
@@ -56,8 +61,18 @@ export function Superficie({ as: Componente = 'section', className = '', childre
 
 const TONOS = { blanco: '', celeste: 'cristal-celeste', crema: 'cristal-crema' };
 
+function clasesMaterial({ material, tono, seleccionada, destacada }) {
+  if (material === 'vidrio') {
+    return `vidrio rounded-superficie ${seleccionada || destacada ? 'vidrio-destacado' : ''}`;
+  }
+  return `cristal rounded-tarjeta ${TONOS[tono] ?? ''} ${
+    seleccionada ? 'cristal-seleccionado' : destacada ? 'cristal-destacado' : ''
+  }`;
+}
+
 export function Tarjeta({
   as: Componente = 'div',
+  material = 'cristal',
   tono = 'blanco',
   seleccionada = false,
   destacada = false,
@@ -68,7 +83,7 @@ export function Tarjeta({
 }) {
   return (
     <Componente
-      className={`cristal relative rounded-tarjeta ${TONOS[tono] ?? ''} ${seleccionada ? 'cristal-seleccionado' : destacada ? 'cristal-destacado' : ''} ${
+      className={`relative ${clasesMaterial({ material, tono, seleccionada, destacada })} ${
         interactiva ? 'hover-ilumina-claro cursor-pointer text-left outline-none focus-visible:ring-4 focus-visible:ring-white/60' : ''
       } ${className}`}
       {...resto}
