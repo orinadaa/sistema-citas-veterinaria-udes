@@ -141,15 +141,15 @@ export function Navbar() {
   const grupoDerechoRef = useRef(null);
   const logoRef = useRef(null);
 
-  // Equilibrio del logo grande (estado transparente, arriba de todo): el
-  // logo esta en el centro exacto de la barra, pero como los enlaces de la
-  // izquierda van agrupados en el medio de su mitad y el grupo derecho
-  // llega hasta el logo, queda mas aire a su izquierda que a su derecha y
-  // se percibe corrido. Se mide ese desbalance y el logo grande se corre a
-  // la izquierda la mitad de la diferencia (--equilibrio), para quedar a
-  // la misma distancia de "Horarios" que del grupo derecho. El corrimiento
-  // se deshace con el viaje del isotipo (ver el <Link> del logo): con la
-  // pildora formada el logo corto vuelve al centro exacto.
+  // Equilibrio del logo (regla de Oriana: en todos los estados de la
+  // topbar el logo va en la mitad entre los enlaces de la izquierda y los
+  // componentes de la derecha, a la misma distancia de ambos). Su columna
+  // esta en el centro exacto de la barra, pero como los enlaces van
+  // agrupados en el medio de su mitad y el grupo derecho llega hasta el
+  // logo, queda mas aire a su izquierda que a su derecha. Se mide ese
+  // desbalance y el logo se corre a la izquierda la mitad de la diferencia
+  // (--equilibrio), igual con la barra transparente (logo grande) que con
+  // la pildora formada (logo corto).
   useLayoutEffect(() => {
     const fila = filaRef.current;
     const logo = logoRef.current;
@@ -351,11 +351,11 @@ export function Navbar() {
             className="relative flex h-10 w-[126px] items-center justify-center"
             // --viaje (0..1): avance del isotipo hacia el centro, compartido
             // por el logo grande y el isotipo blanco para que se muevan juntos.
-            // --equilibrio: corrimiento a la izquierda del logo grande (efecto de
-            // arriba); se deshace con el viaje, asi el logo corto llega al centro.
+            // --equilibrio: corrimiento a la izquierda para quedar a la misma
+            // distancia de los dos grupos (efecto de arriba), en todo el scroll.
             style={{
               '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)',
-              transform: 'translateX(calc(var(--equilibrio, 0px) * (var(--viaje) - 1)))',
+              transform: 'translateX(calc(var(--equilibrio, 0px) * -1))',
             }}
           >
             <>
