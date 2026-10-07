@@ -246,7 +246,6 @@ export function GuiaVetuiPage() {
                 onChange={setFechaNacimiento}
                 minimo={null}
                 maximo={new Date().toLocaleDateString('en-CA')}
-                selectorRapido
               />
               <ZonaFoto fotoUrl={foto} onClick={() => setEditorFoto(true)} />
             </div>

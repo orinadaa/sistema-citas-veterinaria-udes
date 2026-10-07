@@ -195,7 +195,7 @@ Aplica a los tres roles (cliente, médico y administrador), no solo a las pantal
 - Para elegir día y hora de una cita se muestra completo, con `TimeSlotPicker` al lado o debajo (agendar, reprogramar, "Nueva cita" del administrador y del médico).
 - Para cualquier otro campo de fecha se usa `CampoFecha` (`components/form/`): se ve como un campo y despliega ese mismo calendario. Trabaja con `"YYYY-MM-DD"`, igual que el input nativo que reemplaza.
   - Por defecto no deja elegir días pasados. `minimo={null}` quita ese límite; `maximo` pone un tope.
-  - `selectorRapido` vuelve botones el mes y el año del encabezado: el mes abre la grilla de 12 meses y el año una lista de años (fecha de nacimiento, rangos de reportes). No son listas desplegables del navegador.
+  - En todos los calendarios (también el de agendar y reprogramar) el mes y el año del encabezado se pueden pulsar: el mes abre la grilla de 12 meses y el año una lista de años. No son listas desplegables del navegador; lo que queda fuera de los límites sale deshabilitado.
   - Sin `requerido`, el desplegable ofrece "Borrar fecha".
 
 Las horas sueltas (horarios de atención, pausas, hora de un recordatorio) siguen con el campo de hora nativo: no son un calendario.

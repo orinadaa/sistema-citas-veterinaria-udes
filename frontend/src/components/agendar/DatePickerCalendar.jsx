@@ -9,12 +9,15 @@
 //
 // minimo / maximo ("YYYY-MM-DD"): limites elegibles. minimo sin pasar =
 // hoy (no se agenda en el pasado); minimo={null} = sin limite inferior
-// (fecha de nacimiento, reportes). selectorRapido: el mes y el año del
-// encabezado son botones; el mes abre la grilla de los 12 meses y el año
-// una lista de años para recorrer, para llegar rapido a fechas lejanas
-// (nacimiento). No son <select>: se eligen dentro del mismo calendario.
+// (fecha de nacimiento, reportes).
+//
+// En todos los calendarios del sistema (pedido de Oriana) el mes y el año
+// del encabezado se pueden pulsar: el mes abre la grilla de los 12 meses
+// y el año una lista de años para recorrer, ademas de las flechas de mes.
+// No son <select>: se eligen dentro del mismo calendario, y lo que queda
+// fuera de los limites sale deshabilitado.
 import { useState } from 'react';
-import { aFechaLocal, desdeFechaLocal, esMismoDia, formatearMesAnio, sumarDias } from '../../utils/fecha';
+import { aFechaLocal, desdeFechaLocal, esMismoDia, sumarDias } from '../../utils/fecha';
 import { IconoFlechaDerecha } from '../icons';
 
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
@@ -66,7 +69,7 @@ function generarCeldas(mes) {
 
 // diasAbiertos: Set de dia_semana (0=domingo..6=sabado) con horario, o
 // null mientras carga (en ese caso no se deshabilita por dia de semana).
-export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio = false, minimo, maximo, selectorRapido = false }) {
+export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio = false, minimo, maximo }) {
   const t = sobreVidrio ? TONOS.vidrio : TONOS.claro;
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
@@ -89,7 +92,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
   const anioFinal = hasta ? hasta.getFullYear() : hoy.getFullYear() + ANIOS_ADELANTE;
   const anios = [];
   for (let anio = Math.min(anioInicial, mes.getFullYear()); anio <= Math.max(anioFinal, mes.getFullYear()); anio++) anios.push(anio);
-  // Vista del cuerpo (solo con selectorRapido): los dias del mes, la
+  // Vista del cuerpo: los dias del mes, la
   // grilla de 12 meses o la lista de años. Se cambia pulsando el mes o el
   // año del encabezado; elegir uno vuelve a los dias.
   const [vista, setVista] = useState('dias');
@@ -114,30 +117,26 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
   return (
     <div>
       <div className="flex min-h-9 items-center justify-between">
-        {selectorRapido ? (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              aria-label={`Mes: ${MESES[mes.getMonth()]}. Cambiar mes`}
-              aria-expanded={vista === 'meses'}
-              onClick={() => setVista(vista === 'meses' ? 'dias' : 'meses')}
-              className={claseEncabezado(vista === 'meses')}
-            >
-              {MESES[mes.getMonth()]}
-            </button>
-            <button
-              type="button"
-              aria-label={`Año: ${mes.getFullYear()}. Cambiar año`}
-              aria-expanded={vista === 'anios'}
-              onClick={() => setVista(vista === 'anios' ? 'dias' : 'anios')}
-              className={claseEncabezado(vista === 'anios')}
-            >
-              {mes.getFullYear()}
-            </button>
-          </div>
-        ) : (
-          <p className={`font-heading text-base font-semibold ${t.titulo}`}>{formatearMesAnio(mes)}</p>
-        )}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            aria-label={`Mes: ${MESES[mes.getMonth()]}. Cambiar mes`}
+            aria-expanded={vista === 'meses'}
+            onClick={() => setVista(vista === 'meses' ? 'dias' : 'meses')}
+            className={claseEncabezado(vista === 'meses')}
+          >
+            {MESES[mes.getMonth()]}
+          </button>
+          <button
+            type="button"
+            aria-label={`Año: ${mes.getFullYear()}. Cambiar año`}
+            aria-expanded={vista === 'anios'}
+            onClick={() => setVista(vista === 'anios' ? 'dias' : 'anios')}
+            className={claseEncabezado(vista === 'anios')}
+          >
+            {mes.getFullYear()}
+          </button>
+        </div>
         {vista === 'dias' && (
           <div className="flex gap-1">
             <button

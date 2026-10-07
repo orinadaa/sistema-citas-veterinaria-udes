@@ -6,7 +6,7 @@
 //
 // valor / onChange trabajan con "YYYY-MM-DD" ('' = sin fecha), igual que
 // el input nativo que reemplaza, asi quien lo usa no cambia su estado.
-// - minimo / maximo / selectorRapido: se pasan al calendario (ver ahi).
+// - minimo / maximo: se pasan al calendario (ver ahi).
 // - requerido: asterisco en la etiqueta; sin el, el desplegable ofrece
 //   "Borrar fecha". La validacion al enviar la hace cada formulario.
 // - alinear="derecha": el desplegable se ancla al borde derecho del campo
@@ -39,7 +39,6 @@ export function CampoFecha({
   onChange,
   minimo,
   maximo,
-  selectorRapido = false,
   requerido = false,
   placeholder = 'Selecciona una fecha',
   alinear = 'izquierda',
@@ -140,7 +139,6 @@ export function CampoFecha({
             valor={valor}
             minimo={minimo}
             maximo={maximo}
-            selectorRapido={selectorRapido}
             onChange={(fecha) => {
               onChange(fecha);
               setAbierto(false);
