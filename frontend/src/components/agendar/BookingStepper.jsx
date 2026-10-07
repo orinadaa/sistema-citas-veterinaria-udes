@@ -45,6 +45,9 @@ function Hito({ navegable, onClick, etiqueta, className, children }) {
   );
 }
 
+// Variante horizontal: suelta sobre el fondo azul de la pagina (sin
+// tarjeta), con los mismos estados que la lateral: activo blanco con
+// anillo ambar, completado verde con check, pendiente en vidrio.
 export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrAHito }) {
   return (
     <ol className="flex items-start" aria-label="Pasos para agendar la cita">
@@ -65,7 +68,7 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
             {siguiente && (
               <span
                 aria-hidden="true"
-                className={`absolute left-1/2 top-4 h-0.5 w-full ${lineaAlcanzada ? 'bg-brand-blue' : 'bg-slate-300'}`}
+                className={`absolute left-1/2 top-4 h-0.5 w-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`}
               />
             )}
             <Hito
@@ -73,7 +76,7 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
               onClick={() => onIrAHito?.(hito)}
               etiqueta={etiquetaAccesible(hito, estado, navegable)}
               className={`group relative z-10 flex flex-col items-center gap-2 text-center ${
-                navegable ? 'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand-blue' : ''
+                navegable ? 'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-white' : ''
               }`}
             >
               <span
@@ -81,15 +84,15 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
                   estado === 'completado'
                     ? 'bg-brand-green text-white'
                     : estado === 'activo'
-                      ? 'bg-brand-blue text-white ring-4 ring-brand-amber/60'
-                      : 'border-2 border-slate-300 bg-white text-slate-600'
+                      ? 'bg-white font-bold text-brand-blue-800 ring-4 ring-brand-amber/70'
+                      : 'vidrio text-blue-50'
                 } ${navegable ? 'group-hover:scale-110' : ''}`}
               >
                 {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : hito.numero}
               </span>
               <span
                 className={`text-xs font-medium sm:text-sm ${
-                  estado === 'pendiente' ? 'text-slate-600' : estado === 'activo' ? 'font-semibold text-brand-blue-700' : 'text-slate-800'
+                  estado === 'pendiente' ? 'text-blue-100' : estado === 'activo' ? 'font-semibold text-white' : 'text-white'
                 } ${navegable ? 'group-hover:underline' : ''}`}
               >
                 {hito.etiqueta}
@@ -119,10 +122,10 @@ export function BookingStepperLateral({ paginaActual, puedeIrAHito = () => false
   return (
     <nav
       aria-label="Progreso de la cita"
-      className="invisible fixed top-1/2 z-30 hidden -translate-y-1/2 [opacity:clamp(0,calc((var(--flow,0)_-_0.7)_/_0.3),1)] motion-reduce:[opacity:1] lg:block [[data-topbar-decima='7']_&]:visible [[data-topbar-decima='8']_&]:visible [[data-topbar-decima='9']_&]:visible [[data-topbar-decima='10']_&]:visible"
-      // Pegado al borde del contenido (max-w-7xl = 80rem) cuando hay margen
-      // libre; si no, a 12px del borde de la pantalla.
-      style={{ left: 'max(12px, calc((100vw - 80rem) / 2 - 64px))' }}
+      className="invisible fixed top-1/2 z-30 hidden -translate-y-1/2 [opacity:clamp(0,calc((var(--flow,0)_-_0.7)_/_0.3),1)] motion-reduce:[opacity:1] lg:block left-[14px] min-[1360px]:left-[calc(((100vw-80rem)/2+24px)/2-24px)] [[data-topbar-decima='7']_&]:visible [[data-topbar-decima='8']_&]:visible [[data-topbar-decima='9']_&]:visible [[data-topbar-decima='10']_&]:visible"
+      // Centrado en el margen libre a la izquierda del contenido (48px de
+      // ancho): entre lg y 1359px ese margen son los 76px que reserva
+      // <main>; desde 1360px es el margen de max-w-7xl (80rem) + 24px.
     >
       <ol className="flex flex-col items-center">
         {HITOS.map((hito, indice) => {

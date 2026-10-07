@@ -258,14 +258,17 @@ export function Navbar() {
   return (
     <header ref={headerRef} className="pointer-events-none sticky top-0 z-40 h-24">
       <div ref={barraRef} className="pointer-events-auto absolute inset-0">
-        <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:gap-x-10 lg:gap-x-12">
+        <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:w-fit md:gap-x-10 lg:gap-x-12">
           {/* La columna izquierda siempre existe (aunque el nav se oculte en
               movil) para que el grid no corra el logo hacia la izquierda.
-              Desde md los dos grupos se pegan al logo (justify-self hacia el
-              centro) y los extremos de la barra quedan vacios a proposito:
-              el contenido se lee agrupado alrededor del logo. */}
-          <div className="justify-self-start md:justify-self-end">
-            <nav className="hidden items-center gap-8 text-base font-medium text-white/90 md:flex">
+              Desde md la fila mide lo que su contenido (w-fit) y va centrada:
+              las dos columnas 1fr quedan del ancho del grupo mas largo (el
+              derecho) y los enlaces de la izquierda se reparten en todo ese
+              ancho (justify-between). Asi el conjunto se ve centrado: mismo
+              espacio del borde a "Servicios" que de "Agendar cita" al otro
+              borde, y misma distancia de cada grupo al logo. */}
+          <div className="justify-self-start md:justify-self-stretch">
+            <nav className="hidden items-center justify-between gap-8 text-base font-medium text-white/90 md:flex">
               {/* Link (no <a>) para que funcionen desde cualquier pagina, no
                   solo desde el landing: si el usuario esta en /panel, primero
                   navega a "/" y LandingPage.jsx hace scroll al hash una vez
@@ -351,7 +354,9 @@ export function Navbar() {
             </>
           </Link>
 
-          <div className="flex items-center gap-2 justify-self-end md:justify-self-start">
+          {/* En tablet (md) el grupo mas largo es el izquierdo: este se reparte
+              igual (stretch + justify-between) para conservar la simetria. */}
+          <div className="flex items-center gap-2 justify-self-end md:justify-between md:justify-self-stretch">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
                 <button type="button" className="relative hidden rounded-boton p-2 xl:inline-flex text-white/80 transition hover:bg-white/10 hover:text-white">
