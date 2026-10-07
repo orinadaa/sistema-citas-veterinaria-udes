@@ -1,5 +1,6 @@
 // components/agendar/TimeSlotPicker.jsx
-// RF-07: horarios del dia elegido, en tabs Mañana / Tarde / Noche. La
+// RF-07: horarios del dia elegido, en tabs Mañana / Tarde / Noche (solo
+// los turnos que el horario de atencion de la sede cubre ese dia). La
 // disponibilidad la calcula el backend (GET /api/citas/disponibilidad):
 // franjas del horario de atencion de la sede, menos las ya ocupadas por
 // todos los medicos que prestan el servicio en esa sede, menos las que
@@ -34,7 +35,6 @@ const TONOS = {
     pestanas: 'bg-slate-100',
     // Tonos -600/-700: slate-400/500 y brand-blue (500) no llegaban a AA.
     pestanaActiva: 'bg-white text-brand-blue-700 shadow-sm',
-    pestanaVacia: 'cursor-not-allowed text-slate-300',
     pestana: 'text-slate-700 hover:text-slate-900',
     conteo: 'opacity-80',
     elegida: 'border-brand-blue-700 bg-brand-blue-700 text-white shadow-sm ring-2 ring-brand-amber',
@@ -48,7 +48,6 @@ const TONOS = {
     reintentar: 'text-white underline',
     pestanas: 'bg-brand-blue-800/40 ring-1 ring-white/20',
     pestanaActiva: 'bg-white text-brand-blue-800 shadow-sm',
-    pestanaVacia: 'cursor-not-allowed text-white/35',
     pestana: 'text-blue-50 hover:text-white',
     conteo: 'opacity-80',
     elegida: 'border-transparent bg-white font-bold text-brand-blue-800 shadow-sm ring-2 ring-brand-amber',
@@ -147,23 +146,23 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
   return (
     <div className="flex flex-col gap-4">
       <div className={`flex rounded-boton p-1 ${t.pestanas}`} role="tablist">
-        {TURNOS.map((turno) => {
+        {/* Solo los turnos con franjas en el horario de la sede ese dia: si
+            la sede no atiende de noche, no se muestra "Noche". */}
+        {turnosConFranjas.map((turno) => {
           const cantidad = porTurno[turno.id].filter((f) => f.disponible).length;
-          const vacio = porTurno[turno.id].length === 0;
           return (
             <button
               key={turno.id}
               type="button"
               role="tab"
               aria-selected={turnoActivo === turno.id}
-              disabled={vacio}
               onClick={() => setTurnoElegido({ clave, turno: turno.id })}
               className={`flex-1 rounded-boton px-2 py-2 text-sm font-medium transition ${
-                turnoActivo === turno.id ? t.pestanaActiva : vacio ? t.pestanaVacia : t.pestana
+                turnoActivo === turno.id ? t.pestanaActiva : t.pestana
               }`}
             >
               {turno.etiqueta}
-              {!vacio && <span className={`ml-1 text-xs ${t.conteo}`}>({cantidad})</span>}
+              <span className={`ml-1 text-xs ${t.conteo}`}>({cantidad})</span>
             </button>
           );
         })}
