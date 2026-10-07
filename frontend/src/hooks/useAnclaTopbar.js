@@ -1,6 +1,8 @@
 // hooks/useAnclaTopbar.js
-// Scroll en dos posiciones para el arranque de una pagina con <Navbar/>
-// (ej. /agendar), como el paginado del landing pero con una sola parada:
+// Scroll en dos posiciones para el arranque de una pagina con <Navbar/>.
+// Lo usan todas las que no son el landing (/agendar, /panel, /vetui); el
+// landing tiene su propio paginado por secciones (usePaginadoPorRueda).
+// Es como ese paginado pero con una sola parada:
 // - arriba de todo (scroll 0): topbar transparente y stepper superior;
 // - el "ancla": la pildora de la topbar ya formada y el contenido marcado
 //   con data-ancla-topbar justo debajo de ella (respeta su scroll-margin-top,

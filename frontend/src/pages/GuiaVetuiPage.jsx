@@ -5,6 +5,7 @@
 // referencia para construir pantallas nuevas. Documentación: docs/vetui.md.
 import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
+import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
 import {
   Aviso,
   AreaTexto,
@@ -59,6 +60,9 @@ export function GuiaVetuiPage() {
   const [foto, setFoto] = useState(null);
   const [editorFoto, setEditorFoto] = useState(false);
 
+  // Scroll en dos posiciones, como en todas las paginas con <Navbar/>.
+  useAnclaTopbar();
+
   return (
     <FondoVetui>
       <Navbar />
@@ -69,7 +73,7 @@ export function GuiaVetuiPage() {
           descripcion="Floating glass para el sistema de citas de la Clínica Veterinaria UDES: superficies de vidrio que flotan sobre el azul de marca."
         />
 
-        <main className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-20 sm:px-6">
+        <main data-ancla-topbar className="mx-auto flex max-w-7xl scroll-mt-28 flex-col gap-6 px-4 pb-20 sm:px-6">
           <Bloque titulo="Color" descripcion="Paleta de marca. El ámbar es único: acción principal y estado activo.">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {COLORES.map((c) => (
