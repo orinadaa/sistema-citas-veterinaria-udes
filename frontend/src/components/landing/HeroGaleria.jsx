@@ -72,7 +72,7 @@ export function HeroGaleria() {
       // hover:[filter:none]: sin el resplandor general de hover, que
       // dibujaria un halo rectangular alrededor de la foto.
       style={MASCARA}
-      className="relative mx-auto block aspect-[4/3] w-full max-w-[670px] cursor-pointer rounded-[3rem] outline-none hover:[filter:none] focus-visible:ring-2 focus-visible:ring-white/70 lg:-ml-[6%] lg:w-[130%] lg:max-w-none"
+      className="relative mx-auto block aspect-[4/3] w-full max-w-[670px] cursor-pointer rounded-[3rem] outline-none hover:[filter:none] focus-visible:ring-2 focus-visible:ring-white/70 lg:-ml-[6%] lg:-mt-14 lg:w-[130%] lg:max-w-none"
     >
       {FOTOS.map((foto, i) =>
         cargadas.has(i) ? (
