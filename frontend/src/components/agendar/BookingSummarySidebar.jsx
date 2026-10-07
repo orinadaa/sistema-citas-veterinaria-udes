@@ -8,14 +8,21 @@
 import { Superficie } from '../vetui';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { especieYRaza } from '../../utils/mascota';
+import { AvatarMascota } from '../cliente/AvatarMascota';
 import { IconoCalendario, IconoEstetoscopio, IconoPata, IconoReloj, IconoUbicacion } from '../icons';
 
-function Fila({ icono: Icono, etiqueta, valor, detalle, placeholder, onCambiar }) {
+// `fotoUrl`: si viene, el circulo muestra esa foto en vez del icono (la
+// mascota elegida, cuando tiene foto).
+function Fila({ icono: Icono, fotoUrl, etiqueta, valor, detalle, placeholder, onCambiar }) {
   return (
     <div className="flex items-start gap-3 py-3.5">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-brand-blue-700">
-        <Icono className="h-4.5 w-4.5" />
-      </span>
+      {fotoUrl ? (
+        <AvatarMascota fotoUrl={fotoUrl} mascota={{ nombre: valor }} className="h-9 w-9" />
+      ) : (
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-brand-blue-700">
+          <Icono className="h-4.5 w-4.5" />
+        </span>
+      )}
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium uppercase tracking-wide text-slate-700">{etiqueta}</p>
         {valor ? (
@@ -48,6 +55,7 @@ export function BookingSummarySidebar({ mascota, servicio, sede, fechaHora, sede
       <div className="mt-2 divide-y divide-slate-200">
         <Fila
           icono={IconoPata}
+          fotoUrl={mascota?.foto_url}
           etiqueta="Mascota"
           valor={mascota?.nombre}
           detalle={mascota ? especieYRaza(mascota) : undefined}
