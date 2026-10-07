@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
+import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
 import { BookingStepper, BookingStepperLateral } from '../components/agendar/BookingStepper';
 import { BookingSummarySidebar } from '../components/agendar/BookingSummarySidebar';
 import { PaginaMascotaServicio } from '../components/agendar/PaginaMascotaServicio';
@@ -227,6 +228,10 @@ export function AgendarCitaPage() {
       2: Boolean(mascota && servicio && sede && franja),
     }[pagina] ?? false;
 
+  // La rueda salta de "arriba de todo" a "pildora formada + contenido",
+  // sin quedarse en la transicion de la topbar.
+  useAnclaTopbar();
+
   return (
     // vetUI: fondo de marca con halos (FondoVetui, tambien detras de la
     // topbar), secciones de vidrio y tarjetas de cristal.
@@ -259,11 +264,14 @@ export function AgendarCitaPage() {
           <BookingStepperLateral paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />
 
           {pagina === 3 && citaCreada ? (
-            <div className="mt-8">
+            <div data-ancla-topbar className="mt-8 scroll-mt-28">
               <PaginaConfirmacion cita={citaCreada} correoEnviado={correoEnviado} onAgendarOtra={agendarOtra} />
             </div>
           ) : (
-            <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+            // data-ancla-topbar: parada del scroll (useAnclaTopbar) con la
+            // pildora ya formada y este contenido justo debajo (scroll-mt-28,
+            // igual que cada Seccion).
+            <div data-ancla-topbar className="mt-8 grid scroll-mt-28 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
               <div className="flex flex-col gap-6">
                 {pagina === 1 && (
                   <PaginaMascotaServicio
