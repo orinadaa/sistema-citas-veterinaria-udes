@@ -162,10 +162,11 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
         )}
       </div>
 
-      {/* Mismo alto que la grilla de dias, para que el calendario no cambie
-          de tamaño al pasar de una vista a otra. */}
+      {/* Cada vista ocupa solo lo que necesita (pedido de Oriana): la de
+          meses queda mas baja que la de dias; la de años tiene un alto
+          maximo y scroll propio. */}
       {vista === 'meses' && (
-        <div role="group" aria-label="Elegir mes" className="mt-4 grid h-[15.25rem] grid-cols-3 content-center gap-2">
+        <div role="group" aria-label="Elegir mes" className="mt-4 grid grid-cols-3 gap-2">
           {MESES.map((nombre, indice) => {
             const fuera = mesFueraDeLimites(mes.getFullYear(), indice);
             return (
@@ -188,7 +189,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
       )}
 
       {vista === 'anios' && (
-        <div role="group" aria-label="Elegir año" className="mt-4 grid h-[15.25rem] grid-cols-4 content-start gap-2 overflow-y-auto pr-1">
+        <div role="group" aria-label="Elegir año" className="mt-4 grid max-h-[15.25rem] grid-cols-4 content-start gap-2 overflow-y-auto pr-1">
           {anios.map((anio) => (
             <button
               key={anio}
