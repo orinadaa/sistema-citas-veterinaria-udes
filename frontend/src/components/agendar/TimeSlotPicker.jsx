@@ -32,7 +32,7 @@ const TONOS = {
     avisoIcono: 'text-slate-400',
     esqueleto: 'bg-slate-100',
     reintentar: 'text-brand-blue',
-    pestanas: 'bg-slate-100',
+    pestanas: 'bg-slate-200',
     // Tonos -600/-700: slate-400/500 y brand-blue (500) no llegaban a AA.
     pestanaActiva: 'bg-white text-brand-blue-700 shadow-sm',
     pestana: 'text-slate-700 hover:text-slate-900',
