@@ -4,7 +4,7 @@
 // "+ Agregar mascota"): onGuardada recibe la mascota guardada, asi quien
 // lo abre puede seleccionarla sin recargar.
 //
-// - Foto: zona cuadrada punteada (ZonaFotoMascota, la misma del admin).
+// - Foto: zona circular punteada (ZonaFotoMascota, la misma del admin).
 //   El clic abre FotoMascotaModal (el unico modal centrado del sistema),
 //   que valida JPG/PNG de max. 5 MB y recorta. La foto recortada queda pendiente
 //   y se sube al guardar (POST /api/mascotas/:id/foto), asi "Cancelar"
