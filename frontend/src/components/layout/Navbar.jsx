@@ -154,6 +154,7 @@ export function Navbar() {
     let cuadro = null;
     const borde = enLanding ? 'rgb(203 213 225 / 0.25)' : 'rgb(203 213 225 / 0.2)';
     const sombra = enLanding ? '0 10px 26px -10px rgb(0 0 0 / 0.35)' : '0 12px 32px -12px rgb(6 51 138 / 0.5)';
+    const material = enLanding ? MATERIALES.claro : MATERIALES.azul;
     const ubicar = () => {
       const header = headerRef.current;
       const boton = perfilRef.current;
@@ -168,6 +169,16 @@ export function Navbar() {
         menu.style.width = `${b.width}px`;
         menu.style.top = unido ? `${barra.getBoundingClientRect().bottom - h.top}px` : `${b.bottom - h.top + 8}px`;
         menu.style.borderRadius = unido ? '0 0 1rem 1rem' : '1rem';
+        // Unido a la pildora: exactamente su material ya formado (mismo
+        // color, misma transparencia y mismo backdrop, tomados de
+        // MATERIALES), sin el reflejo superior: el de la pildora ya se
+        // apago al llegar a su borde inferior, asi la union no se nota.
+        // Flotando (arriba de todo, sin pildora) valen las clases del menu.
+        const [rojo, verde, azul, alfa] = material.fondo;
+        menu.style.backgroundColor = unido ? `rgb(${rojo} ${verde} ${azul} / ${alfa})` : '';
+        menu.style.backgroundImage = unido ? 'none' : '';
+        menu.style.backdropFilter = unido ? material.backdrop(1) : '';
+        menu.style.webkitBackdropFilter = menu.style.backdropFilter;
         // Unido: borde solo a los costados y abajo (arriba continua la pildora).
         menu.style.boxShadow = unido
           ? `${sombra}, inset 1px 0 0 ${borde}, inset -1px 0 0 ${borde}, inset 0 -1px 0 ${borde}`
@@ -417,12 +428,12 @@ export function Navbar() {
       {menuAbierto && (
         <div
           ref={menuRef}
-          // Mismo material que la pildora de esta pagina (MATERIALES en
-          // aplicarFlow): vidrio claro en el landing, vidrio azul en /agendar
-          // y /panel; mismo borde gris claro tenue y brillo superior. En el
-          // landing oscurece mas lo de atras (58% vs 78% de la pildora): el
-          // menu se abre tambien arriba de todo, sobre la parte mas clara del
-          // Hero, y con 78% el texto blanco quedaba en 3.5:1.
+          // Material: cuando esta unido a la pildora, el efecto de arriba le
+          // pone exactamente el de la pildora (MATERIALES). Estas clases son
+          // el material del menu flotando (arriba de todo, sin pildora): en
+          // el landing oscurece mas lo de atras (58%), porque ahi se abre
+          // sobre la parte mas clara del Hero y las fotos de la galeria, y
+          // con el 78% de la pildora el texto blanco quedaba en 3.5:1.
           // Ancho, posicion, esquinas y bordes los fija el efecto de arriba
           // (segun si la pildora esta formada). min-w-max + nowrap: si el
           // boton es mas angosto que las opciones (en /agendar y /panel dice
