@@ -136,6 +136,48 @@ export function Navbar() {
   const perfilRef = useRef(null);
   const menuRef = useRef(null);
   const nombrePerfilRef = useRef(null);
+  const filaRef = useRef(null);
+  const navRef = useRef(null);
+  const grupoDerechoRef = useRef(null);
+  const logoRef = useRef(null);
+
+  // Equilibrio del logo grande (estado transparente, arriba de todo): el
+  // logo esta en el centro exacto de la barra, pero como los enlaces de la
+  // izquierda van agrupados en el medio de su mitad y el grupo derecho
+  // llega hasta el logo, queda mas aire a su izquierda que a su derecha y
+  // se percibe corrido. Se mide ese desbalance y el logo grande se corre a
+  // la izquierda la mitad de la diferencia (--equilibrio), para quedar a
+  // la misma distancia de "Horarios" que del grupo derecho. El corrimiento
+  // se deshace con el viaje del isotipo (ver el <Link> del logo): con la
+  // pildora formada el logo corto vuelve al centro exacto.
+  useLayoutEffect(() => {
+    const fila = filaRef.current;
+    const logo = logoRef.current;
+    if (!fila || !logo) return undefined;
+    const medir = () => {
+      // El <nav> ocupa toda su columna; lo que cuenta es su ultimo enlace.
+      const nav = navRef.current?.lastElementChild?.getBoundingClientRect();
+      const derecha = [...(grupoDerechoRef.current?.children ?? [])].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0);
+      let equilibrio = 0;
+      if (nav && nav.width > 0 && derecha.length > 0) {
+        // El logo ocupa la columna central de la grilla: su caja (sin el
+        // corrimiento) esta centrada en la fila.
+        const caja = fila.getBoundingClientRect();
+        const centro = caja.left + caja.width / 2;
+        const mitadLogo = logo.offsetWidth / 2;
+        const aireIzquierda = centro - mitadLogo - nav.right;
+        const aireDerecha = Math.min(...derecha.map((r) => r.left)) - (centro + mitadLogo);
+        equilibrio = Math.max(0, (aireIzquierda - aireDerecha) / 2);
+      }
+      logo.style.setProperty('--equilibrio', `${equilibrio.toFixed(1)}px`);
+    };
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(fila);
+    if (navRef.current) observador.observe(navRef.current);
+    if (grupoDerechoRef.current) observador.observe(grupoDerechoRef.current);
+    return () => observador.disconnect();
+  }, [estaAutenticado, enLanding]);
 
   // Menu del perfil: mismo material que la pildora. Vive fuera de ella,
   // como hermano dentro del <header>: si estuviera dentro, su
@@ -269,7 +311,7 @@ export function Navbar() {
   return (
     <header ref={headerRef} className="pointer-events-none sticky top-0 z-40 h-24">
       <div ref={barraRef} className="pointer-events-auto absolute inset-0">
-        <div className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:w-fit md:gap-x-10 lg:gap-x-12">
+        <div ref={filaRef} className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:w-fit md:gap-x-10 lg:gap-x-12">
           {/* La columna izquierda siempre existe (aunque el nav se oculte en
               movil) para que el grid no corra el logo hacia la izquierda.
               Desde md la fila mide lo que su contenido (w-fit) y va centrada:
@@ -279,7 +321,7 @@ export function Navbar() {
               entre si y centrados dentro de su columna (pedido de Oriana;
               antes se repartian en todo el ancho con justify-between). */}
           <div className="justify-self-start md:justify-self-stretch">
-            <nav className="hidden items-center justify-center gap-8 text-base font-medium text-white/90 md:flex">
+            <nav ref={navRef} className="hidden items-center justify-center gap-8 text-base font-medium text-white/90 md:flex">
               {/* Link (no <a>) para que funcionen desde cualquier pagina, no
                   solo desde el landing: si el usuario esta en /panel, primero
                   navega a "/" y LandingPage.jsx hace scroll al hash una vez
@@ -296,6 +338,7 @@ export function Navbar() {
               ocupara sus 72px en el flujo, la fila quedaria mas alta que la
               pildora (64px) y todo el contenido se veria corrido hacia abajo. */}
           <Link
+            ref={logoRef}
             to="/"
             aria-label="Clínica Veterinaria UDES, ir al inicio"
             // El Link solo cambia la ruta: si ya se esta en el landing (o se
@@ -308,7 +351,12 @@ export function Navbar() {
             className="relative flex h-10 w-[126px] items-center justify-center"
             // --viaje (0..1): avance del isotipo hacia el centro, compartido
             // por el logo grande y el isotipo blanco para que se muevan juntos.
-            style={{ '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)' }}
+            // --equilibrio: corrimiento a la izquierda del logo grande (efecto de
+            // arriba); se deshace con el viaje, asi el logo corto llega al centro.
+            style={{
+              '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)',
+              transform: 'translateX(calc(var(--equilibrio, 0px) * (var(--viaje) - 1)))',
+            }}
           >
             <>
                 {/* Transicion en 3 pasos, todo derivado de --flow (0..1):
@@ -367,7 +415,7 @@ export function Navbar() {
 
           {/* En tablet (md) el grupo mas largo es el izquierdo: este se reparte
               igual (stretch + justify-between) para conservar la simetria. */}
-          <div className="flex items-center gap-2 justify-self-end md:justify-between md:justify-self-stretch">
+          <div ref={grupoDerechoRef} className="flex items-center gap-2 justify-self-end md:justify-between md:justify-self-stretch">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
                 <button type="button" className="relative hidden rounded-boton p-2 xl:inline-flex text-white/80 transition hover:bg-white/10 hover:text-white">
