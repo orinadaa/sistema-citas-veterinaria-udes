@@ -19,13 +19,13 @@ import {
   subirFotoPerfilMedico,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { iniciales } from '../../utils/texto';
 import { PageHeader } from '../ui/PageHeader';
 import { Tabs } from '../ui/Tabs';
 import { EstadoError } from '../ui/EstadoError';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { Campo } from '../form/Campo';
 import { FotoMascotaModal } from '../cliente/FotoMascotaModal';
+import { ZonaFoto } from '../form/ZonaFoto';
 import { PanelDisponibilidadMedico } from './PanelDisponibilidadMedico';
 import { IconoCalendario, IconoCamara, IconoCorreo, IconoEstetoscopio, IconoPata, IconoPersona, IconoReloj, IconoSede } from '../icons';
 
@@ -326,23 +326,14 @@ export function PanelMiPerfilMedico() {
           <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_260px]">
             <Tarjeta>
               <div className="flex flex-col items-center text-center">
-                <div className="relative">
-                  {perfil.foto_url ? (
-                    <img src={perfil.foto_url} alt={perfil.nombre_completo} className="h-28 w-28 rounded-full object-cover ring-4 ring-white shadow" />
-                  ) : (
-                    <span className="flex h-28 w-28 items-center justify-center rounded-full bg-brand-blue text-3xl font-bold text-white">
-                      {iniciales(perfil.nombre_completo)}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setEditorFoto(true)}
-                    aria-label="Cambiar foto de perfil"
-                    className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-boton bg-brand-blue text-white shadow-md ring-4 ring-white hover:bg-brand-blue-600"
-                  >
-                    <IconoCamara className="h-4 w-4" />
-                  </button>
-                </div>
+                {/* Zona de foto estandar del sistema; el clic abre el editor. */}
+                <ZonaFoto
+                  fotoUrl={perfil.foto_url}
+                  onClick={() => setEditorFoto(true)}
+                  ayuda="Sube tu foto de perfil"
+                  alt={perfil.nombre_completo}
+                  className="w-32"
+                />
                 <p className="mt-3 font-heading text-lg font-bold text-brand-navy">{perfil.nombre_completo}</p>
                 <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-brand-green">
                   <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-green" />

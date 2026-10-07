@@ -14,6 +14,7 @@ import { crearBloqueoMedico, eliminarBloqueoMedico, guardarHorarioMedico, obtene
 import { useAuth } from '../../context/AuthContext';
 import { hoyComoFechaLocal } from '../../utils/fecha';
 import { EstadoError } from '../ui/EstadoError';
+import { CampoFecha } from '../form/CampoFecha';
 import { IconoPapelera, IconoReloj, IconoSede } from '../icons';
 
 // Lunes primero (la BD guarda 0 = domingo).
@@ -184,6 +185,11 @@ export function PanelDisponibilidadMedico() {
   async function agregarBloqueo(evento) {
     evento.preventDefault();
     setEstadoBloqueo(null);
+    // Antes lo exigia el "required" del input de fecha nativo.
+    if (!bloqueo.fechaInicio) {
+      setEstadoBloqueo({ tipo: 'error', texto: 'Elige desde qué fecha aplica el bloqueo.' });
+      return;
+    }
     try {
       const { citasAfectadas } = await crearBloqueoMedico(
         {
@@ -394,27 +400,24 @@ export function PanelDisponibilidadMedico() {
         <Tarjeta titulo="Bloqueos y excepciones" subtitulo="Vacaciones, permisos o horas puntuales en las que no atiendes.">
           <form onSubmit={agregarBloqueo} className="flex flex-col gap-3">
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                Desde<span className="sr-only"> (fecha)</span>
-                <input
-                  type="date"
-                  required
-                  min={hoyComoFechaLocal()}
-                  value={bloqueo.fechaInicio}
-                  onChange={(e) => setBloqueo({ ...bloqueo, fechaInicio: e.target.value })}
-                  className={CLASE_CAMPO}
-                />
-              </label>
-              <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                Hasta (opcional, un solo día si lo dejas vacío)
-                <input
-                  type="date"
-                  min={bloqueo.fechaInicio || hoyComoFechaLocal()}
-                  value={bloqueo.fechaFin}
-                  onChange={(e) => setBloqueo({ ...bloqueo, fechaFin: e.target.value })}
-                  className={CLASE_CAMPO}
-                />
-              </label>
+              {/* Cambiar "Desde" a un dia posterior al "Hasta" elegido lo borra. */}
+              <CampoFecha
+                id="bloqueo-desde"
+                etiqueta="Desde"
+                requerido
+                valor={bloqueo.fechaInicio}
+                onChange={(fechaInicio) =>
+                  setBloqueo({ ...bloqueo, fechaInicio, fechaFin: bloqueo.fechaFin && bloqueo.fechaFin < fechaInicio ? '' : bloqueo.fechaFin })
+                }
+              />
+              <CampoFecha
+                id="bloqueo-hasta"
+                etiqueta="Hasta (opcional, un solo día si lo dejas vacío)"
+                alinear="derecha"
+                valor={bloqueo.fechaFin}
+                onChange={(fechaFin) => setBloqueo({ ...bloqueo, fechaFin })}
+                minimo={bloqueo.fechaInicio || hoyComoFechaLocal()}
+              />
             </div>
             <label className="flex items-center gap-2 text-sm text-slate-700">
               <input

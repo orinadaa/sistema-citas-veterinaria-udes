@@ -25,6 +25,9 @@ import {
   TarjetaDato,
   TituloSeccion,
 } from '../components/vetui';
+import { CampoFecha } from '../components/form/CampoFecha';
+import { ZonaFoto } from '../components/form/ZonaFoto';
+import { FotoMascotaModal } from '../components/cliente/FotoMascotaModal';
 import { IconoCalendario, IconoCorazon, IconoFlechaDerecha, IconoMas, IconoPata } from '../components/icons';
 
 const COLORES = [
@@ -51,11 +54,15 @@ export function GuiaVetuiPage() {
   const [elegida, setElegida] = useState(1);
   const [panel, setPanel] = useState(false);
   const [dialogo, setDialogo] = useState(false);
+  const [fechaCita, setFechaCita] = useState('');
+  const [fechaNacimiento, setFechaNacimiento] = useState('');
+  const [foto, setFoto] = useState(null);
+  const [editorFoto, setEditorFoto] = useState(false);
 
   return (
     <FondoVetui>
       <Navbar />
-      <div inert={panel || dialogo}>
+      <div inert={panel || dialogo || editorFoto}>
         <EncabezadoPagina
           antetitulo="Sistema de diseño"
           titulo="vetUI"
@@ -223,6 +230,28 @@ export function GuiaVetuiPage() {
             </div>
           </Bloque>
 
+          {/* Estandar de todo el sistema (cliente, medico y admin): ninguna
+              pantalla usa el calendario ni el selector de archivos del navegador. */}
+          <Superficie tono="blanco" className="flex flex-col gap-5">
+            <TituloSeccion
+              titulo="Fechas y fotos"
+              descripcion="Toda fecha se elige con el calendario de agendar (CampoFecha). Toda foto se sube desde el círculo punteado (ZonaFoto), que abre el editor para encuadrarla."
+            />
+            <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9rem]">
+              <CampoFecha id="guia-fecha" etiqueta="Fecha (no permite días pasados)" requerido valor={fechaCita} onChange={setFechaCita} />
+              <CampoFecha
+                id="guia-nacimiento"
+                etiqueta="Fecha de nacimiento (opcional)"
+                valor={fechaNacimiento}
+                onChange={setFechaNacimiento}
+                minimo={null}
+                maximo={new Date().toLocaleDateString('en-CA')}
+                selectorRapido
+              />
+              <ZonaFoto fotoUrl={foto} onClick={() => setEditorFoto(true)} />
+            </div>
+          </Superficie>
+
           <Bloque titulo="Estados" descripcion="Avisos, vacío, error y carga.">
             <div className="grid gap-3 md:grid-cols-2">
               <Aviso tono="info">Selecciona un día para ver los horarios.</Aviso>
@@ -285,6 +314,15 @@ export function GuiaVetuiPage() {
           Sí, salir
         </Boton>
       </Dialogo>
+      <FotoMascotaModal
+        isOpen={editorFoto}
+        onClose={() => setEditorFoto(false)}
+        fotoActual={foto}
+        onGuardar={(blob) => {
+          setFoto(URL.createObjectURL(blob));
+          setEditorFoto(false);
+        }}
+      />
     </FondoVetui>
   );
 }

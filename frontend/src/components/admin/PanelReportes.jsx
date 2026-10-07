@@ -23,6 +23,7 @@ import { obtenerReportes, obtenerSedesAdmin } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora, hoyComoFechaLocal } from '../../utils/fecha';
 import { COLORES_CATEGORIA } from '../ui/CategoryBadge';
+import { CampoFecha } from '../form/CampoFecha';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { DataTable } from '../ui/DataTable';
@@ -197,14 +198,31 @@ export function PanelReportes() {
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-slate-500">Desde</label>
-          <input type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none" />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-slate-500">Hasta</label>
-          <input type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none" />
-        </div>
+        {/* Rango del reporte: cada extremo limita al otro para que no se
+            pueda elegir un "hasta" anterior al "desde". */}
+        <CampoFecha
+          id="reporte-desde"
+          etiqueta="Desde"
+          claseEtiqueta="text-xs font-medium text-slate-500"
+          className="w-52"
+          placeholder="Cualquier fecha"
+          valor={desde}
+          onChange={setDesde}
+          minimo={null}
+          maximo={hasta || undefined}
+          selectorRapido
+        />
+        <CampoFecha
+          id="reporte-hasta"
+          etiqueta="Hasta"
+          claseEtiqueta="text-xs font-medium text-slate-500"
+          className="w-52"
+          placeholder="Cualquier fecha"
+          valor={hasta}
+          onChange={setHasta}
+          minimo={desde || null}
+          selectorRapido
+        />
       </div>
 
       {cargando ? (

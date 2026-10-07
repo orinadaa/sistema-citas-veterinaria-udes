@@ -6,24 +6,26 @@
 //   formulario de abajo). El administrador NO puede eliminar mascotas:
 //   eso lo hace unicamente su dueño (decision de la usuaria).
 // - Formulario "Agregar mascota" embebido en el tab (no es otro panel),
-//   con zona de foto circular punteada (ZonaFotoMascota; sube el archivo
-//   tal cual, sin el editor de recorte del cliente), Sexo como segmented control
+//   con la zona de foto estandar (ZonaFoto) que abre el mismo editor de
+//   foto del cliente (FotoMascotaModal), Sexo como segmented control
 //   obligatorio en este formulario, y sin "Informacion medica" (no
 //   aparece en la referencia de este modulo).
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { crearMascota, actualizarMascota, subirFotoMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
 import { SelectorSexo } from '../form/SelectorSexo';
-import { ZonaFotoMascota } from '../form/ZonaFotoMascota';
+import { ZonaFoto } from '../form/ZonaFoto';
+import { CampoFecha } from '../form/CampoFecha';
+import { FotoMascotaModal } from '../cliente/FotoMascotaModal';
+import { hoyComoFechaLocal } from '../../utils/fecha';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { edadYPeso } from '../../utils/mascota';
 import { IconoLapiz, IconoMas, IconoPata, IconoPuntos } from '../icons';
 
 const MAX_CARACTERISTICAS = 200;
-const TAMANO_MAXIMO_FOTO = 5 * 1024 * 1024;
-const TIPOS_FOTO = ['image/jpeg', 'image/png'];
 
 const FORM_VACIO = {
   nombre: '',
@@ -140,13 +142,13 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
   const { token } = useAuth();
   const [form, setForm] = useState(FORM_VACIO);
   const [mascotaEditando, setMascotaEditando] = useState(null);
-  const [foto, setFoto] = useState(null); // File elegido, pendiente de subir
+  const [foto, setFoto] = useState(null); // foto recortada (Blob), pendiente de subir
   const [vistaPrevia, setVistaPrevia] = useState(null);
+  const [editorFotoAbierto, setEditorFotoAbierto] = useState(false);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [formularioAbierto, setFormularioAbierto] = useState(!formularioColapsable);
-  const inputFoto = useRef(null);
   const formulario = useRef(null);
 
   // Libera la URL temporal de la vista previa cuando cambia.
@@ -161,6 +163,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
     setMascotaEditando(null);
     setFoto(null);
     setVistaPrevia(null);
+    setEditorFotoAbierto(false);
     setError('');
     if (formularioColapsable) setFormularioAbierto(false);
   }
@@ -172,21 +175,6 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
     setForm(formDesdeMascota(mascota));
     setFormularioAbierto(true);
     formulario.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function elegirFoto(archivo) {
-    setError('');
-    if (!archivo) return;
-    if (!TIPOS_FOTO.includes(archivo.type)) {
-      setError('La foto debe ser JPG o PNG.');
-      return;
-    }
-    if (archivo.size > TAMANO_MAXIMO_FOTO) {
-      setError('La foto no puede pesar más de 5 MB.');
-      return;
-    }
-    setFoto(archivo);
-    setVistaPrevia(URL.createObjectURL(archivo));
   }
 
   async function guardar(evento) {
@@ -285,21 +273,8 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
         </div>
 
         <div className="grid grid-cols-[130px_minmax(0,1fr)] gap-4">
-          {/* Zona de foto circular punteada (compartida con el cliente); aca
-              el clic abre el selector de archivos y se sube tal cual. */}
-          <div>
-            <ZonaFotoMascota fotoUrl={fotoMostrada} onClick={() => inputFoto.current?.click()} onSoltarArchivo={elegirFoto} />
-            <input
-              ref={inputFoto}
-              type="file"
-              accept="image/jpeg,image/png"
-              className="hidden"
-              onChange={(e) => {
-                elegirFoto(e.target.files?.[0]);
-                e.target.value = '';
-              }}
-            />
-          </div>
+          {/* Zona de foto estandar: el clic abre el editor de foto (abajo). */}
+          <ZonaFoto fotoUrl={fotoMostrada} onClick={() => setEditorFotoAbierto(true)} />
 
           <div className="flex min-w-0 flex-col gap-3">
             <Campo id="admin-mascota-nombre" label="Nombre" value={form.nombre} onChange={actualizar('nombre')} placeholder="Ej. Luna" required />
@@ -315,12 +290,14 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Campo
+          <CampoFecha
             id="admin-mascota-nacimiento"
-            label="Fecha de nacimiento (opcional)"
-            type="date"
-            value={form.fechaNacimiento}
-            onChange={actualizar('fechaNacimiento')}
+            etiqueta="Fecha de nacimiento (opcional)"
+            valor={form.fechaNacimiento}
+            onChange={(fechaNacimiento) => setForm((actual) => ({ ...actual, fechaNacimiento }))}
+            minimo={null}
+            maximo={hoyComoFechaLocal()}
+            selectorRapido
           />
           <SelectorSexo
             id="admin-mascota-sexo"
@@ -398,6 +375,24 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
           </button>
         </div>
       </form>
+      )}
+
+      {/* En <body> (portal): este formulario vive dentro de un SidePanel, y
+          un ancestro con transform encerraria el position:fixed del editor. */}
+      {createPortal(
+        <FotoMascotaModal
+          isOpen={editorFotoAbierto}
+          onClose={() => setEditorFotoAbierto(false)}
+          fotoActual={fotoMostrada}
+          fotosAnteriores={mascotas.map((m) => m.foto_url).filter((url) => url && url !== mascotaEditando?.foto_url)}
+          tituloMiniaturas="Fotos de sus otras mascotas"
+          onGuardar={(blob) => {
+            setFoto(blob);
+            setVistaPrevia(URL.createObjectURL(blob));
+            setEditorFotoAbierto(false);
+          }}
+        />,
+        document.body
       )}
     </div>
   );

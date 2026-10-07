@@ -184,3 +184,22 @@ Tamaños: `sm`, `md` (por defecto), `lg`, `icono`. Deshabilitado: 50 % de opacid
 6. Formularios y detalles en `PanelLateral`; confirmaciones en `Dialogo`.
 7. Estados de carga, vacío y error con `Esqueleto`, `EstadoVacio` y `EstadoError`.
 8. Revisar la pantalla en `/vetui` como referencia y verificar el contraste.
+9. Fechas y fotos siguen el estándar de la sección 7: nunca `<input type="date">` ni `<input type="file">` sueltos.
+
+## 7. Estándar de fechas y fotos (todo el sistema)
+
+Aplica a los tres roles (cliente, médico y administrador), no solo a las pantallas vetUI.
+
+**Fechas.** Ningún formulario usa el calendario del navegador. Hay un solo calendario, `DatePickerCalendar` (`components/agendar/`), el del flujo de agendar:
+
+- Para elegir día y hora de una cita se muestra completo, con `TimeSlotPicker` al lado o debajo (agendar, reprogramar, "Nueva cita" del administrador y del médico).
+- Para cualquier otro campo de fecha se usa `CampoFecha` (`components/form/`): se ve como un campo y despliega ese mismo calendario. Trabaja con `"YYYY-MM-DD"`, igual que el input nativo que reemplaza.
+  - Por defecto no deja elegir días pasados. `minimo={null}` quita ese límite; `maximo` pone un tope.
+  - `selectorRapido` agrega listas de mes y año (fecha de nacimiento, rangos de reportes).
+  - Sin `requerido`, el desplegable ofrece "Borrar fecha".
+
+Las horas sueltas (horarios de atención, pausas, hora de un recordatorio) siguen con el campo de hora nativo: no son un calendario.
+
+**Fotos.** Todo campo donde se sube una foto usa `ZonaFoto` (`components/form/`): círculo punteado con cámara cuando está vacío, la foto en círculo y "Cambiar foto" cuando ya hay una. El clic abre `FotoMascotaModal` (elegir archivo JPG/PNG de máx. 5 MB, encuadrar, vista previa), que entrega la imagen final. Hoy lo usan la foto de mascota (cliente, médico y administrador) y la foto de perfil del médico.
+
+Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".
