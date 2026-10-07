@@ -236,7 +236,6 @@ export function FormularioMascotaPanel({
             onChange={(fechaNacimiento) => setForm((actual) => ({ ...actual, fechaNacimiento }))}
             minimo={null}
             maximo={hoyComoFechaLocal()}
-            selectorRapido
           />
 
           <SelectorSexo

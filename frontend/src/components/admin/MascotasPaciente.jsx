@@ -297,7 +297,6 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
             onChange={(fechaNacimiento) => setForm((actual) => ({ ...actual, fechaNacimiento }))}
             minimo={null}
             maximo={hoyComoFechaLocal()}
-            selectorRapido
           />
           <SelectorSexo
             id="admin-mascota-sexo"

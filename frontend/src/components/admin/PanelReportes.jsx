@@ -210,7 +210,6 @@ export function PanelReportes() {
           onChange={setDesde}
           minimo={null}
           maximo={hasta || undefined}
-          selectorRapido
         />
         <CampoFecha
           id="reporte-hasta"
@@ -221,7 +220,6 @@ export function PanelReportes() {
           valor={hasta}
           onChange={setHasta}
           minimo={desde || null}
-          selectorRapido
         />
       </div>
 
