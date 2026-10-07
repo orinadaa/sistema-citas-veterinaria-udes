@@ -6,7 +6,7 @@
 //   formulario de abajo). El administrador NO puede eliminar mascotas:
 //   eso lo hace unicamente su dueño (decision de la usuaria).
 // - Formulario "Agregar mascota" embebido en el tab (no es otro panel),
-//   con zona de foto cuadrada punteada (ZonaFotoMascota; sube el archivo
+//   con zona de foto circular punteada (ZonaFotoMascota; sube el archivo
 //   tal cual, sin el editor de recorte del cliente), Sexo como segmented control
 //   obligatorio en este formulario, y sin "Informacion medica" (no
 //   aparece en la referencia de este modulo).
@@ -285,7 +285,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
         </div>
 
         <div className="grid grid-cols-[130px_minmax(0,1fr)] gap-4">
-          {/* Zona de foto cuadrada punteada (compartida con el cliente); aca
+          {/* Zona de foto circular punteada (compartida con el cliente); aca
               el clic abre el selector de archivos y se sube tal cual. */}
           <div>
             <ZonaFotoMascota fotoUrl={fotoMostrada} onClick={() => inputFoto.current?.click()} onSoltarArchivo={elegirFoto} />
