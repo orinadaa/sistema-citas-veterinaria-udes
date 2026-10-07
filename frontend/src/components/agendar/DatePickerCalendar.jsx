@@ -193,9 +193,10 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
       )}
 
       {vista === 'anios' && (
-        // p-1.5 (compensado con -m-1.5): la lista tiene scroll y recortaria el
-        // anillo y la sombra del año elegido si este toca el borde.
-        <div role="group" aria-label="Elegir año" className="-m-1.5 mt-2.5 grid max-h-[16rem] grid-cols-4 content-start gap-2 overflow-y-auto p-1.5">
+        // p-4 compensado con -m-4: la lista tiene scroll y recortaria lo que
+        // sobresale de cada año (anillo y sombra del elegido, resplandor del
+        // hover, que se extiende ~15px). Con 16px de aire por lado caben.
+        <div role="group" aria-label="Elegir año" className="-m-4 mt-0 grid max-h-[18rem] grid-cols-4 content-start gap-2 overflow-y-auto p-4">
           {anios.map((anio) => (
             <button
               key={anio}
