@@ -68,30 +68,30 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
             {siguiente && (
               <span
                 aria-hidden="true"
-                className={`absolute left-1/2 top-4 h-0.5 w-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`}
+                className={`absolute left-1/2 top-[21px] h-[3px] w-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`}
               />
             )}
             <Hito
               navegable={navegable}
               onClick={() => onIrAHito?.(hito)}
               etiqueta={etiquetaAccesible(hito, estado, navegable)}
-              className={`group relative z-10 flex flex-col items-center gap-2 text-center ${
+              className={`group relative z-10 flex flex-col items-center gap-3 text-center ${
                 navegable ? 'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-white' : ''
               }`}
             >
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition ${
+                className={`flex h-11 w-11 items-center justify-center rounded-full text-xl font-semibold transition ${
                   estado === 'completado'
                     ? 'bg-brand-green text-white'
                     : estado === 'activo'
-                      ? 'bg-white font-bold text-brand-blue-800 ring-4 ring-brand-amber/70'
+                      ? 'bg-white font-bold text-brand-blue-800 ring-[6px] ring-brand-amber/70'
                       : 'vidrio text-blue-50'
                 } ${navegable ? 'group-hover:scale-110' : ''}`}
               >
-                {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : hito.numero}
+                {estado === 'completado' ? <IconoCheck className="h-[22px] w-[22px]" /> : hito.numero}
               </span>
               <span
-                className={`text-xs font-medium sm:text-sm ${
+                className={`text-xs font-medium sm:text-base md:text-xl ${
                   estado === 'pendiente' ? 'text-blue-100' : estado === 'activo' ? 'font-semibold text-white' : 'text-white'
                 } ${navegable ? 'group-hover:underline' : ''}`}
               >
