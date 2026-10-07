@@ -1,8 +1,10 @@
 // components/form/SelectorSexo.jsx
-// Segmented control Hembra / Macho (reemplaza al <select> de sexo). Hoy
-// lo usa el formulario de mascota del admin (Detalle del paciente); es
-// generico para reutilizarlo en otros formularios de mascota.
-// Valores: 'hembra' | 'macho' | '' (sin elegir).
+// Segmented control Hembra / Macho (reemplaza al <select> de sexo). Lo
+// usan los formularios de mascota del admin (Detalle del paciente) y del
+// cliente (FormularioMascotaPanel).
+// Valores: 'hembra' | 'macho' | '' (sin elegir). Si no es requerido, un
+// clic sobre la opcion elegida la desmarca (equivale al "Selecciona" del
+// <select> que reemplaza).
 const OPCIONES = [
   { valor: 'hembra', etiqueta: 'Hembra', simbolo: '♀', activa: 'bg-pink-50 text-pink-700 ring-pink-300', icono: 'text-pink-500' },
   { valor: 'macho', etiqueta: 'Macho', simbolo: '♂', activa: 'bg-blue-50 text-brand-blue ring-brand-blue-400', icono: 'text-brand-blue' },
@@ -28,7 +30,7 @@ export function SelectorSexo({ id, valor, onChange, requerido = false, etiqueta 
               type="button"
               role="radio"
               aria-checked={elegida}
-              onClick={() => onChange(opcion.valor)}
+              onClick={() => onChange(elegida && !requerido ? '' : opcion.valor)}
               className={`inline-flex items-center justify-center gap-1.5 rounded-boton px-3 py-2 text-sm font-medium ring-1 transition ${
                 elegida ? `${opcion.activa} ring-2` : 'bg-white text-slate-600 ring-slate-300 hover:bg-slate-50'
               }`}

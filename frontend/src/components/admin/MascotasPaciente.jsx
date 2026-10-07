@@ -6,8 +6,8 @@
 //   formulario de abajo). El administrador NO puede eliminar mascotas:
 //   eso lo hace unicamente su dueño (decision de la usuaria).
 // - Formulario "Agregar mascota" embebido en el tab (no es otro panel),
-//   con zona de foto cuadrada punteada (sube el archivo tal cual, sin
-//   el editor circular del cliente), Sexo como segmented control
+//   con zona de foto cuadrada punteada (ZonaFotoMascota; sube el archivo
+//   tal cual, sin el editor de recorte del cliente), Sexo como segmented control
 //   obligatorio en este formulario, y sin "Informacion medica" (no
 //   aparece en la referencia de este modulo).
 import { useEffect, useRef, useState } from 'react';
@@ -16,9 +16,10 @@ import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
 import { SelectorSexo } from '../form/SelectorSexo';
+import { ZonaFotoMascota } from '../form/ZonaFotoMascota';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { edadYPeso } from '../../utils/mascota';
-import { IconoCamara, IconoLapiz, IconoMas, IconoPata, IconoPuntos } from '../icons';
+import { IconoLapiz, IconoMas, IconoPata, IconoPuntos } from '../icons';
 
 const MAX_CARACTERISTICAS = 200;
 const TAMANO_MAXIMO_FOTO = 5 * 1024 * 1024;
@@ -284,39 +285,10 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
         </div>
 
         <div className="grid grid-cols-[130px_minmax(0,1fr)] gap-4">
-          {/* Zona de foto: caja cuadrada punteada (distinta al circulo del cliente) */}
+          {/* Zona de foto cuadrada punteada (compartida con el cliente); aca
+              el clic abre el selector de archivos y se sube tal cual. */}
           <div>
-            <button
-              type="button"
-              onClick={() => inputFoto.current?.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                elegirFoto(e.dataTransfer.files?.[0]);
-              }}
-              className="flex aspect-square w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/40 p-2 text-center transition hover:border-brand-blue"
-            >
-              {fotoMostrada ? (
-                <img src={fotoMostrada} alt="Foto de la mascota" className="h-full w-full rounded-lg object-cover" />
-              ) : (
-                <>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-brand-blue">
-                    <IconoCamara className="h-5 w-5" />
-                  </span>
-                  <span className="text-xs font-semibold leading-tight text-slate-700">Sube una foto de tu mascota</span>
-                  <span className="text-[11px] text-slate-400">JPG, PNG. Máx. 5 MB.</span>
-                </>
-              )}
-            </button>
-            {fotoMostrada && (
-              <button
-                type="button"
-                onClick={() => inputFoto.current?.click()}
-                className="mt-1 w-full text-center text-xs font-medium text-brand-blue hover:underline"
-              >
-                Cambiar foto
-              </button>
-            )}
+            <ZonaFotoMascota fotoUrl={fotoMostrada} onClick={() => inputFoto.current?.click()} onSoltarArchivo={elegirFoto} />
             <input
               ref={inputFoto}
               type="file"

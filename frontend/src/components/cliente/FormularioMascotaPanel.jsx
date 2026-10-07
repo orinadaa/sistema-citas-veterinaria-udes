@@ -4,12 +4,14 @@
 // "+ Agregar mascota"): onGuardada recibe la mascota guardada, asi quien
 // lo abre puede seleccionarla sin recargar.
 //
-// - Foto circular arriba con boton de camara -> FotoMascotaModal (el
-//   unico modal centrado del sistema). La foto recortada queda pendiente
+// - Foto: zona cuadrada punteada (ZonaFotoMascota, la misma del admin).
+//   El clic abre FotoMascotaModal (el unico modal centrado del sistema),
+//   que valida JPG/PNG de max. 5 MB y recorta. La foto recortada queda pendiente
 //   y se sube al guardar (POST /api/mascotas/:id/foto), asi "Cancelar"
 //   no deja fotos a medias.
 // - Obligatorios: nombre, especie y raza (lista segun la especie,
-//   SelectorEspecieRaza). Sexo, nacimiento, color y peso son opcionales.
+//   SelectorEspecieRaza). Sexo (SelectorSexo, botones Hembra / Macho como
+//   en el admin), nacimiento, color y peso son opcionales.
 // - "Informacion medica (opcional)": texto libre que informa el dueño
 //   (alergias, medicamentos, condiciones, observaciones). No es
 //   historial clinico: sin registros por fecha ni diagnosticos.
@@ -18,10 +20,11 @@ import { crearMascota, actualizarMascota, eliminarMascota, subirFotoMascota } fr
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
+import { SelectorSexo } from '../form/SelectorSexo';
+import { ZonaFotoMascota } from '../form/ZonaFotoMascota';
 import { Boton, PanelLateral } from '../vetui';
-import { AvatarMascota } from './AvatarMascota';
 import { FotoMascotaModal } from './FotoMascotaModal';
-import { IconoCamara, IconoPapelera } from '../icons';
+import { IconoPapelera, IconoPata } from '../icons';
 
 const FORM_VACIO = {
   nombre: '',
@@ -210,17 +213,7 @@ export function FormularioMascotaPanel({
       >
         <form id="form-mascota-cliente" onSubmit={guardar} className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2 pb-2">
-            <div className="relative">
-              <AvatarMascota mascota={mascota} fotoUrl={fotoMostrada} className="h-32 w-32 shadow-lg ring-4 ring-white" iconoClassName="h-14 w-14" />
-              <button
-                type="button"
-                onClick={() => setEditorFotoAbierto(true)}
-                aria-label="Cambiar foto de la mascota"
-                className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-boton bg-brand-blue text-white shadow-md ring-4 ring-white transition hover:bg-brand-blue-600"
-              >
-                <IconoCamara className="h-4.5 w-4.5" />
-              </button>
-            </div>
+            <ZonaFotoMascota fotoUrl={fotoMostrada} onClick={() => setEditorFotoAbierto(true)} className="w-40" />
             <p className="text-xs text-slate-600">{fotoPendiente ? 'Foto nueva: se guardará con la mascota' : 'Foto (opcional)'}</p>
           </div>
 
@@ -228,6 +221,7 @@ export function FormularioMascotaPanel({
 
           <SelectorEspecieRaza
             idPrefijo="mascota-cliente"
+            iconoEspecie={IconoPata}
             especie={form.especie}
             raza={form.raza}
             onChange={({ especie, raza }) => setForm((actual) => ({ ...actual, especie, raza }))}
@@ -241,16 +235,12 @@ export function FormularioMascotaPanel({
             onChange={actualizar('fechaNacimiento')}
           />
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="sexo-mascota-cliente" className="text-sm font-medium text-slate-700">
-              Sexo (opcional)
-            </label>
-            <select id="sexo-mascota-cliente" value={form.sexo} onChange={actualizar('sexo')} className={CLASE_TEXTAREA}>
-              <option value="">Selecciona</option>
-              <option value="macho">Macho</option>
-              <option value="hembra">Hembra</option>
-            </select>
-          </div>
+          <SelectorSexo
+            id="sexo-mascota-cliente"
+            etiqueta="Sexo (opcional)"
+            valor={form.sexo}
+            onChange={(sexo) => setForm((actual) => ({ ...actual, sexo }))}
+          />
 
           <div className="grid grid-cols-2 gap-3">
             <Campo id="color-mascota-cliente" label="Color (opcional)" value={form.color} onChange={actualizar('color')} />
