@@ -122,10 +122,11 @@ export function BookingStepperLateral({ paginaActual, puedeIrAHito = () => false
   return (
     <nav
       aria-label="Progreso de la cita"
-      className="invisible fixed top-1/2 z-30 hidden -translate-y-1/2 [opacity:clamp(0,calc((var(--flow,0)_-_0.7)_/_0.3),1)] motion-reduce:[opacity:1] lg:block left-[14px] min-[1360px]:left-[calc(((100vw-80rem)/2+24px)/2-24px)] [[data-topbar-decima='7']_&]:visible [[data-topbar-decima='8']_&]:visible [[data-topbar-decima='9']_&]:visible [[data-topbar-decima='10']_&]:visible"
-      // Centrado en el margen libre a la izquierda del contenido (48px de
-      // ancho): entre lg y 1359px ese margen son los 76px que reserva
-      // <main>; desde 1360px es el margen de max-w-7xl (80rem) + 24px.
+      className="invisible fixed top-1/2 z-30 hidden -translate-y-1/2 [opacity:clamp(0,calc((var(--flow,0)_-_0.7)_/_0.3),1)] motion-reduce:[opacity:1] lg:block left-[26px] min-[1424px]:left-[calc(((100vw-80rem)/2+24px)/2-12px)] [[data-topbar-decima='7']_&]:visible [[data-topbar-decima='8']_&]:visible [[data-topbar-decima='9']_&]:visible [[data-topbar-decima='10']_&]:visible"
+      // Corrido 12px a la derecha del centro del margen libre a la izquierda
+      // del contenido (pedido de Oriana; 48px de
+      // ancho): entre lg y 1423px ese margen son los 88px que reserva
+      // <main>; desde 1424px es el margen de max-w-7xl (80rem) + 24px.
     >
       <ol className="flex flex-col items-center">
         {HITOS.map((hito, indice) => {
