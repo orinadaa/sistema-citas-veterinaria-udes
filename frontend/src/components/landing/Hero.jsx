@@ -7,14 +7,13 @@
 import { useNavigate } from 'react-router-dom';
 import { HeroGaleria } from './HeroGaleria';
 import { FondoAmbientalHero } from './FondoAmbientalHero';
-import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
+import { IconoFlechaDerecha, IconoPata, IconoEscudo } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 
 const BULLETS = [
   { icono: IconoPata, texto: '2 sedes en Bucaramanga y Valledupar' },
   { icono: IconoEscudo, texto: 'Atención veterinaria integral' },
-  { icono: IconoReloj, texto: 'Agendamiento en línea sin llamadas ni filas' },
 ];
 
 export function Hero() {

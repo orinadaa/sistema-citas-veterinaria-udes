@@ -12,7 +12,6 @@ import { SectionHeading } from './SectionHeading';
 import { HalosAmbientales } from './HalosAmbientales';
 import { TarjetaSlide } from './TarjetaSlide';
 import { detalleHorarioPorDia } from '../../utils/horarioTexto';
-import horariosMascotas from '../../assets/horarios-mascotas.png';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
 // Cristal de vetUI (styles/vetui.css) en sus dos tintes: celeste y crema.
@@ -47,7 +46,10 @@ export function Horarios() {
         <TarjetaSlide>
           <SectionHeading titulo="Horarios de atención" subtitulo="Conoce nuestros horarios en cada sede." sobreFondoOscuro />
 
-          <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+          {/* Solo las tarjetas de cada sede, centradas bajo el encabezado
+              (sin ilustracion al lado). max-w-4xl: con dos sedes no se
+              estiran a todo el ancho de la tarjeta. */}
+          <div className="mx-auto mt-10 w-full max-w-4xl">
             {estado === ESTADOS.CARGANDO && (
               <div className="grid gap-6 sm:grid-cols-2">
                 {[0, 1].map((clave) => (
@@ -87,13 +89,6 @@ export function Horarios() {
                 })}
               </div>
             )}
-
-            <img
-              src={horariosMascotas}
-              alt=""
-              className="mx-auto hidden w-full max-w-sm object-contain lg:block"
-              aria-hidden="true"
-            />
           </div>
         </TarjetaSlide>
       </div>
