@@ -45,11 +45,13 @@ const CONSULTA_DOS_POR_VISTA = '(min-width: 48rem)';
 // Interseccion de tres degradados: un ovalo amplio (redondea las esquinas
 // y da el fundido radial) y dos lineales que garantizan que la foto llegue
 // a transparente en los cuatro bordes, sin dejar una linea recta.
+// Fundido largo y con paradas intermedias (curva suave, no lineal): la
+// foto empieza a apagarse pronto y llega a cero sin un borde perceptible.
 const MASCARA = {
   maskImage: [
-    'radial-gradient(ellipse 72% 76% at 50% 48%, black 58%, transparent 100%)',
-    'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
-    'linear-gradient(to bottom, transparent 0%, black 12%, black 86%, transparent 100%)',
+    'radial-gradient(ellipse 72% 76% at 50% 48%, black 34%, rgb(0 0 0 / 0.85) 52%, rgb(0 0 0 / 0.5) 72%, rgb(0 0 0 / 0.15) 90%, transparent 100%)',
+    `linear-gradient(to right, transparent 0%, rgb(0 0 0 / 0.1) 2%, rgb(0 0 0 / 0.35) 7%, rgb(0 0 0 / 0.75) 15%, black 26%, black 74%, rgb(0 0 0 / 0.75) 85%, rgb(0 0 0 / 0.35) 93%, rgb(0 0 0 / 0.1) 98%, transparent 100%)`,
+    `linear-gradient(to bottom, transparent 0%, rgb(0 0 0 / 0.1) 2%, rgb(0 0 0 / 0.35) 7%, rgb(0 0 0 / 0.75) 15%, black 26%, black 74%, rgb(0 0 0 / 0.75) 85%, rgb(0 0 0 / 0.35) 93%, rgb(0 0 0 / 0.1) 98%, transparent 100%)`,
   ].join(', '),
   maskComposite: 'intersect',
   WebkitMaskComposite: 'source-in',
@@ -198,8 +200,10 @@ export function ServicioSlider({ slides }) {
                     activa ? 'z-10 opacity-100' : 'pointer-events-none opacity-0'
                   }`}
                 >
-                  {/* Foto + overlays, desvanecidos juntos hacia las orillas. */}
-                  <div className="absolute inset-0" style={MASCARA}>
+                  {/* Foto + overlays, desvanecidos juntos hacia las orillas.
+                      Algo mas chica que su puesto (deja aire entre las dos
+                      fotos y con los bordes de la tarjeta). */}
+                  <div className="absolute inset-x-[4%] bottom-[5%] top-[3%]" style={MASCARA}>
                     {visitados.has(i) && (
                       <img
                         src={slide.imagen}
@@ -252,7 +256,7 @@ export function ServicioSlider({ slides }) {
       </div>
 
       {/* Un punto por servicio; los visibles van resaltados. */}
-      <div className="mt-3 flex justify-center gap-1 lg:absolute lg:inset-x-0 lg:bottom-3 lg:z-20 lg:mt-0">
+      <div className="mt-3 flex justify-center gap-0.5 lg:absolute lg:inset-x-0 lg:-bottom-2 lg:z-20 lg:mt-0">
         {slides.map((slide, i) => {
           const activa = visibles.includes(i);
           return (
@@ -265,8 +269,8 @@ export function ServicioSlider({ slides }) {
               className="group rounded-full p-1.5 outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <span
-                className={`block h-2 rounded-full transition-all duration-300 motion-reduce:transition-none ${
-                  activa ? 'w-7 bg-brand-amber' : 'w-2 bg-slate-300 group-hover:bg-slate-200 lg:bg-white/60 lg:group-hover:bg-white'
+                className={`block h-1.5 rounded-full transition-all duration-300 motion-reduce:transition-none ${
+                  activa ? 'w-5 bg-brand-amber' : 'w-1.5 bg-slate-300 group-hover:bg-slate-200 lg:bg-white/60 lg:group-hover:bg-white'
                 }`}
               />
             </button>
