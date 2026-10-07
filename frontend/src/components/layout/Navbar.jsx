@@ -141,34 +141,51 @@ export function Navbar() {
   const grupoDerechoRef = useRef(null);
   const logoRef = useRef(null);
 
-  // Equilibrio del logo grande (estado transparente, arriba de todo): el
-  // logo esta en el centro exacto de la barra, pero como los enlaces de la
-  // izquierda van agrupados en el medio de su mitad y el grupo derecho
-  // llega hasta el logo, queda mas aire a su izquierda que a su derecha y
-  // se percibe corrido. Se mide ese desbalance y el logo grande se corre a
-  // la izquierda la mitad de la diferencia (--equilibrio), para quedar a
-  // la misma distancia de "Horarios" que del grupo derecho. El corrimiento
-  // se deshace con el viaje del isotipo (ver el <Link> del logo): con la
-  // pildora formada el logo corto vuelve al centro exacto.
+  // Equilibrio del logo (regla de Oriana: en todos los estados de la
+  // topbar el logo va en la mitad entre los enlaces de la izquierda y los
+  // componentes de la derecha, a la misma distancia de ambos). Su columna
+  // esta en el centro exacto de la barra, pero como los enlaces van
+  // agrupados en el medio de su mitad y el grupo derecho llega hasta el
+  // logo, queda mas aire a un lado que al otro. Se mide ese desbalance y
+  // el logo se corre la mitad de la diferencia (--equilibrio), igual con
+  // la barra transparente (logo grande) que con la pildora formada (logo
+  // corto). Se vuelve a medir cada vez que la fila o los grupos cambian de
+  // tamaño (ResizeObserver): al formarse la pildora la fila puede
+  // estrecharse y mover las columnas.
   useLayoutEffect(() => {
     const fila = filaRef.current;
     const logo = logoRef.current;
     if (!fila || !logo) return undefined;
+    let aplicado = null;
     const medir = () => {
       // El <nav> ocupa toda su columna; lo que cuenta es su ultimo enlace.
       const nav = navRef.current?.lastElementChild?.getBoundingClientRect();
-      const derecha = [...(grupoDerechoRef.current?.children ?? [])].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0);
+      // A la derecha cuenta donde empieza lo que se VE del primer control
+      // (texto o icono), no su caja: los botones y enlaces de ese lado
+      // tienen relleno interno (8-12px) y los enlaces de la izquierda no.
+      const controles = [...(grupoDerechoRef.current?.querySelectorAll('a, button') ?? [])].filter((e) => e.getBoundingClientRect().width > 0);
+      const derecha = controles.map((e) => e.getBoundingClientRect().left + (parseFloat(getComputedStyle(e).paddingLeft) || 0));
       let equilibrio = 0;
       if (nav && nav.width > 0 && derecha.length > 0) {
-        // El logo ocupa la columna central de la grilla: su caja (sin el
-        // corrimiento) esta centrada en la fila.
-        const caja = fila.getBoundingClientRect();
-        const centro = caja.left + caja.width / 2;
-        const mitadLogo = logo.offsetWidth / 2;
-        const aireIzquierda = centro - mitadLogo - nav.right;
-        const aireDerecha = Math.min(...derecha.map((r) => r.left)) - (centro + mitadLogo);
-        equilibrio = Math.max(0, (aireIzquierda - aireDerecha) / 2);
+        // Posicion REAL de la caja del logo, sin el corrimiento. No se puede
+        // suponer que esta en el centro de la fila: con la pildora formada
+        // (ancho maximo 68rem) y un grupo derecho largo (sesion iniciada:
+        // campana + "Hola, nombre" + Agendar) la fila no cabe, la columna
+        // izquierda se encoge mas que la derecha y el logo queda corrido
+        // hacia los enlaces. Por eso el corrimiento puede ser hacia
+        // cualquiera de los dos lados.
+        // Se calcula con offsetLeft/offsetWidth, que ignoran los transform:
+        // getBoundingClientRect devolveria la caja ya corrida (y a medio
+        // camino si el corrimiento se esta animando), y el calculo se
+        // realimentaria con su propio resultado.
+        const padre = logo.offsetParent;
+        const izquierdaLogo = padre.getBoundingClientRect().left + padre.clientLeft + logo.offsetLeft;
+        const aireIzquierda = izquierdaLogo - nav.right;
+        const aireDerecha = Math.min(...derecha) - (izquierdaLogo + logo.offsetWidth);
+        equilibrio = (aireIzquierda - aireDerecha) / 2;
       }
+      if (aplicado !== null && Math.abs(equilibrio - aplicado) < 0.05) return;
+      aplicado = equilibrio;
       logo.style.setProperty('--equilibrio', `${equilibrio.toFixed(1)}px`);
     };
     medir();
@@ -351,11 +368,11 @@ export function Navbar() {
             className="relative flex h-10 w-[126px] items-center justify-center"
             // --viaje (0..1): avance del isotipo hacia el centro, compartido
             // por el logo grande y el isotipo blanco para que se muevan juntos.
-            // --equilibrio: corrimiento a la izquierda del logo grande (efecto de
-            // arriba); se deshace con el viaje, asi el logo corto llega al centro.
+            // --equilibrio: corrimiento a la izquierda para quedar a la misma
+            // distancia de los dos grupos (efecto de arriba), en todo el scroll.
             style={{
               '--viaje': 'clamp(0, (var(--flow, 0) - 0.1) / 0.6, 1)',
-              transform: 'translateX(calc(var(--equilibrio, 0px) * (var(--viaje) - 1)))',
+              transform: 'translateX(calc(var(--equilibrio, 0px) * -1))',
             }}
           >
             <>
