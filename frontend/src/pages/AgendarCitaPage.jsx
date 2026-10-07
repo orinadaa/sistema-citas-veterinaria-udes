@@ -29,14 +29,6 @@ import { useAuth } from '../context/AuthContext';
 import { IconoFlechaDerecha } from '../components/icons';
 import { Aviso, Boton, EncabezadoPagina, FondoVetui } from '../components/vetui';
 
-// Desde lg el contenido empieza al menos 14px a la derecha del stepper
-// lateral (48px de ancho, ver su left en BookingStepper.jsx): el borde
-// derecho del stepper es max(100px, 25vw - 246px) contando esos 14px, y a
-// eso se le resta el margen que ya pone max-w-7xl al centrarse. Cuando la
-// pantalla es tan ancha que ese margen alcanza solo, queda el padding
-// normal (24px).
-const RESERVA_STEPPER = 'lg:pl-[max(24px,max(100px,25vw_-_246px)_-_max(0px,50vw_-_640px))]';
-
 export function AgendarCitaPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -246,10 +238,14 @@ export function AgendarCitaPage() {
           antetitulo="Agendar cita"
           titulo="Agenda una cita para tu mascota"
           descripcion="Completa los pasos y confirma. Te toma menos de un minuto."
-          className={`pb-6 ${RESERVA_STEPPER}`}
+          className="pb-6 lg:pl-[88px] min-[1424px]:pl-6"
         />
 
-        <main className={`mx-auto max-w-7xl px-4 pb-16 sm:px-6 ${RESERVA_STEPPER}`}>
+        {/* Entre lg y 1423px el margen lateral no alcanza para el stepper
+            lateral (48px + 12px al borde + 16px de aire): se reserva ese
+            espacio a la izquierda del contenido para que no lo tape. Desde
+            1424px ya hay margen libre. */}
+        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[88px] min-[1424px]:pl-6">
           {/* Desde lg, relevo con el stepper lateral atado al progreso de la
               topbar (--flow en <html>, ver Navbar.jsx): esta tarjeta se
               desvanece entre flow 0 y 0.8 y el lateral aparece entre 0.7 y 1,
