@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
+import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
 import { Boton, EncabezadoPagina, FondoVetui, Pestanas, TarjetaDato } from '../components/vetui';
 import { PanelMisCitas } from '../components/cliente/PanelMisCitas';
 import { PanelMisMascotas } from '../components/cliente/PanelMisMascotas';
@@ -55,6 +56,11 @@ export function PanelClientePage() {
     .sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora))[0];
   const citasCompletadas = citas.filter((cita) => estadoDeCita(cita) === 'completada').length;
 
+  // Mismo scroll en dos posiciones que /agendar: de arriba de todo salta a
+  // la vista con la pildora de la topbar ya formada, sin quedarse en la
+  // transicion (el ancla son los indicadores, data-ancla-topbar).
+  useAnclaTopbar();
+
   return (
     <FondoVetui>
       <Navbar />
@@ -68,7 +74,7 @@ export function PanelClientePage() {
       />
 
       <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div data-ancla-topbar className="grid scroll-mt-28 grid-cols-1 gap-4 sm:grid-cols-3">
           <TarjetaDato
             icono={IconoCalendario}
             tono="azul"

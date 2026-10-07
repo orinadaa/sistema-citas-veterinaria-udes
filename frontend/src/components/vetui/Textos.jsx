@@ -8,7 +8,12 @@
 // (cuerpo): ambos en AA sobre vidrio y fondo.
 export function EncabezadoPagina({ antetitulo, titulo, descripcion, acciones, imagen, className = '' }) {
   return (
-    <header className={`mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center ${className}`}>
+    // lg:min-h-[17.25rem] (276px): con los 96px de la topbar, el contenido
+    // que sigue empieza al menos a 372px. Es lo que necesita el scroll en dos
+    // posiciones (useAnclaTopbar): la pildora termina de formarse a los 260px
+    // de scroll, y a esa altura el contenido tiene que quedar debajo de ella
+    // (112px), no detras.
+    <header className={`mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:min-h-[17.25rem] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center ${className}`}>
       <div>
         {antetitulo && <p className="text-xs font-semibold uppercase tracking-wider text-blue-50">{antetitulo}</p>}
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-white md:text-4xl">{titulo}</h1>
