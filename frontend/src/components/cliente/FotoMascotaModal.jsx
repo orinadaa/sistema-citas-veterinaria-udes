@@ -174,11 +174,15 @@ export function FotoMascotaModal({
 
   useEffect(() => {
     if (!isOpen) return undefined;
+    // En fase de captura y sin propagar: Escape cierra solo el editor, no
+    // tambien el panel lateral desde el que se abrio.
     function alPresionarTecla(evento) {
-      if (evento.key === 'Escape') onClose();
+      if (evento.key !== 'Escape') return;
+      evento.stopPropagation();
+      onClose();
     }
-    document.addEventListener('keydown', alPresionarTecla);
-    return () => document.removeEventListener('keydown', alPresionarTecla);
+    document.addEventListener('keydown', alPresionarTecla, true);
+    return () => document.removeEventListener('keydown', alPresionarTecla, true);
   }, [isOpen, onClose]);
 
   // Libera la URL temporal del archivo local al cambiarla o al desmontar.

@@ -10,6 +10,7 @@ import {
   obtenerCitasAdministracion,
   obtenerServicios,
   obtenerClientes,
+  obtenerHorarios,
   agendarCita,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -20,13 +21,14 @@ import { CategoryBadge, COLORES_CATEGORIA } from '../ui/CategoryBadge';
 import { Campo } from '../form/Campo';
 import { MiniCalendario } from '../citas/MiniCalendario';
 import { CalendarioSemanal } from '../citas/CalendarioSemanal';
-import { SelectorFranjas } from '../citas/SelectorFranjas';
+import { DatePickerCalendar } from '../agendar/DatePickerCalendar';
+import { TimeSlotPicker } from '../agendar/TimeSlotPicker';
 import { SelectorMedico } from '../citas/SelectorMedico';
 import { MascotaSelector } from '../citas/MascotaSelector';
 import { IconoFlechaDerecha, IconoPata } from '../icons';
 import { EstadoError } from '../ui/EstadoError';
 
-const FORM_VACIO = { clienteId: '', servicioId: '', franja: null, medicoId: '', mascotaId: '', motivo: '' };
+const FORM_VACIO = { clienteId: '', servicioId: '', fecha: '', franja: null, medicoId: '', mascotaId: '', motivo: '' };
 
 function hoyAMedianoche() {
   const hoy = new Date();
@@ -51,6 +53,20 @@ export function PanelCitasSeguimiento() {
   const [citaDetalle, setCitaDetalle] = useState(null);
   const [panelNuevaAbierto, setPanelNuevaAbierto] = useState(false);
   const [formNueva, setFormNueva] = useState(FORM_VACIO);
+  // Dias de la semana en que atiende la sede (deshabilita los demas en el
+  // calendario de "Nueva cita"); null mientras carga o si falla.
+  const [diasAbiertos, setDiasAbiertos] = useState(null);
+  const sedeIdUsuario = usuario?.sedeId;
+  useEffect(() => {
+    if (!sedeIdUsuario) return undefined;
+    let vigente = true;
+    obtenerHorarios(sedeIdUsuario)
+      .then((datos) => vigente && setDiasAbiertos(new Set(datos.horario.map((h) => h.dia_semana))))
+      .catch(() => vigente && setDiasAbiertos(null));
+    return () => {
+      vigente = false;
+    };
+  }, [sedeIdUsuario]);
   const [errorNueva, setErrorNueva] = useState('');
   const [guardandoNueva, setGuardandoNueva] = useState(false);
 
@@ -375,12 +391,35 @@ export function PanelCitasSeguimiento() {
               </select>
             </div>
 
-            <SelectorFranjas
-              sedeId={usuario.sedeId}
-              servicioId={formNueva.servicioId}
-              valorSeleccionado={formNueva.franja}
-              onSeleccionar={(valor) => setFormNueva({ ...formNueva, franja: valor, medicoId: '' })}
-            />
+            {/* Mismo calendario y selector de horas del flujo de agendar del
+                cliente (disponibilidad agregada de la sede; el medico se
+                elige despues, entre los libres a esa hora). */}
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm font-medium text-slate-700">
+                Fecha y hora<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
+              </p>
+              {!formNueva.servicioId ? (
+                <p className="text-sm text-slate-500">Selecciona primero el servicio.</p>
+              ) : (
+                <div className="flex flex-col gap-5 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+                  <DatePickerCalendar
+                    valor={formNueva.fecha}
+                    onChange={(fecha) => setFormNueva({ ...formNueva, fecha, franja: null, medicoId: '' })}
+                    diasAbiertos={diasAbiertos}
+                  />
+                  <div className="border-t border-slate-200 pt-4">
+                    <p className="mb-3 font-heading text-sm font-semibold text-brand-navy">Horarios disponibles</p>
+                    <TimeSlotPicker
+                      sedeId={usuario.sedeId}
+                      servicioId={formNueva.servicioId}
+                      fecha={formNueva.fecha}
+                      valor={formNueva.franja}
+                      onChange={(valor) => setFormNueva({ ...formNueva, franja: valor, medicoId: '' })}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
 
             <SelectorMedico
               sedeId={usuario.sedeId}

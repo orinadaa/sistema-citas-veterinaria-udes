@@ -12,9 +12,9 @@
 import { useEffect, useState } from 'react';
 import { crearRecordatorioMedico, obtenerRecordatoriosMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { hoyComoFechaLocal } from '../../utils/fecha';
 import { especieYRaza } from '../../utils/mascota';
 import { SidePanel } from '../ui/SidePanel';
+import { CampoFecha } from '../form/CampoFecha';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { IconoCampana, IconoCheck, IconoDesparasitacion, IconoEstetoscopio, IconoJeringa, IconoPastilla } from '../icons';
 
@@ -226,12 +226,8 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="fecha-recordatorio" className="text-sm font-medium text-slate-700">
-                  Fecha<span className="ml-0.5 text-red-500">*</span>
-                </label>
-                <input id="fecha-recordatorio" type="date" min={hoyComoFechaLocal()} value={fecha} onChange={(e) => setFecha(e.target.value)} className={CLASE_CAMPO} />
-              </div>
+              {/* Sin minimo explicito: el calendario no deja elegir dias pasados. */}
+              <CampoFecha id="fecha-recordatorio" etiqueta="Fecha" requerido valor={fecha} onChange={setFecha} />
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="hora-recordatorio" className="text-sm font-medium text-slate-700">
                   Hora<span className="ml-0.5 text-red-500">*</span>

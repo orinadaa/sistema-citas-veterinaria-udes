@@ -4,7 +4,7 @@
 // "+ Agregar mascota"): onGuardada recibe la mascota guardada, asi quien
 // lo abre puede seleccionarla sin recargar.
 //
-// - Foto: zona circular punteada (ZonaFotoMascota, la misma del admin).
+// - Foto: zona circular punteada (ZonaFoto, la misma del admin).
 //   El clic abre FotoMascotaModal (el unico modal centrado del sistema),
 //   que valida JPG/PNG de max. 5 MB y recorta. La foto recortada queda pendiente
 //   y se sube al guardar (POST /api/mascotas/:id/foto), asi "Cancelar"
@@ -18,10 +18,12 @@
 import { useEffect, useState } from 'react';
 import { crearMascota, actualizarMascota, eliminarMascota, subirFotoMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { hoyComoFechaLocal } from '../../utils/fecha';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
 import { SelectorSexo } from '../form/SelectorSexo';
-import { ZonaFotoMascota } from '../form/ZonaFotoMascota';
+import { CampoFecha } from '../form/CampoFecha';
+import { ZonaFoto } from '../form/ZonaFoto';
 import { Boton, PanelLateral } from '../vetui';
 import { FotoMascotaModal } from './FotoMascotaModal';
 import { IconoPapelera, IconoPata } from '../icons';
@@ -213,7 +215,7 @@ export function FormularioMascotaPanel({
       >
         <form id="form-mascota-cliente" onSubmit={guardar} className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2 pb-2">
-            <ZonaFotoMascota fotoUrl={fotoMostrada} onClick={() => setEditorFotoAbierto(true)} className="w-40" />
+            <ZonaFoto fotoUrl={fotoMostrada} onClick={() => setEditorFotoAbierto(true)} className="w-40" />
             <p className="text-xs text-slate-600">{fotoPendiente ? 'Foto nueva: se guardará con la mascota' : 'Foto (opcional)'}</p>
           </div>
 
@@ -227,12 +229,14 @@ export function FormularioMascotaPanel({
             onChange={({ especie, raza }) => setForm((actual) => ({ ...actual, especie, raza }))}
           />
 
-          <Campo
+          <CampoFecha
             id="fecha-nacimiento-mascota-cliente"
-            label="Fecha de nacimiento (opcional)"
-            type="date"
-            value={form.fechaNacimiento}
-            onChange={actualizar('fechaNacimiento')}
+            etiqueta="Fecha de nacimiento (opcional)"
+            valor={form.fechaNacimiento}
+            onChange={(fechaNacimiento) => setForm((actual) => ({ ...actual, fechaNacimiento }))}
+            minimo={null}
+            maximo={hoyComoFechaLocal()}
+            selectorRapido
           />
 
           <SelectorSexo
