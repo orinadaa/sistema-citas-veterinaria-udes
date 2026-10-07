@@ -39,6 +39,10 @@ const TONOS = {
     semana: 'text-slate-600',
     elegido: 'bg-brand-blue-700 font-semibold text-white shadow-sm ring-2 ring-brand-amber',
     deshabilitado: 'cursor-not-allowed text-slate-300',
+    // Meses/años fuera de los limites: gris que si cumple contraste AA
+    // (slate-600, 7.5:1 sobre blanco) y tachado para que no se confunda
+    // con uno elegible.
+    opcionDeshabilitada: 'cursor-not-allowed text-slate-600 line-through decoration-slate-400',
     hoy: 'font-semibold text-brand-blue-700 ring-1 ring-brand-blue/50 hover:bg-blue-50',
     normal: 'text-slate-800 hover:bg-blue-50 hover:text-brand-blue-700',
   },
@@ -50,6 +54,7 @@ const TONOS = {
     semana: 'text-blue-100',
     elegido: 'bg-white font-bold text-brand-blue-800 shadow-sm ring-2 ring-brand-amber',
     deshabilitado: 'cursor-not-allowed text-white/35',
+    opcionDeshabilitada: 'cursor-not-allowed text-white/70 line-through decoration-white/50',
     hoy: 'font-semibold text-white ring-1 ring-white/60 hover:bg-white/15',
     normal: 'text-white hover:bg-white/15',
   },
@@ -112,7 +117,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
   const claseEncabezado = (activa) =>
     `cursor-pointer rounded-sm font-heading text-base font-semibold underline-offset-4 transition-colors hover:[filter:none] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${activa ? t.encabezadoActivo : t.encabezado}`;
   const claseOpcion = (elegida, deshabilitada) =>
-    `rounded-boton px-2 py-2.5 text-sm transition ${elegida ? t.elegido : deshabilitada ? t.deshabilitado : t.normal}`;
+    `rounded-boton px-2 py-2.5 text-sm transition ${elegida ? t.elegido : deshabilitada ? t.opcionDeshabilitada : t.normal}`;
 
   return (
     <div>
