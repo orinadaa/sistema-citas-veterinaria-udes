@@ -196,18 +196,19 @@ export function ServicioSlider({ slides }) {
               </div>
 
               <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
-                <h3 className="text-3xl font-bold tracking-tight [text-shadow:0_1px_12px_rgb(0_0_0/0.35)] sm:text-4xl lg:text-5xl">
+                {/* Jerarquia: por debajo del titulo de la seccion (h2, 30px). */}
+                <h3 className="text-xl font-bold tracking-tight [text-shadow:0_1px_12px_rgb(0_0_0/0.35)] sm:text-2xl">
                   {slide.titulo}
                 </h3>
                 {slide.descripcion && (
-                  <p className="mt-2 max-w-[48ch] text-base text-white/90 [text-shadow:0_1px_8px_rgb(0_0_0/0.4)] sm:mt-3 sm:text-lg">
+                  <p className="mt-1.5 max-w-[48ch] text-sm text-white/90 [text-shadow:0_1px_8px_rgb(0_0_0/0.4)] sm:text-base">
                     {slide.descripcion}
                   </p>
                 )}
                 {slide.href && (
                   <Link
                     to={slide.href}
-                    className="boton-glass-ambar mt-5 inline-flex items-center rounded-boton px-5 py-2.5 text-sm font-semibold text-slate-900 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="boton-glass-ambar mt-4 inline-flex items-center rounded-boton px-5 py-2.5 text-sm font-semibold text-slate-900 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     Agendar cita
                   </Link>
