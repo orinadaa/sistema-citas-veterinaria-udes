@@ -157,7 +157,13 @@ export function Navbar() {
     const medir = () => {
       // El <nav> ocupa toda su columna; lo que cuenta es su ultimo enlace.
       const nav = navRef.current?.lastElementChild?.getBoundingClientRect();
-      const derecha = [...(grupoDerechoRef.current?.children ?? [])].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0);
+      // A la derecha cuenta donde empieza lo que se VE del primer control
+      // (texto o icono), no su caja: los botones y enlaces de ese lado
+      // tienen relleno interno (8-12px) y los enlaces de la izquierda no;
+      // midiendo cajas el logo quedaba esos pixeles mas cerca de la
+      // izquierda de lo que se percibe.
+      const controles = [...(grupoDerechoRef.current?.querySelectorAll('a, button') ?? [])].filter((e) => e.getBoundingClientRect().width > 0);
+      const derecha = controles.map((e) => e.getBoundingClientRect().left + (parseFloat(getComputedStyle(e).paddingLeft) || 0));
       let equilibrio = 0;
       if (nav && nav.width > 0 && derecha.length > 0) {
         // El logo ocupa la columna central de la grilla: su caja (sin el
@@ -166,7 +172,7 @@ export function Navbar() {
         const centro = caja.left + caja.width / 2;
         const mitadLogo = logo.offsetWidth / 2;
         const aireIzquierda = centro - mitadLogo - nav.right;
-        const aireDerecha = Math.min(...derecha.map((r) => r.left)) - (centro + mitadLogo);
+        const aireDerecha = Math.min(...derecha) - (centro + mitadLogo);
         equilibrio = Math.max(0, (aireIzquierda - aireDerecha) / 2);
       }
       logo.style.setProperty('--equilibrio', `${equilibrio.toFixed(1)}px`);
