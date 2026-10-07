@@ -274,12 +274,12 @@ export function Navbar() {
               movil) para que el grid no corra el logo hacia la izquierda.
               Desde md la fila mide lo que su contenido (w-fit) y va centrada:
               las dos columnas 1fr quedan del ancho del grupo mas largo (el
-              derecho) y los enlaces de la izquierda se reparten en todo ese
-              ancho (justify-between). Asi el conjunto se ve centrado: mismo
-              espacio del borde a "Servicios" que de "Agendar cita" al otro
-              borde, y misma distancia de cada grupo al logo. */}
+              derecho), asi el logo queda al centro y el conjunto simetrico.
+              Los enlaces de la izquierda van agrupados (gap fijo), juntos
+              entre si y centrados dentro de su columna (pedido de Oriana;
+              antes se repartian en todo el ancho con justify-between). */}
           <div className="justify-self-start md:justify-self-stretch">
-            <nav className="hidden items-center justify-between gap-8 text-base font-medium text-white/90 md:flex">
+            <nav className="hidden items-center justify-center gap-8 text-base font-medium text-white/90 md:flex">
               {/* Link (no <a>) para que funcionen desde cualquier pagina, no
                   solo desde el landing: si el usuario esta en /panel, primero
                   navega a "/" y LandingPage.jsx hace scroll al hash una vez
