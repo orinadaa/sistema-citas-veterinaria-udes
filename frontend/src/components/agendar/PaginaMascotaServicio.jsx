@@ -48,9 +48,11 @@ export function PaginaMascotaServicio({
                 seleccionada={mascota.id === mascotaId}
                 onSeleccionar={() => onSeleccionarMascota(mascota.id)}
               >
-                <div className="flex items-center gap-3 pr-6">
-                  <AvatarMascota mascota={mascota} />
-                  <div className="min-w-0">
+                {/* Foto grande arriba y datos centrados debajo, como en
+                    "Mis citas" y "Mis mascotas". */}
+                <div className="flex w-full min-w-0 flex-col items-center gap-2 text-center">
+                  <AvatarMascota mascota={mascota} className="h-20 w-20 shadow-md ring-4 ring-white" iconoClassName="h-9 w-9" />
+                  <div className="w-full min-w-0">
                     <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
                     <p className="truncate text-sm text-slate-700">{especieYRaza(mascota) || 'Sin especie registrada'}</p>
                     {edadYPeso(mascota) && <p className="text-xs font-medium text-slate-700">{edadYPeso(mascota)}</p>}
@@ -62,7 +64,7 @@ export function PaginaMascotaServicio({
             <button
               type="button"
               onClick={onAgregarMascota}
-              className="hover-ilumina flex min-h-[5.5rem] items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-slate-300 p-4 text-sm font-semibold text-slate-700 transition hover:border-brand-blue hover:text-brand-blue-700"
+              className="hover-ilumina flex min-h-[5.5rem] flex-col items-center justify-center gap-2 rounded-tarjeta border-2 border-dashed border-slate-300 p-4 text-sm font-semibold text-slate-700 transition hover:border-brand-blue hover:text-brand-blue-700"
             >
               <IconoMas className="h-5 w-5" />
               Agregar mascota

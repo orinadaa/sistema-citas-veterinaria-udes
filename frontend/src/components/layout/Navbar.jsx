@@ -284,6 +284,13 @@ export function Navbar() {
           <Link
             to="/"
             aria-label="Clínica Veterinaria UDES, ir al inicio"
+            // El Link solo cambia la ruta: si ya se esta en el landing (o se
+            // viene de otra pagina con scroll) la vista no subiria sola. Se
+            // lleva arriba aca: suave dentro del landing, directo desde otra.
+            onClick={() => {
+              const suave = ubicacion.pathname === '/' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+              window.scrollTo({ top: 0, behavior: suave ? 'smooth' : 'auto' });
+            }}
             className="relative flex h-10 w-[126px] items-center justify-center"
             // --viaje (0..1): avance del isotipo hacia el centro, compartido
             // por el logo grande y el isotipo blanco para que se muevan juntos.
