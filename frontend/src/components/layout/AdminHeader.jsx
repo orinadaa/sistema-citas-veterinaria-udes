@@ -72,12 +72,17 @@ export function AdminHeader({ onNavegar }) {
         setBuscando(false);
         return;
       }
+      // Si una consulta falla, esa categoria queda vacia en vez de dejar
+      // el buscador colgado en "Buscando...".
       const [servicios, medicos, pacientes] = await Promise.all([
-        obtenerServiciosAdmin(token),
-        obtenerMedicosAdmin(token),
-        obtenerPacientes({}, token),
+        obtenerServiciosAdmin(token).catch(() => ({ servicios: [] })),
+        obtenerMedicosAdmin(token).catch(() => ({ medicos: [] })),
+        obtenerPacientes({}, token).catch(() => ({ pacientes: [] })),
       ]);
+      // Se parte de RESULTADOS_VACIOS para que no falte ninguna categoria
+      // (el admin no busca mascotas, pero el render lee resultados.mascotas).
       setResultados({
+        ...RESULTADOS_VACIOS,
         servicios: servicios.servicios.filter((s) => coincide(s.nombre)).slice(0, 4),
         medicos: medicos.medicos.filter((m) => coincide(m.nombre_completo)).slice(0, 4),
         pacientes: pacientes.pacientes.filter((p) => coincide(p.nombre_completo)).slice(0, 4),
