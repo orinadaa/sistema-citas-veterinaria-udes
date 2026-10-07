@@ -238,14 +238,14 @@ export function AgendarCitaPage() {
           antetitulo="Agendar cita"
           titulo="Agenda una cita para tu mascota"
           descripcion="Completa los pasos y confirma. Te toma menos de un minuto."
-          className="pb-6 lg:pl-[76px] min-[1360px]:pl-6"
+          className="pb-6 lg:pl-[88px] min-[1424px]:pl-6"
         />
 
-        {/* Entre lg y 1359px el margen lateral no alcanza para el stepper
+        {/* Entre lg y 1423px el margen lateral no alcanza para el stepper
             lateral (48px + 12px al borde + 16px de aire): se reserva ese
             espacio a la izquierda del contenido para que no lo tape. Desde
-            1360px ya hay margen libre. */}
-        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[76px] min-[1360px]:pl-6">
+            1424px ya hay margen libre. */}
+        <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:pl-[88px] min-[1424px]:pl-6">
           {/* Desde lg, relevo con el stepper lateral atado al progreso de la
               topbar (--flow en <html>, ver Navbar.jsx): esta tarjeta se
               desvanece entre flow 0 y 0.8 y el lateral aparece entre 0.7 y 1,
