@@ -2,12 +2,10 @@
 // Sin fondo propio: el degradado base es continuo con Servicios y vive en
 // el contenedor que envuelve a ambos (LandingPage.jsx). Aca solo van los
 // halos del Hero (FondoAmbientalHero.jsx).
-// La veterinaria + mascota + iconos flotantes son una sola imagen con
-// transparencia (identidadmarca/fotomain.png), ya compuesta -- se
-// ubica como <img> normal en la columna derecha, no como
-// background-image, asi que no hay riesgo de recorte responsivo.
+// En la columna derecha va la galeria de fotos reales de la clinica
+// (HeroGaleria.jsx), fundida con el fondo por una mascara radial.
 import { useNavigate } from 'react-router-dom';
-import fotoMain from '../../assets/foto-main.png';
+import { HeroGaleria } from './HeroGaleria';
 import { FondoAmbientalHero } from './FondoAmbientalHero';
 import { IconoFlechaDerecha, IconoPata, IconoEscudo, IconoReloj } from '../icons';
 import { useAuth } from '../../context/AuthContext';
@@ -70,7 +68,7 @@ export function Hero() {
         </div>
 
         <div className="relative">
-          <img src={fotoMain} alt="" className="mx-auto w-full max-w-[670px] drop-shadow-2xl lg:max-w-[770px]" />
+          <HeroGaleria />
         </div>
       </div>
     </section>
