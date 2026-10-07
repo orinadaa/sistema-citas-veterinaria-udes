@@ -8,14 +8,18 @@
 // "Cancelar cita". Decisiones de la usuaria: sin "Editar cita", sin
 // "Notas adicionales" (no existen en el sistema) y sin "Ver perfil" del
 // medico (no hay vista de perfil).
+// Reprogramar usa el mismo calendario de mes y selector de horas del
+// flujo de agendar (DatePickerCalendar + TimeSlotPicker), filtrado al
+// medico de la cita: reprogramar no cambia de medico.
 import { useEffect, useState } from 'react';
-import { reprogramarCita, cancelarCita } from '../../api/client';
+import { reprogramarCita, cancelarCita, obtenerHorarios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { formatearFechaLarga, formatearFechaCorta, formatearHora } from '../../utils/fecha';
+import { aFechaLocal, formatearFechaLarga, formatearFechaCorta, formatearHora } from '../../utils/fecha';
 import { formatearCOP } from '../../utils/moneda';
 import { PanelLateral } from '../vetui';
 import { StatusBadge } from '../ui/StatusBadge';
-import { SelectorFranjas } from './SelectorFranjas';
+import { DatePickerCalendar } from '../agendar/DatePickerCalendar';
+import { TimeSlotPicker } from '../agendar/TimeSlotPicker';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import {
   IconoCalendario,
@@ -85,15 +89,40 @@ function BotonFila({ icono: Icono, onClick, href, children }) {
 export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
   const { token } = useAuth();
   const [modo, setModo] = useState('vista');
+  const [nuevaFecha, setNuevaFecha] = useState('');
   const [nuevaFranja, setNuevaFranja] = useState(null);
+  // Dias de la semana en que atiende la sede de la cita (para deshabilitar
+  // los demas en el calendario); null mientras carga o si falla.
+  const [diasAbiertos, setDiasAbiertos] = useState({ sedeId: null, dias: null });
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     setModo('vista');
+    setNuevaFecha('');
     setNuevaFranja(null);
     setError('');
   }, [cita?.id]);
+
+  const sedeId = cita?.sede_id;
+  useEffect(() => {
+    if (modo !== 'reprogramar' || !sedeId) return undefined;
+    let vigente = true;
+    obtenerHorarios(sedeId)
+      .then((datos) => vigente && setDiasAbiertos({ sedeId, dias: new Set(datos.horario.map((h) => h.dia_semana)) }))
+      .catch(() => vigente && setDiasAbiertos({ sedeId, dias: null }));
+    return () => {
+      vigente = false;
+    };
+  }, [modo, sedeId]);
+
+  // El calendario abre en el mes de la cita, con su dia ya elegido.
+  function abrirReprogramar() {
+    setNuevaFecha(aFechaLocal(new Date(cita.fecha_hora)));
+    setNuevaFranja(null);
+    setError('');
+    setModo('reprogramar');
+  }
 
   async function confirmarReprogramacion() {
     if (!nuevaFranja) return;
@@ -154,6 +183,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           type="button"
           onClick={() => {
             setModo('vista');
+            setNuevaFecha('');
             setNuevaFranja(null);
             setError('');
           }}
@@ -258,7 +288,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
               accion={
                 puedeGestionar &&
                 modo !== 'reprogramar' && (
-                  <BotonFila icono={IconoCalendario} onClick={() => setModo('reprogramar')}>
+                  <BotonFila icono={IconoCalendario} onClick={abrirReprogramar}>
                     Reprogramar
                   </BotonFila>
                 )
@@ -266,16 +296,39 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
             />
 
             {modo === 'reprogramar' && (
-              <div className="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
-                <SelectorFranjas
-                  sedeId={cita.sede_id}
-                  servicioId={cita.servicio_id}
-                  medicoId={cita.medico_id}
-                  valorSeleccionado={nuevaFranja}
-                  onSeleccionar={setNuevaFranja}
+              <div className="flex flex-col gap-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                <div>
+                  <p className="font-heading text-base font-semibold text-brand-navy">Elige la nueva fecha y hora</p>
+                  <p className="mt-0.5 text-sm text-slate-600">Se mantiene el mismo médico ({cita.medico_nombre}).</p>
+                </div>
+
+                <DatePickerCalendar
+                  valor={nuevaFecha}
+                  onChange={(valor) => {
+                    setNuevaFecha(valor);
+                    setNuevaFranja(null);
+                  }}
+                  diasAbiertos={diasAbiertos.sedeId === cita.sede_id ? diasAbiertos.dias : null}
                 />
-                <p className="mt-2 text-xs text-slate-400">Se mantiene el mismo médico ({cita.medico_nombre}).</p>
-                {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+
+                <div className="border-t border-slate-200 pt-5">
+                  <p className="mb-3 font-heading text-sm font-semibold text-brand-navy">Horarios disponibles</p>
+                  <TimeSlotPicker
+                    sedeId={cita.sede_id}
+                    servicioId={cita.servicio_id}
+                    medicoId={cita.medico_id}
+                    fecha={nuevaFecha}
+                    valor={nuevaFranja}
+                    onChange={setNuevaFranja}
+                  />
+                </div>
+
+                {nuevaFranja && (
+                  <p className="rounded-xl bg-blue-50 px-4 py-3 text-sm text-slate-700">
+                    Nueva fecha: <span className="font-semibold text-brand-blue-800">{formatearFechaLarga(nuevaFranja)}, {formatearHora(nuevaFranja)}</span>
+                  </p>
+                )}
+                {error && <p className="text-sm text-red-700">{error}</p>}
               </div>
             )}
 
