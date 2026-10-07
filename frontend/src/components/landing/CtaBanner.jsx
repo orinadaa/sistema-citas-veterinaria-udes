@@ -32,13 +32,15 @@ export function CtaBanner() {
     // las esquinas se verian cortadas en seco en el borde superior. El
     // contenedor del landing ya recorta lo que sale por los costados.
     <section data-slide className="relative lg:snap-start lg:snap-always">
-      {/* Halo azul central: se desvanece antes de los bordes de la seccion. */}
+      {/* Halo azul central. Su caja sube 8rem por encima de la seccion
+          para que pueda ser mas grande sin cortarse arriba; abajo termina
+          con la seccion (despues viene el footer, de fondo solido). */}
       <div
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-x-0 -top-32 bottom-0"
         aria-hidden="true"
         style={{
           backgroundImage:
-            'radial-gradient(ellipse 45% 45% at 50% 50%, color-mix(in oklab, var(--color-brand-blue-500) 55%, transparent) 0%, transparent 72%)',
+            'radial-gradient(ellipse 58% 50% at 50% 62%, color-mix(in oklab, var(--color-brand-blue-500) 55%, transparent) 0%, transparent 72%)',
         }}
       />
       <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-amber-400/30 blur-2xl" aria-hidden="true" />
