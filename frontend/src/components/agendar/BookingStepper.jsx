@@ -68,7 +68,7 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
             {siguiente && (
               <span
                 aria-hidden="true"
-                className={`absolute left-1/2 top-[21px] h-[3px] w-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`}
+                className={`absolute left-1/2 top-[19px] h-[3px] w-full ${lineaAlcanzada ? 'bg-white' : 'bg-white/25'}`}
               />
             )}
             <Hito
@@ -80,18 +80,18 @@ export function BookingStepper({ paginaActual, puedeIrAHito = () => false, onIrA
               }`}
             >
               <span
-                className={`flex h-11 w-11 items-center justify-center rounded-full text-xl font-semibold transition ${
+                className={`flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold transition ${
                   estado === 'completado'
                     ? 'bg-brand-green text-white'
                     : estado === 'activo'
-                      ? 'bg-white font-bold text-brand-blue-800 ring-[6px] ring-brand-amber/70'
+                      ? 'bg-white font-bold text-brand-blue-800 ring-[5px] ring-brand-amber/70'
                       : 'vidrio text-blue-50'
                 } ${navegable ? 'group-hover:scale-110' : ''}`}
               >
-                {estado === 'completado' ? <IconoCheck className="h-[22px] w-[22px]" /> : hito.numero}
+                {estado === 'completado' ? <IconoCheck className="h-5 w-5" /> : hito.numero}
               </span>
               <span
-                className={`text-xs font-medium sm:text-base md:text-xl ${
+                className={`text-xs font-medium sm:text-sm md:text-lg ${
                   estado === 'pendiente' ? 'text-blue-100' : estado === 'activo' ? 'font-semibold text-white' : 'text-white'
                 } ${navegable ? 'group-hover:underline' : ''}`}
               >
