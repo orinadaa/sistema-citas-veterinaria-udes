@@ -179,7 +179,7 @@ export function ServicioSlider({ slides }) {
         onPointerLeave={(e) => e.pointerType === 'mouse' && setPausadoHover(false)}
         onFocus={() => setPausadoFoco(true)}
         onBlur={alSalirFoco}
-        className="grid aspect-[3/4] w-full cursor-pointer touch-pan-y select-none grid-cols-1 gap-2 rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-square md:aspect-[2/1] md:grid-cols-2 lg:aspect-auto lg:h-[clamp(22rem,calc(100svh-18.5rem),46rem)] lg:rounded-3xl"
+        className="grid aspect-[3/4] w-full cursor-pointer touch-pan-y select-none grid-cols-1 gap-2 rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-square md:aspect-[2/1] md:grid-cols-2 lg:aspect-auto lg:h-[clamp(22rem,calc(100svh-20.5rem),46rem)] lg:rounded-3xl"
       >
         {visibles.map((indiceVisible, puesto) => (
           <div key={puesto} className="relative overflow-hidden rounded-2xl lg:rounded-3xl">
@@ -255,8 +255,10 @@ export function ServicioSlider({ slides }) {
         </p>
       </div>
 
-      {/* Un punto por servicio; los visibles van resaltados. */}
-      <div className="mt-3 flex justify-center gap-0.5 lg:absolute lg:inset-x-0 lg:-bottom-2 lg:z-20 lg:mt-0">
+      {/* Un punto por servicio; los visibles van resaltados. Van debajo del
+          carrusel, fuera de su caja: asi el anillo de foco del teclado
+          rodea solo las fotos y no pasa por encima de los puntos. */}
+      <div className="mt-3 flex justify-center gap-0.5">
         {slides.map((slide, i) => {
           const activa = visibles.includes(i);
           return (
