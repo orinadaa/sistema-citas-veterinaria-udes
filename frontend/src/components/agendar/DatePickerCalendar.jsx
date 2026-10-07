@@ -9,11 +9,13 @@
 //
 // minimo / maximo ("YYYY-MM-DD"): limites elegibles. minimo sin pasar =
 // hoy (no se agenda en el pasado); minimo={null} = sin limite inferior
-// (fecha de nacimiento, reportes). selectorRapido: mes y año como listas
-// en el encabezado, para fechas lejanas (nacimiento).
+// (fecha de nacimiento, reportes). selectorRapido: el mes y el año del
+// encabezado son botones; el mes abre la grilla de los 12 meses y el año
+// una lista de años para recorrer, para llegar rapido a fechas lejanas
+// (nacimiento). No son <select>: se eligen dentro del mismo calendario.
 import { useState } from 'react';
 import { aFechaLocal, desdeFechaLocal, esMismoDia, formatearMesAnio, sumarDias } from '../../utils/fecha';
-import { IconoFlechaDerecha } from '../icons';
+import { IconoChevronAbajo, IconoFlechaDerecha } from '../icons';
 
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -28,7 +30,8 @@ const TONOS = {
   claro: {
     titulo: 'text-brand-navy',
     flecha: 'text-slate-500 hover:bg-slate-100',
-    lista: 'border-slate-300 bg-white text-brand-navy',
+    encabezado: 'hover:bg-slate-100',
+    encabezadoActivo: 'bg-blue-50',
     // Tonos -600/-700: slate-400 y brand-blue (500) no llegaban a AA.
     semana: 'text-slate-600',
     elegido: 'bg-brand-blue-700 font-semibold text-white shadow-sm ring-2 ring-brand-amber',
@@ -39,7 +42,8 @@ const TONOS = {
   vidrio: {
     titulo: 'text-white',
     flecha: 'text-blue-50 hover:bg-white/10',
-    lista: 'border-white/30 bg-brand-blue-800 text-white',
+    encabezado: 'hover:bg-white/10',
+    encabezadoActivo: 'bg-white/15',
     semana: 'text-blue-100',
     elegido: 'bg-white font-bold text-brand-blue-800 shadow-sm ring-2 ring-brand-amber',
     deshabilitado: 'cursor-not-allowed text-white/35',
@@ -85,63 +89,130 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
   const anioFinal = hasta ? hasta.getFullYear() : hoy.getFullYear() + ANIOS_ADELANTE;
   const anios = [];
   for (let anio = Math.min(anioInicial, mes.getFullYear()); anio <= Math.max(anioFinal, mes.getFullYear()); anio++) anios.push(anio);
-  const claseLista = `rounded-lg border px-2 py-1 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-blue/30 ${t.lista}`;
+  // Vista del cuerpo (solo con selectorRapido): los dias del mes, la
+  // grilla de 12 meses o la lista de años. Se cambia pulsando el mes o el
+  // año del encabezado; elegir uno vuelve a los dias.
+  const [vista, setVista] = useState('dias');
+  const mesFueraDeLimites = (anio, indice) =>
+    (desde && new Date(anio, indice + 1, 0) < desde) || (hasta && new Date(anio, indice, 1) > hasta);
+  // Al cambiar de año el mes puede quedar fuera de los limites (ej. tope
+  // en octubre y estaba en diciembre): se lleva al mes valido mas cercano.
+  function elegirAnio(anio) {
+    let indice = mes.getMonth();
+    if (desde && new Date(anio, indice + 1, 0) < desde) indice = desde.getMonth();
+    if (hasta && new Date(anio, indice, 1) > hasta) indice = hasta.getMonth();
+    setMes(new Date(anio, indice, 1));
+    setVista('dias');
+  }
+  const claseEncabezado = (activa) =>
+    `inline-flex items-center gap-1 rounded-boton px-2.5 py-1 font-heading text-base font-semibold transition ${t.titulo} ${activa ? t.encabezadoActivo : t.encabezado}`;
+  const claseOpcion = (elegida, deshabilitada) =>
+    `rounded-boton px-2 py-2.5 text-sm transition ${elegida ? t.elegido : deshabilitada ? t.deshabilitado : t.normal}`;
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex min-h-9 items-center justify-between">
         {selectorRapido ? (
-          <div className="flex gap-1.5">
-            <select
-              aria-label="Mes"
-              value={mes.getMonth()}
-              onChange={(e) => setMes(new Date(mes.getFullYear(), Number(e.target.value), 1))}
-              className={claseLista}
+          <div className="-ml-2.5 flex gap-0.5">
+            <button
+              type="button"
+              aria-label={`Mes: ${MESES[mes.getMonth()]}. Cambiar mes`}
+              aria-expanded={vista === 'meses'}
+              onClick={() => setVista(vista === 'meses' ? 'dias' : 'meses')}
+              className={claseEncabezado(vista === 'meses')}
             >
-              {MESES.map((nombre, indice) => (
-                <option key={nombre} value={indice}>
-                  {nombre}
-                </option>
-              ))}
-            </select>
-            <select
-              aria-label="Año"
-              value={mes.getFullYear()}
-              onChange={(e) => setMes(new Date(Number(e.target.value), mes.getMonth(), 1))}
-              className={claseLista}
+              {MESES[mes.getMonth()]}
+              <IconoChevronAbajo className="h-3.5 w-3.5 opacity-60" />
+            </button>
+            <button
+              type="button"
+              aria-label={`Año: ${mes.getFullYear()}. Cambiar año`}
+              aria-expanded={vista === 'anios'}
+              onClick={() => setVista(vista === 'anios' ? 'dias' : 'anios')}
+              className={claseEncabezado(vista === 'anios')}
             >
-              {anios.map((anio) => (
-                <option key={anio} value={anio}>
-                  {anio}
-                </option>
-              ))}
-            </select>
+              {mes.getFullYear()}
+              <IconoChevronAbajo className="h-3.5 w-3.5 opacity-60" />
+            </button>
           </div>
         ) : (
           <p className={`font-heading text-base font-semibold ${t.titulo}`}>{formatearMesAnio(mes)}</p>
         )}
-        <div className="flex gap-1">
-          <button
-            type="button"
-            aria-label="Mes anterior"
-            disabled={enPrimerMes}
-            onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-            className={`rounded-boton p-1.5 transition disabled:cursor-not-allowed disabled:opacity-30 ${t.flecha}`}
-          >
-            <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
-          </button>
-          <button
-            type="button"
-            aria-label="Mes siguiente"
-            disabled={enUltimoMes}
-            onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-            className={`rounded-boton p-1.5 transition disabled:cursor-not-allowed disabled:opacity-30 ${t.flecha}`}
-          >
-            <IconoFlechaDerecha className="h-4 w-4" />
-          </button>
-        </div>
+        {vista === 'dias' && (
+          <div className="flex gap-1">
+            <button
+              type="button"
+              aria-label="Mes anterior"
+              disabled={enPrimerMes}
+              onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
+              className={`rounded-boton p-1.5 transition disabled:cursor-not-allowed disabled:opacity-30 ${t.flecha}`}
+            >
+              <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
+            </button>
+            <button
+              type="button"
+              aria-label="Mes siguiente"
+              disabled={enUltimoMes}
+              onClick={() => setMes((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
+              className={`rounded-boton p-1.5 transition disabled:cursor-not-allowed disabled:opacity-30 ${t.flecha}`}
+            >
+              <IconoFlechaDerecha className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
 
+      {/* Mismo alto que la grilla de dias, para que el calendario no cambie
+          de tamaño al pasar de una vista a otra. */}
+      {vista === 'meses' && (
+        <div role="group" aria-label="Elegir mes" className="mt-4 grid h-[15.25rem] grid-cols-3 content-center gap-2">
+          {MESES.map((nombre, indice) => {
+            const fuera = mesFueraDeLimites(mes.getFullYear(), indice);
+            return (
+              <button
+                key={nombre}
+                type="button"
+                disabled={Boolean(fuera)}
+                aria-pressed={indice === mes.getMonth()}
+                onClick={() => {
+                  setMes(new Date(mes.getFullYear(), indice, 1));
+                  setVista('dias');
+                }}
+                className={claseOpcion(indice === mes.getMonth(), fuera)}
+              >
+                {nombre}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {vista === 'anios' && (
+        <div role="group" aria-label="Elegir año" className="mt-4 grid h-[15.25rem] grid-cols-4 content-start gap-2 overflow-y-auto pr-1">
+          {anios.map((anio) => (
+            <button
+              key={anio}
+              type="button"
+              aria-pressed={anio === mes.getFullYear()}
+              // Al abrir, la lista arranca con el año actual a la vista
+              // (se mueve solo el scroll de la lista, no el de la pagina).
+              ref={
+                anio === mes.getFullYear()
+                  ? (boton) => {
+                      if (boton) boton.parentElement.scrollTop = boton.offsetTop - boton.parentElement.offsetTop - boton.parentElement.clientHeight / 2 + boton.offsetHeight / 2;
+                    }
+                  : undefined
+              }
+              onClick={() => elegirAnio(anio)}
+              className={claseOpcion(anio === mes.getFullYear(), false)}
+            >
+              {anio}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {vista === 'dias' && (
       <div className="mt-4 grid grid-cols-7 gap-1 text-center">
         {DIAS_SEMANA.map((dia) => (
           <span key={dia} className={`pb-1 text-xs font-medium ${t.semana}`}>
@@ -175,6 +246,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
           );
         })}
       </div>
+      )}
     </div>
   );
 }
