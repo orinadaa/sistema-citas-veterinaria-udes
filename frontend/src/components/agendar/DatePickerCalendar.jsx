@@ -15,7 +15,7 @@
 // (nacimiento). No son <select>: se eligen dentro del mismo calendario.
 import { useState } from 'react';
 import { aFechaLocal, desdeFechaLocal, esMismoDia, formatearMesAnio, sumarDias } from '../../utils/fecha';
-import { IconoChevronAbajo, IconoFlechaDerecha } from '../icons';
+import { IconoFlechaDerecha } from '../icons';
 
 const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -30,8 +30,8 @@ const TONOS = {
   claro: {
     titulo: 'text-brand-navy',
     flecha: 'text-slate-500 hover:bg-slate-100',
-    encabezado: 'hover:bg-slate-100',
-    encabezadoActivo: 'bg-blue-50',
+    encabezado: 'text-brand-navy hover:text-brand-blue-600 hover:underline',
+    encabezadoActivo: 'text-brand-blue-600 underline',
     // Tonos -600/-700: slate-400 y brand-blue (500) no llegaban a AA.
     semana: 'text-slate-600',
     elegido: 'bg-brand-blue-700 font-semibold text-white shadow-sm ring-2 ring-brand-amber',
@@ -42,8 +42,8 @@ const TONOS = {
   vidrio: {
     titulo: 'text-white',
     flecha: 'text-blue-50 hover:bg-white/10',
-    encabezado: 'hover:bg-white/10',
-    encabezadoActivo: 'bg-white/15',
+    encabezado: 'text-white hover:underline',
+    encabezadoActivo: 'text-brand-amber underline',
     semana: 'text-blue-100',
     elegido: 'bg-white font-bold text-brand-blue-800 shadow-sm ring-2 ring-brand-amber',
     deshabilitado: 'cursor-not-allowed text-white/35',
@@ -104,8 +104,10 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
     setMes(new Date(anio, indice, 1));
     setVista('dias');
   }
+  // Texto suelto, sin forma de boton (pedido de Oriana): el hover y el
+  // estado abierto se marcan sobre el propio texto (color + subrayado).
   const claseEncabezado = (activa) =>
-    `inline-flex items-center gap-1 rounded-boton px-2.5 py-1 font-heading text-base font-semibold transition ${t.titulo} ${activa ? t.encabezadoActivo : t.encabezado}`;
+    `cursor-pointer rounded-sm font-heading text-base font-semibold underline-offset-4 transition-colors hover:[filter:none] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${activa ? t.encabezadoActivo : t.encabezado}`;
   const claseOpcion = (elegida, deshabilitada) =>
     `rounded-boton px-2 py-2.5 text-sm transition ${elegida ? t.elegido : deshabilitada ? t.deshabilitado : t.normal}`;
 
@@ -113,7 +115,7 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
     <div>
       <div className="flex min-h-9 items-center justify-between">
         {selectorRapido ? (
-          <div className="-ml-2.5 flex gap-0.5">
+          <div className="flex gap-2">
             <button
               type="button"
               aria-label={`Mes: ${MESES[mes.getMonth()]}. Cambiar mes`}
@@ -122,7 +124,6 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
               className={claseEncabezado(vista === 'meses')}
             >
               {MESES[mes.getMonth()]}
-              <IconoChevronAbajo className="h-3.5 w-3.5 opacity-60" />
             </button>
             <button
               type="button"
@@ -132,7 +133,6 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
               className={claseEncabezado(vista === 'anios')}
             >
               {mes.getFullYear()}
-              <IconoChevronAbajo className="h-3.5 w-3.5 opacity-60" />
             </button>
           </div>
         ) : (
