@@ -2,7 +2,10 @@
 // Slider fotografico de servicios del landing: una sola foto grande a la
 // vez (sin grilla, thumbnails ni flechas). Capas por slide: foto
 // (object-cover) -> overlay oscuro general -> degradado inferior ->
-// texto abajo a la izquierda. La intensidad del overlay se ajusta por
+// texto abajo a la izquierda. La foto y sus overlays llevan una mascara
+// (MASCARA) que los desvanece hacia las orillas, como la galeria del Hero:
+// la foto se funde con la tarjeta de vidrio de la seccion en vez de verse
+// como un rectangulo dentro de otro. El texto queda fuera de la mascara. La intensidad del overlay se ajusta por
 // foto (`oscuridad`): las fotos con fondo claro (paredes blancas, batas)
 // necesitan mas oscuridad para que el texto blanco cumpla WCAG AA.
 //
@@ -25,6 +28,19 @@ import { Link } from 'react-router-dom';
 
 const INTERVALO_MS = 3000;
 const UMBRAL_SWIPE_PX = 50;
+
+// Interseccion de tres degradados: un ovalo amplio (redondea las esquinas
+// y da el fundido radial) y dos lineales que garantizan que la foto llegue
+// a transparente en los cuatro bordes, sin dejar una linea recta.
+const MASCARA = {
+  maskImage: [
+    'radial-gradient(ellipse 72% 76% at 50% 48%, black 58%, transparent 100%)',
+    'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
+    'linear-gradient(to bottom, transparent 0%, black 12%, black 86%, transparent 100%)',
+  ].join(', '),
+  maskComposite: 'intersect',
+  WebkitMaskComposite: 'source-in',
+};
 
 const OVERLAY = {
   normal: { base: 'bg-black/15', degradado: 'from-black/75' },
@@ -140,7 +156,7 @@ export function ServicioSlider({ slides }) {
         onPointerLeave={(e) => e.pointerType === 'mouse' && setPausadoHover(false)}
         onFocus={() => setPausadoFoco(true)}
         onBlur={alSalirFoco}
-        className="relative aspect-[3/4] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl bg-slate-900 shadow-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-square lg:aspect-auto lg:h-[clamp(22rem,calc(100svh-18.5rem),46rem)] lg:rounded-3xl"
+        className="relative aspect-[3/4] w-full cursor-pointer touch-pan-y select-none overflow-hidden rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-brand-amber/70 sm:aspect-square lg:aspect-auto lg:h-[clamp(22rem,calc(100svh-18.5rem),46rem)] lg:rounded-3xl"
       >
         {slides.map((slide, i) => {
           const activa = i === indice;
@@ -157,6 +173,8 @@ export function ServicioSlider({ slides }) {
                 activa ? 'z-10 opacity-100' : 'pointer-events-none opacity-0'
               }`}
             >
+              {/* Foto + overlays, desvanecidos juntos hacia las orillas. */}
+              <div className="absolute inset-0" style={MASCARA}>
               {visitados.has(i) && (
                 <img
                   src={slide.imagen}
@@ -175,6 +193,7 @@ export function ServicioSlider({ slides }) {
                 className={`absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t ${overlay.degradado} via-black/35 to-transparent sm:h-2/3`}
                 aria-hidden="true"
               />
+              </div>
 
               <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
                 <h3 className="text-3xl font-bold tracking-tight [text-shadow:0_1px_12px_rgb(0_0_0/0.35)] sm:text-4xl lg:text-5xl">
