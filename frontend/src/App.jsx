@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
@@ -10,10 +10,8 @@ import { PanelAdminPage } from './pages/PanelAdminPage';
 import { AgendarCitaPage } from './pages/AgendarCitaPage';
 import { GuiaVetuiPage } from './pages/GuiaVetuiPage';
 
-function App() {
+function Rutas() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/iniciar-sesion" element={<LoginPage />} />
@@ -46,7 +44,18 @@ function App() {
             }
           />
         </Routes>
-      </BrowserRouter>
+  );
+}
+
+// Router "de datos" con una sola ruta comodin que contiene las <Routes> de
+// siempre: es lo que permite frenar una navegacion con useBlocker (ver
+// AgendarCitaPage: confirmar antes de abandonar una cita a medio agendar).
+const router = createBrowserRouter([{ path: '*', element: <Rutas /> }]);
+
+function App() {
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
     </AuthProvider>
   );
 }

@@ -36,6 +36,7 @@ import logoGrande from '../../assets/logoblanco.png';
 import logoCortoBlanco from '../../assets/logocortoblanco.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
+import { salirConPermiso } from '../../utils/guardiaSalida';
 import { IconoCalendario, IconoCampana, IconoChevronAbajo, IconoSalir } from '../icons';
 
 // 260px de scroll para toda la transicion: con 160px una sola vuelta de
@@ -321,8 +322,12 @@ export function Navbar() {
     // /iniciar-sesion antes de que la recarga completa tuviera efecto.
     // Se limpia localStorage directamente y se recarga -- la pagina
     // nueva arranca ya sin sesion, sin pasar por ningun render intermedio.
-    localStorage.removeItem(CLAVE_ALMACENAMIENTO);
-    window.location.href = '/';
+    // salirConPermiso: si hay una cita a medio agendar, /agendar pide
+    // confirmar antes (utils/guardiaSalida.js).
+    salirConPermiso(() => {
+      localStorage.removeItem(CLAVE_ALMACENAMIENTO);
+      window.location.href = '/';
+    });
   }
 
   return (
