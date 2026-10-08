@@ -209,6 +209,15 @@ Todo el sistema usa la barra de vetUI en vez de la gris del navegador (diseño d
 - **En los topes no se ve** (todas las barras): quieta arriba de todo o al final, la barra se apaga, y vuelve al desplazarse o al pasar el mouse por su lugar. Un contenedor recién abierto arranca con la barra apagada. Lo maneja `BarraPagina.jsx` (`data-reposo` en la de la página, `data-barra-activa` en los contenedores).
 - Solo con mouse: en pantallas táctiles se deja la barra del sistema, que ya es flotante. En Firefox las barras de adentro usan el mismo color, sin el brillo.
 
+### Lo que no se puede pulsar no reacciona
+
+Un hover le dice al usuario "esto hace algo". Si el elemento no hace nada, el hover engaña. Regla para todo el sistema:
+
+- Solo reaccionan al mouse (brillo, cambio de color, cursor de mano) los elementos de verdad interactivos y habilitados: enlaces, botones, pestañas, opciones, campos.
+- **No reaccionan:** insignias de estado, contadores y contenedores con forma de píldora, tarjetas informativas, filas de tabla, etiquetas de campo, botones deshabilitados y la pestaña que ya está elegida.
+- Lo garantiza `styles/vetui.css`: los hover generales solo aplican a etiquetas interactivas, aunque un `<span>` use `rounded-boton` por la forma.
+- En el código: nunca `hover:*` ni `cursor-pointer` en un elemento sin `onClick`, `href` o `to`. Y nada de botones que no hacen nada: si la función aún no existe (la campana de notificaciones), el elemento es un adorno sin hover ni foco.
+
 ### Hover de los botones sin contenedor
 
 Un botón que a la vista es solo texto, solo icono o icono + texto ("Quitar foto", "Editar" de las tablas, la X de cerrar, flechas, la campana) lleva la clase `boton-texto`. Al pasar el mouse **brilla solo su contenido**, en su propio color (rojo si es rojo, azul si es azul). **No se le pone `hover:bg-*`**: una píldora que aparece al pasar el mouse sugiere un contenedor que el botón no tiene.

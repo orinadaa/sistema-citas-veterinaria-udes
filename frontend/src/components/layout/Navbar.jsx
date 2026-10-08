@@ -440,9 +440,13 @@ export function Navbar() {
           <div ref={grupoDerechoRef} className="flex items-center gap-2 justify-self-end md:justify-between md:justify-self-stretch">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
-                <button type="button" className="relative hidden boton-texto rounded-boton p-2 xl:inline-flex text-white/80 transition hover:text-white">
+                {/* Campana: adorno hasta que exista el modulo de notificaciones
+                    (incremento 5). No es un boton: no hace nada, asi que no
+                    reacciona al mouse ni recibe foco. Conserva su tamaño para
+                    no mover el centrado de la topbar. */}
+                <span aria-hidden="true" className="relative hidden p-2 text-white/80 xl:inline-flex">
                   <IconoCampana className="h-5 w-5" />
-                </button>
+                </span>
 
                 <div className="relative">
                   <button

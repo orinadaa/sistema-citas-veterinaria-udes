@@ -370,6 +370,18 @@
    - hover-ilumina-claro: tarjetas clicables sobre fondo oscuro (blanco).
    - hover-texto-ilumina: enlaces de texto sobre fondo oscuro.
    - boton-texto: botones sin contenedor visible; brilla solo su contenido.
+
+   REGLA (Oriana): lo que no se puede pulsar no reacciona al mouse. Un
+   hover le dice al usuario "esto hace algo"; si no hace nada, engaña.
+   Por eso los hover de aca abajo solo valen para elementos de verdad
+   interactivos (enlaces, botones, pestañas, opciones) y habilitados:
+   - una insignia, un contador o un contenedor que usa rounded-boton solo
+     por la forma de pildora NO se ilumina;
+   - una etiqueta de campo (<label>) no se ilumina;
+   - un boton deshabilitado (disabled o aria-disabled) no se ilumina;
+   - la pestaña que ya esta elegida tampoco: pulsarla no cambia nada.
+   En el JSX vale lo mismo: nunca hover:* ni cursor-pointer en un elemento
+   sin onClick, href o to.
    --------------------------------------------------------------------- */
 .rounded-boton {
   --brillo: color-mix(in oklab, currentColor 45%, transparent);
@@ -384,7 +396,7 @@
 .rounded-boton[class*="bg-brand-green"] {
   --brillo: color-mix(in oklab, var(--color-brand-green) 60%, transparent);
 }
-.rounded-boton:not(:disabled):not([class*="boton-glass"]):hover {
+:is(a[href], button, summary, [role="button"], [role="tab"], [role="radio"], [role="switch"], [role="combobox"]).rounded-boton:not(:disabled):not([aria-disabled="true"]):not([class*="boton-glass"]):hover {
   filter: brightness(1.08) drop-shadow(0 6px 14px var(--brillo));
 }
 
@@ -400,29 +412,36 @@
 .boton-texto {
   background-color: transparent;
 }
-.boton-texto:not(:disabled):not([class*="boton-glass"]):hover {
+:is(a[href], button, summary, [role="button"], [role="tab"], [role="radio"], [role="switch"], [role="combobox"]).boton-texto:not(:disabled):not([aria-disabled="true"]):not([class*="boton-glass"]):hover {
   background-color: transparent;
   filter: drop-shadow(0 0 3px color-mix(in oklab, currentColor 80%, transparent))
     drop-shadow(0 0 7px color-mix(in oklab, currentColor 35%, transparent));
 }
 
 @utility hover-ilumina {
-  &:hover {
+  &:hover:not(:disabled):not([aria-disabled="true"]) {
     filter: brightness(1.03) drop-shadow(0 10px 22px color-mix(in oklab, var(--color-brand-blue) 35%, transparent));
   }
 }
 @utility hover-ilumina-claro {
-  &:hover {
+  &:hover:not(:disabled):not([aria-disabled="true"]) {
     filter: brightness(1.04) drop-shadow(0 10px 22px rgb(255 255 255 / 0.22));
   }
 }
 @utility hover-texto-ilumina {
-  &:hover {
+  &:hover:not(:disabled):not([aria-disabled="true"]) {
     text-shadow: 0 0 14px rgb(255 255 255 / 0.75);
   }
 }
 
+/* La pestaña ya elegida no reacciona: pulsarla no cambia nada. */
+[role="tab"][aria-selected="true"]:hover {
+  filter: none !important;
+  text-shadow: none !important;
+}
+
 /* Respaldo: cualquier enlace o botón sin hover propio igual se ilumina.
+   (Las etiquetas <label> no entran: no son un control.)
    :where() deja la especificidad en 0 y @layer base lo pone debajo de las
    utilidades: los hovers específicos siempre ganan. */
 @layer base {
@@ -432,11 +451,20 @@
   html {
     font-feature-settings: "lnum" 1;
   }
-  :where(a[href], button:not(:disabled), [role="button"], summary, label[for]):where(:not(.rounded-boton, .hover-ilumina, .hover-ilumina-claro, .hover-texto-ilumina, [class*="boton-glass"])):hover {
+  :where(a[href], button:not(:disabled), [role="button"], summary):where(:not([aria-disabled="true"])):where(:not(.rounded-boton, .hover-ilumina, .hover-ilumina-claro, .hover-texto-ilumina, [class*="boton-glass"])):hover {
     filter: brightness(1.06) drop-shadow(0 4px 10px color-mix(in oklab, currentColor 30%, transparent));
   }
+  /* El cursor acompaña la misma regla: mano solo sobre lo que se puede
+     pulsar y esta habilitado (Tailwind v4 deja los botones con flecha). La
+     pestaña ya elegida y lo deshabilitado quedan con el cursor normal. */
+  :where(button:not(:disabled), [role="button"], [role="tab"], [role="radio"], [role="switch"], [role="option"], [role="combobox"]:not(:disabled), summary):where(:not([aria-disabled="true"])) {
+    cursor: pointer;
+  }
+  :where([role="tab"][aria-selected="true"]) {
+    cursor: default;
+  }
   @media (prefers-reduced-motion: no-preference) {
-    :where(a[href], button, [role="button"], summary, label[for]) {
+    :where(a[href], button, [role="button"], summary) {
       transition-property: color, background-color, border-color, box-shadow, filter, text-shadow, transform, opacity;
       transition-duration: 200ms;
       transition-timing-function: ease-out;
