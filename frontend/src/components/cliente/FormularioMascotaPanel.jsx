@@ -76,7 +76,12 @@ function AreaTexto({ id, label, value, onChange, placeholder }) {
 }
 
 // onEliminada (opcional): si se pasa y se esta editando, aparece
-// "Eliminar mascota" con confirmacion dentro del mismo panel (nunca un
+// "Eliminar" vive en el pie fijo del panel, en el extremo izquierdo: asi
+// siempre esta a la vista (antes quedaba al final del formulario y habia
+// que bajar para encontrarlo) pero separado de "Guardar mascota", que va
+// a la derecha junto a "Cancelar", para que no se toque por error. Es una
+// accion secundaria en rojo, sin relleno: no compite con la principal.
+// La confirmacion reemplaza al pie en el mismo lugar (nunca un
 // window.confirm). Es una baja logica en el backend: las citas pasadas
 // conservan la mascota. confirmarAlAbrir abre el panel directo en esa
 // confirmacion (boton de papelera de la tarjeta en Mis mascotas).
@@ -194,6 +199,7 @@ export function FormularioMascotaPanel({
   }
 
   const fotoMostrada = vistaPreviaFoto || mascota?.foto_url || null;
+  const puedeEliminar = Boolean(mascota && onEliminada);
 
   return (
     <>
@@ -203,14 +209,61 @@ export function FormularioMascotaPanel({
         onClose={() => !editorFotoAbierto && onClose()}
         title={mascota ? 'Editar mascota' : 'Agregar mascota'}
         footer={
-          <div className="flex gap-3">
-            <Boton variante="contorno" onClick={onClose}>
-              Cancelar
-            </Boton>
-            <Boton type="submit" form="form-mascota-cliente" disabled={guardando} className="flex-1">
-              {guardando ? 'Guardando...' : 'Guardar mascota'}
-            </Boton>
-          </div>
+          confirmandoEliminar && puedeEliminar ? (
+            <div role="alertdialog" aria-labelledby="titulo-eliminar-mascota" aria-describedby="detalle-eliminar-mascota">
+              <p id="titulo-eliminar-mascota" className="text-sm font-semibold text-red-800">
+                ¿Eliminar a {mascota.nombre}?
+              </p>
+              <p id="detalle-eliminar-mascota" className="mt-1 text-sm text-slate-700">
+                Ya no aparecerá en tus mascotas ni podrás agendarle citas. Sus citas pasadas se conservan en tu historial.
+              </p>
+              {errorEliminar && (
+                <p role="alert" className="mt-2 text-sm font-medium text-red-800">
+                  {errorEliminar}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap justify-end gap-3">
+                <Boton
+                  variante="contorno"
+                  disabled={eliminando}
+                  onClick={() => {
+                    setConfirmandoEliminar(false);
+                    setErrorEliminar('');
+                  }}
+                >
+                  No, conservar
+                </Boton>
+                <button
+                  type="button"
+                  onClick={eliminar}
+                  disabled={eliminando}
+                  className="rounded-boton bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:opacity-60"
+                >
+                  {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-3">
+              {puedeEliminar && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmandoEliminar(true)}
+                  aria-label={`Eliminar a ${mascota.nombre}`}
+                  className="mr-auto inline-flex items-center gap-1.5 rounded-boton px-3 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50"
+                >
+                  <IconoPapelera className="h-4 w-4" />
+                  Eliminar
+                </button>
+              )}
+              <Boton variante="contorno" onClick={onClose}>
+                Cancelar
+              </Boton>
+              <Boton type="submit" form="form-mascota-cliente" disabled={guardando} className={puedeEliminar ? '' : 'flex-1'}>
+                {guardando ? 'Guardando...' : 'Guardar mascota'}
+              </Boton>
+            </div>
+          )
         }
       >
         <form id="form-mascota-cliente" onSubmit={guardar} className="flex flex-col gap-4">
@@ -290,48 +343,6 @@ export function FormularioMascotaPanel({
 
           {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">{error}</p>}
 
-          {mascota && onEliminada && (
-            <div className="mt-2 border-t border-slate-100 pt-4">
-              {confirmandoEliminar ? (
-                <div className="rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
-                  <p className="text-sm font-semibold text-red-800">¿Eliminar a {mascota.nombre}?</p>
-                  <p className="mt-1 text-sm text-red-700">
-                    Ya no aparecerá en tus mascotas ni podrás agendarle citas. Sus citas pasadas se conservan en tu historial.
-                  </p>
-                  {errorEliminar && <p className="mt-2 text-sm font-medium text-red-800">{errorEliminar}</p>}
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      type="button"
-                      onClick={eliminar}
-                      disabled={eliminando}
-                      className="rounded-boton bg-brand-red px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:opacity-60"
-                    >
-                      {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setConfirmandoEliminar(false);
-                        setErrorEliminar('');
-                      }}
-                      className="rounded-boton border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setConfirmandoEliminar(true)}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-brand-red transition hover:underline"
-                >
-                  <IconoPapelera className="h-4 w-4" />
-                  Eliminar mascota
-                </button>
-              )}
-            </div>
-          )}
         </form>
       </PanelLateral>
 
