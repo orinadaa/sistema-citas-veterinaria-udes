@@ -2,7 +2,7 @@
 // items: [{ id, label, icon? }] -- icon opcional (componente de icons.jsx).
 export function Tabs({ items, activeItem, onChange }) {
   return (
-    <div role="tablist" className="flex gap-1 border-b border-slate-200">
+    <div role="tablist" className="flex gap-1 border-b border-slate-900/15">
       {items.map((item) => (
         <button
           key={item.id}
@@ -12,8 +12,8 @@ export function Tabs({ items, activeItem, onChange }) {
           onClick={() => onChange(item.id)}
           className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition ${
             activeItem === item.id
-              ? 'border-brand-blue text-brand-blue'
-              : 'border-transparent text-slate-500 hover:text-slate-700'
+              ? 'border-brand-blue-700 text-brand-blue-700'
+              : 'border-transparent text-slate-700 hover:text-slate-900'
           }`}
         >
           {item.icon && <item.icon className="h-4 w-4" />}

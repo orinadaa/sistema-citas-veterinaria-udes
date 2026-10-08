@@ -268,6 +268,18 @@
   background-color: rgb(6 51 138 / 0.25);
 }
 
+/* Hoja de trabajo del panel administrativo / medico (cristal translucido
+   sobre el fondo azul): los grises claros que alcanzaban sobre el fondo
+   blanco de antes no llegan a AA sobre el cristal. Se oscurecen un paso en
+   toda la hoja, sin tocar cada pantalla (CSS sin capa: gana sobre las
+   utilidades). */
+.hoja-panel :where(.text-slate-400) {
+  color: var(--color-slate-600);
+}
+.hoja-panel :where(.text-slate-500) {
+  color: var(--color-slate-700);
+}
+
 /* Dentro de un vidrio blanco: las piezas pensadas para fondo oscuro pasan
    a su versión clara sin tocar cada pantalla (CSS sin capa: gana sobre las
    utilidades). Marcadores: vt-titulo, vt-subtitulo, vt-numero,
