@@ -9,6 +9,7 @@ import { Servicios } from '../components/landing/Servicios';
 import { Sedes } from '../components/landing/Sedes';
 import { Horarios } from '../components/landing/Horarios';
 import { CtaBanner } from '../components/landing/CtaBanner';
+import { HuellasFondo } from '../components/landing/HuellasFondo';
 import { usePaginadoPorRueda } from '../hooks/usePaginadoPorRueda';
 
 export function LandingPage() {
@@ -50,6 +51,7 @@ export function LandingPage() {
             enganchadas a este div en vez de a la pagina y el scroll snap del
             landing paginado (index.css) no funcionaba. */}
         <div className="relative isolate -mt-24 overflow-clip bg-[linear-gradient(to_bottom,var(--color-brand-blue-500)_0%,var(--color-brand-blue-600)_7%,var(--color-brand-blue-700)_13%,var(--color-brand-blue-800)_20%,var(--color-brand-blue-800)_100%)]">
+          <HuellasFondo />
           <Hero />
           <Servicios />
           <Sedes />
