@@ -274,6 +274,10 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 
 **Agendar desde el administrador, en una ventana.** "Nueva cita" del panel administrativo es una ventana centrada (`admin/NuevaCitaModal.jsx`), no un panel lateral. Reutiliza el flujo de agendar del cliente (tarjetas de mascota y servicio, calendario y horas) en 3 pasos con `PasosHorizontal` (stepper para superficies claras, en `agendar/BookingStepper.jsx`): 1. Cliente, mascota y servicio; 2. Fecha, hora y médico; 3. Confirmar. Al cerrar con datos elegidos pide confirmar.
 
+**Código de verificación.** Los códigos de un solo uso se escriben en `form/CampoCodigo.jsx`: un recuadro `campo` por dígito, en dos grupos de tres con un guion. Avanza y retrocede solo, acepta pegar el código completo, solo admite dígitos y con `error` pinta los recuadros en rojo. Debajo va `form/ReenviarCodigo.jsx` con `hooks/useCuentaRegresiva.js` (texto "Reenviar código en 00:42" y, al terminar, el botón). Se usa en recuperar contraseña y en el cambio de correo del médico.
+
+**Mensajes del inicio de sesión.** Correo inexistente y contraseña incorrecta responden el mismo mensaje genérico, y la recuperación responde igual exista o no el correo: así no se puede averiguar qué correos tienen cuenta (enumeración de cuentas). El único mensaje específico es "Tu cuenta está inactiva", y solo se muestra cuando la contraseña es correcta.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".
