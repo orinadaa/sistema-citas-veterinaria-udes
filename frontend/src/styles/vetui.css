@@ -41,8 +41,8 @@
   --color-category-cyan: #51caeb;
   --color-category-orange: #d98a3d;
 
-  /* Tipografía: Poppins en todo el sistema (font-sans es la del body). */
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  /* Tipografía: Josefin Sans en todo el sistema (font-sans es la del body). */
+  --font-sans: "Josefin Sans", ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
 
   /* Radios

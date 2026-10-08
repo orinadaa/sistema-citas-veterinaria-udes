@@ -43,7 +43,7 @@ Alcance actual: landing, flujo de agendar cita y panel del cliente (Mis citas, M
 
 ### Tipografía
 
-Poppins (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/poppins`).
+Josefin Sans (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/josefin-sans`).
 
 | Rol | Clases |
 |---|---|
