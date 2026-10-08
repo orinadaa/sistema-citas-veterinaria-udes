@@ -72,7 +72,9 @@ function filasExportables(ultimasCitas) {
   }));
 }
 
-export function PanelReportes() {
+// sedeFija: el administrador de sede ve solo los reportes de SU sede (el
+// servidor tambien lo fuerza); sin ella, el superadministrador ve todas.
+export function PanelReportes({ sedeFija = null }) {
   const { token } = useAuth();
   const [sedes, setSedes] = useState([]);
   const [sedeId, setSedeId] = useState('');
@@ -177,14 +179,14 @@ export function PanelReportes() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Reportes"
-        subtitle="Indicadores y tendencias de citas en todas las sedes."
+        subtitle={sedeFija ? 'Indicadores y tendencias de citas de tu sede.' : 'Indicadores y tendencias de citas en todas las sedes.'}
         actionLabel="Generar reporte"
         actionColor="blue"
         onAction={cargar}
       />
 
       <div className="flex flex-wrap items-end gap-3">
-        <div className="flex flex-col gap-1.5">
+        <div className={`flex-col gap-1.5 ${sedeFija ? 'hidden' : 'flex'}`}>
           <label className="text-xs font-medium text-white/90">Sede</label>
           <Desplegable
             value={sedeId}

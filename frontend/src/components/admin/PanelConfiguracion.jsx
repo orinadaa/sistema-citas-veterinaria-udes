@@ -19,27 +19,16 @@ import { PageHeader } from '../ui/PageHeader';
 import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
-import { Tabs } from '../ui/Tabs';
 import { EstadoError } from '../ui/EstadoError';
-import { PanelHorarios } from './PanelHorarios';
-import { PanelGaleria } from './PanelGaleria';
-import { PanelCampos } from './PanelCampos';
 import { Desplegable } from '../form/Desplegable';
 import { CampoBusqueda } from '../form/CampoBusqueda';
 
-const TABS = [
-  { id: 'usuarios', label: 'Usuarios' },
-  { id: 'sedes', label: 'Sedes' },
-  { id: 'galeria', label: 'Galería' },
-  { id: 'campos', label: 'Campos' },
-];
 
-const ETIQUETA_ROL = { administrador: 'Administrador', veterinario: 'Médico Veterinario' };
+const ETIQUETA_ROL = { administrador: 'Administrador de sede', veterinario: 'Médico Veterinario' };
 const FORM_VACIO = { nombreCompleto: '', correo: '', rol: 'veterinario', sedeId: '', telefono: '', activo: true };
 
 export function PanelConfiguracion() {
   const { token, usuario } = useAuth();
-  const [pestana, setPestana] = useState('usuarios');
 
   const [usuarios, setUsuarios] = useState([]);
   const [sedes, setSedes] = useState([]);
@@ -61,7 +50,8 @@ export function PanelConfiguracion() {
     setErrorCarga('');
     Promise.all([obtenerUsuarios(token), obtenerSedesAdmin(token)])
       .then(([usuariosDatos, sedesDatos]) => {
-        setUsuarios(usuariosDatos.usuarios.filter((u) => u.rol !== 'cliente'));
+        // Solo el personal: sin clientes, y sin el superadministrador (su cuenta no se edita desde el sistema).
+        setUsuarios(usuariosDatos.usuarios.filter((u) => u.rol === 'administrador' || u.rol === 'veterinario'));
         setSedes(sedesDatos.sedes);
       })
       .catch((err) => setErrorCarga(err.message || 'No se pudieron cargar los usuarios.'))
@@ -155,7 +145,7 @@ export function PanelConfiguracion() {
   return (
     <>
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
-      <PageHeader title="Configuración" subtitle="Gestiona las cuentas de personal, las sedes, las fotos de la portada y los campos de los formularios." />
+      <PageHeader title="Usuarios" subtitle="Cuentas del personal: administradores de sede y médicos, con su sede y su estado." />
 
       {aviso && (
         <p
@@ -169,15 +159,7 @@ export function PanelConfiguracion() {
         </p>
       )}
 
-      <Tabs sobreVidrio items={TABS} activeItem={pestana} onChange={setPestana} />
-
-      {pestana === 'sedes' && <PanelHorarios />}
-
-      {pestana === 'galeria' && <PanelGaleria />}
-
-      {pestana === 'campos' && <PanelCampos />}
-
-      {pestana === 'usuarios' && (
+      {(
         <div className="flex flex-col gap-6">
           <div className="flex justify-end">
             <button

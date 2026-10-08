@@ -26,7 +26,9 @@ import {
   IconoPersona,
   IconoPata,
   IconoGrafica,
-  IconoEngranaje,
+  IconoInicio,
+  IconoGlobo,
+  IconoCampos,
   IconoFlechaDerecha,
   IconoSalir,
 } from '../icons';
@@ -34,14 +36,26 @@ import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import logoColor from '../../assets/logocolor.png';
 import logoCorto from '../../assets/logocorto.png';
 
+// Administrador de sede: el dia a dia de SU sede.
 const ITEMS_NAV = [
+  { id: 'inicio', etiqueta: 'Inicio', icono: IconoInicio },
   { id: 'citas', etiqueta: 'Citas', icono: IconoCalendario },
-  { id: 'servicios', etiqueta: 'Servicios', icono: IconoJeringa },
   { id: 'medicos', etiqueta: 'Médicos', icono: IconoMedicos },
   { id: 'pacientes', etiqueta: 'Pacientes', icono: IconoPersona },
-  { id: 'horarios', etiqueta: 'Sedes y horarios', icono: IconoSede },
+  { id: 'servicios', etiqueta: 'Servicios', icono: IconoJeringa },
+  { id: 'horarios', etiqueta: 'Horario', icono: IconoSede },
   { id: 'reportes', etiqueta: 'Reportes', icono: IconoGrafica },
-  { id: 'configuracion', etiqueta: 'Configuración', icono: IconoEngranaje },
+];
+
+// Superadministrador: configura el sistema completo (no opera citas).
+const ITEMS_SUPER = [
+  { id: 'inicio', etiqueta: 'Inicio', icono: IconoInicio },
+  { id: 'sedes', etiqueta: 'Sedes', icono: IconoSede },
+  { id: 'usuarios', etiqueta: 'Usuarios', icono: IconoMedicos },
+  { id: 'servicios', etiqueta: 'Servicios', icono: IconoJeringa },
+  { id: 'web', etiqueta: 'Página web', icono: IconoGlobo },
+  { id: 'campos', etiqueta: 'Campos', icono: IconoCampos },
+  { id: 'reportes', etiqueta: 'Reportes', icono: IconoGrafica },
 ];
 
 // Panel propio del medico veterinario.
@@ -66,7 +80,7 @@ function leerColapsadoGuardado() {
 export function AdminSidebar({ activo, onCambiar }) {
   const { usuario } = useAuth();
   const [colapsado, setColapsado] = useState(leerColapsadoGuardado);
-  const items = usuario?.rol === 'administrador' ? ITEMS_NAV : ITEMS_MEDICO;
+  const items = { superadministrador: ITEMS_SUPER, administrador: ITEMS_NAV }[usuario?.rol] ?? ITEMS_MEDICO;
 
   function alternarColapsado() {
     setColapsado((anterior) => {

@@ -13,7 +13,7 @@ import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedico
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerPacientesMedico } from '../../api/client';
 
-const ETIQUETA_ROL = { administrador: 'Administrador', veterinario: 'Médico Veterinario' };
+const ETIQUETA_ROL = { superadministrador: 'Superadministrador', administrador: 'Administrador de sede', veterinario: 'Médico Veterinario' };
 const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [], mascotas: [] };
 
 export function AdminHeader({ onNavegar }) {
@@ -134,7 +134,8 @@ export function AdminHeader({ onNavegar }) {
         />
       )}
 
-      <div ref={contenedorRef} className={`relative max-w-md flex-1 ${vistaPreviaAbierta ? 'z-50' : ''}`}>
+      {/* El superadministrador no tiene buscador: no opera pacientes ni citas. */}
+      <div ref={contenedorRef} className={`relative max-w-md flex-1 ${vistaPreviaAbierta ? 'z-50' : ''} ${buscadorActivo ? '' : 'invisible'}`}>
         <div className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton px-5 text-white">
           <IconoBuscar className="h-4 w-4 shrink-0" />
           <input

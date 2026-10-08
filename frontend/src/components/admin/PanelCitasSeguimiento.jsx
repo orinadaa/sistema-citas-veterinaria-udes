@@ -30,7 +30,8 @@ function hoyAMedianoche() {
   return hoy;
 }
 
-export function PanelCitasSeguimiento() {
+// abrirNuevaAlEntrar: llega desde "Nueva cita" del Inicio con la ventana ya abierta.
+export function PanelCitasSeguimiento({ abrirNuevaAlEntrar = false }) {
   const { token, usuario } = useAuth();
   const esAdmin = usuario.rol === 'administrador';
 
@@ -44,7 +45,7 @@ export function PanelCitasSeguimiento() {
   const [semanaInicio, setSemanaInicio] = useState(() => inicioDeSemana(hoyAMedianoche()));
 
   const [citaDetalle, setCitaDetalle] = useState(null);
-  const [panelNuevaAbierto, setPanelNuevaAbierto] = useState(false);
+  const [panelNuevaAbierto, setPanelNuevaAbierto] = useState(abrirNuevaAlEntrar);
   // Dias de la semana en que atiende la sede (deshabilita los demas en el
   // calendario de "Nueva cita"); null mientras carga o si falla.
   const [diasAbiertos, setDiasAbiertos] = useState(null);

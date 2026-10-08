@@ -44,7 +44,9 @@ const FORM_VACIO = {
   fotoFocoY: 50,
 };
 
-export function PanelServicios({ busquedaInicial }) {
+// soloLectura: el administrador de sede consulta el catalogo; lo crea y edita
+// el superadministrador (los servicios salen en la pagina web).
+export function PanelServicios({ busquedaInicial, soloLectura = false }) {
   const { token } = useAuth();
   const [servicios, setServicios] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -236,8 +238,12 @@ export function PanelServicios({ busquedaInicial }) {
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <PageHeader
         title="Servicios veterinarios"
-        subtitle="Gestiona los servicios que ofrece tu clínica."
-        actionLabel="Nuevo servicio"
+        subtitle={
+          soloLectura
+            ? 'Catálogo de la clínica. En Médicos eliges quién presta cada servicio en tu sede.'
+            : 'Catálogo de servicios de la clínica: es el que se muestra en la página web.'
+        }
+        actionLabel={soloLectura ? undefined : 'Nuevo servicio'}
         onAction={abrirCrear}
       />
 
@@ -323,13 +329,18 @@ export function PanelServicios({ busquedaInicial }) {
             { header: 'Duración', render: (s) => `${s.duracion_minutos} min` },
             {
               header: 'Estado',
-              render: (s) => (
-                <StatusToggle checked={s.activo} onChange={() => alternarActivo(s)} label={s.activo ? 'Activo' : 'Inactivo'} />
-              ),
+              render: (s) =>
+                soloLectura ? (
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${s.activo ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}`}>
+                    {s.activo ? 'Activo' : 'Inactivo'}
+                  </span>
+                ) : (
+                  <StatusToggle checked={s.activo} onChange={() => alternarActivo(s)} label={s.activo ? 'Activo' : 'Inactivo'} />
+                ),
             },
           ]}
           rows={serviciosFiltrados}
-          actions={(s) => (
+          actions={soloLectura ? undefined : (s) => (
             <button
               type="button"
               onClick={() => abrirEditar(s)}

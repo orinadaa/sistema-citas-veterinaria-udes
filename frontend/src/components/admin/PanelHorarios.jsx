@@ -63,7 +63,10 @@ function resumenHorario(dias) {
   return `${inicio} – ${fin}`;
 }
 
-export function PanelHorarios() {
+// sedeFija: el administrador de sede solo ve SU sede y solo cambia el
+// horario de atencion (los datos y la foto de la sede son del
+// superadministrador). Sin sedeFija es la gestion completa de sedes.
+export function PanelHorarios({ sedeFija = null }) {
   const { token } = useAuth();
   const [sedes, setSedes] = useState([]);
   const [horariosPorSede, setHorariosPorSede] = useState({});
@@ -223,17 +226,23 @@ export function PanelHorarios() {
 
   const sedesConResumen = useMemo(
     () =>
-      sedes.map((sede) => ({
-        ...sede,
-        _diasResumen: diasDeSede(sede.id),
-      })),
-    [sedes, horariosPorSede]
+      sedes
+        .filter((sede) => !sedeFija || sede.id === sedeFija)
+        .map((sede) => ({
+          ...sede,
+          _diasResumen: diasDeSede(sede.id),
+        })),
+    [sedes, horariosPorSede, sedeFija]
   );
 
   return (
     <>
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
-      <PageHeader title="Sedes y horarios" subtitle="Gestiona las sedes de la clínica y su horario de atención." actionLabel="Nueva sede" onAction={abrirCrear} />
+      {sedeFija ? (
+        <PageHeader title="Horario de atención" subtitle="Los días y horas en que tu sede ofrece citas." />
+      ) : (
+        <PageHeader title="Sedes" subtitle="Gestiona las sedes de la clínica y su horario de atención." actionLabel="Nueva sede" onAction={abrirCrear} />
+      )}
 
       {cargando ? (
         <div className="flex flex-col gap-2">
@@ -309,7 +318,7 @@ export function PanelHorarios() {
               onClick={() => abrirEditar(sede)}
               className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
             >
-              Editar
+              {sedeFija ? 'Cambiar horario' : 'Editar'}
             </button>
           )}
         />
@@ -320,9 +329,9 @@ export function PanelHorarios() {
     <SidePanel
       isOpen={panelAbierto}
       onClose={() => setPanelAbierto(false)}
-      title={sedeEditando ? 'Editar sede' : 'Nueva sede'}
+      title={sedeFija ? 'Horario de atención' : sedeEditando ? 'Editar sede' : 'Nueva sede'}
       footer={
-        <button
+        sedeFija ? undefined : <button
           type="submit"
           form="form-sede"
           disabled={guardando}
@@ -333,6 +342,8 @@ export function PanelHorarios() {
       }
     >
         <form id="form-sede" onSubmit={guardarSede} className="flex flex-col gap-4">
+          {!sedeFija && (
+          <>
           {/* Foto de la sede (apaisada: asi se ve en el inicio y al agendar). */}
           <div className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-slate-700">Foto de la sede (opcional)</span>
@@ -378,6 +389,9 @@ export function PanelHorarios() {
             onChange={(valor) => setForm({ ...form, salaPetFriendly: valor })}
             label="Sala de espera pet friendly"
           />
+
+          </>
+          )}
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
