@@ -24,6 +24,9 @@ import { Tabs } from '../ui/Tabs';
 import { EstadoError } from '../ui/EstadoError';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { Campo } from '../form/Campo';
+import { CampoCodigo } from '../form/CampoCodigo';
+import { ReenviarCodigo } from '../form/ReenviarCodigo';
+import { useCuentaRegresiva } from '../../hooks/useCuentaRegresiva';
 import { FotoMascotaModal } from '../cliente/FotoMascotaModal';
 import { ZonaFoto } from '../form/ZonaFoto';
 import { PanelDisponibilidadMedico } from './PanelDisponibilidadMedico';
@@ -90,6 +93,9 @@ function CambioCorreo({ correoActual, onCambiado }) {
   const [codigo, setCodigo] = useState('');
   const [estado, setEstado] = useState(null);
   const [enviando, setEnviando] = useState(false);
+  const [codigoInvalido, setCodigoInvalido] = useState(false);
+  const [enfocarCodigo, setEnfocarCodigo] = useState(0);
+  const cuenta = useCuentaRegresiva(60);
 
   async function pedirCodigo() {
     setEnviando(true);
@@ -97,7 +103,11 @@ function CambioCorreo({ correoActual, onCambiado }) {
     try {
       const r = await solicitarCambioCorreoMedico(correoNuevo.trim(), token);
       setEstado({ tipo: 'ok', texto: r.mensaje });
+      setCodigo('');
+      setCodigoInvalido(false);
       setPaso('confirmar');
+      cuenta.iniciar();
+      setEnfocarCodigo((n) => n + 1);
     } catch (err) {
       setEstado({ tipo: 'error', texto: err.message });
     } finally {
@@ -117,6 +127,10 @@ function CambioCorreo({ correoActual, onCambiado }) {
       setCodigo('');
     } catch (err) {
       setEstado({ tipo: 'error', texto: err.message });
+      // Codigo incorrecto: recuadros en rojo, vacios y foco al primero.
+      setCodigoInvalido(true);
+      setCodigo('');
+      setEnfocarCodigo((n) => n + 1);
     } finally {
       setEnviando(false);
     }
@@ -173,15 +187,18 @@ function CambioCorreo({ correoActual, onCambiado }) {
             )}
           </div>
           {paso === 'confirmar' && (
-            <div className="flex gap-2">
-              <input
-                inputMode="numeric"
-                maxLength={6}
-                value={codigo}
-                onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ''))}
-                placeholder="Código de 6 dígitos"
-                aria-label="Código de verificación"
-                className={`${CLASE_CAMPO} bg-white tracking-widest`}
+            <div className="flex flex-col items-center gap-3">
+              <CampoCodigo
+                id="codigo-cambio-correo"
+                etiqueta="Código de verificación"
+                valor={codigo}
+                onChange={(valor) => {
+                  setCodigo(valor);
+                  setCodigoInvalido(false);
+                }}
+                error={codigoInvalido}
+                disabled={enviando}
+                enfocar={enfocarCodigo}
               />
               <button
                 type="button"
@@ -195,9 +212,7 @@ function CambioCorreo({ correoActual, onCambiado }) {
           )}
           <div className="flex gap-3 text-xs">
             {paso === 'confirmar' && (
-              <button type="button" onClick={pedirCodigo} disabled={enviando} className="font-semibold text-brand-blue hover:underline">
-                Reenviar código
-              </button>
+              <ReenviarCodigo cuenta={cuenta} onReenviar={pedirCodigo} disabled={enviando} className="!text-xs" />
             )}
             <button
               type="button"

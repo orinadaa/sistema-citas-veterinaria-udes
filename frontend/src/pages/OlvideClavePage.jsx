@@ -1,11 +1,17 @@
 // pages/OlvideClavePage.jsx
 // Recuperacion de contraseña por codigo, para cualquier rol. Dos pasos en
 // la misma pantalla: 1) pedir el codigo por correo, 2) confirmarlo junto
-// con la nueva contraseña.
+// con la nueva contraseña. El codigo se escribe en CampoCodigo (un recuadro
+// por digito); si es incorrecto los recuadros se ponen en rojo, se vacian y
+// el foco vuelve al primero. "Reenviar código" espera el mismo minuto que
+// exige el servidor entre envios.
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Campo } from '../components/form/Campo';
+import { CampoCodigo } from '../components/form/CampoCodigo';
+import { ReenviarCodigo } from '../components/form/ReenviarCodigo';
+import { useCuentaRegresiva } from '../hooks/useCuentaRegresiva';
 import { solicitarCodigoRecuperacion, restablecerContrasena } from '../api/client';
 
 export function OlvideClavePage() {
@@ -17,15 +23,23 @@ export function OlvideClavePage() {
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const [codigoInvalido, setCodigoInvalido] = useState(false);
+  const [enfocarCodigo, setEnfocarCodigo] = useState(0);
+  const cuenta = useCuentaRegresiva(60);
 
+  // Sirve para el primer envio (formulario del paso 1) y para "Reenviar".
   async function pedirCodigo(evento) {
-    evento.preventDefault();
+    evento?.preventDefault();
     setError('');
     setEnviando(true);
     try {
       const respuesta = await solicitarCodigoRecuperacion({ correo });
       setMensaje(respuesta.mensaje);
+      setCodigo('');
+      setCodigoInvalido(false);
       setPaso(2);
+      cuenta.iniciar();
+      setEnfocarCodigo((n) => n + 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -36,12 +50,27 @@ export function OlvideClavePage() {
   async function confirmarNuevaContrasena(evento) {
     evento.preventDefault();
     setError('');
+    if (codigo.length !== 6) {
+      setCodigoInvalido(true);
+      setError('Escribe los 6 dígitos del código.');
+      return;
+    }
+    if (contrasenaNueva.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
     setEnviando(true);
     try {
       await restablecerContrasena({ correo, codigo, contrasenaNueva });
       navegar('/iniciar-sesion?restablecida=1', { replace: true });
     } catch (err) {
       setError(err.message);
+      // Codigo incorrecto o vencido: recuadros en rojo, vacios y foco al primero.
+      if (/c[oó]digo/i.test(err.message)) {
+        setCodigoInvalido(true);
+        setCodigo('');
+        setEnfocarCodigo((n) => n + 1);
+      }
     } finally {
       setEnviando(false);
     }
@@ -91,15 +120,18 @@ export function OlvideClavePage() {
             <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 ring-1 ring-green-200">{mensaje}</p>
           )}
 
-          <Campo
+          <CampoCodigo
             id="codigo"
-            label="Código de seguridad"
-            inputMode="numeric"
-            maxLength={6}
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-            required
+            valor={codigo}
+            onChange={(valor) => {
+              setCodigo(valor);
+              setCodigoInvalido(false);
+            }}
+            error={codigoInvalido}
+            disabled={enviando}
+            enfocar={enfocarCodigo}
           />
+          <ReenviarCodigo cuenta={cuenta} onReenviar={() => pedirCodigo()} disabled={enviando} className="-mt-1 self-center" />
           <Campo
             id="contrasenaNueva"
             label="Nueva contraseña"
@@ -125,10 +157,13 @@ export function OlvideClavePage() {
 
           <button
             type="button"
-            onClick={() => setPaso(1)}
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            onClick={() => {
+              setError('');
+              setPaso(1);
+            }}
+            className="boton-texto self-center text-sm font-medium text-slate-600 transition"
           >
-            ¿No te llegó? Pedir otro código
+            Usar otro correo
           </button>
         </form>
       )}
