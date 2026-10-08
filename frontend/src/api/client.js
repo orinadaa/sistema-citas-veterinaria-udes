@@ -387,6 +387,45 @@ export function obtenerEntidadesCampos(token) {
   return solicitar('/campos/entidades', { token });
 }
 
+// Catalogos (superadministrador): categorias de servicio / especialidades,
+// y especies y razas. obtenerEspecies es publica: la usan los formularios
+// de mascota.
+export function obtenerEspecies() {
+  return solicitar('/catalogos/especies');
+}
+
+export function obtenerEspeciesCatalogo(token) {
+  return solicitar('/catalogos/especies/admin', { token });
+}
+
+export function crearEspecieCatalogo(datos, token) {
+  return solicitar('/catalogos/especies', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function actualizarEspecieCatalogo(id, datos, token) {
+  return solicitar(`/catalogos/especies/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function crearRazaCatalogo(especieId, nombre, token) {
+  return solicitar(`/catalogos/especies/${especieId}/razas`, { metodo: 'POST', cuerpo: { nombre }, token });
+}
+
+export function actualizarRazaCatalogo(id, datos, token) {
+  return solicitar(`/catalogos/razas/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function obtenerCategoriasCatalogo(token) {
+  return solicitar('/catalogos/categorias', { token });
+}
+
+export function crearCategoriaCatalogo(datos, token) {
+  return solicitar('/catalogos/categorias', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function actualizarCategoriaCatalogo(id, datos, token) {
+  return solicitar(`/catalogos/categorias/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
 export function crearCampo(datos, token) {
   return solicitar('/campos', { metodo: 'POST', cuerpo: datos, token });
 }

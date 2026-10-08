@@ -14,18 +14,20 @@
 // - cada boton mide al menos 44px de ancho y 96px de alto (maximo 84px
 //   de ancho: siempre queda mas alto que ancho).
 //
-// Raza: lista que depende de la especie (utils/razas.js); para "Otro" es
-// un campo de texto. Si una mascota antigua tiene una especie o una raza
-// escrita a mano que no esta en el catalogo, se conserva como opcion extra
-// para no perderla al editar.
+// Especies y razas salen del catalogo que gestiona el superadministrador
+// (Catalogos > Especies y razas; ver useCatalogoEspecies): solo las activas.
+// Raza: lista que depende de la especie; si la especie no tiene razas (como
+// "Otro") es un campo de texto. Si una mascota tiene una especie o una raza
+// que ya no esta en el catalogo (escrita a mano, o desactivada despues), se
+// conserva como opcion extra para no perderla al editar.
 import { useRef } from 'react';
-import { ESPECIES, RAZAS_POR_ESPECIE, razaEsTextoLibre } from '../../utils/razas';
+import { useCatalogoEspecies } from '../../hooks/useCatalogoEspecies';
 import { IconoAve, IconoCheck, IconoGato, IconoPata, IconoPerro } from '../icons';
 import { Desplegable } from './Desplegable';
 
-// Icono de cada especie del catalogo; "Otro" (y cualquier especie antigua
-// escrita a mano) usa la huella.
-const ICONO_ESPECIE = { Canino: IconoPerro, Felino: IconoGato, Ave: IconoAve };
+// Dibujo de cada especie segun el icono que tiene en el catalogo; una
+// especie escrita a mano que no esta en el catalogo usa la huella.
+const ICONOS = { perro: IconoPerro, gato: IconoGato, ave: IconoAve, pata: IconoPata };
 
 const CLASE_CAMPO =
   'w-full campo px-3 py-2 text-sm';
@@ -46,9 +48,14 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
   const grupo = useRef(null);
   // Especie guardada con un texto que no esta en el catalogo (ej.
   // "Perro" escrito a mano antes de este cambio): se muestra tal cual.
-  const especiesOpciones = especie && !ESPECIES.includes(especie) ? [...ESPECIES, especie] : ESPECIES;
-  const lista = RAZAS_POR_ESPECIE[especie];
-  const razasOpciones = lista && raza && !lista.includes(raza) ? [...lista, raza] : lista;
+  const catalogo = useCatalogoEspecies();
+  const nombres = catalogo.map((e) => e.nombre);
+  const especiesOpciones = especie && !nombres.includes(especie) ? [...nombres, especie] : nombres;
+  const iconoDe = (nombre) => ICONOS[catalogo.find((e) => e.nombre === nombre)?.icono] ?? IconoPata;
+  // Sin razas en el catalogo (o especie fuera de el): la raza se escribe a mano.
+  const razasDeLaEspecie = catalogo.find((e) => e.nombre === especie)?.razas ?? [];
+  const textoLibre = Boolean(especie) && razasDeLaEspecie.length === 0;
+  const razasOpciones = raza && !razasDeLaEspecie.includes(raza) ? [...razasDeLaEspecie, raza] : razasDeLaEspecie;
 
   function elegir(opcion) {
     // Cambiar de especie invalida la raza elegida.
@@ -80,12 +87,12 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
           role="radiogroup"
           aria-required="true"
           aria-labelledby={`${idPrefijo}-especie-etiqueta`}
-          className="grid gap-2"
-          style={{ gridTemplateColumns: `repeat(${especiesOpciones.length}, minmax(0, 5.25rem))` }}
+          // flex-wrap: si el catalogo crece, los botones pasan a otra fila.
+          className="flex flex-wrap gap-2"
         >
           {especiesOpciones.map((opcion, indice) => {
             const elegida = opcion === especie;
-            const IconoEspecie = ICONO_ESPECIE[opcion] ?? IconoPata;
+            const IconoEspecie = iconoDe(opcion);
             return (
               <button
                 key={opcion}
@@ -97,7 +104,7 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
                 tabIndex={elegida || (!especie && indice === 0) ? 0 : -1}
                 onClick={() => elegir(opcion)}
                 onKeyDown={(evento) => alPulsarTecla(evento, indice)}
-                className={`relative flex min-h-24 min-w-11 flex-col items-center justify-center gap-1.5 rounded-xl px-1.5 py-3 text-center text-sm transition hover:[filter:none] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
+                className={`relative flex min-h-24 w-[5.25rem] min-w-11 flex-col items-center justify-center gap-1.5 rounded-xl px-1.5 py-3 text-center text-sm transition hover:[filter:none] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
                   elegida
                     ? 'bg-blue-50 font-semibold text-brand-blue-700 ring-2 ring-brand-blue'
                     : 'bg-white font-medium text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50 hover:ring-slate-400'
@@ -117,8 +124,8 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5">
-        <Etiqueta htmlFor={`${idPrefijo}-raza`}>{razaEsTextoLibre(especie) ? '¿Qué animal es?' : 'Raza'}</Etiqueta>
-        {razaEsTextoLibre(especie) ? (
+        <Etiqueta htmlFor={`${idPrefijo}-raza`}>{textoLibre ? '¿Qué animal o raza es?' : 'Raza'}</Etiqueta>
+        {textoLibre ? (
           <input
             id={`${idPrefijo}-raza`}
             required
@@ -138,7 +145,7 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
             className={CLASE_CAMPO}
           >
             <option value="">{especie ? 'Selecciona una raza' : 'Primero elige la especie'}</option>
-            {(razasOpciones || []).map((opcion) => (
+            {razasOpciones.map((opcion) => (
               <option key={opcion} value={opcion}>
                 {opcion}
               </option>
