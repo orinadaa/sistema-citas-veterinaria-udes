@@ -43,7 +43,11 @@ Alcance actual: landing, flujo de agendar cita y panel del cliente (Mis citas, M
 
 ### Tipografía
 
-Raleway (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/raleway`).
+**Raleway** es la fuente del sistema (decisión definitiva de Oriana, 8 de octubre de 2026, tras probar Manrope, Poppins, Josefin Sans e Inter). Se usa en todo: títulos, texto, botones, formularios y paneles. Pesos 400, 500, 600 y 700, empaquetada con el proyecto (`@fontsource/raleway`, sin depender de internet).
+
+- Tokens: `--font-sans` y `--font-heading` en `frontend/src/styles/vetui.css`; los pesos se importan en `frontend/src/main.jsx`.
+- **Cifras alineadas**: Raleway dibuja por defecto los números en estilo antiguo (el 0 y el 3 quedan bajos). `vetui.css` activa las cifras alineadas para todo el sistema (`font-feature-settings: "lnum"` en `html`); no quitarlo, o precios, fechas y tablas se ven desparejos.
+- Única excepción: el código de la cita en la confirmación de `/agendar` va en monoespaciada (`font-mono`).
 
 | Rol | Clases |
 |---|---|
