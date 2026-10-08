@@ -6,6 +6,8 @@
 jest.mock('../src/models/mascota.model');
 jest.mock('../src/models/usuario.model');
 jest.mock('../src/models/pacienteMedico.model');
+// Campos personalizados: sin definiciones (automock devuelve undefined).
+jest.mock('../src/models/definicionCampo.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
