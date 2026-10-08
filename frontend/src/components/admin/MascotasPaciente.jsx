@@ -16,6 +16,8 @@ import { crearMascota, actualizarMascota, subirFotoMascota } from '../../api/cli
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
+import { CamposAdicionales } from '../form/CamposAdicionales';
+import { useCamposAdicionales } from '../../hooks/useCamposAdicionales';
 import { SelectorSexo } from '../form/SelectorSexo';
 import { ZonaFoto } from '../form/ZonaFoto';
 import { CampoFecha } from '../form/CampoFecha';
@@ -141,6 +143,8 @@ function TarjetaMascota({ mascota, onEditar, accionesExtra = [] }) {
 export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioColapsable = false, accionesExtra = [] }) {
   const { token } = useAuth();
   const [form, setForm] = useState(FORM_VACIO);
+  // Campos personalizados que el administrador definio para la mascota.
+  const campos = useCamposAdicionales('mascota');
   const [mascotaEditando, setMascotaEditando] = useState(null);
   const [foto, setFoto] = useState(null); // foto recortada (Blob), pendiente de subir
   const [vistaPrevia, setVistaPrevia] = useState(null);
@@ -160,6 +164,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
 
   function limpiar() {
     setForm(FORM_VACIO);
+    campos.reiniciar(null);
     setMascotaEditando(null);
     setFoto(null);
     setVistaPrevia(null);
@@ -173,6 +178,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
     setAviso('');
     setMascotaEditando(mascota);
     setForm(formDesdeMascota(mascota));
+    campos.reiniciar(mascota);
     setFormularioAbierto(true);
     formulario.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -185,6 +191,11 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
       setError('Nombre, especie, raza y sexo son obligatorios.');
       return;
     }
+    const faltaAdicional = campos.errorObligatorios();
+    if (faltaAdicional) {
+      setError(faltaAdicional);
+      return;
+    }
 
     const datos = {
       nombre: form.nombre.trim(),
@@ -195,6 +206,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
       pesoKg: form.pesoKg || null,
       color: form.color.trim(),
       caracteristicas: form.caracteristicas.trim(),
+      camposAdicionales: campos.valoresParaEnviar(),
     };
 
     setGuardando(true);
@@ -217,6 +229,9 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
         mensaje = `${guardada.nombre} se guardó, pero la foto no se pudo subir: ${err.message}`;
       }
     }
+    // Adjuntos de los campos personalizados de tipo archivo.
+    const avisoArchivos = await campos.guardarArchivos(guardada.id);
+    if (avisoArchivos) mensaje = `${guardada.nombre} se guardó. ${avisoArchivos}`;
     setGuardando(false);
     limpiar();
     setAviso(mensaje);
@@ -349,6 +364,8 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
             {form.caracteristicas.length}/{MAX_CARACTERISTICAS}
           </p>
         </div>
+
+        <CamposAdicionales campos={campos} idPrefijo="admin-mascota-extra" />
 
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">{error}</p>}
 

@@ -1,7 +1,8 @@
 // components/admin/PanelConfiguracion.jsx
 // Configuracion, acotada a lo que tiene respaldo real: gestion de
 // cuentas de personal (Usuarios), Sedes (reutiliza PanelHorarios tal
-// cual) y Galeria (fotos de la portada del sitio, PanelGaleria). El resto de pestanas del mockup (Notificaciones, Seguridad,
+// cual), Galeria (fotos de la portada del sitio, PanelGaleria) y Campos
+// (campos personalizados de los formularios, PanelCampos). El resto de pestanas del mockup (Notificaciones, Seguridad,
 // Respaldo, Preferencias, Apariencia) no se construyen: sin RF/RNF ni
 // backend detras, ver docs/incremento_3_pruebas.md.
 import { useEffect, useMemo, useState } from 'react';
@@ -22,6 +23,7 @@ import { Tabs } from '../ui/Tabs';
 import { EstadoError } from '../ui/EstadoError';
 import { PanelHorarios } from './PanelHorarios';
 import { PanelGaleria } from './PanelGaleria';
+import { PanelCampos } from './PanelCampos';
 import { Desplegable } from '../form/Desplegable';
 import { CampoBusqueda } from '../form/CampoBusqueda';
 
@@ -29,6 +31,7 @@ const TABS = [
   { id: 'usuarios', label: 'Usuarios' },
   { id: 'sedes', label: 'Sedes' },
   { id: 'galeria', label: 'Galería' },
+  { id: 'campos', label: 'Campos' },
 ];
 
 const ETIQUETA_ROL = { administrador: 'Administrador', veterinario: 'Médico Veterinario' };
@@ -152,7 +155,7 @@ export function PanelConfiguracion() {
   return (
     <>
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
-      <PageHeader title="Configuración" subtitle="Gestiona las cuentas de personal, las sedes y las fotos de la portada del sitio." />
+      <PageHeader title="Configuración" subtitle="Gestiona las cuentas de personal, las sedes, las fotos de la portada y los campos de los formularios." />
 
       {aviso && (
         <p
@@ -171,6 +174,8 @@ export function PanelConfiguracion() {
       {pestana === 'sedes' && <PanelHorarios />}
 
       {pestana === 'galeria' && <PanelGaleria />}
+
+      {pestana === 'campos' && <PanelCampos />}
 
       {pestana === 'usuarios' && (
         <div className="flex flex-col gap-6">

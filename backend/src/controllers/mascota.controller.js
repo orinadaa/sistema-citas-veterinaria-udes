@@ -7,7 +7,17 @@ const usuarioModel = require('../models/usuario.model');
 const pacienteMedicoModel = require('../models/pacienteMedico.model');
 const fs = require('fs/promises');
 const path = require('path');
-const { CARPETA_FOTOS_MASCOTAS, RUTA_PUBLICA_FOTOS_MASCOTAS } = require('../middlewares/subirFoto.middleware');
+const { CARPETA_FOTOS_MASCOTAS, RUTA_PUBLICA_FOTOS_MASCOTAS, adjuntos } = require('../middlewares/subirFoto.middleware');
+const definicionCampoModel = require('../models/definicionCampo.model');
+const { validarCamposAdicionales } = require('../utils/camposAdicionales');
+
+// Campos personalizados de la mascota (Configuracion > Campos): valida lo
+// que llega del formulario contra las definiciones y arma el JSON a
+// guardar. Devuelve { valores } o { error }.
+async function resolverCamposAdicionales(entrantes, previos) {
+  const definiciones = (await definicionCampoModel.listar('mascota')) || [];
+  return validarCamposAdicionales(definiciones, entrantes, previos);
+}
 
 const SEXOS_VALIDOS = ['macho', 'hembra'];
 
@@ -131,6 +141,11 @@ async function crear(req, res, next) {
       clienteId = clienteIdBody;
     }
 
+    const adicionales = await resolverCamposAdicionales(req.body.camposAdicionales, {});
+    if (adicionales.error) {
+      return res.status(400).json({ mensaje: adicionales.error });
+    }
+
     const mascota = await mascotaModel.crear({
       clienteId,
       nombre,
@@ -146,6 +161,7 @@ async function crear(req, res, next) {
       medicamentos,
       condicionesMedicas,
       observaciones,
+      camposAdicionales: adicionales.valores,
     });
     return res.status(201).json({ mascota });
   } catch (error) {
@@ -197,6 +213,16 @@ async function actualizar(req, res, next) {
       return res.status(403).json({ mensaje: 'No puedes editar una mascota que no es tuya.' });
     }
 
+    // Solo si el formulario los envia (otras ediciones parciales no los tocan).
+    let camposAdicionales;
+    if (req.body.camposAdicionales !== undefined) {
+      const adicionales = await resolverCamposAdicionales(req.body.camposAdicionales, mascota.campos_adicionales);
+      if (adicionales.error) {
+        return res.status(400).json({ mensaje: adicionales.error });
+      }
+      camposAdicionales = adicionales.valores;
+    }
+
     const actualizada = await mascotaModel.actualizar(id, {
       nombre,
       especie,
@@ -211,6 +237,7 @@ async function actualizar(req, res, next) {
       medicamentos,
       condicionesMedicas,
       observaciones,
+      camposAdicionales,
     });
     return res.status(200).json({ mascota: actualizada });
   } catch (error) {
@@ -275,4 +302,86 @@ async function subirFoto(req, res, next) {
   }
 }
 
-module.exports = { misMascotas, listarDeCliente, crear, actualizar, eliminar, subirFoto };
+// Campo personalizado de tipo archivo sobre el que se va a operar: valida
+// permiso, que la mascota exista y que la clave sea un campo de archivo.
+// Devuelve { mascota, definicion } o responde el error y devuelve null.
+async function cargarCampoArchivo(req, res, { exigirActivo }) {
+  const { id, clave } = req.params;
+  const mascota = await mascotaModel.buscarPorId(id);
+  if (!mascota) {
+    res.status(404).json({ mensaje: 'Mascota no encontrada.' });
+    return null;
+  }
+  if (!(await puedeGestionarMascotasDe(req.usuario, mascota.cliente_id))) {
+    res.status(403).json({ mensaje: 'No puedes editar una mascota que no es tuya.' });
+    return null;
+  }
+  const definicion = await definicionCampoModel.buscarPorClave('mascota', clave);
+  if (!definicion || definicion.tipo !== 'archivo') {
+    res.status(404).json({ mensaje: 'Ese campo no admite archivos.' });
+    return null;
+  }
+  if (exigirActivo && !definicion.activo) {
+    res.status(400).json({ mensaje: `"${definicion.etiqueta}" ya no se solicita.` });
+    return null;
+  }
+  return { mascota, definicion };
+}
+
+// POST /api/mascotas/:id/campos/:clave/archivo — multipart, campo
+// "archivo" (PDF, JPG o PNG, max 5 MB). Adjunta el archivo de un campo
+// personalizado de tipo archivo (ej. certificado de vacunacion). Dueño,
+// administrador o medico del paciente. Reemplaza el anterior y lo borra.
+async function subirArchivoCampo(req, res, next) {
+  const archivoNuevo = req.file ? `${adjuntos.rutaPublica}/${req.file.filename}` : null;
+  try {
+    if (!archivoNuevo) {
+      return res.status(400).json({ mensaje: 'Adjunta un archivo PDF, JPG o PNG en el campo "archivo".' });
+    }
+    const contexto = await cargarCampoArchivo(req, res, { exigirActivo: true });
+    if (!contexto) {
+      await adjuntos.borrar(archivoNuevo);
+      return undefined;
+    }
+    // El nombre original es solo para mostrarlo; el archivo en disco tiene
+    // un nombre aleatorio. multer lo entrega leido como latin1: se pasa a
+    // UTF-8 para que no se dañen las tildes ("Carné de Luna.pdf").
+    const original = Buffer.from(String(req.file.originalname || 'archivo'), 'latin1').toString('utf8');
+    const nombre = path.basename(original).slice(0, 120);
+    const valor = { url: archivoNuevo, nombre, tipo: req.file.mimetype };
+    const resultado = await mascotaModel.guardarCampoAdicional(contexto.mascota.id, contexto.definicion.clave, valor);
+    await adjuntos.borrar(resultado?.anterior?.url);
+    return res.status(200).json({ mascota: resultado.mascota });
+  } catch (error) {
+    await adjuntos.borrar(archivoNuevo);
+    next(error);
+  }
+}
+
+// DELETE /api/mascotas/:id/campos/:clave/archivo — quita el adjunto.
+// No se puede si el campo esta activo y es obligatorio.
+async function quitarArchivoCampo(req, res, next) {
+  try {
+    const contexto = await cargarCampoArchivo(req, res, { exigirActivo: false });
+    if (!contexto) return undefined;
+    if (contexto.definicion.activo && contexto.definicion.requerido) {
+      return res.status(400).json({ mensaje: `"${contexto.definicion.etiqueta}" es obligatorio: reemplázalo en vez de quitarlo.` });
+    }
+    const resultado = await mascotaModel.guardarCampoAdicional(contexto.mascota.id, contexto.definicion.clave, null);
+    await adjuntos.borrar(resultado?.anterior?.url);
+    return res.status(200).json({ mascota: resultado.mascota });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = {
+  misMascotas,
+  listarDeCliente,
+  crear,
+  actualizar,
+  eliminar,
+  subirFoto,
+  subirArchivoCampo,
+  quitarArchivoCampo,
+};

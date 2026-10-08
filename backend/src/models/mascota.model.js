@@ -5,7 +5,7 @@ const { pool } = require('../config/db');
 
 const CAMPOS =
   'id, cliente_id, nombre, especie, raza, foto_url, fecha_nacimiento, sexo, color, peso_kg, caracteristicas, ' +
-  'alergias, medicamentos, condiciones_medicas, observaciones, creado_en';
+  'alergias, medicamentos, condiciones_medicas, observaciones, campos_adicionales, creado_en';
 
 // Solo mascotas activas: las eliminadas (baja logica, ver
 // database/incremento_4c_mascota_baja.sql) ya no se listan.
@@ -45,11 +45,12 @@ async function crear({
   medicamentos,
   condicionesMedicas,
   observaciones,
+  camposAdicionales,
 }) {
   const resultado = await pool.query(
     `INSERT INTO mascota (cliente_id, nombre, especie, raza, foto_url, fecha_nacimiento, sexo, color, peso_kg, caracteristicas,
-                          alergias, medicamentos, condiciones_medicas, observaciones)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING ${CAMPOS}`,
+                          alergias, medicamentos, condiciones_medicas, observaciones, campos_adicionales)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb) RETURNING ${CAMPOS}`,
     [
       clienteId,
       nombre,
@@ -65,6 +66,7 @@ async function crear({
       medicamentos || null,
       condicionesMedicas || null,
       observaciones || null,
+      JSON.stringify(camposAdicionales || {}),
     ]
   );
   return resultado.rows[0];
@@ -72,7 +74,24 @@ async function crear({
 
 async function actualizar(
   id,
-  { nombre, especie, raza, fotoUrl, fechaNacimiento, sexo, color, pesoKg, caracteristicas, alergias, medicamentos, condicionesMedicas, observaciones }
+  {
+    nombre,
+    especie,
+    raza,
+    fotoUrl,
+    fechaNacimiento,
+    sexo,
+    color,
+    pesoKg,
+    caracteristicas,
+    alergias,
+    medicamentos,
+    condicionesMedicas,
+    observaciones,
+    // Campos personalizados: el JSON completo ya validado, o undefined
+    // para no tocarlos.
+    camposAdicionales,
+  }
 ) {
   const resultado = await pool.query(
     `UPDATE mascota SET
@@ -88,7 +107,8 @@ async function actualizar(
        alergias = COALESCE($11, alergias),
        medicamentos = COALESCE($12, medicamentos),
        condiciones_medicas = COALESCE($13, condiciones_medicas),
-       observaciones = COALESCE($14, observaciones)
+       observaciones = COALESCE($14, observaciones),
+       campos_adicionales = COALESCE($15::jsonb, campos_adicionales)
      WHERE id = $1
      RETURNING ${CAMPOS}`,
     [
@@ -106,9 +126,30 @@ async function actualizar(
       medicamentos ?? null,
       condicionesMedicas ?? null,
       observaciones ?? null,
+      camposAdicionales ? JSON.stringify(camposAdicionales) : null,
     ]
   );
   return resultado.rows[0] || null;
+}
+
+// Guarda (o quita, con valor null) UN campo personalizado sin tocar los
+// demas: lo usa el adjunto de un campo de tipo archivo. Devuelve el valor
+// anterior de esa clave (para borrar el archivo viejo) y la mascota.
+async function guardarCampoAdicional(id, clave, valor) {
+  const resultado = await pool.query(
+    `UPDATE mascota m
+     SET campos_adicionales = CASE
+           WHEN $3::jsonb IS NULL THEN m.campos_adicionales - $2::text
+           ELSE jsonb_set(m.campos_adicionales, ARRAY[$2::text], $3::jsonb, true)
+         END
+     FROM (SELECT campos_adicionales -> $2::text AS anterior FROM mascota WHERE id = $1) previo
+     WHERE m.id = $1 AND m.activo
+     RETURNING previo.anterior, ${CAMPOS.split(', ').map((c) => `m.${c}`).join(', ')}`,
+    [id, clave, valor === null ? null : JSON.stringify(valor)]
+  );
+  if (resultado.rowCount === 0) return null;
+  const { anterior, ...mascota } = resultado.rows[0];
+  return { mascota, anterior };
 }
 
 // Citas activas (agendadas y futuras) de la mascota: mientras tenga
@@ -141,4 +182,14 @@ async function desactivar(id) {
   return resultado.rows[0] || null;
 }
 
-module.exports = { listarPorCliente, buscarPorId, perteneceACliente, crear, actualizar, contarCitasPendientes, actualizarFoto, desactivar };
+module.exports = {
+  listarPorCliente,
+  buscarPorId,
+  perteneceACliente,
+  crear,
+  actualizar,
+  guardarCampoAdicional,
+  contarCitasPendientes,
+  actualizarFoto,
+  desactivar,
+};

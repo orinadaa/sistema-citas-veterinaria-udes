@@ -9,6 +9,8 @@ import { obtenerMisMascotas, obtenerMascotasDeCliente, crearMascota } from '../.
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
+import { CamposAdicionales } from '../form/CamposAdicionales';
+import { useCamposAdicionales } from '../../hooks/useCamposAdicionales';
 import { IconoAlerta } from '../icons';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
@@ -24,6 +26,9 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
   const [especieNueva, setEspecieNueva] = useState('');
   const [razaNueva, setRazaNueva] = useState('');
   const [creando, setCreando] = useState(false);
+  // Campos personalizados de la mascota: en esta alta rapida solo se piden
+  // los obligatorios; el resto se completa despues en la ficha.
+  const campos = useCamposAdicionales('mascota');
   const [error, setError] = useState('');
 
   function cargar() {
@@ -51,13 +56,21 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
       setError('Nombre, especie y raza de la mascota son obligatorios.');
       return;
     }
+    const faltaAdicional = campos.errorObligatorios();
+    if (faltaAdicional) {
+      setError(faltaAdicional);
+      return;
+    }
 
     setCreando(true);
     try {
-      const cuerpo = { nombre: nombreNueva, especie: especieNueva, raza: razaNueva };
+      const cuerpo = { nombre: nombreNueva, especie: especieNueva, raza: razaNueva, camposAdicionales: campos.valoresParaEnviar() };
       if (modoAdmin) cuerpo.clienteId = clienteId;
 
       const { mascota } = await crearMascota(cuerpo, token);
+      const avisoArchivos = await campos.guardarArchivos(mascota.id);
+      campos.reiniciar(null);
+      if (avisoArchivos) setError(`${mascota.nombre} se guardó. ${avisoArchivos}`);
       setMascotas((anteriores) => [...anteriores, mascota]);
       onSeleccionar(mascota.id);
       setMostrarNueva(false);
@@ -136,6 +149,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
               setRazaNueva(raza);
             }}
           />
+          <CamposAdicionales campos={campos} idPrefijo="nueva-mascota-extra" soloObligatorios titulo="Datos obligatorios adicionales" />
           <button
             type="button"
             disabled={creando}

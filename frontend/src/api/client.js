@@ -367,3 +367,43 @@ export function reordenarGaleria(ids, token) {
 export function eliminarFotoGaleria(id, token) {
   return solicitar(`/galeria/${id}`, { metodo: 'DELETE', token });
 }
+
+// Campos personalizados administrables (Configuracion > Campos).
+export function obtenerCampos(entidad, token) {
+  return solicitar(`/campos?${new URLSearchParams({ entidad })}`, { token });
+}
+
+export function obtenerEntidadesCampos(token) {
+  return solicitar('/campos/entidades', { token });
+}
+
+export function crearCampo(datos, token) {
+  return solicitar('/campos', { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function actualizarCampo(id, datos, token) {
+  return solicitar(`/campos/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function reordenarCampos(entidad, ids, token) {
+  return solicitar('/campos/orden', { metodo: 'PUT', cuerpo: { entidad, ids }, token });
+}
+
+// Adjunto de un campo personalizado de tipo archivo (PDF o imagen). Va con
+// su nombre original, que es el que se le muestra despues al usuario.
+export async function subirArchivoCampoMascota(mascotaId, clave, archivo, token) {
+  const datos = new FormData();
+  datos.append('archivo', archivo, archivo.name || 'archivo');
+  const respuesta = await fetch(`/api/mascotas/${mascotaId}/campos/${encodeURIComponent(clave)}/archivo`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: datos,
+  });
+  const cuerpo = await respuesta.json().catch(() => ({}));
+  if (!respuesta.ok) throw new Error(cuerpo.mensaje || `Error inesperado (${respuesta.status})`);
+  return cuerpo;
+}
+
+export function quitarArchivoCampoMascota(mascotaId, clave, token) {
+  return solicitar(`/mascotas/${mascotaId}/campos/${encodeURIComponent(clave)}/archivo`, { metodo: 'DELETE', token });
+}
