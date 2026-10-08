@@ -249,7 +249,7 @@ export function AdminHeader({ onNavegar }) {
               setDropdownAbierto(false);
               setMenuAbierto((v) => !v);
             }}
-            className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton pl-2 pr-4 transition"
+            className={`relative z-10 flex h-[52px] items-center gap-2.5 rounded-boton pl-2 pr-4 transition ${menuAbierto ? '' : 'vidrio'}`}
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-xs font-semibold text-white">
               {iniciales || '·'}
@@ -261,14 +261,20 @@ export function AdminHeader({ onNavegar }) {
             <IconoChevronAbajo className="h-4 w-4 text-white/85" />
           </button>
 
+          {/* Igual que en la vista del cliente (Navbar): el menu no es una
+              pildora aparte, se desprende del perfil. Abierto, el vidrio del
+              perfil se alarga hacia abajo y "Cerrar sesión" queda dentro de
+              la misma pieza: texto blanco, icono rojo bajo el avatar y fondo
+              rojizo al pasar el cursor. */}
           {menuAbierto && (
-            <div className="vidrio vidrio-hoja absolute right-0 top-full z-50 mt-2 w-full min-w-44 rounded-boton p-1.5">
+            <div className="vidrio vidrio-hoja absolute inset-x-0 top-0 overflow-hidden rounded-[26px]">
+              <div aria-hidden="true" className="h-[52px]" />
               <button
                 type="button"
                 onClick={salir}
-                className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
+                className="hover-texto-ilumina relative block w-full border-t border-white/10 py-2.5 pl-[3.375rem] pr-4 text-left text-sm font-medium text-white transition hover:bg-red-500/25"
               >
-                <IconoSalir className="h-4 w-4 shrink-0" />
+                <IconoSalir className="absolute left-[1.125rem] top-1/2 h-4 w-4 -translate-y-1/2 text-red-300" />
                 Cerrar sesión
               </button>
             </div>
