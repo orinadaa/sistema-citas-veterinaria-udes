@@ -11,15 +11,15 @@ const router = express.Router();
 router.get('/', listar);
 
 // GET /api/sedes/admin — solo administrador, incluye inactivas
-router.get('/admin', verificarToken, verificarRol('administrador'), listarAdmin);
+router.get('/admin', verificarToken, verificarRol('superadministrador', 'administrador'), listarAdmin);
 
 // POST /api/sedes — solo administrador
-router.post('/', verificarToken, verificarRol('administrador'), crear);
+router.post('/', verificarToken, verificarRol('superadministrador'), crear);
 
 // PUT /api/sedes/:id — solo administrador
-router.put('/:id', verificarToken, verificarRol('administrador'), actualizar);
+router.put('/:id', verificarToken, verificarRol('superadministrador'), actualizar);
 
 // POST /api/sedes/:id/foto — solo administrador (multipart, campo "foto")
-router.post('/:id/foto', verificarToken, verificarRol('administrador'), fotosSedes.middleware, subirFoto);
+router.post('/:id/foto', verificarToken, verificarRol('superadministrador'), fotosSedes.middleware, subirFoto);
 
 module.exports = router;

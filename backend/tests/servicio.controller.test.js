@@ -10,7 +10,7 @@ const app = require('../src/app');
 const servicioModel = require('../src/models/servicio.model');
 const categoriaServicioModel = require('../src/models/categoriaServicio.model');
 
-const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador' }, process.env.JWT_SECRET);
+const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'superadministrador' }, process.env.JWT_SECRET);
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
 const CATEGORIA_ID = 'cat-1';
 

@@ -7,7 +7,7 @@ const { fotosGaleria } = require('../middlewares/subirFoto.middleware');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
-const soloAdmin = [verificarToken, verificarRol('administrador')];
+const soloAdmin = [verificarToken, verificarRol('superadministrador')];
 
 // GET /api/galeria — publico, solo fotos visibles
 router.get('/', listar);

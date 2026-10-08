@@ -13,12 +13,19 @@ const {
   obtenerDetallePaciente,
 } = require('../controllers/administracion.controller');
 const { obtenerReporte } = require('../controllers/reportes.controller');
+const { obtenerTableroSede, obtenerResumenSistema } = require('../controllers/tablero.controller');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
 router.use(verificarToken);
+
+// GET /api/administracion/tablero — inicio del administrador de sede
+router.get('/tablero', verificarRol('administrador'), obtenerTableroSede);
+
+// GET /api/administracion/sistema — inicio del superadministrador
+router.get('/sistema', verificarRol('superadministrador'), obtenerResumenSistema);
 
 // GET /api/administracion/medicos — solo administrador
 router.get('/medicos', verificarRol('administrador'), listarMedicos);
@@ -48,6 +55,6 @@ router.get('/pacientes', verificarRol('administrador'), listarPacientes);
 router.get('/pacientes/:id', verificarRol('administrador'), obtenerDetallePaciente);
 
 // GET /api/administracion/reportes — solo administrador
-router.get('/reportes', verificarRol('administrador'), obtenerReporte);
+router.get('/reportes', verificarRol('superadministrador', 'administrador'), obtenerReporte);
 
 module.exports = router;

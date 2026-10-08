@@ -26,12 +26,22 @@ async function listar(req, res, next) {
   }
 }
 
-// PUT /api/horarios (solo administrador)
+// El administrador de sede solo cambia el horario de SU sede; el
+// superadministrador, el de cualquiera.
+function puedeCambiarHorario(usuario, sedeId) {
+  return usuario.rol === 'superadministrador' || usuario.sedeId === sedeId;
+}
+const MENSAJE_OTRA_SEDE = 'Solo puedes cambiar el horario de tu propia sede.';
+
+// PUT /api/horarios (superadministrador, o administrador en su sede)
 async function actualizarDia(req, res, next) {
   try {
     const { sedeId, diaSemana, horaInicio, horaFin } = req.body;
     if (!sedeId || diaSemana === undefined || !horaInicio || !horaFin) {
       return res.status(400).json({ mensaje: 'sedeId, diaSemana, horaInicio y horaFin son obligatorios.' });
+    }
+    if (!puedeCambiarHorario(req.usuario, sedeId)) {
+      return res.status(403).json({ mensaje: MENSAJE_OTRA_SEDE });
     }
     if (!DIA_VALIDO(diaSemana)) {
       return res.status(400).json({ mensaje: 'diaSemana debe ser un número entre 0 (domingo) y 6 (sábado).' });
@@ -56,6 +66,9 @@ async function actualizarDia(req, res, next) {
 async function cerrarDia(req, res, next) {
   try {
     const { sedeId, diaSemana } = req.params;
+    if (!puedeCambiarHorario(req.usuario, sedeId)) {
+      return res.status(403).json({ mensaje: MENSAJE_OTRA_SEDE });
+    }
     const dia = Number(diaSemana);
     if (!DIA_VALIDO(dia)) {
       return res.status(400).json({ mensaje: 'diaSemana debe ser un número entre 0 (domingo) y 6 (sábado).' });

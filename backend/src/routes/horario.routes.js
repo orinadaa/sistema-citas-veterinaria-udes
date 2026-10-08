@@ -9,9 +9,9 @@ const router = express.Router();
 router.get('/', listar);
 
 // PUT /api/horarios — solo administrador
-router.put('/', verificarToken, verificarRol('administrador'), actualizarDia);
+router.put('/', verificarToken, verificarRol('superadministrador', 'administrador'), actualizarDia);
 
 // DELETE /api/horarios/:sedeId/:diaSemana — solo administrador
-router.delete('/:sedeId/:diaSemana', verificarToken, verificarRol('administrador'), cerrarDia);
+router.delete('/:sedeId/:diaSemana', verificarToken, verificarRol('superadministrador', 'administrador'), cerrarDia);
 
 module.exports = router;

@@ -60,16 +60,30 @@ describe('GET /api/administracion/reportes', () => {
     expect(respuesta.body).toHaveProperty('ultimasCitas');
   });
 
-  test('pasa el sedeId indicado a los modelos que lo aceptan', async () => {
+  test('el superadministrador puede filtrar por cualquier sede', async () => {
+    mockearRespuestasVacias();
+    const TOKEN_SUPER = jwt.sign({ id: 'super-1', rol: 'superadministrador' }, process.env.JWT_SECRET);
+
+    const respuesta = await request(app)
+      .get('/api/administracion/reportes')
+      .query({ sedeId: 'sede-2' })
+      .set('Authorization', 'Bearer ' + TOKEN_SUPER);
+
+    expect(respuesta.status).toBe(200);
+    expect(reportesModel.obtenerKpis).toHaveBeenCalledWith('sede-2');
+    expect(reportesModel.rankingServicios).toHaveBeenCalledWith('sede-2', expect.any(Date), expect.any(Date));
+  });
+
+  test('el administrador de sede ve solo su sede aunque pida otra', async () => {
     mockearRespuestasVacias();
 
     const respuesta = await request(app)
       .get('/api/administracion/reportes')
       .query({ sedeId: 'sede-2' })
-      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+      .set('Authorization', 'Bearer ' + TOKEN_ADMIN);
 
     expect(respuesta.status).toBe(200);
-    expect(reportesModel.obtenerKpis).toHaveBeenCalledWith('sede-2');
-    expect(reportesModel.rankingServicios).toHaveBeenCalledWith('sede-2', expect.any(Date), expect.any(Date));
+    expect(reportesModel.obtenerKpis).toHaveBeenCalledWith('sede-1');
+    expect(reportesModel.rankingServicios).toHaveBeenCalledWith('sede-1', expect.any(Date), expect.any(Date));
   });
 });

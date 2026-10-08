@@ -15,7 +15,10 @@ const {
 const correoService = require('../services/correo.service');
 const { generarContrasenaTemporal } = require('../utils/contrasena.util');
 
-const ROLES_VALIDOS = ['administrador', 'veterinario', 'cliente'];
+const ROLES_VALIDOS = ['superadministrador', 'administrador', 'veterinario', 'cliente'];
+// Roles que se pueden asignar desde el sistema. El superadministrador no:
+// esa cuenta se crea aparte (src/scripts/crearSuperadmin.js).
+const ROLES_ASIGNABLES = ['administrador', 'veterinario', 'cliente'];
 const RONDAS_SAL = 10;
 const ETIQUETA_ROL = { administrador: 'administrador', veterinario: 'médico veterinario' };
 
@@ -39,6 +42,11 @@ async function listar(req, res, next) {
     const { rol } = req.query;
     if (rol && !ROLES_VALIDOS.includes(rol)) {
       return res.status(400).json({ mensaje: `El rol debe ser uno de: ${ROLES_VALIDOS.join(', ')}.` });
+    }
+
+    // El administrador de sede solo puede listar clientes.
+    if (req.usuario.rol !== 'superadministrador' && rol !== 'cliente') {
+      return res.status(403).json({ mensaje: 'No tiene permisos para acceder a este recurso.' });
     }
 
     const usuarios = await listarTodos(rol);
@@ -105,11 +113,16 @@ async function cambiarRol(req, res, next) {
     const { id } = req.params;
     const { rol, sedeId } = req.body;
 
-    if (!ROLES_VALIDOS.includes(rol)) {
-      return res.status(400).json({ mensaje: `El rol debe ser uno de: ${ROLES_VALIDOS.join(', ')}.` });
+    if (!ROLES_ASIGNABLES.includes(rol)) {
+      return res.status(400).json({ mensaje: `El rol debe ser uno de: ${ROLES_ASIGNABLES.join(', ')}.` });
     }
     if (rol !== 'cliente' && !sedeId) {
       return res.status(400).json({ mensaje: 'Los roles administrador y veterinario requieren una sede.' });
+    }
+    // La cuenta del superadministrador no se degrada desde el sistema.
+    const objetivo = await buscarPorId(id);
+    if (objetivo && objetivo.rol === 'superadministrador') {
+      return res.status(403).json({ mensaje: 'El rol del superadministrador no se puede cambiar desde el sistema.' });
     }
 
     const usuarioActualizado = await actualizarRol(id, { rol, sedeId: rol === 'cliente' ? null : sedeId });
@@ -123,7 +136,7 @@ async function cambiarRol(req, res, next) {
   }
 }
 
-// PATCH /api/usuarios/:id (solo administrador) — activo/telefono/nombre,
+// PATCH /api/usuarios/:id (superadministrador; administrador solo sobre clientes) — activo/telefono/nombre,
 // para cualquier rol (Configuracion->Usuarios, toggle de Pacientes). No
 // cambia rol/sede (eso sigue siendo /:id/rol). Un admin no puede
 // desactivarse a si mismo (evita auto-bloqueo).
@@ -134,6 +147,16 @@ async function actualizarPerfilUsuario(req, res, next) {
 
     if (activo === false && id === req.usuario.id) {
       return res.status(400).json({ mensaje: 'No puedes desactivar tu propia cuenta.' });
+    }
+    // El administrador de sede solo cambia cuentas de clientes (Pacientes).
+    if (req.usuario.rol !== 'superadministrador') {
+      const objetivo = await buscarPorId(id);
+      if (!objetivo) {
+        return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
+      }
+      if (objetivo.rol !== 'cliente') {
+        return res.status(403).json({ mensaje: 'Solo el superadministrador puede cambiar cuentas de personal.' });
+      }
     }
 
     const usuarioActualizado = await actualizarPerfil(id, { nombreCompleto, telefono, activo });

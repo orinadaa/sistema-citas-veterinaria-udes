@@ -14,7 +14,7 @@ function tokenPara(rol) {
   return jwt.sign({ id: 'admin1', rol }, process.env.JWT_SECRET);
 }
 
-describe('Rutas /api/usuarios (protegidas para administrador)', () => {
+describe('Rutas /api/usuarios (gestion de cuentas: superadministrador)', () => {
   beforeEach(() => jest.clearAllMocks());
 
   test('GET /api/usuarios sin token responde 401', async () => {
@@ -35,7 +35,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
 
     const respuesta = await request(app)
       .get('/api/usuarios')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`);
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`);
 
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.usuarios).toHaveLength(1);
@@ -46,7 +46,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
 
     const respuesta = await request(app)
       .get('/api/usuarios?rol=cliente')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`);
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`);
 
     expect(respuesta.status).toBe(200);
     expect(usuarioModel.listarTodos).toHaveBeenCalledWith('cliente');
@@ -55,7 +55,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
   test('GET /api/usuarios?rol=invalido responde 400', async () => {
     const respuesta = await request(app)
       .get('/api/usuarios?rol=superadmin')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`);
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`);
 
     expect(respuesta.status).toBe(400);
   });
@@ -63,7 +63,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
   test('POST /api/usuarios rechaza rol "cliente" (debe usarse /api/auth/registro)', async () => {
     const respuesta = await request(app)
       .post('/api/usuarios')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({
         nombreCompleto: 'Vet Nuevo',
         correo: 'vet@correo.com',
@@ -86,7 +86,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
 
     const respuesta = await request(app)
       .post('/api/usuarios')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({
         nombreCompleto: 'Vet Nuevo',
         correo: 'vet@correo.com',
@@ -106,7 +106,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
   test('PATCH /api/usuarios/:id/rol rechaza un rol invalido', async () => {
     const respuesta = await request(app)
       .patch('/api/usuarios/u1/rol')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({ rol: 'superadmin' });
 
     expect(respuesta.status).toBe(400);
@@ -115,7 +115,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
   test('PATCH /api/usuarios/:id/rol exige sede para roles de personal', async () => {
     const respuesta = await request(app)
       .patch('/api/usuarios/u1/rol')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({ rol: 'veterinario' });
 
     expect(respuesta.status).toBe(400);
@@ -126,7 +126,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
 
     const respuesta = await request(app)
       .patch('/api/usuarios/no-existe/rol')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({ rol: 'cliente' });
 
     expect(respuesta.status).toBe(404);
@@ -137,7 +137,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
 
     const respuesta = await request(app)
       .patch('/api/usuarios/u1/rol')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({ rol: 'cliente' });
 
     expect(respuesta.status).toBe(200);
@@ -149,7 +149,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
 
     const respuesta = await request(app)
       .patch('/api/usuarios/otro-usuario')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({ activo: false });
 
     expect(respuesta.status).toBe(200);
@@ -159,7 +159,7 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
   test('PATCH /api/usuarios/:id rechaza que un admin se desactive a si mismo', async () => {
     const respuesta = await request(app)
       .patch('/api/usuarios/admin1')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({ activo: false });
 
     expect(respuesta.status).toBe(400);
@@ -170,9 +170,76 @@ describe('Rutas /api/usuarios (protegidas para administrador)', () => {
 
     const respuesta = await request(app)
       .patch('/api/usuarios/no-existe')
-      .set('Authorization', `Bearer ${tokenPara('administrador')}`)
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
       .send({ telefono: '3000000000' });
 
     expect(respuesta.status).toBe(404);
+  });
+});
+
+describe('Rutas /api/usuarios para el administrador de sede', () => {
+  beforeEach(() => jest.clearAllMocks());
+  const TOKEN_ADMIN = jwt.sign({ id: 'admin-sede', rol: 'administrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
+  const conToken = (peticion) => peticion.set('Authorization', 'Bearer ' + TOKEN_ADMIN);
+
+  test('puede listar clientes (para agendarles una cita)', async () => {
+    usuarioModel.listarTodos.mockResolvedValue([]);
+    const respuesta = await conToken(request(app).get('/api/usuarios').query({ rol: 'cliente' }));
+    expect(respuesta.status).toBe(200);
+    expect(usuarioModel.listarTodos).toHaveBeenCalledWith('cliente');
+  });
+
+  test('no puede listar al personal ni todas las cuentas', async () => {
+    const todas = await conToken(request(app).get('/api/usuarios'));
+    const medicos = await conToken(request(app).get('/api/usuarios').query({ rol: 'veterinario' }));
+    expect(todas.status).toBe(403);
+    expect(medicos.status).toBe(403);
+    expect(usuarioModel.listarTodos).not.toHaveBeenCalled();
+  });
+
+  test('no puede crear personal ni cambiar roles', async () => {
+    const crear = await conToken(request(app).post('/api/usuarios')).send({
+      nombreCompleto: 'X',
+      correo: 'x@udes.edu.co',
+      rol: 'administrador',
+      sedeId: 'sede-1',
+    });
+    const rol = await conToken(request(app).patch('/api/usuarios/u1/rol')).send({ rol: 'administrador', sedeId: 'sede-1' });
+    expect(crear.status).toBe(403);
+    expect(rol.status).toBe(403);
+    expect(usuarioModel.crearPersonal).not.toHaveBeenCalled();
+    expect(usuarioModel.actualizarRol).not.toHaveBeenCalled();
+  });
+
+  test('puede desactivar la cuenta de un cliente', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'c1', rol: 'cliente' });
+    usuarioModel.actualizarPerfil.mockResolvedValue({ id: 'c1', rol: 'cliente', activo: false });
+    const respuesta = await conToken(request(app).patch('/api/usuarios/c1')).send({ activo: false });
+    expect(respuesta.status).toBe(200);
+  });
+
+  test('no puede cambiar la cuenta de otro administrador ni de un medico', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'a2', rol: 'administrador' });
+    const respuesta = await conToken(request(app).patch('/api/usuarios/a2')).send({ activo: false });
+    expect(respuesta.status).toBe(403);
+    expect(usuarioModel.actualizarPerfil).not.toHaveBeenCalled();
+  });
+});
+
+describe('La cuenta del superadministrador no se toca desde el sistema', () => {
+  beforeEach(() => jest.clearAllMocks());
+  const conToken = (peticion) => peticion.set('Authorization', 'Bearer ' + tokenPara('superadministrador'));
+
+  test('no se puede asignar el rol superadministrador', async () => {
+    const respuesta = await conToken(request(app).patch('/api/usuarios/u1/rol')).send({ rol: 'superadministrador' });
+    expect(respuesta.status).toBe(400);
+    expect(usuarioModel.actualizarRol).not.toHaveBeenCalled();
+  });
+
+  test('no se puede cambiar el rol de un superadministrador', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 's2', rol: 'superadministrador' });
+    const respuesta = await conToken(request(app).patch('/api/usuarios/s2/rol')).send({ rol: 'cliente' });
+    expect(respuesta.status).toBe(403);
+    expect(usuarioModel.actualizarRol).not.toHaveBeenCalled();
   });
 });
