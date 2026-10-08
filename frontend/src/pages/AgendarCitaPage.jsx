@@ -7,8 +7,8 @@
 // Todo el estado de las selecciones vive aqui (no en cada pagina) para
 // que "Cambiar" en el resumen lateral regrese a una pagina sin perder
 // lo ya elegido en las demas.
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useBlocker, useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
 import { BookingStepper, BookingStepperLateral } from '../components/agendar/BookingStepper';
@@ -17,6 +17,7 @@ import { PaginaMascotaServicio } from '../components/agendar/PaginaMascotaServic
 import { PaginaSedeFecha } from '../components/agendar/PaginaSedeFecha';
 import { PaginaConfirmacion } from '../components/agendar/PaginaConfirmacion';
 import { DialogoSalirAgendar } from '../components/agendar/DialogoSalirAgendar';
+import { registrarGuardiaSalida } from '../utils/guardiaSalida';
 import { FormularioMascotaPanel } from '../components/cliente/FormularioMascotaPanel';
 import {
   obtenerMisMascotas,
@@ -146,15 +147,63 @@ export function AgendarCitaPage() {
     setFranja(null);
   }
 
-  // "Cancelar" (abajo, junto a Volver): si ya hay
-  // algo elegido mas alla de la mascota, se confirma antes de salir para
-  // no perder el progreso sin avisar.
-  const hayProgreso = pagina > 1 || Boolean(servicioId || fecha || franja || motivo.trim());
+  // Abandonar la cita a medias: si ya hay algo elegido mas alla de la
+  // mascota (y la cita aun no se creo), CUALQUIER intento de irse pide
+  // confirmar antes, para no perder el progreso sin avisar:
+  // - "Cancelar", enlaces de la topbar (Mis mascotas, Servicios, logo...),
+  //   el menu del perfil y el boton atras del navegador: los frena
+  //   useBlocker y se muestra DialogoSalirAgendar;
+  // - "Cerrar sesion" (recarga completa, no pasa por el router): pide
+  //   permiso por utils/guardiaSalida.js y se muestra el mismo dialogo;
+  // - recargar o cerrar la pestaña: aviso propio del navegador
+  //   (beforeunload), ahi no se puede mostrar un dialogo nuestro.
+  const hayProgreso = !citaCreada && (pagina > 1 || Boolean(servicioId || fecha || franja || motivo.trim()));
+  // true desde que el usuario confirma "Si, salir": deja pasar esa salida.
+  const salidaConfirmada = useRef(false);
+  // Salida que espera confirmacion y no es del router (cerrar sesion).
+  const salidaPendiente = useRef(null);
+
+  const bloqueo = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hayProgreso && !salidaConfirmada.current && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  useEffect(() => {
+    if (!hayProgreso) return undefined;
+    const quitarGuardia = registrarGuardiaSalida((accion) => {
+      salidaPendiente.current = accion;
+      setConfirmarSalida(true);
+    });
+    function alDescargar(evento) {
+      if (salidaConfirmada.current) return;
+      evento.preventDefault();
+      evento.returnValue = '';
+    }
+    window.addEventListener('beforeunload', alDescargar);
+    return () => {
+      quitarGuardia();
+      window.removeEventListener('beforeunload', alDescargar);
+    };
+  }, [hayProgreso]);
+
   function cancelarAgendamiento() {
-    if (hayProgreso) setConfirmarSalida(true);
+    // Con progreso, useBlocker frena esta navegacion y pide confirmar.
+    navigate('/panel');
+  }
+
+  const seguirAgendando = useCallback(() => {
+    salidaPendiente.current = null;
+    setConfirmarSalida(false);
+    if (bloqueo.state === 'blocked') bloqueo.reset();
+  }, [bloqueo]);
+
+  function salirSinAgendar() {
+    salidaConfirmada.current = true;
+    setConfirmarSalida(false);
+    if (bloqueo.state === 'blocked') bloqueo.proceed();
+    else if (salidaPendiente.current) salidaPendiente.current();
     else navigate('/panel');
   }
-  const seguirAgendando = useCallback(() => setConfirmarSalida(false), []);
 
   // Click en un paso de cualquiera de los dos steppers. Se puede ir a los
   // pasos ya hechos y a los de la pagina actual; a la pagina 2 desde la 1
@@ -346,7 +395,11 @@ export function AgendarCitaPage() {
         </main>
       </div>
 
-      <DialogoSalirAgendar abierto={confirmarSalida} onSeguir={seguirAgendando} onSalir={() => navigate('/panel')} />
+      <DialogoSalirAgendar
+        abierto={confirmarSalida || bloqueo.state === 'blocked'}
+        onSeguir={seguirAgendando}
+        onSalir={salirSinAgendar}
+      />
 
       <FormularioMascotaPanel
         isOpen={panelMascotaAbierto}
