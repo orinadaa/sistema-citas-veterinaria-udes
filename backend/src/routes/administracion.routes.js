@@ -5,6 +5,7 @@ const {
   listarMedicos,
   crearMedico,
   actualizarMedico,
+  subirFotoMedico,
   actualizarServiciosDeMedico,
   actualizarEspecialidadesDeMedico,
   listarCitas,
@@ -12,6 +13,7 @@ const {
   obtenerDetallePaciente,
 } = require('../controllers/administracion.controller');
 const { obtenerReporte } = require('../controllers/reportes.controller');
+const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
@@ -26,6 +28,9 @@ router.post('/medicos', verificarRol('administrador'), crearMedico);
 
 // PUT /api/administracion/medicos/:id — solo administrador
 router.put('/medicos/:id', verificarRol('administrador'), actualizarMedico);
+
+// POST /api/administracion/medicos/:id/foto — solo administrador (multipart, campo "foto")
+router.post('/medicos/:id/foto', verificarRol('administrador'), fotosUsuarios.middleware, subirFotoMedico);
 
 // PUT /api/administracion/medicos/:id/servicios — solo administrador
 router.put('/medicos/:id/servicios', verificarRol('administrador'), actualizarServiciosDeMedico);

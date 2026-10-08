@@ -307,3 +307,53 @@ export function crearBloqueoMedico(datos, token) {
 export function eliminarBloqueoMedico(id, token) {
   return solicitar(`/medico/disponibilidad/bloqueos/${id}`, { metodo: 'DELETE', token });
 }
+
+// Subida de archivos (multipart). No usa solicitar(): el navegador debe
+// poner el Content-Type con el boundary del FormData.
+async function subirArchivo(ruta, archivo, token, campos = {}) {
+  const datos = new FormData();
+  datos.append('foto', archivo, 'foto.jpg');
+  Object.entries(campos).forEach(([nombre, valor]) => datos.append(nombre, valor));
+  const respuesta = await fetch(`/api${ruta}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: datos,
+  });
+  const cuerpo = await respuesta.json().catch(() => ({}));
+  if (!respuesta.ok) throw new Error(cuerpo.mensaje || `Error inesperado (${respuesta.status})`);
+  return cuerpo;
+}
+
+// Fotos que el administrador sube como archivo (antes eran un enlace).
+export function subirFotoSede(id, archivo, token) {
+  return subirArchivo(`/sedes/${id}/foto`, archivo, token);
+}
+
+export function subirFotoMedicoAdmin(id, archivo, token) {
+  return subirArchivo(`/administracion/medicos/${id}/foto`, archivo, token);
+}
+
+// Galeria del inicio (fotos del Hero).
+export function obtenerGaleria() {
+  return solicitar('/galeria');
+}
+
+export function obtenerGaleriaAdmin(token) {
+  return solicitar('/galeria/admin', { token });
+}
+
+export function subirFotoGaleria(archivo, descripcion, token) {
+  return subirArchivo('/galeria', archivo, token, { descripcion });
+}
+
+export function actualizarFotoGaleria(id, datos, token) {
+  return solicitar(`/galeria/${id}`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function reordenarGaleria(ids, token) {
+  return solicitar('/galeria/orden', { metodo: 'PUT', cuerpo: { ids }, token });
+}
+
+export function eliminarFotoGaleria(id, token) {
+  return solicitar(`/galeria/${id}`, { metodo: 'DELETE', token });
+}

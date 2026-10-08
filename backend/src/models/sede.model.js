@@ -30,6 +30,18 @@ async function listarTodasAdmin() {
   return resultado.rows;
 }
 
+// Cambia la foto y devuelve la anterior (para borrar su archivo);
+// undefined si la sede no existe.
+async function actualizarFoto(id, fotoUrl) {
+  const resultado = await pool.query(
+    `UPDATE sede s SET foto_url = $2
+     FROM (SELECT id, foto_url AS anterior FROM sede WHERE id = $1) previo
+     WHERE s.id = previo.id RETURNING previo.anterior`,
+    [id, fotoUrl]
+  );
+  return resultado.rowCount === 0 ? undefined : resultado.rows[0].anterior;
+}
+
 async function buscarPorId(id) {
   const resultado = await pool.query(`SELECT ${CAMPOS} FROM sede WHERE id = $1`, [id]);
   return resultado.rows[0] || null;
@@ -98,4 +110,4 @@ async function actualizar(id, { nombre, ciudad, direccion, fotoUrl, activo, codi
   });
 }
 
-module.exports = { listarTodas, listarTodasAdmin, buscarPorId, crear, actualizar };
+module.exports = { listarTodas, listarTodasAdmin, buscarPorId, crear, actualizar, actualizarFoto };

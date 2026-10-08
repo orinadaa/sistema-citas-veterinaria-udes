@@ -16,6 +16,7 @@ const mascotaRoutes = require('./routes/mascota.routes');
 const horarioRoutes = require('./routes/horario.routes');
 const administracionRoutes = require('./routes/administracion.routes');
 const medicoRoutes = require('./routes/medico.routes');
+const galeriaRoutes = require('./routes/galeria.routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -23,7 +24,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Fotos subidas (mascotas): archivos estaticos, ver subirFoto.middleware.js.
+// Fotos subidas (mascotas, medicos, sedes, galeria): archivos estaticos, ver subirFoto.middleware.js.
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 app.use('/api/health', healthRoutes);
@@ -36,6 +37,7 @@ app.use('/api/mascotas', mascotaRoutes);
 app.use('/api/horarios', horarioRoutes);
 app.use('/api/administracion', administracionRoutes);
 app.use('/api/medico', medicoRoutes);
+app.use('/api/galeria', galeriaRoutes);
 
 app.get('/', (req, res) => {
   res.send('API del sistema de citas - Clinica Veterinaria UDES');

@@ -8,6 +8,7 @@
 // en el consecutivo de la cita, CV-BGA-2026-00045), sede principal y
 // amenidades (parqueadero, sala de espera pet friendly).
 const sedeModel = require('../models/sede.model');
+const { fotosSedes } = require('../middlewares/subirFoto.middleware');
 
 // 2 a 5 letras mayusculas, sin tildes (va dentro del codigo de la cita).
 const PATRON_CODIGO = /^[A-Z]{2,5}$/;
@@ -47,7 +48,7 @@ async function listarAdmin(req, res, next) {
 // POST /api/sedes — solo administrador
 async function crear(req, res, next) {
   try {
-    const { nombre, ciudad, direccion, fotoUrl, esPrincipal, tieneParqueadero, salaPetFriendly } = req.body;
+    const { nombre, ciudad, direccion, esPrincipal, tieneParqueadero, salaPetFriendly } = req.body;
     const codigo = normalizarCodigo(req.body.codigo);
     if (!nombre || !ciudad || !codigo) {
       return res.status(400).json({ mensaje: 'El nombre, la ciudad y el código de la sede son obligatorios.' });
@@ -56,7 +57,7 @@ async function crear(req, res, next) {
       return res.status(400).json({ mensaje: 'El código debe tener de 2 a 5 letras, sin tildes (ej. BGA).' });
     }
 
-    const sede = await sedeModel.crear({ nombre, ciudad, direccion, fotoUrl, codigo, esPrincipal, tieneParqueadero, salaPetFriendly });
+    const sede = await sedeModel.crear({ nombre, ciudad, direccion, codigo, esPrincipal, tieneParqueadero, salaPetFriendly });
     return res.status(201).json({ sede });
   } catch (error) {
     if (manejarDuplicado(error, res)) return undefined;
@@ -68,7 +69,7 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const { id } = req.params;
-    const { nombre, ciudad, direccion, fotoUrl, activo, esPrincipal, tieneParqueadero, salaPetFriendly } = req.body;
+    const { nombre, ciudad, direccion, activo, esPrincipal, tieneParqueadero, salaPetFriendly } = req.body;
     const codigo = normalizarCodigo(req.body.codigo);
     if (codigo !== undefined && !PATRON_CODIGO.test(codigo)) {
       return res.status(400).json({ mensaje: 'El código debe tener de 2 a 5 letras, sin tildes (ej. BGA).' });
@@ -78,7 +79,6 @@ async function actualizar(req, res, next) {
       nombre,
       ciudad,
       direccion,
-      fotoUrl,
       activo,
       codigo,
       esPrincipal,
@@ -96,4 +96,28 @@ async function actualizar(req, res, next) {
   }
 }
 
-module.exports = { listar, listarAdmin, crear, actualizar };
+// POST /api/sedes/:id/foto — solo administrador (multipart, campo "foto").
+// La foto de la sede se sube como archivo (backend/uploads/sedes); ya no
+// se escribe un enlace a mano.
+async function subirFoto(req, res, next) {
+  const archivoNuevo = req.file ? `${fotosSedes.rutaPublica}/${req.file.filename}` : null;
+  try {
+    if (!archivoNuevo) {
+      return res.status(400).json({ mensaje: 'Adjunta una imagen JPG o PNG en el campo "foto".' });
+    }
+    const anterior = await sedeModel.actualizarFoto(req.params.id, archivoNuevo);
+    if (anterior === undefined) {
+      await fotosSedes.borrar(archivoNuevo);
+      return res.status(404).json({ mensaje: 'Sede no encontrada.' });
+    }
+    await fotosSedes.borrar(anterior);
+    return res.status(200).json({ fotoUrl: archivoNuevo });
+  } catch (error) {
+    await fotosSedes.borrar(archivoNuevo);
+    // 22P02: el id de la ruta no es un UUID valido.
+    if (error.code === '22P02') return res.status(404).json({ mensaje: 'Sede no encontrada.' });
+    next(error);
+  }
+}
+
+module.exports = { listar, listarAdmin, crear, actualizar, subirFoto };
