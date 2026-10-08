@@ -91,7 +91,7 @@ export function AdminSidebar({ activo, onCambiar }) {
   return (
     <aside
       className={`vidrio hidden max-h-full shrink-0 flex-col overflow-y-auto transition-[width,border-radius] duration-200 lg:flex ${
-        colapsado ? 'h-[80%] self-center rounded-[38px] py-4' : 'h-full rounded-superficie py-6'
+        colapsado ? 'h-[95%] self-center rounded-[38px] py-4' : 'h-full rounded-superficie py-6'
       }`}
       style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO }}
     >
