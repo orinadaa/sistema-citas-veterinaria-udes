@@ -29,6 +29,7 @@ import { KPICard } from '../ui/KPICard';
 import { DataTable } from '../ui/DataTable';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoCalendario, IconoJeringa, IconoMedicos, IconoPersona } from '../icons';
+import { Desplegable } from '../form/Desplegable';
 
 // Orden categorico fijo (mismo set que las categorias de servicio, ver
 // CategoryBadge.jsx), reutilizado aqui para identificar sedes: nunca
@@ -185,10 +186,10 @@ export function PanelReportes() {
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-slate-500">Sede</label>
-          <select
+          <Desplegable
             value={sedeId}
             onChange={(e) => setSedeId(e.target.value)}
-            className="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none"
+            className="campo px-3 py-2 text-sm"
           >
             <option value="">Todas las sedes</option>
             {sedes.map((s) => (
@@ -196,7 +197,7 @@ export function PanelReportes() {
                 {s.nombre}
               </option>
             ))}
-          </select>
+          </Desplegable>
         </div>
         {/* Rango del reporte: cada extremo limita al otro para que no se
             pueda elegir un "hasta" anterior al "desde". */}

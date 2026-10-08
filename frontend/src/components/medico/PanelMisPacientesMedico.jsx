@@ -22,9 +22,11 @@ import { DetallePacienteMedicoPanel } from './DetallePacienteMedicoPanel';
 import { AgendarCitaMedicoPanel } from './AgendarCitaMedicoPanel';
 import { CrearRecordatorioPanel } from './CrearRecordatorioPanel';
 import { IconoBuscar, IconoCalendario, IconoCampana, IconoCorazon, IconoPata, IconoPersona, IconoPuntos } from '../icons';
+import { Desplegable } from '../form/Desplegable';
+import { CampoBusqueda } from '../form/CampoBusqueda';
 
 const CLASE_FILTRO =
-  'rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30';
+  'campo px-3 py-2 text-sm';
 
 function MenuFila({ opciones }) {
   const [abierto, setAbierto] = useState(false);
@@ -146,27 +148,26 @@ export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[220px] flex-1">
             <IconoBuscar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              type="search"
+            <CampoBusqueda
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Buscar dueño o mascota..."
               className={`${CLASE_FILTRO} w-full pl-9`}
             />
           </div>
-          <select aria-label="Sede" value={sedeId} onChange={(e) => setSedeId(e.target.value)} className={CLASE_FILTRO}>
+          <Desplegable aria-label="Sede" value={sedeId} onChange={(e) => setSedeId(e.target.value)} className={CLASE_FILTRO}>
             <option value="">Todas las sedes</option>
             {sedes.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.ciudad}
               </option>
             ))}
-          </select>
-          <select aria-label="Estado" value={estado} onChange={(e) => setEstado(e.target.value)} className={CLASE_FILTRO}>
+          </Desplegable>
+          <Desplegable aria-label="Estado" value={estado} onChange={(e) => setEstado(e.target.value)} className={CLASE_FILTRO}>
             <option value="todos">Todos los estados</option>
             <option value="activo">Activos</option>
             <option value="inactivo">Inactivos</option>
-          </select>
+          </Desplegable>
           {hayFiltros && (
             <button
               type="button"

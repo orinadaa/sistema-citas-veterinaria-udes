@@ -21,6 +21,7 @@ import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoSede } from '../icons';
+import { CampoHora } from '../form/CampoHora';
 
 const DIAS = [
   { numero: 1, letra: 'L', nombre: 'Lunes' },
@@ -388,22 +389,20 @@ export function PanelHorarios() {
                   <span className="w-24 shrink-0 text-sm text-slate-600">{dia.nombre}</span>
                   {dia.abierto ? (
                     <>
-                      <input
-                        type="time"
+                      <CampoHora
                         value={dia.horaInicio}
                         onChange={(e) =>
                           setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, horaInicio: e.target.value } : d)))
                         }
-                        className="rounded-lg border border-slate-300 px-2 py-1 text-sm focus:border-brand-blue focus:outline-none"
+                        className="campo px-2 py-1 text-sm"
                       />
                       <span className="text-xs text-slate-400">a</span>
-                      <input
-                        type="time"
+                      <CampoHora
                         value={dia.horaFin}
                         onChange={(e) =>
                           setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, horaFin: e.target.value } : d)))
                         }
-                        className="rounded-lg border border-slate-300 px-2 py-1 text-sm focus:border-brand-blue focus:outline-none"
+                        className="campo px-2 py-1 text-sm"
                       />
                       <button
                         type="button"

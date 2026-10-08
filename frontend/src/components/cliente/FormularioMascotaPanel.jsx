@@ -62,7 +62,7 @@ function formDesdeMascota(mascota) {
 }
 
 const CLASE_TEXTAREA =
-  'rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30';
+  'campo px-3 py-2 text-sm';
 
 function AreaTexto({ id, label, value, onChange, placeholder }) {
   return (

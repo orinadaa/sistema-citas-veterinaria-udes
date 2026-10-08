@@ -27,6 +27,8 @@ import { SelectorMedico } from '../citas/SelectorMedico';
 import { MascotaSelector } from '../citas/MascotaSelector';
 import { IconoFlechaDerecha, IconoPata } from '../icons';
 import { EstadoError } from '../ui/EstadoError';
+import { Desplegable } from '../form/Desplegable';
+import { CampoBusqueda } from '../form/CampoBusqueda';
 
 const FORM_VACIO = { clienteId: '', servicioId: '', fecha: '', franja: null, medicoId: '', mascotaId: '', motivo: '' };
 
@@ -350,18 +352,16 @@ export function PanelCitasSeguimiento() {
               <label htmlFor="cliente-cita" className="text-sm font-medium text-slate-700">
                 Cliente<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
               </label>
-              <input
-                type="search"
+              <CampoBusqueda
                 placeholder="Buscar cliente por nombre..."
                 value={busquedaCliente}
                 onChange={(e) => setBusquedaCliente(e.target.value)}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
               />
-              <select
+              <Desplegable
                 id="cliente-cita"
                 value={formNueva.clienteId}
                 onChange={(e) => setFormNueva({ ...formNueva, clienteId: e.target.value, mascotaId: '' })}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+                className="campo px-3 py-2 text-sm"
               >
                 <option value="">Selecciona un cliente</option>
                 {clientesFiltrados.map((c) => (
@@ -369,18 +369,18 @@ export function PanelCitasSeguimiento() {
                     {c.nombre_completo} ({c.correo})
                   </option>
                 ))}
-              </select>
+              </Desplegable>
             </div>
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="servicio-cita-admin" className="text-sm font-medium text-slate-700">
                 Servicio<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
               </label>
-              <select
+              <Desplegable
                 id="servicio-cita-admin"
                 value={formNueva.servicioId}
                 onChange={(e) => setFormNueva({ ...formNueva, servicioId: e.target.value, franja: null, medicoId: '' })}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+                className="campo px-3 py-2 text-sm"
               >
                 <option value="">Selecciona un servicio</option>
                 {servicios.map((s) => (
@@ -388,7 +388,7 @@ export function PanelCitasSeguimiento() {
                     {s.nombre}
                   </option>
                 ))}
-              </select>
+              </Desplegable>
             </div>
 
             {/* Mismo calendario y selector de horas del flujo de agendar del

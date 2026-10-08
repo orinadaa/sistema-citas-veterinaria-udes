@@ -25,6 +25,8 @@ import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoMedicos } from '../icons';
+import { Desplegable } from '../form/Desplegable';
+import { CampoBusqueda } from '../form/CampoBusqueda';
 
 const FORM_VACIO = {
   nombreCompleto: '',
@@ -277,17 +279,16 @@ export function PanelMedicos({ busquedaInicial }) {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <input
-          type="search"
+        <CampoBusqueda
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           placeholder="Buscar médico..."
-          className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+          className="flex-1"
         />
-        <select
+        <Desplegable
           value={filtroEspecialidad}
           onChange={(e) => setFiltroEspecialidad(e.target.value)}
-          className="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none"
+          className="campo px-3 py-2 text-sm"
         >
           <option value="">Todas las especialidades</option>
           {categorias.map((c) => (
@@ -295,16 +296,16 @@ export function PanelMedicos({ busquedaInicial }) {
               {c.nombre}
             </option>
           ))}
-        </select>
-        <select
+        </Desplegable>
+        <Desplegable
           value={filtroEstado}
           onChange={(e) => setFiltroEstado(e.target.value)}
-          className="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none"
+          className="campo px-3 py-2 text-sm"
         >
           <option value="">Todos los estados</option>
           <option value="activo">Activo</option>
           <option value="inactivo">Inactivo</option>
-        </select>
+        </Desplegable>
       </div>
 
       {cargando ? (
@@ -513,7 +514,7 @@ export function PanelMedicos({ busquedaInicial }) {
               maxLength={500}
               onChange={(e) => setForm({ ...form, biografia: e.target.value })}
               rows={4}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="campo px-3 py-2 text-sm"
             />
           </div>
 

@@ -17,6 +17,7 @@ import { SidePanel } from '../ui/SidePanel';
 import { CampoFecha } from '../form/CampoFecha';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { IconoCampana, IconoCheck, IconoDesparasitacion, IconoEstetoscopio, IconoJeringa, IconoPastilla } from '../icons';
+import { CampoHora } from '../form/CampoHora';
 
 const TIPOS = [
   { id: 'medicacion', titulo: 'Medicación', descripcion: 'Dosis o tratamiento', icono: IconoPastilla, sugerido: (n) => `Dar medicación a ${n}` },
@@ -28,7 +29,7 @@ const TIPOS = [
 const ETIQUETA_TIPO = Object.fromEntries(TIPOS.map((t) => [t.id, t.titulo]));
 const MAX_DESCRIPCION = 300;
 const CLASE_CAMPO =
-  'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30';
+  'w-full campo px-3 py-2 text-sm';
 
 const formatoFecha = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
 function fechaLegible(texto) {
@@ -232,7 +233,7 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
                 <label htmlFor="hora-recordatorio" className="text-sm font-medium text-slate-700">
                   Hora<span className="ml-0.5 text-red-500">*</span>
                 </label>
-                <input id="hora-recordatorio" type="time" value={hora} onChange={(e) => setHora(e.target.value)} className={CLASE_CAMPO} />
+                <CampoHora id="hora-recordatorio" value={hora} onChange={(e) => setHora(e.target.value)} className={CLASE_CAMPO} />
               </div>
             </div>
           </div>

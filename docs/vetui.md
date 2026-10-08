@@ -175,8 +175,24 @@ Tamaños: `sm`, `md` (por defecto), `lg`, `icono`. Deshabilitado: 50 % de opacid
 
 ### Formulario
 
-- `CampoTexto`, `AreaTexto` (con `Etiqueta`): para superficies de vidrio. Campo casi blanco con texto oscuro, etiqueta blanca, foco con anillo ámbar.
-- Dentro de un `PanelLateral` se usan los campos de `form/Campo.jsx` (oscuros sobre claro).
+**Ningún control usa el aspecto que le pone el navegador.** Todos comparten borde, radio (12 px), fuente y foco (borde azul de marca + anillo ámbar). Se pueden probar en `/vetui`, bloque "Campos de formulario".
+
+| Necesidad | Componente (`components/form/`) | Reemplaza a |
+|---|---|---|
+| Texto, correo, clave, número | `Campo` (etiqueta + campo + error) | `<input>` suelto |
+| Lista de opciones | `Desplegable` | `<select>` |
+| Hora | `CampoHora` (cada 30 min, "8:00 a. m.") | `<input type="time">` |
+| Fecha | `CampoFecha` (calendario de agendar) | `<input type="date">` |
+| Búsqueda | `CampoBusqueda` (lupa + X para borrar) | `<input type="search">` |
+| Texto largo | `<textarea className="campo ...">` (crece con el contenido) | área de texto con esquina para estirar |
+| Deslizador | `<input type="range">` (estilo global: riel fino, perilla ámbar) | deslizador gris |
+| Casilla | `<input type="checkbox" className="casilla">` | casilla del navegador |
+| Pocas opciones fijas | botones: `SelectorSexo`, `SelectorCategoria`, `SelectorEspecieRaza` | desplegable |
+
+- **`campo`** (clase, `styles/vetui.css`): el aspecto único de todo campo sobre superficies claras. Solo define el aspecto; el tamaño va con utilidades (`px-3 py-2 text-sm`). Estados: reposo, hover, foco, inválido (`aria-invalid`) y deshabilitado. No se escriben a mano `border`, `rounded-*` ni `focus:ring-*` en un campo.
+- **`Desplegable`** se usa igual que un `<select>` (hijos `<option>`, `value`, `onChange` con `e.target.value`). La lista es una tarjeta flotante con la opción elegida en azul y con check; se maneja con mouse o teclado (flechas, Inicio/Fin, Enter, Escape, escribir letras). Se dibuja en `<body>` para que no la recorte un panel.
+- Sobre vidrio oscuro: `CampoTexto` y `AreaTexto` de `vetui/Formulario.jsx` (clase `campo-vetui`, etiqueta blanca).
+- Excepción: el buscador global del encabezado del administrador conserva su caja gris propia.
 
 ### Topbar (Navbar.jsx)
 

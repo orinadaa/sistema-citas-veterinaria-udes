@@ -28,6 +28,7 @@ import { FotoMascotaModal } from '../cliente/FotoMascotaModal';
 import { ZonaFoto } from '../form/ZonaFoto';
 import { PanelDisponibilidadMedico } from './PanelDisponibilidadMedico';
 import { IconoCalendario, IconoCamara, IconoCorreo, IconoEstetoscopio, IconoPata, IconoPersona, IconoReloj, IconoSede } from '../icons';
+import { Desplegable } from '../form/Desplegable';
 
 const TABS = [
   { id: 'personal', label: 'Información personal', icon: IconoPersona },
@@ -42,7 +43,7 @@ const ANIOS_EXPERIENCIA = [
   { valor: '10+', etiqueta: 'Más de 10 años' },
 ];
 const CLASE_CAMPO =
-  'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30';
+  'w-full campo px-3 py-2 text-sm';
 
 function Tarjeta({ titulo, children, className = '' }) {
   return (
@@ -542,7 +543,7 @@ export function PanelMiPerfilMedico() {
                     <label htmlFor="perfil-experiencia" className="text-sm font-medium text-slate-700">
                       Años de experiencia
                     </label>
-                    <select
+                    <Desplegable
                       id="perfil-experiencia"
                       value={profesional.aniosExperiencia}
                       onChange={(e) => setProfesional({ ...profesional, aniosExperiencia: e.target.value })}
@@ -554,7 +555,7 @@ export function PanelMiPerfilMedico() {
                           {a.etiqueta}
                         </option>
                       ))}
-                    </select>
+                    </Desplegable>
                   </div>
                 </div>
                 <AreaConContador
