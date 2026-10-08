@@ -32,10 +32,10 @@ input[type="password"]::-ms-clear {
    viewport.
    - slide-card: las tarjetas (TarjetaSlide) suben deslizandose y se
      agrandan al entrar, y se desvanecen al salir. La salida termina antes
-     (exit 45%) que la del contenido: en la ultima slide (cierre + footer)
-     la pagina no alcanza a bajar hasta el inicio del cierre y el final
-     de la tarjeta de Horarios quedaria asomandose arriba.
-   - slide-contenido: el contenido de Sedes, Horarios y el cierre aparece
+     (exit 45%) que la del contenido. La ultima (slide-card-ultima) no
+     tiene salida: debajo solo queda el footer, y la tarjeta sigue a la
+     vista cuando se baja hasta el.
+   - slide-contenido: el contenido de las secciones aparece
      con un fundido al entrar y se desvanece al salir.
    - slide-sale: solo salida (el Hero, que ya esta visible al cargar).
    Navegadores sin soporte o con reduced-motion: todo queda visible y
@@ -72,6 +72,14 @@ input[type="password"]::-ms-clear {
       animation: slide-card-entra linear both, slide-sale linear both;
       animation-timeline: view(), view();
       animation-range: entry 0% entry 100%, exit 0% exit 45%;
+    }
+    /* Ultima seccion (Horarios): solo entra. Despues viene el footer, que
+       es bajo; al bajar hasta el la tarjeta sigue a la vista y no debe
+       quedar a medio desvanecer. */
+    .slide-card-ultima {
+      animation: slide-card-entra linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
     }
     .slide-contenido {
       animation: slide-entra linear both, slide-sale linear both;
