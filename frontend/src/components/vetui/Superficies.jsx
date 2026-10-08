@@ -36,18 +36,38 @@ const HALOS = [
   `radial-gradient(ellipse 30% 25% at 70% 60%, ${color('brand-blue-600', 50)} 0%, transparent 72%)`,
 ].join(', ');
 
-export function FondoVetui({ children, className = '' }) {
+// Fondo del panel administrativo y del medico (pedido de Oriana): el azul
+// del Hero del landing (brand-blue-500 -> brand-blue-800) con mas toques
+// ambar y manchas de azul oscuro. Ahi nada va directo sobre el fondo: todo
+// vive en piezas de vidrio, que son las que garantizan el contraste.
+const HALOS_PANEL = [
+  `radial-gradient(ellipse 34% 30% at 96% 4%, ${color('brand-amber', 60)} 0%, ${color('brand-amber', 18)} 50%, transparent 74%)`,
+  `radial-gradient(ellipse 30% 34% at 2% 96%, ${color('brand-amber', 62)} 0%, ${color('brand-amber', 20)} 48%, transparent 74%)`,
+  `radial-gradient(ellipse 24% 22% at 58% 100%, ${color('brand-amber', 42)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 20% 22% at 30% 0%, ${color('brand-amber', 30)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 42% 40% at 6% 18%, ${color('brand-blue-800', 85)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 40% 42% at 92% 70%, ${color('brand-navy', 85)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 36% 30% at 48% 48%, ${color('brand-blue-800', 60)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 34% 32% at 70% 22%, ${color('brand-blue-400', 50)} 0%, transparent 72%)`,
+].join(', ');
+
+const DEGRADADO = 'bg-[linear-gradient(to_bottom,var(--color-brand-blue-600)_0,var(--color-brand-blue-700)_16rem,var(--color-brand-blue-800)_32rem)]';
+const DEGRADADO_PANEL = 'bg-gradient-to-b from-brand-blue-500 to-brand-blue-800';
+
+// variante="panel": el fondo del panel administrativo / medico.
+export function FondoVetui({ children, className = '', variante = 'app' }) {
+  const esPanel = variante === 'panel';
   return (
     // isolate: los halos (-z-10) quedan detrás del contenido pero dentro
     // de la página. overflow-clip (no hidden): recorta sin crear un
     // contenedor de scroll, así la topbar sticky sigue funcionando.
     <div
-      className={`relative isolate min-h-screen overflow-clip bg-[linear-gradient(to_bottom,var(--color-brand-blue-600)_0,var(--color-brand-blue-700)_16rem,var(--color-brand-blue-800)_32rem)] ${className}`}
+      className={`relative isolate min-h-screen overflow-clip ${esPanel ? DEGRADADO_PANEL : DEGRADADO} ${className}`}
     >
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
         <div
           className="absolute -inset-[10%] animate-halo-deriva motion-reduce:animate-none"
-          style={{ backgroundImage: HALOS }}
+          style={{ backgroundImage: esPanel ? HALOS_PANEL : HALOS }}
         />
       </div>
       {children}

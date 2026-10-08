@@ -8,6 +8,10 @@
 // (sin "variante navy": decision de la usuaria) con su propio set de
 // items (ITEMS_MEDICO).
 //
+// Material: vidrio que desenfoca el fondo. Contraido queda como una pildora
+// flotante (igual que la pildora de la topbar del cliente) que abraza sus
+// iconos; expandido es un panel de alto completo.
+//
 // Se puede expandir/contraer (solo iconos); el estado se recuerda entre
 // sesiones. El ancho es fijo dentro de cada estado (no cambia con el
 // contenido de la pagina): lo controla PanelAdminPage con un layout de
@@ -77,7 +81,9 @@ export function AdminSidebar({ activo, onCambiar }) {
 
   return (
     <aside
-      className="vidrio hidden h-full shrink-0 flex-col overflow-y-auto rounded-superficie py-6 transition-[width] duration-200 lg:flex"
+      className={`vidrio hidden max-h-full shrink-0 flex-col overflow-y-auto transition-[width,border-radius] duration-200 lg:flex ${
+        colapsado ? 'self-start rounded-[38px] py-4' : 'h-full rounded-superficie py-6'
+      }`}
       style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO }}
     >
       <div className={`flex items-center px-4 ${colapsado ? 'justify-center' : 'justify-end'}`}>
@@ -99,7 +105,7 @@ export function AdminSidebar({ activo, onCambiar }) {
         )}
       </div>
 
-      <nav className="mt-8 flex flex-1 flex-col gap-1 px-4">
+      <nav className={`flex flex-1 flex-col gap-1 px-4 ${colapsado ? 'mt-5' : 'mt-8'}`}>
         {items.map((item) => {
           const Icono = item.icono;
           const esActivo = activo === item.id;
@@ -109,8 +115,8 @@ export function AdminSidebar({ activo, onCambiar }) {
               type="button"
               onClick={() => onCambiar(item.id)}
               title={colapsado ? item.etiqueta : undefined}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                colapsado ? 'justify-center px-0' : ''
+              className={`flex items-center gap-3 text-sm font-medium transition ${
+                colapsado ? 'h-11 w-11 justify-center rounded-full' : 'rounded-boton px-4 py-2.5'
               } ${esActivo ? 'bg-brand-amber text-brand-navy' : 'hover-texto-ilumina text-white/80 hover:bg-white/15 hover:text-white'}`}
             >
               <Icono className="h-5 w-5 shrink-0" />
