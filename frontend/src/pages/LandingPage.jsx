@@ -34,7 +34,7 @@ export function LandingPage() {
   }, [hash]);
 
   return (
-    <div data-fondo-oscuro className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main>
         {/* Hero, Servicios, Sedes, Horarios y la banda de cierre comparten un
