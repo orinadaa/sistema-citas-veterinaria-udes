@@ -17,6 +17,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { ZonaImagen } from '../form/ZonaImagen';
 import { SelectorEncuadre } from '../form/SelectorEncuadre';
+import { SelectorCategoria } from '../form/SelectorCategoria';
 import { fondoEsClaro } from '../../utils/imagen';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
@@ -367,50 +368,7 @@ export function PanelServicios({ busquedaInicial }) {
       }
     >
         <form id="form-servicio" onSubmit={guardar} className="flex flex-col gap-4">
-          {servicioEditando && (
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                <IconoJeringa className="h-5 w-5" peso="duotone" />
-              </span>
-              <CategoryBadge nombre={servicioEditando.categoria_nombre} color={servicioEditando.categoria_color} />
-            </div>
-          )}
-
-          <Campo id="nombre-servicio" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="categoria-servicio" className="text-sm font-medium text-slate-700">
-              Categoría<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
-            </label>
-            <select
-              id="categoria-servicio"
-              value={form.categoriaId}
-              onChange={(e) => setForm({ ...form, categoriaId: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
-            >
-              <option value="">Selecciona una categoría</option>
-              {categorias.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="descripcion-servicio" className="text-sm font-medium text-slate-700">
-              Descripción (opcional)
-            </label>
-            <textarea
-              id="descripcion-servicio"
-              value={form.descripcion}
-              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-              rows={3}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
-            />
-          </div>
-
-          {/* Foto del servicio en la pagina publica. */}
+          {/* Foto del servicio en la pagina publica: lo primero del formulario. */}
           <fieldset className="flex flex-col gap-3 rounded-xl border border-slate-200 p-3">
             <legend className="px-1 text-sm font-medium text-slate-700">Foto en la página de inicio (opcional)</legend>
             <ZonaImagen
@@ -463,6 +421,29 @@ export function PanelServicios({ busquedaInicial }) {
               </p>
             )}
           </fieldset>
+
+          <Campo id="nombre-servicio" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
+
+          <SelectorCategoria
+            id="categoria-servicio"
+            categorias={categorias}
+            valor={form.categoriaId}
+            onChange={(categoriaId) => setForm({ ...form, categoriaId })}
+            requerido
+          />
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="descripcion-servicio" className="text-sm font-medium text-slate-700">
+              Descripción (opcional)
+            </label>
+            <textarea
+              id="descripcion-servicio"
+              value={form.descripcion}
+              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+              rows={3}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+            />
+          </div>
 
           <Campo
             id="precio-servicio"
