@@ -49,7 +49,7 @@ export function PanelAdminPage() {
 
         <div className="relative min-h-0 flex-1">
           <div aria-hidden="true" className="cristal absolute inset-0 rounded-superficie" />
-          <main className="relative h-full overflow-y-auto rounded-superficie px-6 py-8 sm:px-8">
+          <main className="hoja-panel relative h-full overflow-y-auto rounded-superficie px-6 py-8 sm:px-8">
           {esAdministrador && pestana === 'citas' && <PanelCitasSeguimiento />}
           {esAdministrador && pestana === 'servicios' && <PanelServicios busquedaInicial={busquedaPorPestana.servicios} />}
           {esAdministrador && pestana === 'medicos' && <PanelMedicos busquedaInicial={busquedaPorPestana.medicos} />}
