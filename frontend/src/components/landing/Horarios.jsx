@@ -6,12 +6,13 @@
 // - la foto de la sede arriba (sede.foto_url, la misma del admin y de la
 //   seccion Sedes), fundida hacia el color de la sede, con un circulo con
 //   el icono de sede y el nombre y la ciudad en grande sobre la foto;
-// - un dia por fila: abreviatura en una pildora del color de la sede y la
-//   hora a la derecha; los dias sin atencion llevan "Cerrado" en rojo;
-// - una franja final "¿Necesitas una cita?" que lleva a agendar con esa
-//   sede ya elegida (/agendar?sedeId=...).
-// Arriba a la derecha, el aviso de que todas las sedes atienden con cita
-// previa; de fondo, motivos muy tenues (huella, linea punteada, reloj).
+// - un dia por fila, en un bloque centrado dentro de la tarjeta: abreviatura
+//   en una pildora del color de la sede y la hora pegada a su lado; los dias
+//   sin atencion llevan "Cerrado" en rojo;
+// - al final, "Agendar cita" como enlace de solo texto con icono de
+//   calendario, que lleva a agendar con esa sede ya elegida
+//   (/agendar?sedeId=...).
+// De fondo, motivos muy tenues (huella, linea punteada, reloj).
 //
 // El color se asigna por orden (la primera azul, la segunda ambar, y se
 // repite), no por nombre de ciudad: el sistema soporta sedes nuevas
@@ -26,7 +27,7 @@ import { obtenerSedes, obtenerHorarios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { detalleHorarioPorDia } from '../../utils/horarioTexto';
-import { IconoAlerta, IconoDestello, IconoFlechaDerecha, IconoPata, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
+import { IconoAlerta, IconoCalendario, IconoPata, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
 import { SectionHeading } from './SectionHeading';
 import { HalosAmbientales } from './HalosAmbientales';
 import { TarjetaSlide } from './TarjetaSlide';
@@ -44,8 +45,6 @@ const ACENTOS = [
     sinFoto: 'bg-[linear-gradient(135deg,var(--color-brand-blue-600),var(--color-brand-blue-800))]',
     circulo: 'bg-brand-blue-600 text-white',
     dia: 'bg-blue-100 text-brand-blue-800',
-    franja: 'bg-blue-50 ring-blue-200',
-    flecha: 'bg-brand-blue-700 text-white',
   },
   {
     // Ambar de marca
@@ -53,8 +52,6 @@ const ACENTOS = [
     sinFoto: 'bg-[linear-gradient(135deg,var(--color-brand-amber-600),var(--color-amber-900))]',
     circulo: 'bg-brand-amber text-slate-900',
     dia: 'bg-amber-100 text-amber-900',
-    franja: 'bg-amber-50 ring-amber-200',
-    flecha: 'bg-brand-amber text-slate-900',
   },
 ];
 
@@ -89,18 +86,18 @@ function TarjetaSede({ sede, horario, acento }) {
 
       {/* Un dia por fila; en pantallas bajas, dos columnas que se leen hacia
           abajo (lunes a jueves, viernes a domingo). */}
-      <ul className="grid flex-1 gap-x-6 gap-y-1.5 px-5 py-4 text-sm lg:[@media(max-height:860px)]:grid-flow-col lg:[@media(max-height:860px)]:grid-cols-2 lg:[@media(max-height:860px)]:grid-rows-4">
+      <ul className="mx-auto grid w-fit flex-1 content-center gap-x-10 gap-y-2 px-5 py-4 text-base lg:[@media(max-height:860px)]:grid-flow-col lg:[@media(max-height:860px)]:grid-cols-2 lg:[@media(max-height:860px)]:grid-rows-4">
         {dias.map((d) => {
           const cerrado = d.texto === 'Cerrado';
           return (
-            <li key={d.dia} className="flex items-center justify-between gap-3">
-              <span className={`inline-flex w-12 justify-center rounded-full py-0.5 text-xs font-semibold ${acento.dia}`}>
+            <li key={d.dia} className="flex items-center gap-4">
+              <span className={`inline-flex w-14 justify-center rounded-full py-0.5 text-sm font-semibold ${acento.dia}`}>
                 <abbr title={d.dia} className="no-underline">
                   {ABREVIATURA[d.dia] ?? d.dia}
                 </abbr>
               </span>
               {cerrado ? (
-                <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">Cerrado</span>
+                <span className="rounded-full bg-red-100 px-3 py-0.5 text-sm font-semibold text-red-800">Cerrado</span>
               ) : (
                 <span className="font-semibold tabular-nums text-slate-800">{d.texto}</span>
               )}
@@ -109,20 +106,15 @@ function TarjetaSede({ sede, horario, acento }) {
         })}
       </ul>
 
-      {/* Franja de accion: toda la franja es el enlace (area amplia); el
-          circulo de la flecha es su señal visual. */}
+      {/* Accion: enlace de solo texto e icono (sin pildora), lleva a agendar
+          con esta sede ya elegida. */}
       <Link
         to={rutaAgendarCita(estaAutenticado, null, sede.id)}
-        aria-label={`Agendar una cita en la sede ${nombre}`}
-        className={`hover-ilumina mx-4 mb-4 flex items-center justify-between gap-3 rounded-2xl px-4 py-3 ring-1 outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-700 ${acento.franja}`}
+        aria-label={`Agendar cita en la sede ${nombre}`}
+        className="boton-texto mx-auto mb-4 inline-flex items-center gap-2 rounded-boton px-3 py-1.5 text-base font-bold text-brand-blue-800 outline-none transition focus-visible:ring-2 focus-visible:ring-brand-blue-700"
       >
-        <span className="min-w-0">
-          <span className="block text-sm font-bold text-slate-900">¿Necesitas una cita?</span>
-          <span className="block text-xs text-slate-700">Agenda en línea de forma rápida y segura</span>
-        </span>
-        <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm ${acento.flecha}`}>
-          <IconoFlechaDerecha className="h-5 w-5" peso="bold" />
-        </span>
+        <IconoCalendario className="h-5 w-5" peso="bold" />
+        Agendar cita
       </Link>
     </article>
   );
@@ -171,16 +163,6 @@ export function Horarios() {
             titulo="Horarios de atención"
             subtitulo="Conoce nuestros horarios en cada sede y agenda tu cita fácilmente."
             sobreFondoOscuro
-            accion={
-              // Aviso (no es un boton): vidrio claro, texto blanco.
-              <p className="vidrio flex max-w-sm items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium text-white">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15">
-                  <IconoReloj className="h-5 w-5" />
-                </span>
-                <span>Todas nuestras sedes atienden con cita previa. ¡Te esperamos!</span>
-                <IconoDestello className="h-5 w-5 shrink-0 text-brand-amber" peso="fill" />
-              </p>
-            }
           />
 
           <div className="mx-auto mt-8 w-full max-w-5xl lg:mt-6">
