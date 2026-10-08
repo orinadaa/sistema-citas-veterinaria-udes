@@ -114,12 +114,22 @@ export function AdminHeader({ onNavegar }) {
   const hayResultados =
     resultados.pacientes.length + resultados.medicos.length + resultados.servicios.length + resultados.mascotas.length > 0;
 
+  const vistaPreviaAbierta = buscadorActivo && dropdownAbierto && terminoValido;
+
   return (
     <header
       className="relative z-30 flex shrink-0 items-center justify-between gap-4"
       style={{ height: '52px' }}
     >
-      <div ref={contenedorRef} className="relative max-w-md flex-1">
+      {/* Con la vista previa de resultados abierta, todo lo demas se desenfoca
+          (pedido de Oriana): solo quedan nitidos el buscador y sus resultados,
+          que van por encima de este velo. Un clic en el velo la cierra (lo
+          hace el mousedown fuera del contenedor). */}
+      {vistaPreviaAbierta && (
+        <div aria-hidden="true" className="fixed inset-0 z-40 bg-brand-blue-800/25 backdrop-blur-md" />
+      )}
+
+      <div ref={contenedorRef} className={`relative max-w-md flex-1 ${vistaPreviaAbierta ? 'z-50' : ''}`}>
         <div className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton px-5 text-white">
           <IconoBuscar className="h-4 w-4 shrink-0" />
           <input
@@ -136,7 +146,7 @@ export function AdminHeader({ onNavegar }) {
           />
         </div>
 
-        {buscadorActivo && dropdownAbierto && terminoValido && (
+        {vistaPreviaAbierta && (
           <div className="vidrio vidrio-hoja absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-superficie p-2">
             {buscando && <p className="px-4 py-2 text-sm text-white/85">Buscando...</p>}
 
