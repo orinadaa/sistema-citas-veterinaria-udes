@@ -49,7 +49,7 @@ export function PanelAdminPage() {
         <AdminHeader onNavegar={navegarDesdeBusqueda} />
 
         <div className="relative min-h-0 flex-1">
-          <div aria-hidden="true" className="vidrio absolute inset-0 rounded-superficie" />
+          <div aria-hidden="true" className="vidrio vidrio-hoja absolute inset-0 rounded-superficie" />
           <main className="hoja-panel relative h-full text-white overflow-y-auto rounded-superficie px-6 py-8 sm:px-8">
           {esAdministrador && pestana === 'citas' && <PanelCitasSeguimiento />}
           {esAdministrador && pestana === 'servicios' && <PanelServicios busquedaInicial={busquedaPorPestana.servicios} />}
