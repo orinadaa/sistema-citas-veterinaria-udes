@@ -16,7 +16,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { ZonaImagen } from '../form/ZonaImagen';
-import { SelectorEncuadre } from '../form/SelectorEncuadre';
+import { EncuadreModal } from '../form/EncuadreModal';
 import { SelectorCategoria } from '../form/SelectorCategoria';
 import { fondoEsClaro } from '../../utils/imagen';
 import { PageHeader } from '../ui/PageHeader';
@@ -26,7 +26,7 @@ import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
-import { IconoJeringa } from '../icons';
+import { IconoEncuadre, IconoJeringa, IconoPapelera } from '../icons';
 import { iconoDeServicio } from '../../utils/iconoServicio';
 import { formatearCOP } from '../../utils/moneda';
 
@@ -72,6 +72,9 @@ export function PanelServicios({ busquedaInicial }) {
   const [vistaPrevia, setVistaPrevia] = useState(null);
   const [fondoClaro, setFondoClaro] = useState(true);
   const [quitarFoto, setQuitarFoto] = useState(false);
+  // Ventana "Ajustar foto" (encuadre y descripcion): fuera del formulario,
+  // solo para quien quiera afinarla.
+  const [ajusteAbierto, setAjusteAbierto] = useState(false);
 
   useEffect(() => () => vistaPrevia && URL.revokeObjectURL(vistaPrevia), [vistaPrevia]);
 
@@ -79,6 +82,7 @@ export function PanelServicios({ busquedaInicial }) {
     setFoto(null);
     setVistaPrevia(null);
     setQuitarFoto(false);
+    setAjusteAbierto(false);
   }
 
   async function elegirFoto(blob) {
@@ -378,41 +382,38 @@ export function PanelServicios({ busquedaInicial }) {
               ayuda="Sube la foto que se verá en la sección Servicios del inicio"
               alt={form.nombre ? `Foto de ${form.nombre}` : 'Foto del servicio'}
               proporcion="aspect-[4/3]"
+              posicion={`${form.fotoFocoX}% ${form.fotoFocoY}%`}
             />
             {fotoMostrada ? (
               <>
-                <Campo
-                  id="foto-descripcion-servicio"
-                  label="Descripción de la foto (opcional)"
-                  value={form.fotoDescripcion}
-                  maxLength={200}
-                  onChange={(e) => setForm({ ...form, fotoDescripcion: e.target.value })}
-                  placeholder="Ej. Veterinaria vacunando a un perro"
-                />
-                <p className="-mt-1.5 text-xs text-slate-500">
-                  Di qué se ve en la foto: es lo que escuchan las personas que usan lector de pantalla.
+                {/* El encuadre y la descripcion se ajustan en una ventana
+                    aparte (EncuadreModal): la mayoria no necesita tocarlos. */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAjusteAbierto(true)}
+                    className="inline-flex items-center gap-2 rounded-boton border border-brand-blue px-3.5 py-2 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
+                  >
+                    <IconoEncuadre className="h-4 w-4" />
+                    Ajustar foto
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFoto(null);
+                      setVistaPrevia(null);
+                      setQuitarFoto(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-boton px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  >
+                    <IconoPapelera className="h-4 w-4" />
+                    Quitar foto
+                  </button>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Con “Ajustar foto” eliges qué parte se ve siempre y escribes su descripción.
+                  {foto && ' La foto se sube al guardar.'}
                 </p>
-                <SelectorEncuadre
-                  src={fotoMostrada}
-                  focoX={form.fotoFocoX}
-                  focoY={form.fotoFocoY}
-                  onCambiar={(foco) =>
-                    setForm((actual) => ({ ...actual, fotoFocoX: foco.focoX, fotoFocoY: foco.focoY }))
-                  }
-                  proporcionVista="aspect-square"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFoto(null);
-                    setVistaPrevia(null);
-                    setQuitarFoto(true);
-                  }}
-                  className="self-start rounded-boton px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                >
-                  Quitar foto
-                </button>
-                {foto && <p className="text-xs text-slate-500">La foto se sube al guardar.</p>}
               </>
             ) : (
               <p className="text-xs text-slate-500">
@@ -477,6 +478,25 @@ export function PanelServicios({ busquedaInicial }) {
           {error && <p className="text-sm text-red-600">{error}</p>}
         </form>
     </SidePanel>
+
+    <EncuadreModal
+      isOpen={ajusteAbierto && Boolean(fotoMostrada)}
+      onClose={() => setAjusteAbierto(false)}
+      titulo="Ajustar foto del servicio"
+      src={fotoMostrada}
+      focoX={form.fotoFocoX}
+      focoY={form.fotoFocoY}
+      descripcion={form.fotoDescripcion}
+      onAplicar={(ajuste) => {
+        setForm((actual) => ({
+          ...actual,
+          fotoFocoX: ajuste.focoX,
+          fotoFocoY: ajuste.focoY,
+          fotoDescripcion: ajuste.descripcion,
+        }));
+        setAjusteAbierto(false);
+      }}
+    />
     </>
   );
 }
