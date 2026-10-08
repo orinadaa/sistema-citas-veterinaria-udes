@@ -137,7 +137,7 @@ export function AdminHeader({ onNavegar }) {
         </div>
 
         {buscadorActivo && dropdownAbierto && terminoValido && (
-          <div className="vidrio-azul absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-superficie p-2">
+          <div className="vidrio absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-superficie p-2">
             {buscando && <p className="px-4 py-2 text-sm text-white/85">Buscando...</p>}
 
             {!buscando && !hayResultados && (
@@ -240,7 +240,7 @@ export function AdminHeader({ onNavegar }) {
           </button>
 
           {menuAbierto && (
-            <div className="vidrio-azul absolute right-0 top-full z-50 mt-2 w-full min-w-44 rounded-boton p-1.5">
+            <div className="vidrio absolute right-0 top-full z-50 mt-2 w-full min-w-44 rounded-boton p-1.5">
               <button
                 type="button"
                 onClick={salir}

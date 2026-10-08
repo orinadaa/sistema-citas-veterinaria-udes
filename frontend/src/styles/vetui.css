@@ -273,6 +273,21 @@
    blanco de antes no llegan a AA sobre el cristal. Se oscurecen un paso en
    toda la hoja, sin tocar cada pantalla (CSS sin capa: gana sobre las
    utilidades). */
+/* Tarjetas de la hoja (indicadores, tablas, calendario): blancas pero no
+   solidas, vidrio empañado flotante. No llevan backdrop-filter propio: lo
+   de atras ya es la hoja desenfocada, y un backdrop-filter por tarjeta
+   crearia contextos de apilamiento que taparian los desplegables de la
+   tarjeta de al lado. */
+.hoja-panel .rounded-2xl.bg-white {
+  background-color: rgb(255 255 255 / 0.74);
+  background-image: linear-gradient(to bottom, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 40%);
+  border-radius: 1.5rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 0 0 1px rgb(255 255 255 / 0.6),
+    var(--shadow-flotante);
+}
+
 .hoja-panel :where(.text-slate-400) {
   color: var(--color-slate-600);
 }

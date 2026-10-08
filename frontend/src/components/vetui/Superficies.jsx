@@ -41,13 +41,14 @@ const HALOS = [
 // ambar y manchas de azul oscuro. Ahi nada va directo sobre el fondo: todo
 // vive en piezas de vidrio, que son las que garantizan el contraste.
 const HALOS_PANEL = [
-  `radial-gradient(ellipse 34% 30% at 96% 4%, ${color('brand-amber', 60)} 0%, ${color('brand-amber', 18)} 50%, transparent 74%)`,
-  `radial-gradient(ellipse 30% 34% at 2% 96%, ${color('brand-amber', 62)} 0%, ${color('brand-amber', 20)} 48%, transparent 74%)`,
-  `radial-gradient(ellipse 24% 22% at 58% 100%, ${color('brand-amber', 42)} 0%, transparent 72%)`,
-  `radial-gradient(ellipse 20% 22% at 30% 0%, ${color('brand-amber', 30)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 46% 42% at 94% 6%, ${color('brand-amber', 92)} 0%, ${color('brand-amber', 45)} 45%, transparent 76%)`,
+  `radial-gradient(ellipse 46% 44% at 36% 100%, ${color('brand-amber', 95)} 0%, ${color('brand-amber', 48)} 45%, transparent 76%)`,
+  `radial-gradient(ellipse 36% 34% at 84% 100%, ${color('brand-amber', 80)} 0%, ${color('brand-amber', 30)} 50%, transparent 76%)`,
+  `radial-gradient(ellipse 30% 30% at 34% 0%, ${color('brand-amber', 65)} 0%, transparent 74%)`,
+  `radial-gradient(ellipse 28% 30% at 52% 46%, ${color('brand-amber-400', 55)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 22% 26% at 100% 58%, ${color('brand-amber', 70)} 0%, transparent 74%)`,
   `radial-gradient(ellipse 42% 40% at 6% 18%, ${color('brand-blue-800', 85)} 0%, transparent 72%)`,
   `radial-gradient(ellipse 40% 42% at 92% 70%, ${color('brand-navy', 85)} 0%, transparent 72%)`,
-  `radial-gradient(ellipse 36% 30% at 48% 48%, ${color('brand-blue-800', 60)} 0%, transparent 72%)`,
   `radial-gradient(ellipse 34% 32% at 70% 22%, ${color('brand-blue-400', 50)} 0%, transparent 72%)`,
 ].join(', ');
 
