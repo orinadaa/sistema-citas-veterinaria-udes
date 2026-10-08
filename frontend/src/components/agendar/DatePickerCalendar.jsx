@@ -32,7 +32,7 @@ const ANIOS_ADELANTE = 5;
 const TONOS = {
   claro: {
     titulo: 'text-brand-navy',
-    flecha: 'text-slate-500 hover:bg-slate-100',
+    flecha: 'boton-texto text-slate-500 hover:text-brand-blue-700',
     encabezado: 'text-brand-navy hover:text-brand-blue-600 hover:underline',
     encabezadoActivo: 'text-brand-blue-600 underline',
     // Tonos -600/-700: slate-400 y brand-blue (500) no llegaban a AA.
@@ -48,7 +48,7 @@ const TONOS = {
   },
   vidrio: {
     titulo: 'text-white',
-    flecha: 'text-blue-50 hover:bg-white/10',
+    flecha: 'boton-texto text-blue-50 hover:text-white',
     encabezado: 'text-white hover:underline',
     encabezadoActivo: 'text-brand-amber underline',
     semana: 'text-blue-100',

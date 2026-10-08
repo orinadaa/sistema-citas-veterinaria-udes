@@ -369,6 +369,7 @@
    - hover-ilumina: tarjetas clicables sobre fondo claro (brillo azul).
    - hover-ilumina-claro: tarjetas clicables sobre fondo oscuro (blanco).
    - hover-texto-ilumina: enlaces de texto sobre fondo oscuro.
+   - boton-texto: botones sin contenedor visible; brilla solo su contenido.
    --------------------------------------------------------------------- */
 .rounded-boton {
   --brillo: color-mix(in oklab, currentColor 45%, transparent);
@@ -385,6 +386,24 @@
 }
 .rounded-boton:not(:disabled):not([class*="boton-glass"]):hover {
   filter: brightness(1.08) drop-shadow(0 6px 14px var(--brillo));
+}
+
+/* Botones SIN contenedor visible (solo texto, solo icono, o icono + texto
+   sueltos: "Quitar foto", "Editar", la X de cerrar, flechas, la campana).
+   A la vista son solo su contenido, asi que el hover resalta solo eso: el
+   texto y el icono brillan en su propio color (rojo si es rojo, azul si es
+   azul). No se pinta ninguna forma detras: una pildora que aparece al
+   pasar el mouse sugiere un contenedor que el boton no tiene (regla de
+   Oriana). El area clicable sigue siendo la misma, con su relleno
+   transparente, y el foco de teclado conserva su anillo.
+   drop-shadow sigue la forma de las letras y del icono, no la caja. */
+.boton-texto {
+  background-color: transparent;
+}
+.boton-texto:not(:disabled):not([class*="boton-glass"]):hover {
+  background-color: transparent;
+  filter: drop-shadow(0 0 3px color-mix(in oklab, currentColor 80%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, currentColor 35%, transparent));
 }
 
 @utility hover-ilumina {
@@ -429,6 +448,7 @@
    prefers-reduced-motion. */
 @media (prefers-reduced-motion: no-preference) {
   .rounded-boton,
+  .boton-texto,
   .hover-ilumina,
   .hover-ilumina-claro,
   .hover-texto-ilumina {

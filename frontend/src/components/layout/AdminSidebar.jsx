@@ -85,7 +85,7 @@ export function AdminSidebar({ activo, onCambiar }) {
           type="button"
           onClick={alternarColapsado}
           title={colapsado ? 'Expandir menú' : 'Contraer menú'}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-boton text-white/70 transition hover:bg-white/15 hover:text-white"
+          className="flex h-8 w-8 shrink-0 items-center justify-center boton-texto rounded-boton text-white/70 transition hover:text-white"
         >
           <IconoFlechaDerecha className={`h-4 w-4 transition-transform duration-200 ${colapsado ? '' : 'rotate-180'}`} />
         </button>

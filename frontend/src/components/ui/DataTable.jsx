@@ -64,7 +64,7 @@ export function DataTable({ columns, rows, actions, filaVacia = 'No hay resultad
               type="button"
               disabled={pagina === 1}
               onClick={() => setPagina((p) => p - 1)}
-              className="rounded-boton px-2.5 py-1 font-medium text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
+              className="boton-texto rounded-boton px-2.5 py-1 font-medium text-slate-600 transition disabled:opacity-40"
             >
               Anterior
             </button>
@@ -72,7 +72,7 @@ export function DataTable({ columns, rows, actions, filaVacia = 'No hay resultad
               type="button"
               disabled={pagina === totalPaginas}
               onClick={() => setPagina((p) => p + 1)}
-              className="rounded-boton px-2.5 py-1 font-medium text-slate-600 transition hover:bg-slate-100 disabled:opacity-40"
+              className="boton-texto rounded-boton px-2.5 py-1 font-medium text-slate-600 transition disabled:opacity-40"
             >
               Siguiente
             </button>

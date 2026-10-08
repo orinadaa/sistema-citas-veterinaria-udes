@@ -190,10 +190,10 @@ export function PanelCitasSeguimiento() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={irSemanaAnterior} className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
+        <button type="button" onClick={irSemanaAnterior} className="boton-texto rounded-boton p-2 text-slate-500 transition">
           <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
         </button>
-        <button type="button" onClick={irSemanaSiguiente} className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
+        <button type="button" onClick={irSemanaSiguiente} className="boton-texto rounded-boton p-2 text-slate-500 transition">
           <IconoFlechaDerecha className="h-4 w-4" />
         </button>
         <button

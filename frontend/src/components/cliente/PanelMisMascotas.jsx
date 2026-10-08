@@ -97,7 +97,7 @@ export function PanelMisMascotas() {
                   type="button"
                   onClick={() => abrirEditar(mascota, { eliminar: true })}
                   aria-label={`Eliminar a ${mascota.nombre}`}
-                  className="rounded-boton p-2 text-slate-700 transition hover:bg-red-50 hover:text-red-700"
+                  className="boton-texto rounded-boton p-2 text-slate-700 transition hover:text-red-700"
                 >
                   <IconoPapelera className="h-4 w-4" />
                 </button>

@@ -247,7 +247,7 @@ export function PanelConfiguracion() {
                 <button
                   type="button"
                   onClick={() => abrirEditar(u)}
-                  className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+                  className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
                 >
                   Editar
                 </button>

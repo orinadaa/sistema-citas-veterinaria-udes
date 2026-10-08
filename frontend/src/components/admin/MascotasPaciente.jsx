@@ -96,7 +96,7 @@ function TarjetaMascota({ mascota, onEditar, accionesExtra = [] }) {
             onClick={() => setMenuAbierto((abierto) => !abierto)}
             aria-label={`Acciones para ${mascota.nombre}`}
             aria-expanded={menuAbierto}
-            className="rounded-boton p-1.5 text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+            className="boton-texto rounded-boton p-1.5 text-slate-400 transition hover:text-slate-600"
           >
             <IconoPuntos className="h-5 w-5" />
           </button>

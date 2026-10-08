@@ -332,7 +332,7 @@ export function PanelServicios({ busquedaInicial }) {
             <button
               type="button"
               onClick={() => abrirEditar(s)}
-              className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
             >
               Editar
             </button>
@@ -404,7 +404,7 @@ export function PanelServicios({ busquedaInicial }) {
                       setVistaPrevia(null);
                       setQuitarFoto(true);
                     }}
-                    className="inline-flex items-center gap-1.5 rounded-boton px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                    className="inline-flex items-center gap-1.5 boton-texto rounded-boton px-3 py-2 text-sm font-medium text-red-600 transition"
                   >
                     <IconoPapelera className="h-4 w-4" />
                     Quitar foto

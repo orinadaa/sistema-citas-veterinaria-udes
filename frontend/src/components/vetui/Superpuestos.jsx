@@ -49,7 +49,7 @@ export function PanelLateral({ isOpen, onClose, title, children, footer }) {
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
-            className="rounded-boton p-1.5 text-slate-600 transition hover:bg-slate-900/5 hover:text-slate-900"
+            className="boton-texto rounded-boton p-1.5 text-slate-600 transition hover:text-slate-900"
           >
             <IconoX className="h-5 w-5" />
           </button>

@@ -41,14 +41,14 @@ export function MiniCalendario({ diaSeleccionado, onSeleccionarDia }) {
           <button
             type="button"
             onClick={() => setMesMostrado((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-            className="rounded-boton p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="boton-texto rounded-boton p-1 text-slate-400 transition hover:text-slate-600"
           >
             <IconoFlechaDerecha className="h-3.5 w-3.5 rotate-180" />
           </button>
           <button
             type="button"
             onClick={() => setMesMostrado((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-            className="rounded-boton p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="boton-texto rounded-boton p-1 text-slate-400 transition hover:text-slate-600"
           >
             <IconoFlechaDerecha className="h-3.5 w-3.5" />
           </button>

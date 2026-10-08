@@ -217,7 +217,7 @@ export function AdminHeader({ onNavegar }) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button type="button" className="relative rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
+        <button type="button" className="relative boton-texto rounded-boton p-2 text-slate-500 transition">
           <IconoCampana className="h-5 w-5" />
         </button>
 
@@ -225,7 +225,7 @@ export function AdminHeader({ onNavegar }) {
           <button
             type="button"
             onClick={() => setMenuAbierto((v) => !v)}
-            className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-slate-100"
+            className="boton-texto flex items-center gap-2 rounded-xl px-2 py-1.5 transition"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-navy text-xs font-semibold text-white">
               {iniciales || '·'}

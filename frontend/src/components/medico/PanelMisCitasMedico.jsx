@@ -155,10 +155,10 @@ export function PanelMisCitasMedico() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" aria-label="Anterior" onClick={() => mover(-1)} className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
+            <button type="button" aria-label="Anterior" onClick={() => mover(-1)} className="boton-texto rounded-boton p-2 text-slate-500 transition">
               <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
             </button>
-            <button type="button" aria-label="Siguiente" onClick={() => mover(1)} className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100">
+            <button type="button" aria-label="Siguiente" onClick={() => mover(1)} className="boton-texto rounded-boton p-2 text-slate-500 transition">
               <IconoFlechaDerecha className="h-4 w-4" />
             </button>
             <button
