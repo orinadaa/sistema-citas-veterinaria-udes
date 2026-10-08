@@ -870,6 +870,36 @@ html:has([aria-modal="true"]:not([aria-hidden="true"]):not([aria-hidden="true"] 
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
+  /* Un respiro minimo en los extremos para cualquier barra de adentro. */
+  ::-webkit-scrollbar-track {
+    margin: 0.4rem;
+  }
+  /* Contenedores con esquinas redondeadas: el recorrido de la barra empieza
+     y termina donde acaba la curva. Sin esto la pildora llegaba hasta la
+     esquina y quedaba por fuera del borde redondeado. El margen es el radio
+     de cada contenedor (los ejes que no aplican se ignoran). */
+  .rounded-lg::-webkit-scrollbar-track {
+    margin: 0.4rem;
+  }
+  .rounded-xl::-webkit-scrollbar-track,
+  .desplegable-lista::-webkit-scrollbar-track {
+    margin: 0.65rem;
+  }
+  .rounded-2xl::-webkit-scrollbar-track,
+  .rounded-tarjeta::-webkit-scrollbar-track {
+    margin: 0.9rem;
+  }
+  .rounded-3xl::-webkit-scrollbar-track,
+  .hoja-panel .rounded-2xl.bg-white::-webkit-scrollbar-track {
+    margin: 1.25rem;
+  }
+  .rounded-superficie::-webkit-scrollbar-track {
+    margin: 1.5rem;
+  }
+  .rounded-\[38px\]::-webkit-scrollbar-track,
+  .rounded-full::-webkit-scrollbar-track {
+    margin: 2.1rem;
+  }
   /* En reposo (sin desplazar o quieta en un tope) la pildora existe pero no
      se pinta. */
   ::-webkit-scrollbar-thumb {

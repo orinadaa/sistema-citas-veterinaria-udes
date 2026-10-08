@@ -280,6 +280,8 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 
 **Panel administrativo y del médico en vidrio.** Fondo `FondoVetui variante="panel"` (azul del landing con más ámbar y manchas de azul oscuro). Nada va directo sobre el fondo: menú lateral en `vidrio` (contraído es una píldora de alto completo), barra superior sin contenedor con buscador, campana y perfil en píldoras `vidrio`, y hoja de trabajo en el mismo `vidrio` translúcido de la barra, con texto blanco directo sobre ella y las tarjetas blancas (texto oscuro) adentro. Los desplegables de la barra (resultados del buscador, menú del perfil) van en el mismo `vidrio` de la barra. Las tarjetas de la hoja (`rounded-2xl bg-white`) se vuelven vidrio empañado blanco con una regla de `.hoja-panel` en vetui.css, sin `backdrop-filter` propio. `ui/Tabs.jsx` lleva `sobreVidrio` cuando va directo sobre la hoja. "Cerrar sesión" va al fondo del menú lateral, solo icono y texto en rojo; contraído, al pasar el cursor queda un círculo rojo con el icono blanco. El panel lateral (`ui/SidePanel.jsx`) flota en `cristal-fuerte` sobre el `velo`. Ojo: `backdrop-filter` en un ancestro atrapa los `position: fixed`; por eso el cristal de la hoja es una capa hermana del `<main>`.
 
+**Barra de desplazamiento en contenedores redondeados.** El recorrido de la barra empieza y termina donde acaba la curva de la esquina (margen del `::-webkit-scrollbar-track` igual al radio, por clase `rounded-*`, en vetui.css). Un contenedor con scroll y un radio nuevo debe sumarse a esa lista.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".
