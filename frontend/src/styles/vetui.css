@@ -275,7 +275,9 @@
    utilidades). */
 /* Hoja que encierra cada modulo: el mismo vidrio translucido de la barra,
    pero con mucho mas desenfoque (pedido de Oriana): a traves de ella no se
-   distinguen las manchas del fondo, solo un color difuso. */
+   distinguen las manchas del fondo, solo un color difuso. Tambien la llevan
+   los desplegables de la barra superior (resultados del buscador, menu del
+   perfil): lo que queda detras de ellos se desenfoca del todo. */
 .vidrio-hoja {
   -webkit-backdrop-filter: blur(64px) saturate(150%) brightness(75%);
   backdrop-filter: blur(64px) saturate(150%) brightness(75%);
