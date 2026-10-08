@@ -7,11 +7,20 @@
 // para filtrar, cada cita en una Tarjeta de vidrio blanco (corta el azul del
 // fondo; la proxima mas cercana con anillo ambar). La foto de la mascota va
 // grande, arriba del nombre y la raza.
+//
+// Calendario + lista (diseño elegido por Oriana): a la izquierda un
+// calendario de mes con un punto de color en cada dia que tiene cita
+// (azul proxima, verde completada, rojo cancelada); tocar un dia deja en
+// la lista solo las citas de ese dia, y tocarlo otra vez (o "Ver todas
+// las fechas") quita el filtro. El filtro de dia se combina con el de
+// estado. La lista sigue siendo lo principal: ahi se abre el detalle. En
+// celular el calendario va arriba de la lista.
 import { useMemo, useState } from 'react';
-import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
-import { Boton, Chips, EstadoVacio, Esqueleto, Insignia, Tarjeta } from '../vetui';
+import { aFechaLocal, desdeFechaLocal, formatearFechaLarga, formatearHora } from '../../utils/fecha';
+import { Boton, Chips, EstadoVacio, Esqueleto, Insignia, Superficie, Tarjeta } from '../vetui';
+import { DatePickerCalendar } from '../agendar/DatePickerCalendar';
 import { DetalleCitaPanel, estadoDeCita } from '../citas/DetalleCitaPanel';
-import { IconoCalendario, IconoEstetoscopio, IconoFlechaDerecha } from '../icons';
+import { IconoCalendario, IconoEstetoscopio, IconoFlechaDerecha, IconoX } from '../icons';
 import { AvatarMascota } from './AvatarMascota';
 
 const FILTROS = [
@@ -19,6 +28,12 @@ const FILTROS = [
   { id: 'proxima', etiqueta: 'Próximas' },
   { id: 'completada', etiqueta: 'Completadas' },
   { id: 'cancelada', etiqueta: 'Canceladas' },
+];
+
+const LEYENDA = [
+  { estado: 'proxima', etiqueta: 'Próxima', punto: 'bg-brand-blue-600' },
+  { estado: 'completada', etiqueta: 'Completada', punto: 'bg-emerald-600' },
+  { estado: 'cancelada', etiqueta: 'Cancelada', punto: 'bg-red-600' },
 ];
 
 // La proxima cita mas cercana en el tiempo lleva fondo y borde de
@@ -33,6 +48,8 @@ function idProximaMasCercana(citas) {
 export function PanelMisCitas({ citas, cargando, onActualizada }) {
   const [filtro, setFiltro] = useState('todas');
   const [citaDetalle, setCitaDetalle] = useState(null);
+  // Dia elegido en el calendario ("YYYY-MM-DD"), o '' = todas las fechas.
+  const [dia, setDia] = useState('');
 
   const conteos = useMemo(() => {
     const base = { todas: citas.length, proxima: 0, completada: 0, cancelada: 0 };
@@ -42,10 +59,26 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
     return base;
   }, [citas]);
 
-  const citasFiltradas = useMemo(() => {
+  const citasPorEstado = useMemo(() => {
     if (filtro === 'todas') return citas;
     return citas.filter((cita) => estadoDeCita(cita) === filtro);
   }, [citas, filtro]);
+
+  // Puntos del calendario: los estados de las citas de cada dia (segun el
+  // filtro de estado activo, igual que la lista).
+  const marcas = useMemo(() => {
+    const porDia = {};
+    citasPorEstado.forEach((cita) => {
+      const clave = aFechaLocal(new Date(cita.fecha_hora));
+      (porDia[clave] ||= []).push(estadoDeCita(cita));
+    });
+    return porDia;
+  }, [citasPorEstado]);
+
+  const citasFiltradas = useMemo(() => {
+    if (!dia) return citasPorEstado;
+    return citasPorEstado.filter((cita) => aFechaLocal(new Date(cita.fecha_hora)) === dia);
+  }, [citasPorEstado, dia]);
 
   const idDestacada = useMemo(() => idProximaMasCercana(citas), [citas]);
 
@@ -64,6 +97,39 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
         onCambiar={setFiltro}
       />
 
+      <div className="grid items-start gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
+        {/* Calendario: se queda a la vista mientras se recorre la lista. */}
+        <Superficie as="aside" tono="blanco" aria-label="Calendario de mis citas" className="lg:sticky lg:top-28">
+          <DatePickerCalendar valor={dia} onChange={setDia} minimo={null} marcas={marcas} permiteQuitar />
+          <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-slate-900/10 pt-4 text-xs text-slate-700">
+            {LEYENDA.map((item) => (
+              <li key={item.estado} className="flex items-center gap-1.5">
+                <span aria-hidden="true" className={`h-2 w-2 rounded-full ${item.punto}`} />
+                {item.etiqueta}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-slate-700">Toca un día para ver solo sus citas.</p>
+        </Superficie>
+
+        <div className="flex min-w-0 flex-col gap-3">
+          {dia && (
+            <div className="vidrio flex flex-wrap items-center justify-between gap-2 rounded-tarjeta px-4 py-2.5">
+              <p role="status" className="text-sm font-medium text-white">
+                {formatearFechaLarga(desdeFechaLocal(dia))}: {citasFiltradas.length}{' '}
+                {citasFiltradas.length === 1 ? 'cita' : 'citas'}
+              </p>
+              <button
+                type="button"
+                onClick={() => setDia('')}
+                className="boton-texto inline-flex items-center gap-1.5 rounded-boton px-2 py-1 text-sm font-semibold text-white"
+              >
+                <IconoX className="h-3.5 w-3.5" peso="bold" />
+                Ver todas las fechas
+              </button>
+            </div>
+          )}
+
       {cargando ? (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((clave) => (
@@ -71,7 +137,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
           ))}
         </div>
       ) : citasFiltradas.length === 0 ? (
-        <EstadoVacio>No tienes citas en esta categoría.</EstadoVacio>
+        <EstadoVacio>{dia ? 'No tienes citas ese día.' : 'No tienes citas en esta categoría.'}</EstadoVacio>
       ) : (
         <div className="flex flex-col gap-3">
           {citasFiltradas.map((cita) => {
@@ -81,7 +147,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
                 key={cita.id}
                 material="blanco"
                 destacada={destacada}
-                className="grid grid-cols-1 items-center gap-4 p-4 md:grid-cols-[12rem_minmax(0,1fr)_minmax(0,1.3fr)_auto_auto] md:gap-6"
+                className="grid grid-cols-1 items-center gap-4 p-4 md:grid-cols-[9rem_minmax(0,1fr)_minmax(0,1.2fr)_auto] md:gap-5"
               >
                 {/* 1-2. Foto grande arriba + nombre y especie/raza, centrados en
                     una columna angosta (12rem) para no dejar un hueco grande
@@ -119,20 +185,21 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
                   </div>
                 </div>
 
-                {/* 5. Estado */}
-                <div>
+                {/* 5-6. Estado y "Ver detalles", apilados: con el calendario al
+                    lado la tarjeta es mas angosta y no caben en fila. */}
+                <div className="flex flex-row items-center justify-between gap-3 md:flex-col md:items-end">
                   <Insignia estado={estadoDeCita(cita)} />
+                  <Boton variante="contorno" tamano="sm" iconoFinal={IconoFlechaDerecha} onClick={() => setCitaDetalle(cita)}>
+                    Ver detalles
+                  </Boton>
                 </div>
-
-                {/* 6. Ver detalles */}
-                <Boton variante="contorno" tamano="sm" iconoFinal={IconoFlechaDerecha} onClick={() => setCitaDetalle(cita)}>
-                  Ver detalles
-                </Boton>
               </Tarjeta>
             );
           })}
         </div>
       )}
+        </div>
+      </div>
 
     </div>
 
