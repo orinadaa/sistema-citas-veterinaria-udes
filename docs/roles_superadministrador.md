@@ -82,7 +82,7 @@ Unitarias (`backend/tests`, modelos simulados):
 | Inicio de sede | `GET /api/administracion/tablero` | Datos de su sede y avisos; 403 para otros roles | Correcto |
 | Inicio del sistema | `GET /api/administracion/sistema` | Resumen y avisos; las sedes inactivas no generan avisos; 403 para el administrador | Correcto |
 
-Total del servidor: 332 pruebas pasan.
+Total del servidor: 353 pruebas pasan.
 
 Aceptación (base de datos real, solo lectura):
 
@@ -99,8 +99,44 @@ No probado todavía: guardar cambios desde las pantallas del superadministrador
 con una cuenta real (hace falta crearla), y el formulario de horario del
 administrador de sede abierto en el navegador.
 
+## Catálogos (superadministrador)
+
+Listas de opciones que se cambian sin programar. Decisiones de Oriana:
+catálogos gestionados (no un editor libre de tablas); categorías, especies y
+razas editables; al desactivar, los registros que ya lo usan se conservan.
+
+- **Categorías y especialidades.** Es un solo catálogo (`categoria_servicio`):
+  clasifica los servicios y es la lista de especialidades de los médicos. Se
+  crean, se renombran, se les cambia el color (7 de la paleta) y se desactivan.
+- **Especies y razas.** Pasaron del código a las tablas `especie` y `raza`
+  (migración `incremento_8b_catalogos.sql`, con la misma lista de antes). Una
+  especie nueva usa uno de cuatro iconos: perro, gato, ave o huella. Una
+  especie sin razas activas pide la raza como texto libre (así funciona
+  "Otro").
+- `mascota.especie` y `mascota.raza` siguen guardando el texto, sin llave
+  foránea: desactivar no toca ninguna mascota. Renombrar sí corrige el texto
+  en las mascotas que lo tienen, en la misma transacción.
+- No hay rutas para eliminar. Cada fila muestra cuántos registros la usan.
+- Los formularios de mascota leen el catálogo (`hooks/useCatalogoEspecies.js`)
+  y, si el servidor no responde, usan la lista de respaldo del código.
+
+Pruebas:
+
+| Descripción | Entrada | Resultado esperado | Resultado obtenido |
+|---|---|---|---|
+| Solo el superadministrador gestiona catálogos | Token de administrador contra las 8 rutas de gestión | 403 | Correcto |
+| No hay eliminación | `DELETE` sobre especie, raza y categoría | 404 | Correcto |
+| Lista pública de especies | `GET /api/catalogos/especies` sin sesión | Solo activas, solo nombres | Correcto |
+| Validaciones | Nombre vacío o largo, color o icono fuera de lista, estado no booleano | 400 | Correcto |
+| Duplicados | Nombre repetido de categoría, especie o raza | 409 | Correcto |
+| Migración 8b (base real) | Ejecutarla dos veces | Canino 42, Felino 17, Ave 11, Otro 0; sin duplicar; mascotas y categorías sin cambios | Correcto |
+| Ciclo completo (base real, registros temporales "ZZ") | Crear especie y raza, renombrar, desactivar; crear y editar categoría | La raza desactivada sale de la lista pública; la especie desactivada también, y sigue en la de administración | Correcto |
+| Formulario del cliente | Abrir "Agregar mascota" y elegir Canino | 4 especies y 42 razas, leídas del catálogo | Correcto |
+
+Los registros temporales de la prueba se borraron al terminar. No probado:
+renombrar una especie o raza que ya tienen mascotas reales, ni guardar desde la
+pantalla de Catálogos (solo se abrió para mirar).
+
 ## Pendiente
 
-- Catálogos gestionados (especies y razas, categorías de servicio,
-  especialidades): acordado, aún no construido.
 - Ver el perfil completo de un usuario desde Usuarios.

@@ -2,8 +2,8 @@
 // Panel interno (/admin). Tres roles, cada uno con sus modulos (el menu
 // lateral, AdminSidebar, muestra los mismos):
 // - Superadministrador: administra el sistema completo sin programar
-//   (sedes, cuentas del personal, catalogo de servicios, pagina web, campos
-//   de los formularios, reportes de todas las sedes). No opera citas.
+//   (sedes, cuentas, catalogo de servicios, pagina web, campos de los
+//   formularios, catalogos, reportes de todas las sedes). No opera citas.
 // - Administrador de sede: el dia a dia de SU sede (inicio, citas, medicos,
 //   pacientes, horario, reportes de su sede; los servicios, solo consulta).
 // - Medico veterinario: su propio modulo (components/medico/).
@@ -24,6 +24,7 @@ import { PanelPacientes } from '../components/admin/PanelPacientes';
 import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
 import { PanelGaleria } from '../components/admin/PanelGaleria';
 import { PanelCampos } from '../components/admin/PanelCampos';
+import { PanelCatalogos } from '../components/admin/PanelCatalogos';
 import { PanelReportes } from '../components/admin/PanelReportes';
 import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
 import { PanelMisPacientesMedico } from '../components/medico/PanelMisPacientesMedico';
@@ -85,6 +86,7 @@ export function PanelAdminPage() {
                 <PanelCampos />
               </div>
             )}
+            {esSuper && pestana === 'catalogos' && <PanelCatalogos />}
             {esSuper && pestana === 'reportes' && <PanelReportes />}
 
             {/* Administrador de sede */}

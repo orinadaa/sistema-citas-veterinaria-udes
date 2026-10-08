@@ -433,6 +433,9 @@ export function PanelMedicos({ busquedaInicial }) {
               <div className="flex flex-wrap gap-2">
                 {categorias.map((c) => {
                   const activa = medicoActual?.especialidades.some((e) => e.id === c.id);
+                  // Una especialidad desactivada en Catalogos solo se muestra
+                  // si el medico ya la tiene (para poder quitarsela).
+                  if (c.activo === false && !activa) return null;
                   return (
                     <button
                       key={c.id}

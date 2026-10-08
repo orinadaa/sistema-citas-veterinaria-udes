@@ -439,7 +439,9 @@ export function PanelServicios({ busquedaInicial, soloLectura = false }) {
 
           <SelectorCategoria
             id="categoria-servicio"
-            categorias={categorias}
+            // Solo las activas; una desactivada se sigue mostrando si es la
+            // que este servicio ya tiene (Catalogos: nada se elimina).
+            categorias={categorias.filter((c) => c.activo !== false || c.id === form.categoriaId)}
             valor={form.categoriaId}
             onChange={(categoriaId) => setForm({ ...form, categoriaId })}
             requerido
