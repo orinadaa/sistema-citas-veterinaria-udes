@@ -88,7 +88,7 @@ export function LoginPage() {
 
         <Link
           to="/olvide-clave"
-          className="-mt-2 self-end text-sm font-medium text-blue-600 hover:text-blue-700"
+          className="-mt-2 self-end text-sm font-medium text-brand-blue-700 hover:text-brand-blue-800"
         >
           ¿Olvidaste tu contraseña?
         </Link>
