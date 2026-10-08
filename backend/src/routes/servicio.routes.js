@@ -21,18 +21,18 @@ router.get('/', listar);
 router.get('/categorias', listarCategorias);
 
 // GET /api/servicios/admin — solo administrador
-router.get('/admin', verificarToken, verificarRol('administrador'), listarAdmin);
+router.get('/admin', verificarToken, verificarRol('superadministrador', 'administrador'), listarAdmin);
 
 // POST /api/servicios — solo administrador
-router.post('/', verificarToken, verificarRol('administrador'), crear);
+router.post('/', verificarToken, verificarRol('superadministrador'), crear);
 
 // PUT /api/servicios/:id — solo administrador
-router.put('/:id', verificarToken, verificarRol('administrador'), actualizar);
+router.put('/:id', verificarToken, verificarRol('superadministrador'), actualizar);
 
 // POST /api/servicios/:id/foto — solo administrador (multipart, campo "foto")
-router.post('/:id/foto', verificarToken, verificarRol('administrador'), fotosServicios.middleware, subirFoto);
+router.post('/:id/foto', verificarToken, verificarRol('superadministrador'), fotosServicios.middleware, subirFoto);
 
 // DELETE /api/servicios/:id/foto — solo administrador
-router.delete('/:id/foto', verificarToken, verificarRol('administrador'), quitarFoto);
+router.delete('/:id/foto', verificarToken, verificarRol('superadministrador'), quitarFoto);
 
 module.exports = router;

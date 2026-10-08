@@ -21,7 +21,9 @@ function parsearFecha(valor) {
 // GET /api/administracion/reportes?sedeId=&desde=&hasta=
 async function obtenerReporte(req, res, next) {
   try {
-    const { sedeId } = req.query;
+    // El administrador de sede ve solo su sede (se ignora el filtro que
+    // envie); el superadministrador puede ver todas o filtrar por una.
+    const sedeId = req.usuario.rol === 'superadministrador' ? req.query.sedeId : req.usuario.sedeId;
     const { desde: desdeDefecto, hasta: hastaDefecto } = rangoPorDefecto();
     const desde = parsearFecha(req.query.desde) || desdeDefecto;
     const hasta = parsearFecha(req.query.hasta) || hastaDefecto;

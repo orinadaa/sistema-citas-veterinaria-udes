@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const galeriaModel = require('../src/models/galeria.model');
 
-const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
+const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'superadministrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
 const TOKEN_VET = jwt.sign({ id: 'vet-1', rol: 'veterinario', sedeId: 'sede-1' }, process.env.JWT_SECRET);
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
 

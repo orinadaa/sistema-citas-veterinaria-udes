@@ -19,6 +19,7 @@ const medicoModel = require('../src/models/medico.model');
 
 const ID_SEDE = 'sede-1';
 const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: ID_SEDE }, process.env.JWT_SECRET);
+const TOKEN_SUPER = jwt.sign({ id: 'super-1', rol: 'superadministrador' }, process.env.JWT_SECRET);
 const TOKEN_VET = jwt.sign({ id: 'vet-1', rol: 'veterinario', sedeId: ID_SEDE }, process.env.JWT_SECRET);
 
 const UPLOADS = path.join(__dirname, '..', 'uploads');
@@ -68,26 +69,26 @@ describe('POST /api/sedes/:id/foto', () => {
   });
 
   test('rechaza un archivo que no es JPG/PNG', async () => {
-    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_ADMIN, Buffer.from('hola'), 'text/plain');
+    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_SUPER, Buffer.from('hola'), 'text/plain');
     expect(respuesta.status).toBe(400);
     expect(sedeModel.actualizarFoto).not.toHaveBeenCalled();
   });
 
   test('rechaza si no se adjunta archivo', async () => {
-    const respuesta = await request(app).post('/api/sedes/s1/foto').set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+    const respuesta = await request(app).post('/api/sedes/s1/foto').set('Authorization', `Bearer ${TOKEN_SUPER}`);
     expect(respuesta.status).toBe(400);
   });
 
   test('responde 404 si la sede no existe y no deja el archivo en disco', async () => {
     sedeModel.actualizarFoto.mockResolvedValue(undefined);
-    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_ADMIN);
+    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_SUPER);
     expect(respuesta.status).toBe(404);
     expect(archivosNuevos()).toHaveLength(0);
   });
 
   test('guarda la ruta publica de la foto de la sede', async () => {
     sedeModel.actualizarFoto.mockResolvedValue(null);
-    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_ADMIN);
+    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_SUPER);
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.fotoUrl).toMatch(/^\/uploads\/sedes\/[0-9a-f-]+\.png$/);
     expect(sedeModel.actualizarFoto).toHaveBeenCalledWith('s1', respuesta.body.fotoUrl);
@@ -97,14 +98,14 @@ describe('POST /api/sedes/:id/foto', () => {
     fs.mkdirSync(CARPETAS[0], { recursive: true });
     fs.writeFileSync(path.join(CARPETAS[0], 'anterior-prueba.png'), PNG);
     sedeModel.actualizarFoto.mockResolvedValue('/uploads/sedes/anterior-prueba.png');
-    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_ADMIN);
+    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_SUPER);
     expect(respuesta.status).toBe(200);
     expect(fs.existsSync(path.join(CARPETAS[0], 'anterior-prueba.png'))).toBe(false);
   });
 
   test('una foto anterior que era un enlace externo no intenta borrarse', async () => {
     sedeModel.actualizarFoto.mockResolvedValue('https://ejemplo.com/sede.jpg');
-    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_ADMIN);
+    const respuesta = await subir('/api/sedes/s1/foto', TOKEN_SUPER);
     expect(respuesta.status).toBe(200);
   });
 });
@@ -114,7 +115,7 @@ describe('PUT /api/sedes/:id', () => {
     sedeModel.actualizar.mockResolvedValue({ id: 's1', nombre: 'Sede' });
     const respuesta = await request(app)
       .put('/api/sedes/s1')
-      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .set('Authorization', `Bearer ${TOKEN_SUPER}`)
       .send({ nombre: 'Sede', fotoUrl: 'https://ejemplo.com/sede.jpg' });
     expect(respuesta.status).toBe(200);
     expect(sedeModel.actualizar.mock.calls[0][1]).not.toHaveProperty('fotoUrl');

@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const sedeModel = require('../src/models/sede.model');
 
-const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
+const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'superadministrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
 
 describe('GET /api/sedes', () => {

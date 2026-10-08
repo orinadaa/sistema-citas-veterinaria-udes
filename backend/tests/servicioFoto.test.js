@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const servicioModel = require('../src/models/servicio.model');
 
-const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
+const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'superadministrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
 const TOKEN_VET = jwt.sign({ id: 'vet-1', rol: 'veterinario', sedeId: 'sede-1' }, process.env.JWT_SECRET);
 
 const ID_SERVICIO = '33333333-3333-4333-8333-333333333333';

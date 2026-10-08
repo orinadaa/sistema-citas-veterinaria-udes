@@ -12,7 +12,9 @@ const horarioModel = require('../src/models/horario.model');
 const sedeModel = require('../src/models/sede.model');
 
 const ID_SEDE = 'sede-1';
-const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador' }, process.env.JWT_SECRET);
+const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: ID_SEDE }, process.env.JWT_SECRET);
+const TOKEN_ADMIN_OTRA_SEDE = jwt.sign({ id: 'admin-2', rol: 'administrador', sedeId: 'otra-sede' }, process.env.JWT_SECRET);
+const TOKEN_SUPER = jwt.sign({ id: 'super-1', rol: 'superadministrador' }, process.env.JWT_SECRET);
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
 
 describe('GET /api/horarios', () => {
@@ -109,5 +111,31 @@ describe('DELETE /api/horarios/:sedeId/:diaSemana', () => {
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
 
     expect(respuesta.status).toBe(204);
+  });
+});
+
+describe('Horarios: cada administrador solo cambia los de su sede', () => {
+  beforeEach(() => jest.clearAllMocks());
+  const DIA = { sedeId: ID_SEDE, diaSemana: 1, horaInicio: '08:00', horaFin: '17:00' };
+
+  test('un administrador de otra sede no puede cambiar el horario', async () => {
+    const respuesta = await request(app).put('/api/horarios').set('Authorization', 'Bearer ' + TOKEN_ADMIN_OTRA_SEDE).send(DIA);
+    expect(respuesta.status).toBe(403);
+    expect(horarioModel.upsertDia).not.toHaveBeenCalled();
+  });
+
+  test('un administrador de otra sede no puede cerrar un dia', async () => {
+    const respuesta = await request(app)
+      .delete('/api/horarios/' + ID_SEDE + '/1')
+      .set('Authorization', 'Bearer ' + TOKEN_ADMIN_OTRA_SEDE);
+    expect(respuesta.status).toBe(403);
+    expect(horarioModel.cerrarDia).not.toHaveBeenCalled();
+  });
+
+  test('el superadministrador puede cambiar el horario de cualquier sede', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    horarioModel.upsertDia.mockResolvedValue({ dia_semana: 1 });
+    const respuesta = await request(app).put('/api/horarios').set('Authorization', 'Bearer ' + TOKEN_SUPER).send(DIA);
+    expect(respuesta.status).toBe(200);
   });
 });

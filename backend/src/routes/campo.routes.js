@@ -8,7 +8,7 @@ const { listar, listarEntidades, crear, actualizar, reordenar } = require('../co
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
-const soloAdmin = verificarRol('administrador');
+const soloAdmin = verificarRol('superadministrador');
 
 router.use(verificarToken);
 

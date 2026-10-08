@@ -16,7 +16,7 @@ const definicionCampoModel = require('../src/models/definicionCampo.model');
 const mascotaModel = require('../src/models/mascota.model');
 
 const ID_CLIENTE = 'cliente-1';
-const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
+const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'superadministrador', sedeId: 'sede-1' }, process.env.JWT_SECRET);
 const TOKEN_CLIENTE = jwt.sign({ id: ID_CLIENTE, rol: 'cliente' }, process.env.JWT_SECRET);
 const ID_CAMPO = '44444444-4444-4444-8444-444444444444';
 const CARPETA = path.join(__dirname, '..', 'uploads', 'adjuntos');
