@@ -273,6 +273,20 @@
    blanco de antes no llegan a AA sobre el cristal. Se oscurecen un paso en
    toda la hoja, sin tocar cada pantalla (CSS sin capa: gana sobre las
    utilidades). */
+/* Paginas del cliente sobre el fondo con mucho ambar (FondoVetui
+   variante="panel" + textoDirecto): ahi si hay texto blanco directo sobre el
+   fondo (encabezado, pasos, filtros) y las manchas ambar pasan por detras al
+   desplazar. Una sombra azul oscura suave lo mantiene legible sobre el ambar.
+   Dentro de las superficies claras y de los botones no aplica. */
+.fondo-texto-directo {
+  text-shadow:
+    0 1px 2px rgb(6 51 138 / 0.55),
+    0 0 14px rgb(6 51 138 / 0.5);
+}
+.fondo-texto-directo :where(.vidrio-blanco, .cristal, .cristal-fuerte, .bg-white, .rounded-boton, [class*='boton-glass'], [class*='bg-white']) {
+  text-shadow: none;
+}
+
 /* Hoja que encierra cada modulo: el mismo vidrio translucido de la barra,
    pero con mucho mas desenfoque (pedido de Oriana): a traves de ella no se
    distinguen las manchas del fondo, solo un color difuso. Tambien la llevan

@@ -62,7 +62,7 @@ export function PanelClientePage() {
   useAnclaTopbar();
 
   return (
-    <FondoVetui>
+    <FondoVetui variante="panel" textoDirecto>
       <Navbar />
 
       <EncabezadoPagina

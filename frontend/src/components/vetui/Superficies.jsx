@@ -55,15 +55,18 @@ const HALOS_PANEL = [
 const DEGRADADO = 'bg-[linear-gradient(to_bottom,var(--color-brand-blue-600)_0,var(--color-brand-blue-700)_16rem,var(--color-brand-blue-800)_32rem)]';
 const DEGRADADO_PANEL = 'bg-gradient-to-b from-brand-blue-500 to-brand-blue-800';
 
-// variante="panel": el fondo del panel administrativo / medico.
-export function FondoVetui({ children, className = '', variante = 'app' }) {
+// variante="panel": el fondo del panel administrativo / medico, que tambien
+// usan las paginas del cliente (pedido de Oriana: mismo fondo, mas ambar).
+// textoDirecto: la pagina tiene texto blanco directo sobre el fondo (las del
+// cliente); le da una sombra suave para que se lea sobre las manchas ambar.
+export function FondoVetui({ children, className = '', variante = 'app', textoDirecto = false }) {
   const esPanel = variante === 'panel';
   return (
     // isolate: los halos (-z-10) quedan detrás del contenido pero dentro
     // de la página. overflow-clip (no hidden): recorta sin crear un
     // contenedor de scroll, así la topbar sticky sigue funcionando.
     <div
-      className={`relative isolate min-h-screen overflow-clip ${esPanel ? DEGRADADO_PANEL : DEGRADADO} ${className}`}
+      className={`relative isolate min-h-screen overflow-clip ${esPanel ? DEGRADADO_PANEL : DEGRADADO} ${textoDirecto ? 'fondo-texto-directo' : ''} ${className}`}
     >
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
         <div

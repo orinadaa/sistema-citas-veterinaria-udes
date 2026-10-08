@@ -290,7 +290,7 @@ export function AgendarCitaPage() {
   return (
     // vetUI: fondo de marca con halos (FondoVetui, tambien detras de la
     // topbar), secciones de vidrio y tarjetas de cristal.
-    <FondoVetui>
+    <FondoVetui variante="panel" textoDirecto>
       <Navbar />
 
       <div inert={panelMascotaAbierto} aria-hidden={panelMascotaAbierto}>
