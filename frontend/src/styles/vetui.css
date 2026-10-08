@@ -41,7 +41,8 @@
   --color-category-cyan: #51caeb;
   --color-category-orange: #d98a3d;
 
-  /* Tipografía: Raleway en todo el sistema (font-sans es la del body). */
+  /* Tipografía: Raleway, la fuente definitiva del sistema (font-sans es la
+     del body). Ver docs/vetui.md > Tipografía. */
   --font-sans: "Raleway", ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
 
