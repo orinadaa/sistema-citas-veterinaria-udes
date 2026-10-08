@@ -73,7 +73,10 @@ export function PanelClientePage() {
         imagen={<img src={fotoMain} alt="" className="mx-auto hidden w-full max-w-[300px] drop-shadow-2xl lg:block" />}
       />
 
-      <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+      {/* lg:min-h: aunque la pestaña tenga poco contenido (ej. una sola
+          mascota), la pagina alcanza a bajar hasta el ancla; sin eso
+          useAnclaTopbar se desactiva y se ve la topbar a medio formar. */}
+      <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:min-h-[calc(100vh-7rem)]">
         <div data-ancla-topbar className="grid scroll-mt-28 grid-cols-1 gap-4 sm:grid-cols-3">
           <TarjetaDato
             icono={IconoCalendario}
