@@ -7,12 +7,13 @@ const ENLACES_RAPIDOS = [
   { href: '#horarios', etiqueta: 'Horarios' },
 ];
 
-// Compacto a proposito (pedido de Oriana): asi en el ultimo tramo del
-// scroll del landing la seccion final ("¿Tu mascota necesita una cita?")
-// no queda pegada a la topbar.
+// Compacto a proposito (pedido de Oriana). Despues de Horarios viene directo
+// el footer (la banda "¿Tu mascota necesita una cita?" se quito): es el
+// ultimo punto del landing paginado (data-slide + snap), asi la rueda baja
+// hasta el y no rebota de vuelta a Horarios.
 export function Footer() {
   return (
-    <footer className="text-slate-300" style={{ backgroundColor: '#0E172C' }}>
+    <footer data-slide className="text-slate-300 lg:snap-start lg:snap-always" style={{ backgroundColor: '#0E172C' }}>
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-7 sm:px-6 md:grid-cols-3 md:gap-10">
         <div>
           {/* Mismo archivo que el logo grande de la topbar (logoblanco.png). */}

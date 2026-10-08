@@ -8,7 +8,6 @@ import { Hero } from '../components/landing/Hero';
 import { Servicios } from '../components/landing/Servicios';
 import { Sedes } from '../components/landing/Sedes';
 import { Horarios } from '../components/landing/Horarios';
-import { CtaBanner } from '../components/landing/CtaBanner';
 import { HuellasFondo } from '../components/landing/HuellasFondo';
 import { usePaginadoPorRueda } from '../hooks/usePaginadoPorRueda';
 
@@ -38,7 +37,7 @@ export function LandingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       <main>
-        {/* Hero, Servicios, Sedes, Horarios y la banda de cierre comparten un
+        {/* Hero, Servicios, Sedes y Horarios comparten un
             solo fondo (el footer no). Degradado continuo que arranca en
             brand-blue-500 (el azul de la topbar) y oscurece rapido: el azul
             claro queda solo en la parte alta del Hero y brand-blue-800 llega
@@ -56,7 +55,6 @@ export function LandingPage() {
           <Servicios />
           <Sedes />
           <Horarios />
-          <CtaBanner />
         </div>
       </main>
       <Footer />

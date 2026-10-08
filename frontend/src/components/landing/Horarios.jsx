@@ -172,7 +172,7 @@ export function Horarios() {
       <HalosAmbientales variante="horarios" />
       <Decoracion />
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:flex lg:flex-1 lg:flex-col">
-        <TarjetaSlide>
+        <TarjetaSlide ultima>
           <SectionHeading
             titulo="Horarios de atención"
             subtitulo="Conoce nuestros horarios en cada sede y agenda tu cita fácilmente."

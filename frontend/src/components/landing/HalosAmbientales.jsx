@@ -1,5 +1,5 @@
 // components/landing/HalosAmbientales.jsx
-// Halos de Sedes, Horarios y la banda de cierre, mismo lenguaje que
+// Halos de Sedes y Horarios, mismo lenguaje que
 // FondoAmbientalHero/FondoAmbientalServicios. La base es el degradado
 // continuo del landing (LandingPage.jsx); aca solo van los halos.
 // La capa se extiende un 15% por encima y por debajo de la seccion para
