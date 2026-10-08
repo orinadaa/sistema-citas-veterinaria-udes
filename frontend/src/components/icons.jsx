@@ -1,402 +1,243 @@
 // components/icons.jsx
-// Iconos de linea, dibujados a mano y minimos. El proyecto no instala
-// librerias de iconos nuevas (stack fijo, ver el alcance del proyecto), asi que este
-// set cubre unicamente lo que usa la landing y los formularios.
+// Iconos del sistema: Phosphor Icons (@phosphor-icons/react, MIT),
+// elegida por Oriana porque trae los iconos de veterinaria (huella,
+// jeringa, estetoscopio, diente...) y varios pesos del mismo dibujo.
+// Reemplaza al set de linea dibujado a mano que habia antes.
+//
+// Este archivo es la UNICA puerta de entrada: el resto del sistema sigue
+// importando IconoReloj, IconoPata, etc. desde aca, con la misma interfaz
+// de siempre (className para tamaño y color; el color es el del texto).
+// Para un icono nuevo: importarlo de Phosphor y exportarlo igual que los demas.
+//
+// `peso` elige la variante del dibujo:
+// - "regular" (por defecto): linea. Botones, menus, topbar, campos.
+// - "duotone": linea + relleno suave del mismo color. Solo para iconos
+//   ilustrativos: servicios, tarjetas de indicadores y estados vacios.
+// - "bold" / "fill": casos puntuales que necesitan mas peso.
+//
+// Cada icono se importa por su propio archivo (dist/csr/...), no desde la
+// raiz del paquete: asi Vite no tiene que procesar los ~1500 iconos.
+import { ArrowClockwiseIcon } from '@phosphor-icons/react/dist/csr/ArrowClockwise';
+import { ArrowRightIcon } from '@phosphor-icons/react/dist/csr/ArrowRight';
+import { BellIcon } from '@phosphor-icons/react/dist/csr/Bell';
+import { BoneIcon } from '@phosphor-icons/react/dist/csr/Bone';
+import { BugIcon } from '@phosphor-icons/react/dist/csr/Bug';
+import { CalendarBlankIcon } from '@phosphor-icons/react/dist/csr/CalendarBlank';
+import { CameraIcon } from '@phosphor-icons/react/dist/csr/Camera';
+import { CarIcon } from '@phosphor-icons/react/dist/csr/Car';
+import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown';
+import { ChartBarIcon } from '@phosphor-icons/react/dist/csr/ChartBar';
+import { CheckIcon } from '@phosphor-icons/react/dist/csr/Check';
+import { ClockIcon } from '@phosphor-icons/react/dist/csr/Clock';
+import { DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/csr/DotsThreeVertical';
+import { EnvelopeIcon } from '@phosphor-icons/react/dist/csr/Envelope';
+import { EyeIcon } from '@phosphor-icons/react/dist/csr/Eye';
+import { EyeSlashIcon } from '@phosphor-icons/react/dist/csr/EyeSlash';
+import { FileTextIcon } from '@phosphor-icons/react/dist/csr/FileText';
+import { FlaskIcon } from '@phosphor-icons/react/dist/csr/Flask';
+import { GearIcon } from '@phosphor-icons/react/dist/csr/Gear';
+import { HeartIcon } from '@phosphor-icons/react/dist/csr/Heart';
+import { HospitalIcon } from '@phosphor-icons/react/dist/csr/Hospital';
+import { ImageIcon } from '@phosphor-icons/react/dist/csr/Image';
+import { MagnifyingGlassIcon } from '@phosphor-icons/react/dist/csr/MagnifyingGlass';
+import { MapPinIcon } from '@phosphor-icons/react/dist/csr/MapPin';
+import { PawPrintIcon } from '@phosphor-icons/react/dist/csr/PawPrint';
+import { PencilSimpleIcon } from '@phosphor-icons/react/dist/csr/PencilSimple';
+import { PillIcon } from '@phosphor-icons/react/dist/csr/Pill';
+import { PlusIcon } from '@phosphor-icons/react/dist/csr/Plus';
+import { ScalesIcon } from '@phosphor-icons/react/dist/csr/Scales';
+import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors';
+import { ShieldCheckIcon } from '@phosphor-icons/react/dist/csr/ShieldCheck';
+import { SignOutIcon } from '@phosphor-icons/react/dist/csr/SignOut';
+import { StethoscopeIcon } from '@phosphor-icons/react/dist/csr/Stethoscope';
+import { SyringeIcon } from '@phosphor-icons/react/dist/csr/Syringe';
+import { ToothIcon } from '@phosphor-icons/react/dist/csr/Tooth';
+import { TrashIcon } from '@phosphor-icons/react/dist/csr/Trash';
+import { UserIcon } from '@phosphor-icons/react/dist/csr/User';
+import { UsersIcon } from '@phosphor-icons/react/dist/csr/Users';
+import { WarningIcon } from '@phosphor-icons/react/dist/csr/Warning';
+import { XIcon } from '@phosphor-icons/react/dist/csr/X';
 
-const trazoBase = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.6,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-};
+// Dibuja un icono de Phosphor (`de`) con la interfaz del sistema.
+// aria-hidden: todos son decorativos (el nombre accesible lo pone el boton
+// o el texto de al lado).
+function Icono({ de: Phosphor, className, peso = 'regular' }) {
+  return <Phosphor className={className} weight={peso} aria-hidden="true" />;
+}
 
-function Icono({ children, className }) {
+// --- Interfaz ---
+export function IconoReloj(props) {
+  return <Icono de={ClockIcon} {...props} />;
+}
+export function IconoUbicacion(props) {
+  return <Icono de={MapPinIcon} {...props} />;
+}
+// Cerrar sesion: puerta con flecha saliendo.
+export function IconoSalir(props) {
+  return <Icono de={SignOutIcon} {...props} />;
+}
+export function IconoFlechaDerecha(props) {
+  return <Icono de={ArrowRightIcon} {...props} />;
+}
+export function IconoAlerta(props) {
+  return <Icono de={WarningIcon} {...props} />;
+}
+export function IconoCorazon(props) {
+  return <Icono de={HeartIcon} {...props} />;
+}
+export function IconoOjo(props) {
+  return <Icono de={EyeIcon} {...props} />;
+}
+export function IconoOjoTachado(props) {
+  return <Icono de={EyeSlashIcon} {...props} />;
+}
+export function IconoEscudo(props) {
+  return <Icono de={ShieldCheckIcon} {...props} />;
+}
+export function IconoCalendario(props) {
+  return <Icono de={CalendarBlankIcon} {...props} />;
+}
+export function IconoMedicos(props) {
+  return <Icono de={UsersIcon} {...props} />;
+}
+export function IconoSede(props) {
+  return <Icono de={HospitalIcon} {...props} />;
+}
+export function IconoBuscar(props) {
+  return <Icono de={MagnifyingGlassIcon} {...props} />;
+}
+export function IconoCampana(props) {
+  return <Icono de={BellIcon} {...props} />;
+}
+export function IconoMas(props) {
+  return <Icono de={PlusIcon} {...props} />;
+}
+export function IconoLapiz(props) {
+  return <Icono de={PencilSimpleIcon} {...props} />;
+}
+export function IconoPapelera(props) {
+  return <Icono de={TrashIcon} {...props} />;
+}
+export function IconoChevronAbajo(props) {
+  return <Icono de={CaretDownIcon} {...props} />;
+}
+export function IconoPersona(props) {
+  return <Icono de={UserIcon} {...props} />;
+}
+export function IconoGrafica(props) {
+  return <Icono de={ChartBarIcon} {...props} />;
+}
+export function IconoEngranaje(props) {
+  return <Icono de={GearIcon} {...props} />;
+}
+export function IconoX(props) {
+  return <Icono de={XIcon} {...props} />;
+}
+export function IconoCheck(props) {
+  return <Icono de={CheckIcon} {...props} />;
+}
+export function IconoCarro(props) {
+  return <Icono de={CarIcon} {...props} />;
+}
+export function IconoCorreo(props) {
+  return <Icono de={EnvelopeIcon} {...props} />;
+}
+export function IconoCamara(props) {
+  return <Icono de={CameraIcon} {...props} />;
+}
+export function IconoRotar(props) {
+  return <Icono de={ArrowClockwiseIcon} {...props} />;
+}
+export function IconoImagen(props) {
+  return <Icono de={ImageIcon} {...props} />;
+}
+export function IconoDocumento(props) {
+  return <Icono de={FileTextIcon} {...props} />;
+}
+export function IconoPeso(props) {
+  return <Icono de={ScalesIcon} {...props} />;
+}
+// Menu de acciones de una tarjeta (tres puntos verticales): en negrita,
+// en linea normal los puntos casi no se ven.
+export function IconoPuntos(props) {
+  return <Icono de={DotsThreeVerticalIcon} peso="bold" {...props} />;
+}
+
+// --- Veterinaria y servicios ---
+export function IconoPata(props) {
+  return <Icono de={PawPrintIcon} {...props} />;
+}
+export function IconoJeringa(props) {
+  return <Icono de={SyringeIcon} {...props} />;
+}
+export function IconoCirugia(props) {
+  return <Icono de={ScissorsIcon} {...props} />;
+}
+export function IconoLaboratorio(props) {
+  return <Icono de={FlaskIcon} {...props} />;
+}
+export function IconoEstetoscopio(props) {
+  return <Icono de={StethoscopeIcon} {...props} />;
+}
+// Desparasitacion: el parasito.
+export function IconoDesparasitacion(props) {
+  return <Icono de={BugIcon} {...props} />;
+}
+export function IconoDienteDental(props) {
+  return <Icono de={ToothIcon} {...props} />;
+}
+// Radiografia: el hueso (Phosphor no trae una placa de rayos X).
+export function IconoRadiografia(props) {
+  return <Icono de={BoneIcon} {...props} />;
+}
+// Recordatorio de medicacion.
+export function IconoPastilla(props) {
+  return <Icono de={PillIcon} {...props} />;
+}
+
+// --- Propios: Phosphor no trae la cinta de oncologia ni un endoscopio ---
+// Dibujados a mano con el mismo trazo (1.5 sobre 24) y la misma interfaz;
+// con peso "duotone" llevan el relleno suave, igual que los de Phosphor.
+function IconoPropio({ className, peso, relleno, children }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} {...trazoBase}>
+    <svg
+      viewBox="0 0 24 24"
+      width="1em"
+      height="1em"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={peso === 'bold' ? 2.25 : 1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {(peso === 'duotone' || peso === 'fill') && (
+        <g fill="currentColor" stroke="none" opacity={peso === 'fill' ? 1 : 0.2}>
+          {relleno}
+        </g>
+      )}
       {children}
     </svg>
   );
 }
 
-export function IconoReloj({ className }) {
-  return (
-    <Icono className={className}>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3.5 2" />
-    </Icono>
-  );
-}
+const LAZO_CINTA = 'M9 4a3 3 0 1 1 6 0c0 2.5-1.2 3.8-2 5.5-.3.6-.8.6-1 0C11.2 7.8 9 6.5 9 4Z';
 
-export function IconoUbicacion({ className }) {
+export function IconoCintaOncologia({ className, peso = 'regular' }) {
   return (
-    <Icono className={className}>
-      <path d="M12 21s-6.5-5.44-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.56-6.5 11-6.5 11Z" />
-      <circle cx="12" cy="10" r="2.3" />
-    </Icono>
-  );
-}
-
-export function IconoJeringa({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="m18.5 5.5-1-1-3.2 3.2m4.2-2.2L21 8l-2.5 2.5m-3-5 3 3m-9.5 1.5 4 4M5 19l2-5.2 3.2 3.2L5 19Z" />
-    </Icono>
-  );
-}
-
-export function IconoCirugia({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M6 6 18 18M18 6 6 18" />
-      <circle cx="6" cy="6" r="1.6" />
-      <circle cx="18" cy="18" r="1.6" />
-    </Icono>
-  );
-}
-
-export function IconoLaboratorio({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M10 2v6.2L5.5 17a2 2 0 0 0 1.8 2.9h9.4a2 2 0 0 0 1.8-2.9L14 8.2V2" />
-      <path d="M9 2h6M8 14h8" />
-    </Icono>
-  );
-}
-
-export function IconoEstetoscopio({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M6 3v6a4 4 0 0 0 8 0V3M6 3H4.5M14 3h1.5" />
-      <path d="M10 13v2.5a4.5 4.5 0 0 0 9 0v-1" />
-      <circle cx="19.5" cy="14.5" r="1.8" />
-    </Icono>
-  );
-}
-
-export function IconoDesparasitacion({ className }) {
-  return (
-    <Icono className={className}>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M8 8l8 8M16 8l-8 8" />
-    </Icono>
-  );
-}
-
-export function IconoDienteDental({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M12 3c-2.8 0-5 1.8-5 4.5 0 2 .6 3 1 5.5.3 1.8.6 4.5 1.8 6.5.6 1 1.6 1 2.2 0 .7-1.2.9-2.5 1-3.5.1 1 .3 2.3 1 3.5.6 1 1.6 1 2.2 0C17.4 18 17.7 15.3 18 13.5c.4-2.5 1-3.5 1-5.5 0-2.7-2.2-4.5-5-4.5-.8 0-1.5.2-2 .5-.5-.3-1.2-.5-2-.5Z" />
-    </Icono>
-  );
-}
-
-export function IconoRadiografia({ className }) {
-  return (
-    <Icono className={className}>
-      <rect x="4" y="3" width="16" height="18" rx="1.5" />
-      <path d="M8 8h8M8 12h8M8 16h5" />
-    </Icono>
-  );
-}
-
-export function IconoCintaOncologia({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M9 4a3 3 0 1 1 6 0c0 2.5-1.2 3.8-2 5.5-.3.6-.8.6-1 0C11.2 7.8 9 6.5 9 4Z" />
+    <IconoPropio className={className} peso={peso} relleno={<path d={LAZO_CINTA} />}>
+      <path d={LAZO_CINTA} />
       <path d="M9.5 9.8 6 20M14.5 9.8 18 20" />
-    </Icono>
+    </IconoPropio>
   );
 }
 
-export function IconoEndoscopia({ className }) {
+export function IconoEndoscopia({ className, peso = 'regular' }) {
   return (
-    <Icono className={className}>
+    <IconoPropio className={className} peso={peso} relleno={<circle cx="7" cy="6" r="2.3" />}>
       <circle cx="7" cy="6" r="2.3" />
       <path d="M8.6 7.6c3 3 5.6 4 8.4 6 1.3 1 2.2 2.4 2.2 3.9a2.5 2.5 0 0 1-5 0c0-1 .4-1.7 1-2.4" />
-    </Icono>
-  );
-}
-
-export function IconoPata({ className }) {
-  return (
-    <Icono className={className}>
-      <circle cx="7" cy="8" r="1.5" />
-      <circle cx="11.5" cy="5.5" r="1.5" />
-      <circle cx="16" cy="8" r="1.5" />
-      <path d="M11.7 10.2c2.7 0 4.8 2.1 4.8 4.4 0 2.1-1.6 3.4-3.7 3.4-.9 0-1.4-.4-2-.4-.6 0-1.1.4-2 .4-2.1 0-3.8-1.3-3.8-3.4 0-2.3 2-4.4 4.7-4.4Z" />
-    </Icono>
-  );
-}
-
-// Cerrar sesion: puerta con flecha saliendo.
-export function IconoSalir({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-    </Icono>
-  );
-}
-
-export function IconoFlechaDerecha({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M4 12h16M13 5l7 7-7 7" />
-    </Icono>
-  );
-}
-
-export function IconoAlerta({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M12 9v4M12 16.5h.01" />
-      <path d="M10.3 3.9 2.7 17.5A1.6 1.6 0 0 0 4.1 20h15.8a1.6 1.6 0 0 0 1.4-2.5L13.7 3.9a1.6 1.6 0 0 0-3.4 0Z" />
-    </Icono>
-  );
-}
-
-export function IconoCorazon({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M12 20.2s-7.5-4.4-9.7-9.1C.9 7.8 2.6 4.5 6 4c2.1-.3 4 .8 6 3 2-2.2 3.9-3.3 6-3 3.4.5 5.1 3.8 3.7 7.1-2.2 4.7-9.7 9.1-9.7 9.1Z" />
-    </Icono>
-  );
-}
-
-export function IconoOjo({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
-      <circle cx="12" cy="12" r="3" />
-    </Icono>
-  );
-}
-
-export function IconoOjoTachado({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M2.5 12S6 5.5 12 5.5c1.9 0 3.5.5 4.8 1.2M21.5 12s-1.3 2.4-3.8 4.3M9.9 15.4A3 3 0 0 1 14.1 11" />
-      <path d="M4 4l16 16" />
-    </Icono>
-  );
-}
-
-export function IconoEscudo({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M12 3.5 5 6v5.5c0 4.5 3 7.6 7 9 4-1.4 7-4.5 7-9V6Z" />
-      <path d="m9 12 2 2 4-4.2" />
-    </Icono>
-  );
-}
-
-export function IconoCalendario({ className }) {
-  return (
-    <Icono className={className}>
-      <rect x="3.5" y="5" width="17" height="15" rx="2" />
-      <path d="M8 3v4M16 3v4M3.5 10h17" />
-    </Icono>
-  );
-}
-
-export function IconoMedicos({ className }) {
-  return (
-    <Icono className={className}>
-      <circle cx="9" cy="8" r="3" />
-      <path d="M3.5 20c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2" />
-      <path d="M16 4.3a3 3 0 0 1 0 5.8M20.5 20c0-2.6-1.8-4.7-4.2-5.1" />
-    </Icono>
-  );
-}
-
-export function IconoSede({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M5 20V9l7-4.5L19 9v11" />
-      <path d="M9.5 20v-6h5v6M4 20h16" />
-    </Icono>
-  );
-}
-
-export function IconoBuscar({ className }) {
-  return (
-    <Icono className={className}>
-      <circle cx="10.5" cy="10.5" r="6.5" />
-      <path d="m20 20-4.5-4.5" />
-    </Icono>
-  );
-}
-
-export function IconoCampana({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10Z" />
-      <path d="M10 19a2 2 0 0 0 4 0" />
-    </Icono>
-  );
-}
-
-export function IconoMas({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M12 5v14M5 12h14" />
-    </Icono>
-  );
-}
-
-export function IconoLapiz({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3Z" />
-      <path d="M13.5 6.5l3 3" />
-    </Icono>
-  );
-}
-
-export function IconoPapelera({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
-      <path d="M10 11v6M14 11v6" />
-    </Icono>
-  );
-}
-
-export function IconoChevronAbajo({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="m6 9 6 6 6-6" />
-    </Icono>
-  );
-}
-
-export function IconoPersona({ className }) {
-  return (
-    <Icono className={className}>
-      <circle cx="12" cy="8" r="3.5" />
-      <path d="M4.5 20c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7" />
-    </Icono>
-  );
-}
-
-export function IconoGrafica({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M4 20V10M10 20V4M16 20v-7M4 20h16" />
-    </Icono>
-  );
-}
-
-export function IconoEngranaje({ className }) {
-  return (
-    <Icono className={className}>
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.55 1.55M7.15 16.85 5.6 18.4M18.4 18.4l-1.55-1.55M7.15 7.15 5.6 5.6" />
-    </Icono>
-  );
-}
-
-export function IconoX({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M6 6l12 12M18 6 6 18" />
-    </Icono>
-  );
-}
-
-// Flujo de agendamiento (incremento 4): check de seleccion/hito
-// completado, amenidades de la sede y el correo de confirmacion.
-export function IconoCheck({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="m5 12.5 4.5 4.5L19 7.5" />
-    </Icono>
-  );
-}
-
-export function IconoCarro({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M5 16.5V12l1.8-4.6A1.5 1.5 0 0 1 8.2 6.5h7.6a1.5 1.5 0 0 1 1.4.9L19 12v4.5M5 16.5h14M5 16.5V19M19 16.5V19M5 12h14" />
-      <circle cx="8" cy="14.3" r=".6" />
-      <circle cx="16" cy="14.3" r=".6" />
-    </Icono>
-  );
-}
-
-export function IconoCorreo({ className }) {
-  return (
-    <Icono className={className}>
-      <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
-      <path d="m4 7 8 6 8-6" />
-    </Icono>
-  );
-}
-
-// Editor de foto de mascota.
-export function IconoCamara({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9Z" />
-      <circle cx="12" cy="13" r="3.3" />
-    </Icono>
-  );
-}
-
-export function IconoRotar({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M19 12a7 7 0 1 1-2.05-4.95M19 4.5V8h-3.5" />
-    </Icono>
-  );
-}
-
-export function IconoImagen({ className }) {
-  return (
-    <Icono className={className}>
-      <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
-      <circle cx="9" cy="10" r="1.8" />
-      <path d="m20.5 16-5-5-8.5 8.5" />
-    </Icono>
-  );
-}
-
-// Detalle de la cita.
-export function IconoDocumento({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M14 3.5H7.5A1.5 1.5 0 0 0 6 5v14a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V7.5L14 3.5Z" />
-      <path d="M14 3.5V7.5h4M9 12h6M9 15.5h6" />
-    </Icono>
-  );
-}
-
-export function IconoPeso({ className }) {
-  return (
-    <Icono className={className}>
-      <path d="M6.5 8h11l1.8 11.5H4.7L6.5 8Z" />
-      <circle cx="12" cy="5.5" r="2" />
-    </Icono>
-  );
-}
-
-// Menu de acciones de una tarjeta (tres puntos verticales).
-export function IconoPuntos({ className }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-      <circle cx="12" cy="5.5" r="1.7" />
-      <circle cx="12" cy="12" r="1.7" />
-      <circle cx="12" cy="18.5" r="1.7" />
-    </svg>
-  );
-}
-
-// Recordatorio de medicacion.
-export function IconoPastilla({ className }) {
-  return (
-    <Icono className={className}>
-      <rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-45 12 12)" />
-      <path d="m9.5 9.5 5 5" />
-    </Icono>
+    </IconoPropio>
   );
 }

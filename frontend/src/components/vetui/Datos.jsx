@@ -27,7 +27,7 @@ export function TarjetaDato({ icono: Icono, tono = 'azul', valor, detalle, etiqu
       }`}
     >
       <span className={`flex h-10 w-10 items-center justify-center rounded-full ${TONOS_ICONO[tono] ?? TONOS_ICONO.azul}`}>
-        {Icono && <Icono className="h-5 w-5" />}
+        {Icono && <Icono className="h-5 w-5" peso="duotone" />}
       </span>
       <span className="mt-4 text-2xl font-bold text-slate-900">{valor}</span>
       {detalle && <span className="text-xs font-medium text-slate-700">{detalle}</span>}

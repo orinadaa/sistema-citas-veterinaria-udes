@@ -19,6 +19,7 @@ import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoJeringa } from '../icons';
+import { iconoDeServicio } from '../../utils/iconoServicio';
 import { formatearCOP } from '../../utils/moneda';
 
 const FORM_VACIO = { nombre: '', descripcion: '', categoriaId: '', precio: '', duracionMinutos: '30', activo: true };
@@ -216,17 +217,21 @@ export function PanelServicios({ busquedaInicial }) {
           columns={[
             {
               header: 'Servicio',
-              render: (s) => (
+              render: (s) => {
+                // Mismo icono por servicio que ve el cliente al agendar.
+                const IconoServicio = iconoDeServicio(s.nombre);
+                return (
                 <div className="flex items-center gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                    <IconoJeringa className="h-4 w-4" />
+                    <IconoServicio className="h-4 w-4" peso="duotone" />
                   </span>
                   <div>
                     <p className="font-medium text-slate-900">{s.nombre}</p>
                     {s.descripcion && <p className="text-xs text-slate-400">{s.descripcion}</p>}
                   </div>
                 </div>
-              ),
+                );
+              },
             },
             { header: 'Categoría', render: (s) => <CategoryBadge nombre={s.categoria_nombre} color={s.categoria_color} /> },
             { header: 'Precio', render: (s) => formatearCOP(s.precio) },
@@ -286,7 +291,7 @@ export function PanelServicios({ busquedaInicial }) {
           {servicioEditando && (
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                <IconoJeringa className="h-5 w-5" />
+                <IconoJeringa className="h-5 w-5" peso="duotone" />
               </span>
               <CategoryBadge nombre={servicioEditando.categoria_nombre} color={servicioEditando.categoria_color} />
             </div>
