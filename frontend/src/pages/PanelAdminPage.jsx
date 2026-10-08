@@ -40,16 +40,13 @@ export function PanelAdminPage() {
   // global del topbar (AdminHeader) cuando se elige un resultado, y
   // cada panel lo usa para inicializar su propio filtro de busqueda.
   const [busquedaPorPestana, setBusquedaPorPestana] = useState({});
-  // "Nueva cita" del Inicio lleva a Citas con la ventana ya abierta.
-  const [abrirNuevaCita, setAbrirNuevaCita] = useState(false);
 
   function navegarDesdeBusqueda(pestanaDestino, termino) {
     setBusquedaPorPestana((anterior) => ({ ...anterior, [pestanaDestino]: termino }));
     setPestana(pestanaDestino);
   }
 
-  function irA(modulo, opciones = {}) {
-    setAbrirNuevaCita(Boolean(opciones.nuevaCita));
+  function irA(modulo) {
     setPestana(modulo);
   }
 
@@ -92,7 +89,7 @@ export function PanelAdminPage() {
 
             {/* Administrador de sede */}
             {esAdministrador && pestana === 'inicio' && <PanelInicioSede onIr={irA} />}
-            {esAdministrador && pestana === 'citas' && <PanelCitasSeguimiento abrirNuevaAlEntrar={abrirNuevaCita} />}
+            {esAdministrador && pestana === 'citas' && <PanelCitasSeguimiento />}
             {esAdministrador && pestana === 'medicos' && <PanelMedicos busquedaInicial={busquedaPorPestana.medicos} />}
             {esAdministrador && pestana === 'pacientes' && <PanelPacientes busquedaInicial={busquedaPorPestana.pacientes} />}
             {esAdministrador && pestana === 'servicios' && <PanelServicios soloLectura busquedaInicial={busquedaPorPestana.servicios} />}
