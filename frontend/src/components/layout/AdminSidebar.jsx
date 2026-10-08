@@ -27,8 +27,9 @@ import {
   IconoGrafica,
   IconoEngranaje,
   IconoFlechaDerecha,
+  IconoSalir,
 } from '../icons';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import logoColor from '../../assets/logocolor.png';
 import logoCorto from '../../assets/logocorto.png';
 
@@ -79,6 +80,13 @@ export function AdminSidebar({ activo, onCambiar }) {
     });
   }
 
+  // Igual que el "Cerrar sesión" de la barra superior (AdminHeader): se
+  // limpia la sesion y se recarga, sin render intermedio sobre /admin.
+  function salir() {
+    localStorage.removeItem(CLAVE_ALMACENAMIENTO);
+    window.location.href = '/';
+  }
+
   return (
     <aside
       className={`vidrio hidden max-h-full shrink-0 flex-col overflow-y-auto transition-[width,border-radius] duration-200 lg:flex ${
@@ -125,6 +133,24 @@ export function AdminSidebar({ activo, onCambiar }) {
           );
         })}
       </nav>
+
+      {/* Cerrar sesion, al fondo del menu. Texto e icono en rojo (pedido de
+          Oriana) sobre una pildora clara: ningun rojo llega a contraste AA
+          directo sobre el vidrio azul. */}
+      <div className={`px-4 ${colapsado ? 'mt-5' : 'mt-6'}`}>
+        <button
+          type="button"
+          onClick={salir}
+          title={colapsado ? 'Cerrar sesión' : undefined}
+          aria-label="Cerrar sesión"
+          className={`flex items-center gap-3 bg-white/85 text-sm font-semibold text-red-700 ring-1 ring-white transition ${
+            colapsado ? 'h-11 w-11 justify-center rounded-full' : 'w-full rounded-boton px-4 py-2.5'
+          }`}
+        >
+          <IconoSalir className="h-5 w-5 shrink-0" />
+          {!colapsado && 'Cerrar sesión'}
+        </button>
+      </div>
     </aside>
   );
 }
