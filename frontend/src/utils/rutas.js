@@ -5,8 +5,13 @@
 // Iniciar sesion: la mayoria de quienes agendan por primera vez no
 // tienen cuenta todavia, y RegistroPage ya tiene un link a "Inicia
 // sesión" (con este mismo "next") para quien si la tiene.
-export function rutaAgendarCita(estaAutenticado, servicioId) {
-  const destino = servicioId ? `/agendar?${new URLSearchParams({ servicioId })}` : '/agendar';
+// servicioId / sedeId (opcionales): llegan a /agendar ya preseleccionados
+// (tarjetas de Servicios y de Horarios del landing).
+export function rutaAgendarCita(estaAutenticado, servicioId, sedeId) {
+  const parametros = new URLSearchParams();
+  if (servicioId) parametros.set('servicioId', servicioId);
+  if (sedeId) parametros.set('sedeId', sedeId);
+  const destino = parametros.size > 0 ? `/agendar?${parametros}` : '/agendar';
   return estaAutenticado ? destino : `/registrarse?next=${encodeURIComponent(destino)}`;
 }
 

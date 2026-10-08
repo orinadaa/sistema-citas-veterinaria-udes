@@ -93,8 +93,14 @@ export function AgendarCitaPage() {
         // registrada: no existe "sede de preferencia" en el perfil). Las
         // citas vienen ordenadas por fecha_hora DESC; solo si esa sede
         // sigue activa.
+        // ?sedeId=... (tarjetas de Horarios del landing) manda sobre esa
+        // sugerencia: el cliente ya eligio la sede; solo si sigue activa.
+        const sedeInicial = parametros.get('sedeId');
         const ultima = datosCitas.citas[0];
-        if (ultima && datosSedes.sedes.some((s) => s.id === ultima.sede_id)) {
+        if (sedeInicial && datosSedes.sedes.some((s) => s.id === sedeInicial)) {
+          setSedeId(sedeInicial);
+          setSedeSugerida(false);
+        } else if (ultima && datosSedes.sedes.some((s) => s.id === ultima.sede_id)) {
           setSedeId(ultima.sede_id);
           setSedeSugerida(true);
         }
