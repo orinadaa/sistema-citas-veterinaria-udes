@@ -318,7 +318,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
                 step="0.1"
                 value={form.pesoKg}
                 onChange={actualizar('pesoKg')}
-                className="w-full rounded-lg border border-slate-300 py-2 pl-3 pr-9 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+                className="w-full campo py-2 pl-3 pr-9 text-sm"
               />
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">kg</span>
             </div>
@@ -343,7 +343,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
             value={form.caracteristicas}
             onChange={actualizar('caracteristicas')}
             placeholder="Ej. Muy cariñosa, alérgica a ciertos alimentos, etc."
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+            className="campo px-3 py-2 text-sm"
           />
           <p className="self-end text-xs text-slate-400">
             {form.caracteristicas.length}/{MAX_CARACTERISTICAS}

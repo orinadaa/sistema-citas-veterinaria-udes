@@ -22,6 +22,8 @@ import { Tabs } from '../ui/Tabs';
 import { EstadoError } from '../ui/EstadoError';
 import { PanelHorarios } from './PanelHorarios';
 import { PanelGaleria } from './PanelGaleria';
+import { Desplegable } from '../form/Desplegable';
+import { CampoBusqueda } from '../form/CampoBusqueda';
 
 const TABS = [
   { id: 'usuarios', label: 'Usuarios' },
@@ -183,22 +185,21 @@ export function PanelConfiguracion() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <input
-              type="search"
+            <CampoBusqueda
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Buscar usuario..."
-              className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="flex-1"
             />
-            <select
+            <Desplegable
               value={filtroEstado}
               onChange={(e) => setFiltroEstado(e.target.value)}
-              className="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none"
+              className="campo px-3 py-2 text-sm"
             >
               <option value="">Todos los estados</option>
               <option value="activo">Activo</option>
               <option value="inactivo">Inactivo</option>
-            </select>
+            </Desplegable>
           </div>
 
           {cargando ? (
@@ -295,26 +296,26 @@ export function PanelConfiguracion() {
             <label htmlFor="rol-usuario-config" className="text-sm font-medium text-slate-700">
               Rol<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
             </label>
-            <select
+            <Desplegable
               id="rol-usuario-config"
               value={form.rol}
               onChange={(e) => setForm({ ...form, rol: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="campo px-3 py-2 text-sm"
             >
               <option value="veterinario">Médico Veterinario</option>
               <option value="administrador">Administrador</option>
-            </select>
+            </Desplegable>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="sede-usuario-config" className="text-sm font-medium text-slate-700">
               Sede<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
             </label>
-            <select
+            <Desplegable
               id="sede-usuario-config"
               value={form.sedeId}
               onChange={(e) => setForm({ ...form, sedeId: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+              className="campo px-3 py-2 text-sm"
             >
               <option value="">Selecciona una sede</option>
               {sedes.map((s) => (
@@ -322,7 +323,7 @@ export function PanelConfiguracion() {
                   {s.nombre}
                 </option>
               ))}
-            </select>
+            </Desplegable>
           </div>
 
           <Campo id="telefono-usuario-config" label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />

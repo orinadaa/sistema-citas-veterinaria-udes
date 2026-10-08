@@ -21,13 +21,14 @@
 import { useRef } from 'react';
 import { ESPECIES, RAZAS_POR_ESPECIE, razaEsTextoLibre } from '../../utils/razas';
 import { IconoAve, IconoCheck, IconoGato, IconoPata, IconoPerro } from '../icons';
+import { Desplegable } from './Desplegable';
 
 // Icono de cada especie del catalogo; "Otro" (y cualquier especie antigua
 // escrita a mano) usa la huella.
 const ICONO_ESPECIE = { Canino: IconoPerro, Felino: IconoGato, Ave: IconoAve };
 
 const CLASE_CAMPO =
-  'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30 disabled:bg-slate-50 disabled:text-slate-400';
+  'w-full campo px-3 py-2 text-sm';
 
 function Etiqueta({ htmlFor, id, children }) {
   const Elemento = htmlFor ? 'label' : 'span';
@@ -128,7 +129,7 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
             className={CLASE_CAMPO}
           />
         ) : (
-          <select
+          <Desplegable
             id={`${idPrefijo}-raza`}
             required
             disabled={!especie}
@@ -142,7 +143,7 @@ export function SelectorEspecieRaza({ idPrefijo, especie, raza, onChange, classN
                 {opcion}
               </option>
             ))}
-          </select>
+          </Desplegable>
         )}
       </div>
     </div>

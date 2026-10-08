@@ -116,11 +116,10 @@ export function CampoFecha({
         aria-expanded={abierto}
         aria-label={etiqueta ? undefined : `${etiquetaAccesible || 'Fecha'}: ${valor ? formatear(valor) : placeholder}`}
         onClick={() => setAbierto((v) => !v)}
-        className={`flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-blue/30 ${
-          abierto ? 'border-brand-blue ring-2 ring-brand-blue/30' : 'border-slate-300 hover:border-slate-400'
-        }`}
+        data-abierto={abierto || undefined}
+        className="campo flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm"
       >
-        <span className={`truncate ${valor ? 'text-slate-900' : 'text-slate-400'}`}>{valor ? formatear(valor) : placeholder}</span>
+        <span className={`truncate ${valor ? 'text-slate-900' : 'text-slate-500'}`}>{valor ? formatear(valor) : placeholder}</span>
         <IconoCalendario className="h-4 w-4 shrink-0 text-brand-blue" />
       </button>
 

@@ -16,6 +16,8 @@ import { hoyComoFechaLocal } from '../../utils/fecha';
 import { EstadoError } from '../ui/EstadoError';
 import { CampoFecha } from '../form/CampoFecha';
 import { IconoPapelera, IconoReloj, IconoSede } from '../icons';
+import { Desplegable } from '../form/Desplegable';
+import { CampoHora } from '../form/CampoHora';
 
 // Lunes primero (la BD guarda 0 = domingo).
 const DIAS = [
@@ -28,7 +30,7 @@ const DIAS = [
   { dia: 0, nombre: 'Domingo' },
 ];
 const CLASE_CAMPO =
-  'rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30 disabled:bg-slate-50 disabled:text-slate-400';
+  'campo px-2.5 py-1.5 text-sm';
 
 const hhmm = (hora) => String(hora).slice(0, 5);
 const formatoFecha = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -287,7 +289,7 @@ export function PanelDisponibilidadMedico() {
                               horaFin: d.horaFin || (h ? hhmm(h.hora_fin) : ''),
                             });
                           }}
-                          className="h-4 w-4 accent-brand-blue"
+                          className="casilla"
                         />
                         {nombre}
                       </label>
@@ -295,7 +297,7 @@ export function PanelDisponibilidadMedico() {
                         <span className="text-xs text-slate-400">Ninguna sede atiende este día</span>
                       ) : (
                         <>
-                          <select
+                          <Desplegable
                             aria-label={`Sede del ${nombre}`}
                             value={d.sedeId}
                             disabled={!d.activo}
@@ -308,9 +310,8 @@ export function PanelDisponibilidadMedico() {
                                 {s.ciudad}
                               </option>
                             ))}
-                          </select>
-                          <input
-                            type="time"
+                          </Desplegable>
+                          <CampoHora
                             aria-label={`Hora de inicio del ${nombre}`}
                             value={d.horaInicio}
                             disabled={!d.activo}
@@ -318,8 +319,7 @@ export function PanelDisponibilidadMedico() {
                             className={CLASE_CAMPO}
                           />
                           <span className="text-sm text-slate-400">a</span>
-                          <input
-                            type="time"
+                          <CampoHora
                             aria-label={`Hora de fin del ${nombre}`}
                             value={d.horaFin}
                             disabled={!d.activo}
@@ -341,16 +341,14 @@ export function PanelDisponibilidadMedico() {
                     {d.activo && d.conPausa && (
                       <div className="mt-2 flex flex-wrap items-center gap-2 pl-32 text-sm text-slate-600">
                         <span>Pausa</span>
-                        <input
-                          type="time"
+                        <CampoHora
                           aria-label={`Inicio de la pausa del ${nombre}`}
                           value={d.pausaInicio}
                           onChange={(e) => cambiarDia(dia, { pausaInicio: e.target.value })}
                           className={CLASE_CAMPO}
                         />
                         <span className="text-slate-400">a</span>
-                        <input
-                          type="time"
+                        <CampoHora
                           aria-label={`Fin de la pausa del ${nombre}`}
                           value={d.pausaFin}
                           onChange={(e) => cambiarDia(dia, { pausaFin: e.target.value })}
@@ -424,14 +422,13 @@ export function PanelDisponibilidadMedico() {
                 type="checkbox"
                 checked={bloqueo.soloHoras}
                 onChange={(e) => setBloqueo({ ...bloqueo, soloHoras: e.target.checked })}
-                className="h-4 w-4 accent-brand-blue"
+                className="casilla"
               />
               Solo unas horas (no el día completo)
             </label>
             {bloqueo.soloHoras && (
               <div className="flex items-center gap-2">
-                <input
-                  type="time"
+                <CampoHora
                   required
                   aria-label="Hora de inicio del bloqueo"
                   value={bloqueo.horaInicio}
@@ -439,8 +436,7 @@ export function PanelDisponibilidadMedico() {
                   className={CLASE_CAMPO}
                 />
                 <span className="text-sm text-slate-400">a</span>
-                <input
-                  type="time"
+                <CampoHora
                   required
                   aria-label="Hora de fin del bloqueo"
                   value={bloqueo.horaFin}

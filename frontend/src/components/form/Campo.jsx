@@ -1,5 +1,8 @@
 // components/form/Campo.jsx
 // Bloque de formulario consistente: label arriba, input, error debajo.
+// El input usa `campo`, el campo unico de vetUI (styles/vetui.css): mismo
+// borde, radio y foco que el Desplegable, el buscador, la hora y la fecha.
+// Con `error`, aria-invalid lo pinta en rojo.
 // Si type="password", agrega un boton de mostrar/ocultar clave dentro
 // del input (icono de ojo).
 import { useState } from 'react';
@@ -28,9 +31,7 @@ export function Campo({ id, label, error, type = 'text', required, ...resto }) {
           required={required}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={`w-full rounded-lg border px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 ${
-            esClave ? 'pr-10' : ''
-          } ${error ? 'border-red-400 focus:border-red-500' : 'border-slate-300 focus:border-blue-500'}`}
+          className={`campo w-full px-3 py-2 text-sm ${esClave ? 'pr-10' : ''}`}
           {...resto}
         />
         {esClave && (

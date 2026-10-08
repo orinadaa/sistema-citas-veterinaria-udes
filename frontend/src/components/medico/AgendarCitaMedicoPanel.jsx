@@ -31,11 +31,13 @@ import { TimeSlotPicker } from '../agendar/TimeSlotPicker';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { IconoBuscar, IconoCheck, IconoX } from '../icons';
 import { iniciales } from '../../utils/texto';
+import { Desplegable } from '../form/Desplegable';
+import { CampoBusqueda } from '../form/CampoBusqueda';
 
 const PASOS = ['Paciente y mascota', 'Servicio', 'Fecha y hora', 'Confirmar'];
 const MAX_NOTAS = 255;
 const CLASE_CAMPO =
-  'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30';
+  'w-full campo px-3 py-2 text-sm';
 
 function Stepper({ paso }) {
   return (
@@ -257,8 +259,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
               ) : (
                 <div className="relative">
                   <IconoBuscar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="search"
+                  <CampoBusqueda
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     placeholder="Buscar por nombre, correo o teléfono..."
@@ -304,14 +305,14 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
                     Este paciente no tiene mascotas registradas. Agrégala desde Mis pacientes.
                   </p>
                 ) : (
-                  <select id="mascota-cita-medico" value={mascotaId} onChange={(e) => setMascotaId(e.target.value)} className={CLASE_CAMPO}>
+                  <Desplegable id="mascota-cita-medico" value={mascotaId} onChange={(e) => setMascotaId(e.target.value)} className={CLASE_CAMPO}>
                     <option value="">Selecciona una mascota</option>
                     {listaMascotas.map((m) => (
                       <option key={m.id} value={m.id}>
                         {m.nombre} ({especieYRaza(m)})
                       </option>
                     ))}
-                  </select>
+                  </Desplegable>
                 )}
                 {mascota && <TarjetaMascotaResumen mascota={mascota} />}
               </div>
@@ -329,7 +330,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
                 No tienes servicios asignados. El administrador los asigna desde Médicos.
               </p>
             ) : (
-              <select
+              <Desplegable
                 id="servicio-cita-medico"
                 value={servicioId}
                 onChange={(e) => {
@@ -344,7 +345,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
                     {s.nombre}
                   </option>
                 ))}
-              </select>
+              </Desplegable>
             )}
             {servicio && <TarjetaServicio servicio={servicio} />}
           </div>

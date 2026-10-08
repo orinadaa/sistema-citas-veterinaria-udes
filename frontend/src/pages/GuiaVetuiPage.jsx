@@ -28,6 +28,10 @@ import {
 } from '../components/vetui';
 import { CampoFecha } from '../components/form/CampoFecha';
 import { ZonaFoto } from '../components/form/ZonaFoto';
+import { Campo } from '../components/form/Campo';
+import { Desplegable } from '../components/form/Desplegable';
+import { CampoHora } from '../components/form/CampoHora';
+import { CampoBusqueda } from '../components/form/CampoBusqueda';
 import { FotoMascotaModal } from '../components/cliente/FotoMascotaModal';
 import { IconoCalendario, IconoCorazon, IconoFlechaDerecha, IconoMas, IconoPata } from '../components/icons';
 
@@ -59,6 +63,19 @@ export function GuiaVetuiPage() {
   const [fechaNacimiento, setFechaNacimiento] = useState('');
   const [foto, setFoto] = useState(null);
   const [editorFoto, setEditorFoto] = useState(false);
+  // Bloque "Campos de formulario".
+  const [campos, setCampos] = useState({
+    nombre: '',
+    precio: '60000',
+    sede: '',
+    raza: 'Caniche (poodle)',
+    hora: '08:00',
+    busqueda: '',
+    notas: '',
+    zoom: 40,
+    soloHoras: true,
+  });
+  const cambiar = (clave) => (e) => setCampos((actual) => ({ ...actual, [clave]: e.target.value }));
 
   // Scroll en dos posiciones, como en todas las paginas con <Navbar/>.
   useAnclaTopbar();
@@ -252,6 +269,89 @@ export function GuiaVetuiPage() {
                 maximo={new Date().toLocaleDateString('en-CA')}
               />
               <ZonaFoto fotoUrl={foto} onClick={() => setEditorFoto(true)} />
+            </div>
+          </Superficie>
+
+          {/* Campos de formulario: ninguno usa el aspecto que pone el
+              navegador (ver docs/vetui.md > Campos de formulario). */}
+          <Superficie tono="blanco" className="flex flex-col gap-5">
+            <TituloSeccion
+              titulo="Campos de formulario"
+              descripcion="Texto, número, lista desplegable, hora, buscador, área de texto, deslizador y casilla comparten borde, radio y foco. Ninguno usa el control del navegador."
+            />
+            <div className="grid items-start gap-5 md:grid-cols-3">
+              <Campo id="guia-nombre" label="Nombre" value={campos.nombre} onChange={cambiar('nombre')} placeholder="Ej. Luna" required />
+              <Campo id="guia-precio" label="Precio (COP)" type="number" min="0" step="1000" value={campos.precio} onChange={cambiar('precio')} />
+              <Campo id="guia-error" label="Correo" type="email" value="correo-sin-arroba" onChange={() => {}} error="Escribe un correo válido." />
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="guia-sede" className="text-sm font-medium text-slate-700">
+                  Sede
+                </label>
+                <Desplegable id="guia-sede" value={campos.sede} onChange={cambiar('sede')} className="px-3 py-2 text-sm">
+                  <option value="">Todas las sedes</option>
+                  <option value="bga">Clínica Veterinaria UDES Bucaramanga</option>
+                  <option value="vup">Clínica Veterinaria UDES Valledupar</option>
+                </Desplegable>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="guia-raza" className="text-sm font-medium text-slate-700">
+                  Raza (lista larga)
+                </label>
+                <Desplegable id="guia-raza" value={campos.raza} onChange={cambiar('raza')} className="px-3 py-2 text-sm">
+                  {['Akita', 'Beagle', 'Bóxer', 'Bulldog francés', 'Caniche (poodle)', 'Chihuahua', 'Dálmata', 'Golden retriever', 'Husky siberiano', 'Labrador retriever', 'Pastor alemán', 'Pug', 'Schnauzer', 'Shih tzu'].map(
+                    (raza) => (
+                      <option key={raza} value={raza}>
+                        {raza}
+                      </option>
+                    )
+                  )}
+                </Desplegable>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="guia-hora" className="text-sm font-medium text-slate-700">
+                  Hora
+                </label>
+                <CampoHora id="guia-hora" value={campos.hora} onChange={cambiar('hora')} className="px-3 py-2 text-sm" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-slate-700">Buscador</span>
+                <CampoBusqueda value={campos.busqueda} onChange={cambiar('busqueda')} placeholder="Buscar servicio..." />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="guia-deshabilitado" className="text-sm font-medium text-slate-700">
+                  Deshabilitado
+                </label>
+                <Desplegable id="guia-deshabilitado" value="" disabled className="px-3 py-2 text-sm">
+                  <option value="">Primero elige la especie</option>
+                </Desplegable>
+              </div>
+              <div className="flex flex-col gap-3">
+                <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+                  Deslizador
+                  <input type="range" min="0" max="100" value={campos.zoom} onChange={cambiar('zoom')} />
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    className="casilla"
+                    checked={campos.soloHoras}
+                    onChange={(e) => setCampos((actual) => ({ ...actual, soloHoras: e.target.checked }))}
+                  />
+                  Bloquear solo algunas horas
+                </label>
+              </div>
+              <div className="flex flex-col gap-1.5 md:col-span-3">
+                <label htmlFor="guia-notas" className="text-sm font-medium text-slate-700">
+                  Área de texto (crece con lo que se escribe)
+                </label>
+                <textarea
+                  id="guia-notas"
+                  value={campos.notas}
+                  onChange={cambiar('notas')}
+                  placeholder="Ej. Muy cariñosa, alérgica a ciertos alimentos."
+                  className="campo px-3 py-2 text-sm"
+                />
+              </div>
             </div>
           </Superficie>
 
