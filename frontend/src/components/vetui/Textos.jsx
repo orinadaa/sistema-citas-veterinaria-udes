@@ -1,5 +1,5 @@
 // components/vetui/Textos.jsx
-// Encabezados de vetUI (escala tipográfica, Manrope):
+// Encabezados de vetUI (escala tipográfica, Inter):
 //   EncabezadoPagina  antetítulo + h1 + descripción, sobre el fondo.
 //                     `acciones` a la derecha, `imagen` decorativa.
 //   TituloSeccion     h2 de una Superficie (vidrio), con número de paso

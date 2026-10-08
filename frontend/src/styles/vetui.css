@@ -41,8 +41,8 @@
   --color-category-cyan: #51caeb;
   --color-category-orange: #d98a3d;
 
-  /* Tipografía: Manrope en todo el sistema (font-sans es la del body). */
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  /* Tipografía: Inter en todo el sistema (font-sans es la del body). */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
 
   /* Radios
