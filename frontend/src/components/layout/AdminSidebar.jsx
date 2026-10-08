@@ -46,7 +46,7 @@ const ITEMS_MEDICO = [
 ];
 
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';
-const ANCHO_EXPANDIDO = '248px';
+const ANCHO_EXPANDIDO = '244px';
 const ANCHO_COLAPSADO = '76px';
 
 function leerColapsadoGuardado() {
@@ -77,7 +77,7 @@ export function AdminSidebar({ activo, onCambiar }) {
 
   return (
     <aside
-      className="hidden h-screen shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 py-6 transition-[width] duration-200 lg:flex"
+      className="vidrio hidden h-full shrink-0 flex-col overflow-y-auto rounded-superficie py-6 transition-[width] duration-200 lg:flex"
       style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO }}
     >
       <div className={`flex items-center px-4 ${colapsado ? 'justify-center' : 'justify-end'}`}>
