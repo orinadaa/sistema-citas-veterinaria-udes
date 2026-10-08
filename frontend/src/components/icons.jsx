@@ -52,6 +52,7 @@ import { PlusIcon } from '@phosphor-icons/react/dist/csr/Plus';
 import { ScalesIcon } from '@phosphor-icons/react/dist/csr/Scales';
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors';
 import { ShieldCheckIcon } from '@phosphor-icons/react/dist/csr/ShieldCheck';
+import { SparkleIcon } from '@phosphor-icons/react/dist/csr/Sparkle';
 import { SignOutIcon } from '@phosphor-icons/react/dist/csr/SignOut';
 import { StethoscopeIcon } from '@phosphor-icons/react/dist/csr/Stethoscope';
 import { SyringeIcon } from '@phosphor-icons/react/dist/csr/Syringe';
@@ -151,6 +152,10 @@ export function IconoCamara(props) {
 }
 export function IconoRotar(props) {
   return <Icono de={ArrowClockwiseIcon} {...props} />;
+}
+// Destello decorativo (avisos del landing).
+export function IconoDestello(props) {
+  return <Icono de={SparkleIcon} {...props} />;
 }
 // Ajustar el encuadre de una foto.
 export function IconoEncuadre(props) {
