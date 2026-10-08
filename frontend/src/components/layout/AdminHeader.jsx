@@ -116,11 +116,11 @@ export function AdminHeader({ onNavegar }) {
 
   return (
     <header
-      className="vidrio-blanco relative z-30 flex shrink-0 items-center justify-between rounded-superficie px-6"
-      style={{ height: '68px' }}
+      className="relative z-30 flex shrink-0 items-center justify-between gap-4"
+      style={{ height: '52px' }}
     >
       <div ref={contenedorRef} className="relative max-w-md flex-1">
-        <div className="flex items-center gap-2 rounded-boton bg-white/70 px-4 py-2 text-slate-500 ring-1 ring-slate-900/10">
+        <div className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton px-5 text-white">
           <IconoBuscar className="h-4 w-4 shrink-0" />
           <input
             type="search"
@@ -132,7 +132,7 @@ export function AdminHeader({ onNavegar }) {
             onFocus={() => setDropdownAbierto(true)}
             disabled={!buscadorActivo}
             placeholder={esMedico ? 'Buscar paciente o mascota...' : 'Buscar paciente, médico o servicio...'}
-            className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none disabled:cursor-not-allowed"
+            className="w-full bg-transparent text-sm font-medium text-white placeholder:text-white/80 focus:outline-none disabled:cursor-not-allowed"
           />
         </div>
 
@@ -216,10 +216,10 @@ export function AdminHeader({ onNavegar }) {
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {/* Campana: adorno hasta que exista el modulo de notificaciones. No
             es un boton (no hace nada): no reacciona al mouse ni recibe foco. */}
-        <span aria-hidden="true" className="relative p-2 text-slate-500">
+        <span aria-hidden="true" className="vidrio flex h-[52px] w-[52px] items-center justify-center rounded-full text-white">
           <IconoCampana className="h-5 w-5" />
         </span>
 
@@ -227,16 +227,16 @@ export function AdminHeader({ onNavegar }) {
           <button
             type="button"
             onClick={() => setMenuAbierto((v) => !v)}
-            className="boton-texto flex items-center gap-2 rounded-xl px-2 py-1.5 transition"
+            className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton pl-2 pr-4 transition"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-navy text-xs font-semibold text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-xs font-semibold text-white">
               {iniciales || '·'}
             </span>
             <span className="hidden text-left sm:block">
-              <span className="block text-sm font-medium text-slate-800">{usuario?.nombreCompleto}</span>
-              <span className="block text-xs text-slate-600">{ETIQUETA_ROL[usuario?.rol] ?? usuario?.rol}</span>
+              <span className="block text-sm font-semibold text-white">{usuario?.nombreCompleto}</span>
+              <span className="block text-xs text-white/85">{ETIQUETA_ROL[usuario?.rol] ?? usuario?.rol}</span>
             </span>
-            <IconoChevronAbajo className="h-4 w-4 text-slate-400" />
+            <IconoChevronAbajo className="h-4 w-4 text-white/85" />
           </button>
 
           {menuAbierto && (
