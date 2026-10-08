@@ -333,6 +333,16 @@ export function subirFotoMedicoAdmin(id, archivo, token) {
   return subirArchivo(`/administracion/medicos/${id}/foto`, archivo, token);
 }
 
+// Foto del servicio en la pagina publica. fondoClaro: la foto es clara en
+// la zona del texto (el slider la oscurece mas).
+export function subirFotoServicio(id, archivo, fondoClaro, token) {
+  return subirArchivo(`/servicios/${id}/foto`, archivo, token, { fondoClaro: String(fondoClaro) });
+}
+
+export function quitarFotoServicio(id, token) {
+  return solicitar(`/servicios/${id}/foto`, { metodo: 'DELETE', token });
+}
+
 // Galeria del inicio (fotos del Hero).
 export function obtenerGaleria() {
   return solicitar('/galeria');

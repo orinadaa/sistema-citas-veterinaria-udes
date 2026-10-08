@@ -6,7 +6,7 @@
 // mismo patron que un sistema real con almacenamiento de archivos,
 // adaptado a una entrega local. Se usa para fotos de mascotas, la foto
 // de perfil del medico (la sube el o el administrador), la foto de cada
-// sede y la galeria del inicio.
+// sede, la galeria del inicio y la foto de cada servicio.
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs/promises');
@@ -63,6 +63,7 @@ const fotosMascotas = crearReceptorFoto('mascotas');
 const fotosUsuarios = crearReceptorFoto('usuarios');
 const fotosSedes = crearReceptorFoto('sedes');
 const fotosGaleria = crearReceptorFoto('galeria');
+const fotosServicios = crearReceptorFoto('servicios');
 
 module.exports = {
   subirFotoMascota: fotosMascotas.middleware,
@@ -71,4 +72,5 @@ module.exports = {
   fotosUsuarios,
   fotosSedes,
   fotosGaleria,
+  fotosServicios,
 };

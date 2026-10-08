@@ -2,15 +2,22 @@
 // RF-11: catalogo de servicios veterinarios (categoria, precio, duracion
 // estimada, estado). La duracion se muestra al cliente en el resumen del
 // flujo de agendamiento; es informativa (la agenda sigue en franjas de 30 min).
+// Cada servicio puede llevar una foto: es la que se ve en la seccion
+// "Servicios" de la pagina publica (un servicio sin foto no aparece ahi).
 import { useEffect, useMemo, useState } from 'react';
 import {
   obtenerServiciosAdmin,
   obtenerCategoriasServicio,
   crearServicio,
   actualizarServicio,
+  subirFotoServicio,
+  quitarFotoServicio,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
+import { ZonaImagen } from '../form/ZonaImagen';
+import { SelectorEncuadre } from '../form/SelectorEncuadre';
+import { fondoEsClaro } from '../../utils/imagen';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { CategoryBadge } from '../ui/CategoryBadge';
@@ -22,7 +29,17 @@ import { IconoJeringa } from '../icons';
 import { iconoDeServicio } from '../../utils/iconoServicio';
 import { formatearCOP } from '../../utils/moneda';
 
-const FORM_VACIO = { nombre: '', descripcion: '', categoriaId: '', precio: '', duracionMinutos: '30', activo: true };
+const FORM_VACIO = {
+  nombre: '',
+  descripcion: '',
+  categoriaId: '',
+  precio: '',
+  duracionMinutos: '30',
+  activo: true,
+  fotoDescripcion: '',
+  fotoFocoX: 50,
+  fotoFocoY: 50,
+};
 
 export function PanelServicios({ busquedaInicial }) {
   const { token } = useAuth();
@@ -47,6 +64,29 @@ export function PanelServicios({ busquedaInicial }) {
   const [form, setForm] = useState(FORM_VACIO);
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
+  // Foto del servicio para la pagina publica. `foto` es la imagen nueva ya
+  // reducida (Blob), pendiente de subir al guardar; `quitarFoto` marca que
+  // al guardar se elimina la actual.
+  const [foto, setFoto] = useState(null);
+  const [vistaPrevia, setVistaPrevia] = useState(null);
+  const [fondoClaro, setFondoClaro] = useState(true);
+  const [quitarFoto, setQuitarFoto] = useState(false);
+
+  useEffect(() => () => vistaPrevia && URL.revokeObjectURL(vistaPrevia), [vistaPrevia]);
+
+  function limpiarFoto() {
+    setFoto(null);
+    setVistaPrevia(null);
+    setQuitarFoto(false);
+  }
+
+  async function elegirFoto(blob) {
+    setFoto(blob);
+    setVistaPrevia(URL.createObjectURL(blob));
+    setQuitarFoto(false);
+    setForm((actual) => ({ ...actual, fotoFocoX: 50, fotoFocoY: 50 }));
+    setFondoClaro(await fondoEsClaro(blob));
+  }
 
   function cargar() {
     setCargando(true);
@@ -85,6 +125,7 @@ export function PanelServicios({ busquedaInicial }) {
   function abrirCrear() {
     setServicioEditando(null);
     setForm(FORM_VACIO);
+    limpiarFoto();
     setError('');
     setPanelAbierto(true);
   }
@@ -98,7 +139,11 @@ export function PanelServicios({ busquedaInicial }) {
       precio: String(servicio.precio),
       duracionMinutos: String(servicio.duracion_minutos ?? 30),
       activo: servicio.activo,
+      fotoDescripcion: servicio.foto_descripcion || '',
+      fotoFocoX: servicio.foto_foco_x ?? 50,
+      fotoFocoY: servicio.foto_foco_y ?? 50,
     });
+    limpiarFoto();
     setError('');
     setPanelAbierto(true);
   }
@@ -121,20 +166,44 @@ export function PanelServicios({ busquedaInicial }) {
     };
 
     setGuardando(true);
+    let servicioId = servicioEditando?.id;
     try {
       if (servicioEditando) {
         await actualizarServicio(servicioEditando.id, cuerpo, token);
       } else {
-        await crearServicio(cuerpo, token);
+        servicioId = (await crearServicio(cuerpo, token)).servicio.id;
       }
-      setPanelAbierto(false);
-      cargar();
     } catch (err) {
       setError(err.message);
+      setGuardando(false);
+      return;
+    }
+
+    // Los datos ya quedaron guardados: si la foto falla, se avisa sin
+    // perder lo demas (el panel queda abierto para reintentar).
+    try {
+      if (foto) {
+        await subirFotoServicio(servicioId, foto, fondoClaro, token);
+      } else if (quitarFoto) {
+        await quitarFotoServicio(servicioId, token);
+      }
+      if (foto || (servicioEditando?.foto_url && !quitarFoto)) {
+        await actualizarServicio(
+          servicioId,
+          { fotoDescripcion: form.fotoDescripcion, fotoFocoX: form.fotoFocoX, fotoFocoY: form.fotoFocoY },
+          token
+        );
+      }
+      setPanelAbierto(false);
+    } catch (err) {
+      setError(`El servicio se guardó, pero la foto no: ${err.message}`);
     } finally {
       setGuardando(false);
+      cargar();
     }
   }
+
+  const fotoMostrada = quitarFoto ? null : vistaPrevia || servicioEditando?.foto_url || null;
 
   async function desactivarDesdeElPanel() {
     if (!servicioEditando) return;
@@ -222,9 +291,19 @@ export function PanelServicios({ busquedaInicial }) {
                 const IconoServicio = iconoDeServicio(s.nombre);
                 return (
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                    <IconoServicio className="h-4 w-4" peso="duotone" />
-                  </span>
+                  {s.foto_url ? (
+                    <img
+                      src={s.foto_url}
+                      alt=""
+                      loading="lazy"
+                      style={{ objectPosition: `${s.foto_foco_x}% ${s.foto_foco_y}%` }}
+                      className="h-9 w-9 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
+                      <IconoServicio className="h-4 w-4" peso="duotone" />
+                    </span>
+                  )}
                   <div>
                     <p className="font-medium text-slate-900">{s.nombre}</p>
                     {s.descripcion && <p className="text-xs text-slate-400">{s.descripcion}</p>}
@@ -330,6 +409,60 @@ export function PanelServicios({ busquedaInicial }) {
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
             />
           </div>
+
+          {/* Foto del servicio en la pagina publica. */}
+          <fieldset className="flex flex-col gap-3 rounded-xl border border-slate-200 p-3">
+            <legend className="px-1 text-sm font-medium text-slate-700">Foto en la página de inicio (opcional)</legend>
+            <ZonaImagen
+              id="foto-servicio"
+              imagenUrl={fotoMostrada}
+              onElegir={elegirFoto}
+              ayuda="Sube la foto que se verá en la sección Servicios del inicio"
+              alt={form.nombre ? `Foto de ${form.nombre}` : 'Foto del servicio'}
+              proporcion="aspect-[4/3]"
+            />
+            {fotoMostrada ? (
+              <>
+                <Campo
+                  id="foto-descripcion-servicio"
+                  label="Descripción de la foto (opcional)"
+                  value={form.fotoDescripcion}
+                  maxLength={200}
+                  onChange={(e) => setForm({ ...form, fotoDescripcion: e.target.value })}
+                  placeholder="Ej. Veterinaria vacunando a un perro"
+                />
+                <p className="-mt-1.5 text-xs text-slate-500">
+                  Di qué se ve en la foto: es lo que escuchan las personas que usan lector de pantalla.
+                </p>
+                <SelectorEncuadre
+                  src={fotoMostrada}
+                  focoX={form.fotoFocoX}
+                  focoY={form.fotoFocoY}
+                  onCambiar={(foco) =>
+                    setForm((actual) => ({ ...actual, fotoFocoX: foco.focoX, fotoFocoY: foco.focoY }))
+                  }
+                  proporcionVista="aspect-square"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFoto(null);
+                    setVistaPrevia(null);
+                    setQuitarFoto(true);
+                  }}
+                  className="self-start rounded-boton px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                >
+                  Quitar foto
+                </button>
+                {foto && <p className="text-xs text-slate-500">La foto se sube al guardar.</p>}
+              </>
+            ) : (
+              <p className="text-xs text-slate-500">
+                Sin foto, el servicio no aparece en la sección Servicios del inicio (igual se puede agendar).
+                {quitarFoto && ' La foto actual se quitará al guardar.'}
+              </p>
+            )}
+          </fieldset>
 
           <Campo
             id="precio-servicio"

@@ -211,9 +211,10 @@ export function ServicioSlider({ slides }) {
                         decoding="async"
                         fetchPriority={activa ? 'high' : 'low'}
                         draggable={false}
+                        style={{ objectPosition: slide.enfoque }}
                         className={`h-full w-full object-cover transition-transform duration-[1200ms] ease-out motion-reduce:scale-100 motion-reduce:transition-none ${
-                          slide.enfoque
-                        } ${activa ? 'scale-100' : 'scale-[1.02]'}`}
+                          activa ? 'scale-100' : 'scale-[1.02]'
+                        }`}
                       />
                     )}
                     <div className={`absolute inset-0 ${overlay.base}`} aria-hidden="true" />
