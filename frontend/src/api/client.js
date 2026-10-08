@@ -43,6 +43,16 @@ export function obtenerSedes() {
   return solicitar('/sedes');
 }
 
+// Paneles de inicio: el dia de la sede (administrador) y el estado del
+// sistema (superadministrador).
+export function obtenerTableroSede(token) {
+  return solicitar('/administracion/tablero', { token });
+}
+
+export function obtenerResumenSistema(token) {
+  return solicitar('/administracion/sistema', { token });
+}
+
 export function obtenerSedesAdmin(token) {
   return solicitar('/sedes/admin', { token });
 }

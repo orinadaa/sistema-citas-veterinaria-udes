@@ -18,8 +18,10 @@ export function rutaAgendarCita(estaAutenticado, servicioId, sedeId) {
 // A donde va cada rol despues de iniciar sesion cuando no hay un
 // "next" explicito en la URL: /panel es la vista del cliente, /admin
 // es el panel administrativo/veterinario (ver App.jsx).
+export const ROLES_DEL_PANEL = ['superadministrador', 'administrador', 'veterinario'];
+
 export function rutaPanelPorRol(rol) {
-  return rol === 'administrador' || rol === 'veterinario' ? '/admin' : '/panel';
+  return ROLES_DEL_PANEL.includes(rol) ? '/admin' : '/panel';
 }
 
 // A donde navegar justo despues de iniciar sesion. "next" (si viene en
@@ -33,6 +35,7 @@ export function rutaPanelPorRol(rol) {
 // Rutas protegidas a las que puede ir cada rol (ver App.jsx).
 const RUTAS_DEL_ROL = {
   cliente: ['/panel', '/agendar'],
+  superadministrador: ['/admin'],
   administrador: ['/admin'],
   veterinario: ['/admin'],
 };

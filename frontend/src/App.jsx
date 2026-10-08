@@ -6,6 +6,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegistroPage } from './pages/RegistroPage';
 import { OlvideClavePage } from './pages/OlvideClavePage';
 import { PanelClientePage } from './pages/PanelClientePage';
+import { ROLES_DEL_PANEL } from './utils/rutas';
 import { PanelAdminPage } from './pages/PanelAdminPage';
 import { AgendarCitaPage } from './pages/AgendarCitaPage';
 import { GuiaVetuiPage } from './pages/GuiaVetuiPage';
@@ -39,7 +40,7 @@ function Rutas() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute rolesPermitidos={['administrador', 'veterinario']}>
+              <ProtectedRoute rolesPermitidos={ROLES_DEL_PANEL}>
                 <PanelAdminPage />
               </ProtectedRoute>
             }
