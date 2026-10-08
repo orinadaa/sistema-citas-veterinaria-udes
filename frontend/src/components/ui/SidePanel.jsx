@@ -6,6 +6,8 @@
 // padre sigue marcando su contenido principal `inert` mientras esta
 // abierto (ver cualquier PanelXxx.jsx que lo use) para que tampoco se
 // pueda llegar a el con el teclado.
+// Material vetUI: velo azul detras y el panel en cristal fuerte, flotando
+// con margen y esquinas redondeadas (no pegado al borde de la ventana).
 // `footer` (opcional) fija los botones de accion abajo, fuera del
 // scroll del cuerpo -- si no se pasa, el panel queda sin pie fijo.
 // z-50: mas alto que el navbar publico (Navbar.jsx, sticky z-40) -- con
@@ -31,22 +33,22 @@ export function SidePanel({ isOpen, onClose, title, children, footer }) {
     <div
       aria-hidden="true"
       onClick={onClose}
-      className={`fixed inset-0 z-50 bg-black/40 transition-opacity duration-200 ${
+      className={`velo fixed inset-0 z-50 transition-opacity duration-200 ${
         isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
     />
     <div
-      className={`fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-[480px] flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-200 ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
+      className={`cristal-fuerte fixed inset-y-3 right-3 z-50 flex w-[calc(100%-1.5rem)] max-w-[480px] flex-col overflow-hidden rounded-superficie transition-transform duration-200 ${
+        isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'
       }`}
       aria-hidden={!isOpen}
     >
-      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+      <div className="flex items-center justify-between border-b border-slate-900/10 px-6 py-5">
         <h2 className="font-heading text-lg font-semibold text-brand-navy">{title}</h2>
         <button
           type="button"
           onClick={onClose}
-          className="boton-texto rounded-boton p-1.5 text-slate-400 transition hover:text-slate-600"
+          className="boton-texto rounded-boton p-1.5 text-slate-600 transition hover:text-slate-900"
         >
           <IconoX className="h-5 w-5" />
         </button>
@@ -54,7 +56,7 @@ export function SidePanel({ isOpen, onClose, title, children, footer }) {
 
       <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
 
-      {footer && <div className="border-t border-slate-100 px-6 py-4">{footer}</div>}
+      {footer && <div className="border-t border-slate-900/10 px-6 py-4">{footer}</div>}
     </div>
     </>
   );
