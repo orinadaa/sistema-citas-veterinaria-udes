@@ -225,3 +225,5 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".
+
+**Pocas opciones fijas: botones, no desplegable.** Cuando un campo tiene pocas opciones conocidas se muestran todas como botones (grupo de radio), no en un `<select>`: sexo (`SelectorSexo`, Hembra / Macho) y especie de la mascota (`SelectorEspecieRaza`: tarjetas más altas que anchas con el icono del animal arriba y el nombre abajo). La opción elegida se marca con color, check y negrita (nunca solo con color), y el grupo se recorre con las flechas del teclado. Las listas largas (raza) siguen siendo desplegables.

@@ -20,15 +20,18 @@
 import { ArrowClockwiseIcon } from '@phosphor-icons/react/dist/csr/ArrowClockwise';
 import { ArrowRightIcon } from '@phosphor-icons/react/dist/csr/ArrowRight';
 import { BellIcon } from '@phosphor-icons/react/dist/csr/Bell';
+import { BirdIcon } from '@phosphor-icons/react/dist/csr/Bird';
 import { BoneIcon } from '@phosphor-icons/react/dist/csr/Bone';
 import { BugIcon } from '@phosphor-icons/react/dist/csr/Bug';
 import { CalendarBlankIcon } from '@phosphor-icons/react/dist/csr/CalendarBlank';
 import { CameraIcon } from '@phosphor-icons/react/dist/csr/Camera';
 import { CarIcon } from '@phosphor-icons/react/dist/csr/Car';
 import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown';
+import { CatIcon } from '@phosphor-icons/react/dist/csr/Cat';
 import { ChartBarIcon } from '@phosphor-icons/react/dist/csr/ChartBar';
 import { CheckIcon } from '@phosphor-icons/react/dist/csr/Check';
 import { ClockIcon } from '@phosphor-icons/react/dist/csr/Clock';
+import { DogIcon } from '@phosphor-icons/react/dist/csr/Dog';
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/csr/DotsThreeVertical';
 import { EnvelopeIcon } from '@phosphor-icons/react/dist/csr/Envelope';
 import { EyeIcon } from '@phosphor-icons/react/dist/csr/Eye';
@@ -161,6 +164,17 @@ export function IconoPeso(props) {
 // en linea normal los puntos casi no se ven.
 export function IconoPuntos(props) {
   return <Icono de={DotsThreeVerticalIcon} peso="bold" {...props} />;
+}
+
+// --- Especies (SelectorEspecieRaza) ---
+export function IconoPerro(props) {
+  return <Icono de={DogIcon} {...props} />;
+}
+export function IconoGato(props) {
+  return <Icono de={CatIcon} {...props} />;
+}
+export function IconoAve(props) {
+  return <Icono de={BirdIcon} {...props} />;
 }
 
 // --- Veterinaria y servicios ---
