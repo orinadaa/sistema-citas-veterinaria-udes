@@ -10,13 +10,14 @@
 // Sin ingresos ni facturacion (fuera del alcance del proyecto).
 // onIr(modulo): cambia de modulo en el menu lateral.
 import { useEffect, useState } from 'react';
-import { obtenerTableroSede } from '../../api/client';
+import { obtenerClientes, obtenerHorarios, obtenerServicios, obtenerTableroSede } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearHora } from '../../utils/fecha';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { EstadoError } from '../ui/EstadoError';
 import { AvisosAtencion } from './AvisosAtencion';
+import { NuevaCitaModal } from './NuevaCitaModal';
 import { IconoCalendario, IconoReloj, IconoGrafica, IconoX, IconoPata } from '../icons';
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -42,6 +43,27 @@ export function PanelInicioSede({ onIr }) {
       vigente = false;
     };
   }, [token, intento]);
+
+  // "Nueva cita" abre la misma ventana de Citas aqui mismo, sin salir del
+  // Inicio. Lo que la ventana necesita (clientes, servicios y dias con
+  // horario de la sede) se pide una sola vez, la primera vez que se abre.
+  const [nuevaCitaAbierta, setNuevaCitaAbierta] = useState(false);
+  const [paraAgendar, setParaAgendar] = useState(null);
+  const sedeId = usuario?.sedeId;
+
+  function abrirNuevaCita() {
+    setNuevaCitaAbierta(true);
+    if (paraAgendar) return;
+    Promise.all([obtenerClientes(token), obtenerServicios(), obtenerHorarios(sedeId)])
+      .then(([clientes, servicios, horarios]) =>
+        setParaAgendar({
+          clientes: clientes.usuarios,
+          servicios: servicios.servicios,
+          diasAbiertos: new Set(horarios.horario.map((h) => h.dia_semana)),
+        })
+      )
+      .catch((err) => console.error('No se pudieron cargar los datos para agendar:', err));
+  }
 
   const nombre = usuario?.nombreCompleto?.split(' ')[0] ?? '';
 
@@ -80,7 +102,21 @@ export function PanelInicioSede({ onIr }) {
         title={`Hola, ${nombre}`}
         subtitle={`${fechaDeHoy()} · ${sede.nombre}`}
         actionLabel="Nueva cita"
-        onAction={() => onIr('citas', { nuevaCita: true })}
+        onAction={abrirNuevaCita}
+      />
+
+      {/* Al agendar se queda en Inicio y se refrescan las citas de hoy. */}
+      <NuevaCitaModal
+        abierto={nuevaCitaAbierta}
+        onCerrar={() => setNuevaCitaAbierta(false)}
+        onAgendada={() => {
+          setNuevaCitaAbierta(false);
+          setIntento((n) => n + 1);
+        }}
+        clientes={paraAgendar?.clientes ?? []}
+        servicios={paraAgendar?.servicios ?? []}
+        sedeId={sedeId}
+        diasAbiertos={paraAgendar?.diasAbiertos ?? null}
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
