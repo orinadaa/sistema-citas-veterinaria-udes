@@ -9,18 +9,19 @@
 // veterinario busca entre SUS pacientes (dueños y mascotas) y lleva a
 // "Mis pacientes" con el termino precargado.
 import { useEffect, useRef, useState } from 'react';
-import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPata, IconoPersona, IconoSalir } from '../icons';
+import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPata, IconoPersona, IconoSalir, IconoSede } from '../icons';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
-import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerPacientesMedico } from '../../api/client';
+import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerPacientesMedico, obtenerSedesAdmin, obtenerUsuarios } from '../../api/client';
 
 const ETIQUETA_ROL = { superadministrador: 'Superadministrador', administrador: 'Administrador de sede', veterinario: 'Médico Veterinario' };
-const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [], mascotas: [] };
+const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [], mascotas: [], usuarios: [], sedes: [] };
 
 export function AdminHeader({ onNavegar }) {
   const { usuario, token } = useAuth();
   const esAdmin = usuario?.rol === 'administrador';
   const esMedico = usuario?.rol === 'veterinario';
-  const buscadorActivo = esAdmin || esMedico;
+  const esSuper = usuario?.rol === 'superadministrador';
+  const buscadorActivo = esAdmin || esMedico || esSuper;
 
   function salir() {
     // No se llama cerrarSesion() (dispara un re-render vía React state):
@@ -72,6 +73,25 @@ export function AdminHeader({ onNavegar }) {
         setBuscando(false);
         return;
       }
+      if (esSuper) {
+        // El superadministrador busca en lo que administra: cuentas (por
+        // nombre o correo), sedes y servicios del catalogo.
+        const [usuarios, sedes, servicios] = await Promise.all([
+          obtenerUsuarios(token).catch(() => ({ usuarios: [] })),
+          obtenerSedesAdmin(token).catch(() => ({ sedes: [] })),
+          obtenerServiciosAdmin(token).catch(() => ({ servicios: [] })),
+        ]);
+        setResultados({
+          ...RESULTADOS_VACIOS,
+          usuarios: usuarios.usuarios
+            .filter((u) => u.rol !== 'superadministrador' && (coincide(u.nombre_completo) || coincide(u.correo)))
+            .slice(0, 5),
+          sedes: sedes.sedes.filter((s) => coincide(s.nombre) || coincide(s.ciudad)).slice(0, 4),
+          servicios: servicios.servicios.filter((s) => coincide(s.nombre)).slice(0, 4),
+        });
+        setBuscando(false);
+        return;
+      }
       // Si una consulta falla, esa categoria queda vacia en vez de dejar
       // el buscador colgado en "Buscando...".
       const [servicios, medicos, pacientes] = await Promise.all([
@@ -91,7 +111,7 @@ export function AdminHeader({ onNavegar }) {
     }, 300);
 
     return () => clearTimeout(temporizador);
-  }, [termino, token, buscadorActivo, esMedico]);
+  }, [termino, token, buscadorActivo, esMedico, esSuper]);
 
   useEffect(() => {
     function alHacerClicFuera(evento) {
@@ -112,7 +132,13 @@ export function AdminHeader({ onNavegar }) {
 
   const terminoValido = termino.trim().length >= 2;
   const hayResultados =
-    resultados.pacientes.length + resultados.medicos.length + resultados.servicios.length + resultados.mascotas.length > 0;
+    resultados.pacientes.length +
+      resultados.medicos.length +
+      resultados.servicios.length +
+      resultados.mascotas.length +
+      resultados.usuarios.length +
+      resultados.sedes.length >
+    0;
 
   const vistaPreviaAbierta = buscadorActivo && dropdownAbierto && terminoValido;
 
@@ -134,8 +160,7 @@ export function AdminHeader({ onNavegar }) {
         />
       )}
 
-      {/* El superadministrador no tiene buscador: no opera pacientes ni citas. */}
-      <div ref={contenedorRef} className={`relative max-w-md flex-1 ${vistaPreviaAbierta ? 'z-50' : ''} ${buscadorActivo ? '' : 'invisible'}`}>
+      <div ref={contenedorRef} className={`relative max-w-md flex-1 ${vistaPreviaAbierta ? 'z-50' : ''}`}>
         <div className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton px-5 text-white">
           <IconoBuscar className="h-4 w-4 shrink-0" />
           <input
@@ -151,7 +176,7 @@ export function AdminHeader({ onNavegar }) {
               setMenuAbierto(false);
             }}
             disabled={!buscadorActivo}
-            placeholder={esMedico ? 'Buscar paciente o mascota...' : 'Buscar paciente, médico o servicio...'}
+            placeholder={esMedico ? 'Buscar paciente o mascota...' : esSuper ? 'Buscar usuario, sede o servicio...' : 'Buscar paciente, médico o servicio...'}
             className="w-full bg-transparent text-sm font-medium text-white placeholder:text-white/80 focus:outline-none disabled:cursor-not-allowed"
           />
         </div>
@@ -162,6 +187,41 @@ export function AdminHeader({ onNavegar }) {
 
             {!buscando && !hayResultados && (
               <p className="px-4 py-2 text-sm text-white/85">Sin resultados para &quot;{termino.trim()}&quot;.</p>
+            )}
+
+            {!buscando && resultados.usuarios.length > 0 && (
+              <div className="mb-1">
+                <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-white/75">Usuarios</p>
+                {resultados.usuarios.map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => seleccionarResultado('usuarios', u.nombre_completo)}
+                    className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
+                  >
+                    <IconoPersona className="h-4 w-4 shrink-0 text-brand-amber-400" />
+                    <span className="truncate">{u.nombre_completo}</span>
+                    <span className="shrink-0 text-xs text-white/75">· {ETIQUETA_ROL[u.rol] ?? 'Cliente'}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!buscando && resultados.sedes.length > 0 && (
+              <div className="mb-1">
+                <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-white/75">Sedes</p>
+                {resultados.sedes.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => seleccionarResultado('sedes', s.nombre)}
+                    className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
+                  >
+                    <IconoSede className="h-4 w-4 shrink-0 text-brand-amber-400" />
+                    {s.nombre}
+                  </button>
+                ))}
+              </div>
             )}
 
             {!buscando && resultados.pacientes.length > 0 && (
