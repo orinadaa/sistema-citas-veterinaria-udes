@@ -9,8 +9,8 @@
 // items (ITEMS_MEDICO).
 //
 // Material: vidrio que desenfoca el fondo. Contraido queda como una pildora
-// flotante (igual que la pildora de la topbar del cliente) que abraza sus
-// iconos; expandido es un panel de alto completo.
+// flotante de alto completo (igual que la pildora de la topbar del
+// cliente, en vertical); "Cerrar sesión" queda siempre abajo del todo.
 //
 // Se puede expandir/contraer (solo iconos); el estado se recuerda entre
 // sesiones. El ancho es fijo dentro de cada estado (no cambia con el
@@ -89,8 +89,8 @@ export function AdminSidebar({ activo, onCambiar }) {
 
   return (
     <aside
-      className={`vidrio hidden max-h-full shrink-0 flex-col overflow-y-auto transition-[width,border-radius] duration-200 lg:flex ${
-        colapsado ? 'self-start rounded-[38px] py-4' : 'h-full rounded-superficie py-6'
+      className={`vidrio hidden h-full shrink-0 flex-col overflow-y-auto transition-[width,border-radius] duration-200 lg:flex ${
+        colapsado ? 'rounded-[38px] py-4' : 'rounded-superficie py-6'
       }`}
       style={{ width: colapsado ? ANCHO_COLAPSADO : ANCHO_EXPANDIDO }}
     >
