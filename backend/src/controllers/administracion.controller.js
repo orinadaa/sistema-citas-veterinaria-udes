@@ -9,7 +9,9 @@ const citaModel = require('../models/cita.model');
 const usuarioModel = require('../models/usuario.model');
 const mascotaModel = require('../models/mascota.model');
 const pacienteModel = require('../models/paciente.model');
+const perfilMedicoModel = require('../models/perfilMedico.model');
 const correoService = require('../services/correo.service');
+const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 const { generarContrasenaTemporal } = require('../utils/contrasena.util');
 
 const RONDAS_SAL = 10;
@@ -74,7 +76,7 @@ async function crearMedico(req, res, next) {
 async function actualizarMedico(req, res, next) {
   try {
     const { id } = req.params;
-    const { nombreCompleto, telefono, documento, fotoUrl, biografia, activo } = req.body;
+    const { nombreCompleto, telefono, documento, biografia, activo } = req.body;
 
     const medico = await usuarioModel.buscarPorId(id);
     if (!medico || medico.rol !== 'veterinario') {
@@ -84,10 +86,38 @@ async function actualizarMedico(req, res, next) {
       return res.status(403).json({ mensaje: 'Solo puedes administrar médicos de tu propia sede.' });
     }
 
-    await medicoModel.actualizar(id, { nombreCompleto, telefono, documento, fotoUrl, biografia, activo });
+    await medicoModel.actualizar(id, { nombreCompleto, telefono, documento, biografia, activo });
     const medicos = await medicoModel.listarConServicios(req.usuario.sedeId);
     return res.status(200).json({ medico: medicos.find((m) => m.id === id) });
   } catch (error) {
+    next(error);
+  }
+}
+
+// POST /api/administracion/medicos/:id/foto — solo administrador, de su
+// sede (multipart, campo "foto"). Misma carpeta y mismo campo que la
+// foto que el propio medico sube en "Mi perfil": es la misma foto.
+async function subirFotoMedico(req, res, next) {
+  const archivoNuevo = req.file ? `${fotosUsuarios.rutaPublica}/${req.file.filename}` : null;
+  try {
+    if (!archivoNuevo) {
+      return res.status(400).json({ mensaje: 'Adjunta una imagen JPG o PNG en el campo "foto".' });
+    }
+    const medico = await usuarioModel.buscarPorId(req.params.id);
+    if (!medico || medico.rol !== 'veterinario') {
+      await fotosUsuarios.borrar(archivoNuevo);
+      return res.status(404).json({ mensaje: 'Médico no encontrado.' });
+    }
+    if (medico.sede_id !== req.usuario.sedeId) {
+      await fotosUsuarios.borrar(archivoNuevo);
+      return res.status(403).json({ mensaje: 'Solo puedes administrar médicos de tu propia sede.' });
+    }
+
+    const anterior = await perfilMedicoModel.actualizarFoto(medico.id, archivoNuevo);
+    await fotosUsuarios.borrar(anterior);
+    return res.status(200).json({ fotoUrl: archivoNuevo });
+  } catch (error) {
+    await fotosUsuarios.borrar(archivoNuevo);
     next(error);
   }
 }
@@ -214,6 +244,7 @@ module.exports = {
   listarMedicos,
   crearMedico,
   actualizarMedico,
+  subirFotoMedico,
   actualizarServiciosDeMedico,
   actualizarEspecialidadesDeMedico,
   listarCitas,

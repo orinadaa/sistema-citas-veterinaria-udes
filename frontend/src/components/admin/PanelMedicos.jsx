@@ -2,6 +2,7 @@
 // RF-10/RF-11: CRUD de medicos de la sede del administrador (perfil,
 // especialidades y que servicio presta cada uno).
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   obtenerMedicosAdmin,
   obtenerServiciosAdmin,
@@ -10,9 +11,12 @@ import {
   actualizarMedico,
   actualizarServiciosDeMedico,
   actualizarEspecialidadesDeMedico,
+  subirFotoMedicoAdmin,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
+import { ZonaFoto } from '../form/ZonaFoto';
+import { FotoMascotaModal } from '../cliente/FotoMascotaModal';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { CategoryBadge } from '../ui/CategoryBadge';
@@ -27,7 +31,6 @@ const FORM_VACIO = {
   correo: '',
   documento: '',
   telefono: '',
-  fotoUrl: '',
   biografia: '',
   activo: true,
 };
@@ -64,6 +67,19 @@ export function PanelMedicos({ busquedaInicial }) {
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [aviso, setAviso] = useState(null);
+  // Foto del medico: se sube como archivo (ya no es un enlace). `foto` es
+  // la imagen recortada en el editor (Blob), pendiente de subir al guardar.
+  const [foto, setFoto] = useState(null);
+  const [vistaPrevia, setVistaPrevia] = useState(null);
+  const [editorFotoAbierto, setEditorFotoAbierto] = useState(false);
+
+  useEffect(() => () => vistaPrevia && URL.revokeObjectURL(vistaPrevia), [vistaPrevia]);
+
+  function limpiarFoto() {
+    setFoto(null);
+    setVistaPrevia(null);
+    setEditorFotoAbierto(false);
+  }
 
   function cargar() {
     setCargando(true);
@@ -103,6 +119,7 @@ export function PanelMedicos({ busquedaInicial }) {
   function abrirCrear() {
     setMedicoEditando(null);
     setForm(FORM_VACIO);
+    limpiarFoto();
     setError('');
     setAviso(null);
     setPanelAbierto(true);
@@ -115,10 +132,10 @@ export function PanelMedicos({ busquedaInicial }) {
       correo: medico.correo,
       documento: medico.documento || '',
       telefono: medico.telefono || '',
-      fotoUrl: medico.foto_url || '',
       biografia: medico.biografia || '',
       activo: medico.activo,
     });
+    limpiarFoto();
     setError('');
     setAviso(null);
     setPanelAbierto(true);
@@ -134,6 +151,8 @@ export function PanelMedicos({ busquedaInicial }) {
 
     setGuardando(true);
     try {
+      let medicoId = medicoEditando?.id;
+      let avisoGuardado = null;
       if (medicoEditando) {
         await actualizarMedico(
           medicoEditando.id,
@@ -141,7 +160,6 @@ export function PanelMedicos({ busquedaInicial }) {
             nombreCompleto: form.nombreCompleto,
             documento: form.documento || null,
             telefono: form.telefono || null,
-            fotoUrl: form.fotoUrl || null,
             biografia: form.biografia || null,
             activo: form.activo,
           },
@@ -162,12 +180,24 @@ export function PanelMedicos({ busquedaInicial }) {
           },
           token
         );
-        setAviso(
-          respuesta.correoEnviado
-            ? { tipo: 'exito', texto: `Médico creado. Se envió un correo con sus credenciales a ${form.correo}.` }
-            : { tipo: 'advertencia', texto: 'Médico creado, pero no se pudo enviar el correo con sus credenciales — verifica la configuración de correo.' }
-        );
+        medicoId = respuesta.medico?.id;
+        avisoGuardado = respuesta.correoEnviado
+          ? { tipo: 'exito', texto: `Médico creado. Se envió un correo con sus credenciales a ${form.correo}.` }
+          : { tipo: 'advertencia', texto: 'Médico creado, pero no se pudo enviar el correo con sus credenciales — verifica la configuración de correo.' };
       }
+      // Los datos ya quedaron guardados: si la foto falla, se avisa sin
+      // perder lo demas.
+      if (foto && medicoId) {
+        try {
+          await subirFotoMedicoAdmin(medicoId, foto, token);
+        } catch (err) {
+          avisoGuardado = {
+            tipo: 'advertencia',
+            texto: `${avisoGuardado ? `${avisoGuardado.texto} ` : 'Los datos del médico se guardaron. '}La foto no se pudo subir: ${err.message}`,
+          };
+        }
+      }
+      if (avisoGuardado) setAviso(avisoGuardado);
       setPanelAbierto(false);
       cargar();
     } catch (err) {
@@ -215,6 +245,7 @@ export function PanelMedicos({ busquedaInicial }) {
   }
 
   const medicoActual = medicoEditando ? medicos.find((m) => m.id === medicoEditando.id) ?? medicoEditando : null;
+  const fotoMostrada = vistaPrevia || medicoEditando?.foto_url || null;
 
   return (
     <>
@@ -381,24 +412,14 @@ export function PanelMedicos({ busquedaInicial }) {
       }
     >
         <form id="form-medico" onSubmit={guardar} className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            {form.fotoUrl ? (
-              <img src={form.fotoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
-            ) : (
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-navy text-lg font-semibold text-white">
-                {iniciales(form.nombreCompleto) || '·'}
-              </span>
-            )}
-            <div className="flex-1">
-              <Campo
-                id="foto-medico"
-                label="URL de la foto (opcional)"
-                value={form.fotoUrl}
-                onChange={(e) => setForm({ ...form, fotoUrl: e.target.value })}
-                placeholder="https://..."
-              />
-            </div>
-          </div>
+          {/* Zona de foto estandar: el clic abre el editor de foto (abajo). */}
+          <ZonaFoto
+            fotoUrl={fotoMostrada}
+            onClick={() => setEditorFotoAbierto(true)}
+            ayuda="Sube la foto del médico (opcional)"
+            alt={form.nombreCompleto ? `Foto de ${form.nombreCompleto}` : 'Foto del médico'}
+            className="w-32 self-center"
+          />
 
           <Campo
             id="nombre-medico"
@@ -506,6 +527,23 @@ export function PanelMedicos({ busquedaInicial }) {
           {error && <p className="text-sm text-red-600">{error}</p>}
         </form>
     </SidePanel>
+
+    {/* En <body> (portal): mismo editor de foto que mascotas y "Mi perfil"
+        del medico; entrega la foto ya recortada. */}
+    {createPortal(
+      <FotoMascotaModal
+        isOpen={editorFotoAbierto}
+        onClose={() => setEditorFotoAbierto(false)}
+        titulo="Foto del médico"
+        fotoActual={fotoMostrada}
+        onGuardar={(blob) => {
+          setFoto(blob);
+          setVistaPrevia(URL.createObjectURL(blob));
+          setEditorFotoAbierto(false);
+        }}
+      />,
+      document.body
+    )}
     </>
   );
 }

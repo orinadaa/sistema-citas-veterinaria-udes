@@ -10,9 +10,11 @@ import {
   obtenerHorarios,
   actualizarHorario,
   cerrarDiaHorario,
+  subirFotoSede,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
+import { ZonaImagen } from '../form/ZonaImagen';
 import { PageHeader } from '../ui/PageHeader';
 import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
@@ -38,7 +40,6 @@ const FORM_VACIO = {
   ciudad: '',
   codigo: '',
   direccion: '',
-  fotoUrl: '',
   activo: true,
   esPrincipal: false,
   tieneParqueadero: false,
@@ -75,6 +76,17 @@ export function PanelHorarios() {
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [guardandoDia, setGuardandoDia] = useState(null);
+  // Foto de la sede: se sube como archivo (ya no es un enlace). `foto` es
+  // la imagen ya reducida (Blob), pendiente de subir al guardar.
+  const [foto, setFoto] = useState(null);
+  const [vistaPrevia, setVistaPrevia] = useState(null);
+
+  useEffect(() => () => vistaPrevia && URL.revokeObjectURL(vistaPrevia), [vistaPrevia]);
+
+  function limpiarFoto() {
+    setFoto(null);
+    setVistaPrevia(null);
+  }
 
   function cargar() {
     setCargando(true);
@@ -106,6 +118,7 @@ export function PanelHorarios() {
   function abrirCrear() {
     setSedeEditando(null);
     setForm(FORM_VACIO);
+    limpiarFoto();
     setDiasHorario(diasVacios());
     setError('');
     setPanelAbierto(true);
@@ -118,12 +131,12 @@ export function PanelHorarios() {
       ciudad: sede.ciudad,
       codigo: sede.codigo || '',
       direccion: sede.direccion || '',
-      fotoUrl: sede.foto_url || '',
       activo: sede.activo,
       esPrincipal: sede.es_principal,
       tieneParqueadero: sede.tiene_parqueadero,
       salaPetFriendly: sede.sala_pet_friendly,
     });
+    limpiarFoto();
     setDiasHorario(diasDeSede(sede.id));
     setError('');
     setPanelAbierto(true);
@@ -139,15 +152,26 @@ export function PanelHorarios() {
 
     setGuardando(true);
     try {
+      let sede = sedeEditando;
       if (sedeEditando) {
-        await actualizarSede(sedeEditando.id, form, token);
-        cargar();
+        sede = (await actualizarSede(sedeEditando.id, form, token)).sede;
       } else {
-        const resultado = await crearSede(form, token);
-        setSedeEditando(resultado.sede);
+        sede = (await crearSede(form, token)).sede;
         setDiasHorario(diasVacios());
-        cargar();
       }
+      // Los datos ya quedaron guardados: si la foto falla, se avisa sin
+      // perder lo demas (y la foto elegida sigue lista para reintentar).
+      if (foto) {
+        try {
+          const { fotoUrl } = await subirFotoSede(sede.id, foto, token);
+          sede = { ...sede, foto_url: fotoUrl };
+          limpiarFoto();
+        } catch (err) {
+          setError(`La sede se guardó, pero la foto no se pudo subir: ${err.message}`);
+        }
+      }
+      setSedeEditando(sede);
+      cargar();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -308,17 +332,20 @@ export function PanelHorarios() {
       }
     >
         <form id="form-sede" onSubmit={guardarSede} className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            {form.fotoUrl ? (
-              <img src={form.fotoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
-            ) : (
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                <IconoSede className="h-6 w-6" />
-              </span>
-            )}
-            <div className="flex-1">
-              <Campo id="foto-sede" label="URL de la foto (opcional)" value={form.fotoUrl} onChange={(e) => setForm({ ...form, fotoUrl: e.target.value })} placeholder="https://..." />
-            </div>
+          {/* Foto de la sede (apaisada: asi se ve en el inicio y al agendar). */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-sm font-medium text-slate-700">Foto de la sede (opcional)</span>
+            <ZonaImagen
+              id="foto-sede"
+              imagenUrl={vistaPrevia || sedeEditando?.foto_url || null}
+              onElegir={(blob) => {
+                setFoto(blob);
+                setVistaPrevia(URL.createObjectURL(blob));
+              }}
+              ayuda="Sube una foto de la fachada o del interior"
+              alt={form.nombre ? `Foto de ${form.nombre}` : 'Foto de la sede'}
+            />
+            {foto && <p className="text-xs text-slate-500">La foto se sube al guardar.</p>}
           </div>
 
           <Campo id="nombre-sede" label="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />

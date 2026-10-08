@@ -4,8 +4,9 @@
 // un nombre aleatorio (nunca el nombre original que manda el
 // navegador), y la base de datos solo guarda la ruta publica -- el
 // mismo patron que un sistema real con almacenamiento de archivos,
-// adaptado a una entrega local. Se usa para fotos de mascotas y para la
-// foto de perfil del medico.
+// adaptado a una entrega local. Se usa para fotos de mascotas, la foto
+// de perfil del medico (la sube el o el administrador), la foto de cada
+// sede y la galeria del inicio.
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs/promises');
@@ -60,10 +61,14 @@ function crearReceptorFoto(subcarpeta) {
 
 const fotosMascotas = crearReceptorFoto('mascotas');
 const fotosUsuarios = crearReceptorFoto('usuarios');
+const fotosSedes = crearReceptorFoto('sedes');
+const fotosGaleria = crearReceptorFoto('galeria');
 
 module.exports = {
   subirFotoMascota: fotosMascotas.middleware,
   CARPETA_FOTOS_MASCOTAS: fotosMascotas.carpeta,
   RUTA_PUBLICA_FOTOS_MASCOTAS: fotosMascotas.rutaPublica,
   fotosUsuarios,
+  fotosSedes,
+  fotosGaleria,
 };

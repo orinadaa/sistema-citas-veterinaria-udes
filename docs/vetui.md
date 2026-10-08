@@ -200,6 +200,10 @@ Aplica a los tres roles (cliente, médico y administrador), no solo a las pantal
 
 Las horas sueltas (horarios de atención, pausas, hora de un recordatorio) siguen con el campo de hora nativo: no son un calendario.
 
-**Fotos.** Todo campo donde se sube una foto usa `ZonaFoto` (`components/form/`): círculo punteado con cámara cuando está vacío, la foto en círculo y "Cambiar foto" cuando ya hay una. El clic abre `FotoMascotaModal` (elegir archivo JPG/PNG de máx. 5 MB, encuadrar, vista previa), que entrega la imagen final. Hoy lo usan la foto de mascota (cliente, médico y administrador) y la foto de perfil del médico.
+**Fotos.** Todo campo donde se sube una foto usa `ZonaFoto` (`components/form/`): círculo punteado con cámara cuando está vacío, la foto en círculo y "Cambiar foto" cuando ya hay una. El clic abre `FotoMascotaModal` (elegir archivo JPG/PNG de máx. 5 MB, encuadrar, vista previa), que entrega la imagen final. Hoy lo usan la foto de mascota (cliente, médico y administrador) y la foto del médico (en su perfil y en el panel del administrador).
+
+Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaImagen` (`components/form/`): la misma zona punteada, pero rectangular; se hace clic o se arrastra el archivo (JPG/PNG de máx. 15 MB) y la imagen se reduce en el navegador antes de subirla (`utils/imagen.js`).
+
+**Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".

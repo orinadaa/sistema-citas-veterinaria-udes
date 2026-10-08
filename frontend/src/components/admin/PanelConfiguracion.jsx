@@ -1,7 +1,7 @@
 // components/admin/PanelConfiguracion.jsx
 // Configuracion, acotada a lo que tiene respaldo real: gestion de
-// cuentas de personal (Usuarios) y Sedes (reutiliza PanelHorarios tal
-// cual). El resto de pestanas del mockup (Notificaciones, Seguridad,
+// cuentas de personal (Usuarios), Sedes (reutiliza PanelHorarios tal
+// cual) y Galeria (fotos de la portada del sitio, PanelGaleria). El resto de pestanas del mockup (Notificaciones, Seguridad,
 // Respaldo, Preferencias, Apariencia) no se construyen: sin RF/RNF ni
 // backend detras, ver docs/incremento_3_pruebas.md.
 import { useEffect, useMemo, useState } from 'react';
@@ -21,10 +21,12 @@ import { SidePanel } from '../ui/SidePanel';
 import { Tabs } from '../ui/Tabs';
 import { EstadoError } from '../ui/EstadoError';
 import { PanelHorarios } from './PanelHorarios';
+import { PanelGaleria } from './PanelGaleria';
 
 const TABS = [
   { id: 'usuarios', label: 'Usuarios' },
   { id: 'sedes', label: 'Sedes' },
+  { id: 'galeria', label: 'Galería' },
 ];
 
 const ETIQUETA_ROL = { administrador: 'Administrador', veterinario: 'Médico Veterinario' };
@@ -148,7 +150,7 @@ export function PanelConfiguracion() {
   return (
     <>
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
-      <PageHeader title="Configuración" subtitle="Gestiona las cuentas de personal y las sedes de la clínica." />
+      <PageHeader title="Configuración" subtitle="Gestiona las cuentas de personal, las sedes y las fotos de la portada del sitio." />
 
       {aviso && (
         <p
@@ -165,6 +167,8 @@ export function PanelConfiguracion() {
       <Tabs items={TABS} activeItem={pestana} onChange={setPestana} />
 
       {pestana === 'sedes' && <PanelHorarios />}
+
+      {pestana === 'galeria' && <PanelGaleria />}
 
       {pestana === 'usuarios' && (
         <div className="flex flex-col gap-6">
