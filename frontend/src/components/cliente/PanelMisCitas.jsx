@@ -8,7 +8,7 @@
 // fondo; la proxima mas cercana con anillo ambar). La foto de la mascota va
 // grande, arriba del nombre y la raza.
 //
-// Calendario + lista (diseño elegido por Oriana): a la izquierda un
+// Lista + calendario (diseño elegido por Oriana): a la derecha un
 // calendario de mes con un punto de color en cada dia que tiene cita
 // (azul proxima, verde completada, rojo cancelada); tocar un dia deja en
 // la lista solo las citas de ese dia, y tocarlo otra vez (o "Ver todas
@@ -97,9 +97,11 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
         onCambiar={setFiltro}
       />
 
-      <div className="grid items-start gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
-        {/* Calendario: se queda a la vista mientras se recorre la lista. */}
-        <Superficie as="aside" tono="blanco" aria-label="Calendario de mis citas" className="lg:sticky lg:top-28">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        {/* Calendario: a la derecha de las citas (pedido de Oriana) y a la
+            vista mientras se recorre la lista. En el codigo va primero para
+            que en celular quede arriba; lg:order-2 lo pasa a la derecha. */}
+        <Superficie as="aside" tono="blanco" aria-label="Calendario de mis citas" className="lg:sticky lg:top-28 lg:order-2">
           <DatePickerCalendar valor={dia} onChange={setDia} minimo={null} marcas={marcas} permiteQuitar />
           <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-slate-900/10 pt-4 text-xs text-slate-700">
             {LEYENDA.map((item) => (
