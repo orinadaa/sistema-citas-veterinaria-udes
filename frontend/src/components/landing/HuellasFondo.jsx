@@ -7,7 +7,7 @@
 // secciones), elegidas a mano para que no sigan un patron ni caigan dos
 // juntas; al ser fijas no cambian entre visitas ni saltan al recargar.
 // En celular se muestran solo algunas, para no ensuciar una pantalla chica.
-// Tambien las usan las pantallas de sesion (AuthLayout), en modo compacto.
+// Las pantallas de sesion (AuthLayout) usan su propia lista (denso).
 import { IconoPata } from '../icons';
 
 const HUELLAS = [
@@ -25,11 +25,31 @@ const HUELLAS = [
   { arriba: '93%', lado: { left: '22%' }, tamano: 'h-36 w-36', giro: '-rotate-[26deg]', opacidad: 'opacity-[0.05]', movil: false },
 ];
 
-// compacto: para una pagina de una sola pantalla (inicio de sesion, registro,
-// recuperar contraseña). La lista esta pensada para las cinco pantallas del
-// landing; en una sola quedaria amontonada, asi que se usa una de cada dos.
-export function HuellasFondo({ compacto = false }) {
-  const huellas = compacto ? HUELLAS.filter((_, indice) => indice % 2 === 0) : HUELLAS;
+// Huellas de las pantallas de sesion (una sola pantalla de alto): mas
+// chicas y mas numerosas que las del landing, repartidas por los bordes y
+// las esquinas para no competir con el formulario del centro.
+const HUELLAS_SESION = [
+  { arriba: '4%', lado: { left: '5%' }, tamano: 'h-28 w-28', giro: '-rotate-[18deg]', opacidad: 'opacity-[0.08]', movil: true },
+  { arriba: '2%', lado: { left: '30%' }, tamano: 'h-16 w-16', giro: 'rotate-[24deg]', opacidad: 'opacity-[0.07]', movil: false },
+  { arriba: '6%', lado: { right: '28%' }, tamano: 'h-20 w-20', giro: '-rotate-[8deg]', opacidad: 'opacity-[0.07]', movil: false },
+  { arriba: '3%', lado: { right: '6%' }, tamano: 'h-32 w-32', giro: 'rotate-[20deg]', opacidad: 'opacity-[0.08]', movil: true },
+  { arriba: '24%', lado: { left: '16%' }, tamano: 'h-20 w-20', giro: 'rotate-[34deg]', opacidad: 'opacity-[0.07]', movil: false },
+  { arriba: '28%', lado: { right: '14%' }, tamano: 'h-24 w-24', giro: '-rotate-[28deg]', opacidad: 'opacity-[0.07]', movil: false },
+  { arriba: '40%', lado: { left: '-1%' }, tamano: 'h-36 w-36', giro: 'rotate-[12deg]', opacidad: 'opacity-[0.08]', movil: false },
+  { arriba: '46%', lado: { right: '0%' }, tamano: 'h-40 w-40', giro: '-rotate-[14deg]', opacidad: 'opacity-[0.08]', movil: true },
+  { arriba: '52%', lado: { left: '20%' }, tamano: 'h-16 w-16', giro: '-rotate-[30deg]', opacidad: 'opacity-[0.07]', movil: false },
+  { arriba: '58%', lado: { right: '22%' }, tamano: 'h-16 w-16', giro: 'rotate-[16deg]', opacidad: 'opacity-[0.07]', movil: false },
+  { arriba: '70%', lado: { left: '8%' }, tamano: 'h-28 w-28', giro: 'rotate-[26deg]', opacidad: 'opacity-[0.08]', movil: false },
+  { arriba: '74%', lado: { right: '10%' }, tamano: 'h-28 w-28', giro: 'rotate-[10deg]', opacidad: 'opacity-[0.08]', movil: false },
+  { arriba: '84%', lado: { left: '28%' }, tamano: 'h-20 w-20', giro: '-rotate-[20deg]', opacidad: 'opacity-[0.07]', movil: true },
+  { arriba: '86%', lado: { right: '30%' }, tamano: 'h-24 w-24', giro: 'rotate-[30deg]', opacidad: 'opacity-[0.07]', movil: false },
+  { arriba: '88%', lado: { left: '-2%' }, tamano: 'h-32 w-32', giro: '-rotate-[10deg]', opacidad: 'opacity-[0.08]', movil: false },
+  { arriba: '90%', lado: { right: '-1%' }, tamano: 'h-36 w-36', giro: '-rotate-[24deg]', opacidad: 'opacity-[0.08]', movil: true },
+];
+
+// denso: la lista de las pantallas de sesion en vez de la del landing.
+export function HuellasFondo({ denso = false }) {
+  const huellas = denso ? HUELLAS_SESION : HUELLAS;
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden text-white">
       {huellas.map((h) => (

@@ -52,6 +52,17 @@ const HALOS_PANEL = [
   `radial-gradient(ellipse 34% 32% at 70% 22%, ${color('brand-blue-400', 50)} 0%, transparent 72%)`,
 ].join(', ');
 
+// Pantallas de sesion (iniciar sesion, registro, recuperar): el mismo azul
+// del panel, pero con menos ambar (pedido de Oriana): solo dos toques en
+// esquinas opuestas, y las manchas de azul oscuro.
+const HALOS_SESION = [
+  `radial-gradient(ellipse 34% 30% at 96% 4%, ${color('brand-amber', 55)} 0%, ${color('brand-amber', 18)} 50%, transparent 76%)`,
+  `radial-gradient(ellipse 34% 32% at 22% 100%, ${color('brand-amber', 50)} 0%, ${color('brand-amber', 16)} 50%, transparent 76%)`,
+  `radial-gradient(ellipse 42% 40% at 6% 18%, ${color('brand-blue-800', 85)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 40% 42% at 92% 70%, ${color('brand-navy', 85)} 0%, transparent 72%)`,
+  `radial-gradient(ellipse 34% 32% at 70% 22%, ${color('brand-blue-400', 50)} 0%, transparent 72%)`,
+].join(', ');
+
 const DEGRADADO = 'bg-[linear-gradient(to_bottom,var(--color-brand-blue-600)_0,var(--color-brand-blue-700)_16rem,var(--color-brand-blue-800)_32rem)]';
 const DEGRADADO_PANEL = 'bg-gradient-to-b from-brand-blue-500 to-brand-blue-800';
 
@@ -60,7 +71,9 @@ const DEGRADADO_PANEL = 'bg-gradient-to-b from-brand-blue-500 to-brand-blue-800'
 // textoDirecto: la pagina tiene texto blanco directo sobre el fondo (las del
 // cliente); le da una sombra suave para que se lea sobre las manchas ambar.
 export function FondoVetui({ children, className = '', variante = 'app', textoDirecto = false }) {
-  const esPanel = variante === 'panel';
+  // "sesion" comparte el degradado del panel; solo cambian las manchas.
+  const esPanel = variante === 'panel' || variante === 'sesion';
+  const halos = { panel: HALOS_PANEL, sesion: HALOS_SESION }[variante] ?? HALOS;
   return (
     // isolate: los halos (-z-10) quedan detrás del contenido pero dentro
     // de la página. overflow-clip (no hidden): recorta sin crear un
@@ -71,7 +84,7 @@ export function FondoVetui({ children, className = '', variante = 'app', textoDi
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
         <div
           className="absolute -inset-[10%] animate-halo-deriva motion-reduce:animate-none"
-          style={{ backgroundImage: esPanel ? HALOS_PANEL : HALOS }}
+          style={{ backgroundImage: halos }}
         />
       </div>
       {children}
