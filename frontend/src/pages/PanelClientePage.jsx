@@ -70,15 +70,16 @@ export function PanelClientePage() {
         titulo={`Hola, ${usuario?.nombreCompleto?.split(' ')[0] ?? ''} 👋`}
         descripcion="Aquí puedes gestionar tus citas y las mascotas de tu cuenta de forma rápida y sencilla."
         className="py-6"
-        // Ilustracion grande y arrimada al texto (pedido de Oriana): el
-        // margen derecho la separa del borde y la acerca al saludo; el
-        // margen vertical negativo deja que crezca sin empujar tanto las
-        // tarjetas de abajo.
+        // Saludo e ilustracion forman un solo bloque centrado en la pagina
+        // (pedido de Oriana): el texto queda un poco corrido a la derecha y
+        // la ilustracion, grande, a su lado. El margen vertical negativo
+        // deja que la imagen crezca sin empujar tanto las tarjetas de abajo.
+        agrupado
         imagen={
           <img
             src={fotoMain}
             alt=""
-            className="hidden w-[340px] drop-shadow-2xl lg:-my-4 lg:block xl:mr-28 xl:w-[420px]"
+            className="hidden w-[340px] drop-shadow-2xl lg:-my-4 lg:block xl:w-[420px]"
           />
         }
       />
