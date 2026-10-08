@@ -264,14 +264,15 @@ export function AgendarCitaPage() {
           <BookingStepperLateral paginaActual={pagina} puedeIrAHito={puedeIrAHito} onIrAHito={irAHito} />
 
           {pagina === 3 && citaCreada ? (
-            <div data-ancla-topbar className="mt-8 scroll-mt-28">
+            <div data-ancla-topbar className="mt-8 scroll-mt-28 lg:min-h-[calc(100vh-7rem)]">
               <PaginaConfirmacion cita={citaCreada} correoEnviado={correoEnviado} onAgendarOtra={agendarOtra} />
             </div>
           ) : (
             // data-ancla-topbar: parada del scroll (useAnclaTopbar) con la
             // pildora ya formada y este contenido justo debajo (scroll-mt-28,
-            // igual que cada Seccion).
-            <div data-ancla-topbar className="mt-8 grid scroll-mt-28 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+            // igual que cada Seccion). lg:min-h: con un paso corto la pagina
+            // igual alcanza a bajar hasta el ancla (si no, el salto se apaga).
+            <div data-ancla-topbar className="mt-8 grid scroll-mt-28 gap-6 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
               <div className="flex flex-col gap-6">
                 {pagina === 1 && (
                   <PaginaMascotaServicio
