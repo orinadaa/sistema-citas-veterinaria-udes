@@ -259,6 +259,8 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 
 **Ajustes de la foto, en una ventana aparte.** El formulario muestra solo la foto y sus acciones (Cambiar, Ajustar, Quitar). El encuadre (qué parte debe verse siempre) y la descripción de la foto se editan en la ventana "Ajustar foto" (`form/EncuadreModal.jsx`), con la misma forma que el editor de fotos circulares: lo opcional y avanzado no ocupa el formulario. La ventana trabaja sobre un borrador que solo se guarda con "Aplicar". Hoy la usa la foto de cada servicio.
 
+**Tareas con calendario, en una ventana.** Reprogramar una cita se hace en la ventana "Reprogramar cita" (`citas/ReprogramarCitaModal.jsx`), que se abre sobre el detalle de la cita: calendario a la izquierda, horas disponibles a la derecha, resumen y acciones abajo. No se despliega un calendario dentro de un panel lateral.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".
