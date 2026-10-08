@@ -9,8 +9,8 @@
 // - un dia por fila, en un bloque centrado dentro de la tarjeta: abreviatura
 //   en una pildora del color de la sede y la hora pegada a su lado; los dias
 //   sin atencion llevan "Cerrado" en rojo;
-// - al final, "Agendar cita" como una barra que una flecha ambar llena de
-//   izquierda a derecha al pasar el cursor; lleva a agendar con esa sede
+// - al final, "Agendar cita" como un boton de vidrio que se llena de ambar, de
+//   izquierda a derecha, al pasar el cursor; lleva a agendar con esa sede
 //   ya elegida (/agendar?sedeId=...).
 // De fondo, motivos muy tenues (linea punteada, reloj).
 //
@@ -27,7 +27,7 @@ import { obtenerSedes, obtenerHorarios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { detalleHorarioPorDia } from '../../utils/horarioTexto';
-import { IconoAlerta, IconoCalendario, IconoFlechaDerecha, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
+import { IconoAlerta, IconoCalendario, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
 import { SectionHeading } from './SectionHeading';
 import { HalosAmbientales } from './HalosAmbientales';
 import { TarjetaSlide } from './TarjetaSlide';
@@ -106,28 +106,29 @@ function TarjetaSede({ sede, horario, acento }) {
         })}
       </ul>
 
-      {/* Accion: barra que se llena. En reposo es una pista clara con borde
-          ambar; al pasar el cursor (o enfocarla con el teclado) una flecha
-          ambar la recorre de izquierda a derecha hasta llenarla, y la
-          flecha del final avanza. El texto es negro siempre (AA sobre la
-          pista y sobre el ambar). Lleva a agendar con esta sede elegida.
-          El relleno es mas ancho que la barra: la punta de la flecha sale
-          por la derecha y queda recortada, asi termina llena y pareja. */}
+      {/* Accion: boton de vidrio flotante que se llena de "agua" ambar. En
+          reposo es vidrio claro con borde de luz y un resplandor ambar
+          suave; al pasar el cursor (o enfocarlo con el teclado) el liquido
+          ambar entra por la izquierda y lo llena, con el frente curvo y un
+          brillo arriba, y el resplandor crece. El texto es negro siempre
+          (AA sobre el vidrio y sobre el ambar). Lleva a agendar con esta
+          sede elegida. El liquido es mas ancho que el boton: el frente
+          curvo sale por la derecha y queda recortado, asi termina lleno. */}
       <Link
         to={rutaAgendarCita(estaAutenticado, null, sede.id)}
         aria-label={`Agendar cita en la sede ${nombre}`}
-        className="group relative mx-5 mb-4 flex items-center justify-center gap-2 overflow-hidden rounded-boton bg-white/70 px-5 py-2.5 text-base font-bold text-slate-900 ring-1 ring-inset ring-brand-amber outline-none focus-visible:ring-2 focus-visible:ring-brand-amber-600"
+        style={{ '--brillo': 'color-mix(in oklab, var(--color-brand-amber) 80%, transparent)' }}
+        className="group relative mx-5 mb-5 flex items-center justify-center gap-2 overflow-hidden rounded-boton bg-white/45 px-5 py-2.5 text-base font-bold text-slate-900 shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_0_0_1px_rgb(255_255_255/0.7),0_10px_26px_-10px_rgb(247_167_28/0.75)] outline-none backdrop-blur-md transition-shadow duration-500 hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_0_0_1px_rgb(255_255_255/0.7),0_12px_34px_-6px_rgb(247_167_28/0.95)] focus-visible:ring-2 focus-visible:ring-brand-amber-600"
       >
         <span
           aria-hidden="true"
-          className="absolute inset-y-0 left-0 w-[calc(100%+1.75rem)] -translate-x-full bg-brand-amber transition-transform duration-500 ease-out [clip-path:polygon(0_0,calc(100%-1.75rem)_0,100%_50%,calc(100%-1.75rem)_100%,0_100%)] group-hover:translate-x-0 group-focus-visible:translate-x-0 motion-reduce:transition-none"
-        />
+          className="absolute inset-y-0 left-0 w-[calc(100%+3rem)] -translate-x-full rounded-r-full bg-[linear-gradient(to_bottom,var(--color-brand-amber-400),var(--color-brand-amber))] transition-transform duration-700 ease-out group-hover:translate-x-0 group-focus-visible:translate-x-0 motion-reduce:transition-none"
+        >
+          {/* Reflejo del liquido. */}
+          <span className="absolute inset-x-0 top-0 h-1/2 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.45),rgb(255_255_255/0))]" />
+        </span>
         <IconoCalendario className="relative h-5 w-5" peso="bold" />
         <span className="relative">Agendar cita</span>
-        <IconoFlechaDerecha
-          className="relative h-4 w-4 transition-transform duration-500 ease-out group-hover:translate-x-1.5 group-focus-visible:translate-x-1.5 motion-reduce:transition-none"
-          peso="bold"
-        />
       </Link>
     </article>
   );
