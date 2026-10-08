@@ -9,6 +9,7 @@ import { PanelClientePage } from './pages/PanelClientePage';
 import { PanelAdminPage } from './pages/PanelAdminPage';
 import { AgendarCitaPage } from './pages/AgendarCitaPage';
 import { GuiaVetuiPage } from './pages/GuiaVetuiPage';
+import { BarraPagina } from './components/layout/BarraPagina';
 
 function Rutas() {
   return (
@@ -56,6 +57,8 @@ function App() {
   return (
     <AuthProvider>
       <RouterProvider router={router} />
+      {/* Barra de desplazamiento flotante de la pagina (todas las vistas). */}
+      <BarraPagina />
     </AuthProvider>
   );
 }

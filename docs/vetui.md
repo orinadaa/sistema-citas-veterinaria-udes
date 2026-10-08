@@ -186,10 +186,11 @@ Tamaños: `sm`, `md` (por defecto), `lg`, `icono`. Deshabilitado: 50 % de opacid
 
 ### Barra de desplazamiento
 
-Todo el sistema usa la barra de vetUI en vez de la gris del navegador (reglas al final de `styles/vetui.css`, sin clases que agregar): una píldora angosta y redondeada, sin canal visible.
+Todo el sistema usa la barra de vetUI en vez de la gris del navegador (diseño de Oriana): una **píldora ámbar con brillo**, del mismo color que los botones "Agendar cita", que **flota sin canal ni fondo**. Se ensancha y brilla más al pasar el mouse o arrastrarla. No hay que agregar clases en ninguna pantalla.
 
-- Sobre superficies claras (paneles laterales, panel administrativo, tablas, áreas de texto): azul de marca translúcido, más intenso al pasar el mouse y al arrastrar.
-- Barra de la página en vistas de fondo oscuro (inicio, agendar, panel del cliente, inicio de sesión): blanca translúcida sobre un canal azul oscuro. La página se marca con el atributo `data-fondo-oscuro` (ya lo ponen `FondoVetui`, `LandingPage` y `AuthLayout`); una página oscura nueva que no use `FondoVetui` debe ponerlo.
+- **Barra de la página** (inicio, agendar, panel del cliente, inicio de sesión): el componente `layout/BarraPagina.jsx`, montado una sola vez en `App.jsx`. La barra nativa de la página no puede ser transparente (siempre reserva una franja), así que se oculta y la píldora se dibuja encima del contenido, atada al scroll real; se puede arrastrar. Se oculta sola si la página no tiene scroll o mientras hay un panel o diálogo abierto.
+- **Barras de adentro** (paneles laterales, contenido del panel administrativo, tablas, áreas de texto): la barra nativa con el mismo aspecto, por CSS (final de `styles/vetui.css`).
+- Solo con mouse: en pantallas táctiles se deja la barra del sistema, que ya es flotante. En Firefox las barras de adentro usan el mismo color, sin el brillo.
 
 ### Acciones destructivas en un panel
 

@@ -41,10 +41,7 @@ export function FondoVetui({ children, className = '' }) {
     // isolate: los halos (-z-10) quedan detrás del contenido pero dentro
     // de la página. overflow-clip (no hidden): recorta sin crear un
     // contenedor de scroll, así la topbar sticky sigue funcionando.
-    // data-fondo-oscuro: la barra de desplazamiento de la pagina usa su
-    // version para fondo oscuro (vetui.css).
     <div
-      data-fondo-oscuro
       className={`relative isolate min-h-screen overflow-clip bg-[linear-gradient(to_bottom,var(--color-brand-blue-600)_0,var(--color-brand-blue-700)_16rem,var(--color-brand-blue-800)_32rem)] ${className}`}
     >
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">

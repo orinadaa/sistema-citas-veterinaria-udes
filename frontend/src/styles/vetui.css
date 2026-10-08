@@ -439,94 +439,130 @@
 }
 
 /* ---------------------------------------------------------------------
-   Barra de desplazamiento de vetUI (reemplaza a la gris del navegador en
-   TODO el sistema: la pagina, los paneles laterales, tablas, listas y
-   areas de texto).
-   - Pildora flotante: sin canal visible, angosta y redondeada, como los
-     botones (rounded-boton). El borde transparente + background-clip la
-     separa de la orilla.
-   - Sobre superficies claras (cristal, blanco, panel admin): azul de marca
-     translucido, que se intensifica al pasar el mouse y al arrastrar.
-   - En paginas de fondo oscuro (data-fondo-oscuro: landing, /agendar,
-     /panel, login): la barra de la PAGINA es blanca translucida sobre un
-     canal azul oscuro (un canal transparente dejaria ver blanco).
-   - Contraste del pulgar contra su fondo >= 3:1 en reposo (WCAG 1.4.11).
-   Chrome/Edge/Safari usan ::-webkit-scrollbar; Firefox no lo soporta y
-   usa scrollbar-color / scrollbar-width con los mismos colores.
+   Barra de desplazamiento de vetUI (diseño de Oriana): una pildora AMBAR
+   con brillo, como los botones "Agendar cita", que flota sin canal ni
+   fondo. Reemplaza a la gris del navegador en todo el sistema.
+
+   Son dos piezas con el mismo aspecto:
+   1. La barra de la PAGINA: el componente BarraPagina.jsx (.barra-pagina).
+      La nativa siempre reserva una franja con fondo, asi que se oculta
+      (html.barra-flotante) y se dibuja la pildora encima del contenido.
+   2. Las barras de adentro (paneles laterales, el contenido del panel
+      administrativo, tablas, listas, areas de texto): la nativa, con
+      canal transparente. La pildora es el fondo recortado al area interna
+      (padding-box) y el brillo es un segundo fondo, un degradado que se
+      apaga hacia los lados, bajo el borde transparente (un box-shadow
+      hacia afuera se recortaria al ancho de la barra).
+
+   El borde ambar oscuro de la pildora la deja legible tambien sobre blanco
+   (>= 3:1, WCAG 1.4.11). Solo con mouse: en pantallas tactiles se deja la
+   barra del sistema, que ya es flotante.
    --------------------------------------------------------------------- */
 :root {
-  --barra-pulgar: color-mix(in oklab, var(--color-brand-blue-700) 55%, transparent);
-  --barra-pulgar-hover: color-mix(in oklab, var(--color-brand-blue-700) 80%, transparent);
-  --barra-pulgar-activo: var(--color-brand-blue-800);
-  --barra-canal: transparent;
+  --barra-ambar: var(--color-brand-amber);
+  --barra-ambar-borde: var(--color-brand-amber-600);
+  --barra-brillo: color-mix(in oklab, var(--color-brand-amber) 70%, transparent);
 }
 
-html:has([data-fondo-oscuro]) {
-  --barra-pagina-pulgar: rgb(255 255 255 / 0.5);
-  --barra-pagina-pulgar-hover: rgb(255 255 255 / 0.75);
-  --barra-pagina-pulgar-activo: rgb(255 255 255 / 0.9);
-  --barra-pagina-canal: var(--color-brand-blue-800);
+/* 1. Barra de la pagina (BarraPagina.jsx). */
+html.barra-flotante {
+  scrollbar-width: none;
+}
+html.barra-flotante::-webkit-scrollbar,
+html.barra-flotante body::-webkit-scrollbar {
+  display: none;
 }
 
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+.barra-pagina {
+  position: fixed;
+  top: 0;
+  right: 2px;
+  z-index: 45;
+  box-sizing: border-box;
+  width: 18px;
+  /* El area que recibe el mouse es mas ancha que la pildora visible. */
+  padding: 0 5px;
+  touch-action: none;
+  transition: padding 150ms ease-out;
 }
-::-webkit-scrollbar-track {
-  background: var(--barra-canal);
-}
-::-webkit-scrollbar-thumb {
-  min-height: 48px;
-  border: 3px solid transparent;
+.barra-pagina::before {
+  content: "";
+  display: block;
+  height: 100%;
   border-radius: 9999px;
-  background-color: var(--barra-pulgar);
-  background-clip: padding-box;
+  background-color: color-mix(in oklab, var(--barra-ambar) 95%, transparent);
+  background-image: linear-gradient(to right, rgb(255 255 255 / 0.4), rgb(255 255 255 / 0) 60%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.35),
+    0 0 0 1px color-mix(in oklab, var(--barra-ambar-borde) 55%, transparent),
+    0 0 10px 1px color-mix(in oklab, var(--barra-ambar) 75%, transparent),
+    0 0 24px 3px color-mix(in oklab, var(--barra-ambar) 40%, transparent);
+  transition: box-shadow 150ms ease-out, background-color 150ms ease-out;
 }
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--barra-pulgar-hover);
+/* Al pasar el mouse o arrastrar: mas ancha y con mas brillo. */
+.barra-pagina:hover,
+.barra-pagina[data-arrastrando] {
+  padding: 0 3px;
 }
-::-webkit-scrollbar-thumb:active {
-  background-color: var(--barra-pulgar-activo);
+.barra-pagina:hover::before,
+.barra-pagina[data-arrastrando]::before {
+  background-color: var(--barra-ambar);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.45),
+    0 0 0 1px color-mix(in oklab, var(--barra-ambar-borde) 70%, transparent),
+    0 0 14px 2px color-mix(in oklab, var(--barra-ambar) 90%, transparent),
+    0 0 32px 5px color-mix(in oklab, var(--barra-ambar) 55%, transparent);
 }
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* Barra de la pagina. Chrome toma su estilo del <body> si tiene reglas de
-   barra (y las generales de arriba le aplican), y si no del <html>: por eso
-   cada regla va para los dos. El fondo va en la barra entera y en el canal:
-   Chrome pinta blanco lo que quede sin fondo. */
-html::-webkit-scrollbar,
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar,
-body::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-html:has([data-fondo-oscuro])::-webkit-scrollbar,
-html:has([data-fondo-oscuro])::-webkit-scrollbar-track,
-html:has([data-fondo-oscuro]) body::-webkit-scrollbar,
-html:has([data-fondo-oscuro]) body::-webkit-scrollbar-track {
-  background: var(--color-brand-blue-800);
-}
-html:has([data-fondo-oscuro])::-webkit-scrollbar-thumb,
-html:has([data-fondo-oscuro]) body::-webkit-scrollbar-thumb {
-  background-color: rgb(255 255 255 / 0.5);
-}
-html:has([data-fondo-oscuro])::-webkit-scrollbar-thumb:hover,
-html:has([data-fondo-oscuro]) body::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(255 255 255 / 0.75);
-}
-html:has([data-fondo-oscuro])::-webkit-scrollbar-thumb:active,
-html:has([data-fondo-oscuro]) body::-webkit-scrollbar-thumb:active {
-  background-color: rgb(255 255 255 / 0.9);
-}
-
-@supports not selector(::-webkit-scrollbar) {
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--barra-pulgar) var(--barra-canal);
+@media (prefers-reduced-motion: reduce) {
+  .barra-pagina,
+  .barra-pagina::before {
+    transition: none;
   }
-  html {
-    scrollbar-color: var(--barra-pagina-pulgar, var(--barra-pulgar)) var(--barra-pagina-canal, #f1f5f9);
+}
+/* Con un panel lateral o un dialogo abierto la pagina no se desplaza: se
+   oculta su barra para que no quede al lado de la del panel. */
+html:has([aria-modal="true"]:not([aria-hidden="true"]):not([aria-hidden="true"] *)) .barra-pagina {
+  visibility: hidden;
+}
+
+/* 2. Barras de adentro. */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 18px;
+    height: 18px;
+    background: transparent;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    min-height: 48px;
+    border: 5px solid transparent;
+    border-radius: 9999px;
+    background:
+      linear-gradient(to right, var(--color-brand-amber-400), var(--barra-ambar)) padding-box,
+      linear-gradient(to right, transparent, var(--barra-brillo) 50%, transparent) border-box;
+    box-shadow: inset 0 0 0 1px var(--barra-ambar-borde);
+  }
+  ::-webkit-scrollbar-thumb:horizontal {
+    min-width: 48px;
+    background:
+      linear-gradient(to bottom, var(--color-brand-amber-400), var(--barra-ambar)) padding-box,
+      linear-gradient(to bottom, transparent, var(--barra-brillo) 50%, transparent) border-box;
+  }
+  /* Al pasar el mouse o arrastrar: mas ancha y con mas brillo. */
+  ::-webkit-scrollbar-thumb:hover,
+  ::-webkit-scrollbar-thumb:active {
+    border-width: 4px;
+    --barra-brillo: var(--color-brand-amber);
+  }
+
+  /* Firefox no soporta ::-webkit-scrollbar: mismos colores, sin el brillo. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--barra-ambar) transparent;
+    }
   }
 }

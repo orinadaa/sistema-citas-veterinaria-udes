@@ -10,7 +10,7 @@ import logoBlanco from '../../assets/logoblanco.png';
 
 export function AuthLayout({ titulo, subtitulo, children, pieDePagina }) {
   return (
-    <div data-fondo-oscuro className="flex min-h-[100dvh] flex-col items-center justify-center bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 px-4 py-12">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-gradient-to-b from-brand-blue-500 to-brand-blue-800 px-4 py-12">
       <Link to="/" className="mb-8">
         <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-[62px] w-auto" />
       </Link>
