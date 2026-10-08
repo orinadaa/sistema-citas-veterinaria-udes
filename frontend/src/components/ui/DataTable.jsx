@@ -40,7 +40,7 @@ export function DataTable({ columns, rows, actions, filaVacia = 'No hay resultad
               </tr>
             ) : (
               filasVisibles.map((fila) => (
-                <tr key={fila.id} className="hover:bg-slate-50/60">
+                <tr key={fila.id}>
                   {columns.map((columna) => (
                     <td key={columna.header} className="px-4 py-3 align-middle text-slate-700">
                       {columna.render(fila)}

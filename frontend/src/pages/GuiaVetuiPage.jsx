@@ -280,7 +280,7 @@ export function GuiaVetuiPage() {
               descripcion="Texto, número, lista desplegable, hora, buscador, área de texto, deslizador y casilla comparten borde, radio y foco. Ninguno usa el control del navegador."
             />
             <div className="grid items-start gap-5 md:grid-cols-3">
-              <Campo id="guia-nombre" label="Nombre" value={campos.nombre} onChange={cambiar('nombre')} placeholder="Ej. Luna" required />
+              <Campo id="guia-campo-nombre" label="Nombre" value={campos.nombre} onChange={cambiar('nombre')} placeholder="Ej. Luna" required />
               <Campo id="guia-precio" label="Precio (COP)" type="number" min="0" step="1000" value={campos.precio} onChange={cambiar('precio')} />
               <Campo id="guia-error" label="Correo" type="email" value="correo-sin-arroba" onChange={() => {}} error="Escribe un correo válido." />
               <div className="flex flex-col gap-1.5">

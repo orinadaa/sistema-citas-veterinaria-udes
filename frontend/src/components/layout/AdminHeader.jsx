@@ -217,9 +217,11 @@ export function AdminHeader({ onNavegar }) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button type="button" className="relative boton-texto rounded-boton p-2 text-slate-500 transition">
+        {/* Campana: adorno hasta que exista el modulo de notificaciones. No
+            es un boton (no hace nada): no reacciona al mouse ni recibe foco. */}
+        <span aria-hidden="true" className="relative p-2 text-slate-500">
           <IconoCampana className="h-5 w-5" />
-        </button>
+        </span>
 
         <div className="relative">
           <button
