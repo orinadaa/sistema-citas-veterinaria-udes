@@ -8,18 +8,18 @@
 // "Cancelar cita". Decisiones de la usuaria: sin "Editar cita", sin
 // "Notas adicionales" (no existen en el sistema) y sin "Ver perfil" del
 // medico (no hay vista de perfil).
-// Reprogramar usa el mismo calendario de mes y selector de horas del
+// Reprogramar abre una ventana centrada (ReprogramarCitaModal), no un
+// calendario dentro del panel. Usa el mismo calendario de mes y selector de horas del
 // flujo de agendar (DatePickerCalendar + TimeSlotPicker), filtrado al
 // medico de la cita: reprogramar no cambia de medico.
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { reprogramarCita, cancelarCita, obtenerHorarios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { aFechaLocal, formatearFechaLarga, formatearFechaCorta, formatearHora } from '../../utils/fecha';
 import { formatearCOP } from '../../utils/moneda';
 import { PanelLateral } from '../vetui';
 import { StatusBadge } from '../ui/StatusBadge';
-import { DatePickerCalendar } from '../agendar/DatePickerCalendar';
-import { TimeSlotPicker } from '../agendar/TimeSlotPicker';
+import { ReprogramarCitaModal } from './ReprogramarCitaModal';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import {
   IconoCalendario,
@@ -124,6 +124,13 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     setModo('reprogramar');
   }
 
+  const cerrarReprogramar = useCallback(() => {
+    setModo('vista');
+    setNuevaFecha('');
+    setNuevaFranja(null);
+    setError('');
+  }, []);
+
   async function confirmarReprogramacion() {
     if (!nuevaFranja) return;
     setEnviando(true);
@@ -154,10 +161,10 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
   const puedeGestionar = estado === 'proxima';
 
   // Pie fijo: solo "Cancelar cita" (Reprogramar vive en la fila de Fecha
-  // y hora). Ocupa todo el ancho: con un unico boton, alineado a la
+  // y hora, y abre su propia ventana: ReprogramarCitaModal). Ocupa todo el ancho: con un unico boton, alineado a la
   // izquierda dejaba un hueco que se leia como un boton faltante.
   let footer = null;
-  if (cita && puedeGestionar && modo === 'vista') {
+  if (cita && puedeGestionar && modo !== 'confirmarCancelar') {
     footer = (
       <button
         type="button"
@@ -167,31 +174,6 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
         <IconoPapelera className="h-4 w-4" />
         Cancelar cita
       </button>
-    );
-  } else if (cita && modo === 'reprogramar') {
-    footer = (
-      <div className="flex gap-3">
-        <button
-          type="button"
-          disabled={!nuevaFranja || enviando}
-          onClick={confirmarReprogramacion}
-          className="flex-1 rounded-boton bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {enviando ? 'Guardando...' : 'Confirmar nueva fecha'}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setModo('vista');
-            setNuevaFecha('');
-            setNuevaFranja(null);
-            setError('');
-          }}
-          className="rounded-boton border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-        >
-          Volver
-        </button>
-      </div>
     );
   } else if (cita && modo === 'confirmarCancelar') {
     footer = (
@@ -225,6 +207,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     : '';
 
   return (
+    <>
     <PanelLateral isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={footer}>
       {cita && (
         <div className="flex flex-col gap-6">
@@ -286,51 +269,13 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
               valor={formatearFechaLarga(cita.fecha_hora)}
               detalle={formatearHora(cita.fecha_hora)}
               accion={
-                puedeGestionar &&
-                modo !== 'reprogramar' && (
+                puedeGestionar && (
                   <BotonFila icono={IconoCalendario} onClick={abrirReprogramar}>
                     Reprogramar
                   </BotonFila>
                 )
               }
             />
-
-            {modo === 'reprogramar' && (
-              <div className="flex flex-col gap-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-                <div>
-                  <p className="font-heading text-base font-semibold text-brand-navy">Elige la nueva fecha y hora</p>
-                  <p className="mt-0.5 text-sm text-slate-600">Se mantiene el mismo médico ({cita.medico_nombre}).</p>
-                </div>
-
-                <DatePickerCalendar
-                  valor={nuevaFecha}
-                  onChange={(valor) => {
-                    setNuevaFecha(valor);
-                    setNuevaFranja(null);
-                  }}
-                  diasAbiertos={diasAbiertos.sedeId === cita.sede_id ? diasAbiertos.dias : null}
-                />
-
-                <div className="border-t border-slate-200 pt-5">
-                  <p className="mb-3 font-heading text-sm font-semibold text-brand-navy">Horarios disponibles</p>
-                  <TimeSlotPicker
-                    sedeId={cita.sede_id}
-                    servicioId={cita.servicio_id}
-                    medicoId={cita.medico_id}
-                    fecha={nuevaFecha}
-                    valor={nuevaFranja}
-                    onChange={setNuevaFranja}
-                  />
-                </div>
-
-                {nuevaFranja && (
-                  <p className="rounded-xl bg-blue-50 px-4 py-3 text-sm text-slate-700">
-                    Nueva fecha: <span className="font-semibold text-brand-blue-800">{formatearFechaLarga(nuevaFranja)}, {formatearHora(nuevaFranja)}</span>
-                  </p>
-                )}
-                {error && <p className="text-sm text-red-700">{error}</p>}
-              </div>
-            )}
 
             <FilaInfo
               icono={IconoEstetoscopio}
@@ -404,5 +349,20 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
         </div>
       )}
     </PanelLateral>
+
+    <ReprogramarCitaModal
+      abierto={modo === 'reprogramar'}
+      cita={cita}
+      onCerrar={cerrarReprogramar}
+      onConfirmar={confirmarReprogramacion}
+      fecha={nuevaFecha}
+      onCambiarFecha={setNuevaFecha}
+      franja={nuevaFranja}
+      onCambiarFranja={setNuevaFranja}
+      diasAbiertos={cita && diasAbiertos.sedeId === cita.sede_id ? diasAbiertos.dias : null}
+      enviando={enviando}
+      error={error}
+    />
+    </>
   );
 }
