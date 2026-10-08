@@ -155,20 +155,20 @@ export function PanelMisCitasMedico() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" aria-label="Anterior" onClick={() => mover(-1)} className="boton-texto rounded-boton p-2 text-slate-500 transition">
+            <button type="button" aria-label="Anterior" onClick={() => mover(-1)} className="boton-texto rounded-boton p-2 text-white transition">
               <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
             </button>
-            <button type="button" aria-label="Siguiente" onClick={() => mover(1)} className="boton-texto rounded-boton p-2 text-slate-500 transition">
+            <button type="button" aria-label="Siguiente" onClick={() => mover(1)} className="boton-texto rounded-boton p-2 text-white transition">
               <IconoFlechaDerecha className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={() => setDiaSeleccionado(hoyAMedianoche())}
-              className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+              className="rounded-boton bg-white/85 px-3.5 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-white transition"
             >
               Hoy
             </button>
-            <p className="ml-1 font-heading text-sm font-semibold text-brand-navy">{etiquetaRango}</p>
+            <p className="ml-1 font-heading text-sm font-semibold text-white">{etiquetaRango}</p>
           </div>
 
           <div className="flex rounded-xl bg-slate-100 p-1" role="tablist" aria-label="Vista del calendario">

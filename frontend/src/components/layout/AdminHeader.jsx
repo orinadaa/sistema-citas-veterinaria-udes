@@ -9,7 +9,7 @@
 // veterinario busca entre SUS pacientes (dueños y mascotas) y lleva a
 // "Mis pacientes" con el termino precargado.
 import { useEffect, useRef, useState } from 'react';
-import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPata, IconoPersona } from '../icons';
+import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPata, IconoPersona, IconoSalir } from '../icons';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerPacientesMedico } from '../../api/client';
 
@@ -137,24 +137,24 @@ export function AdminHeader({ onNavegar }) {
         </div>
 
         {buscadorActivo && dropdownAbierto && terminoValido && (
-          <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-xl bg-white p-2 shadow-lg ring-1 ring-slate-200">
-            {buscando && <p className="px-3 py-2 text-sm text-slate-400">Buscando...</p>}
+          <div className="vidrio-azul absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-superficie p-2">
+            {buscando && <p className="px-4 py-2 text-sm text-white/85">Buscando...</p>}
 
             {!buscando && !hayResultados && (
-              <p className="px-3 py-2 text-sm text-slate-400">Sin resultados para &quot;{termino.trim()}&quot;.</p>
+              <p className="px-4 py-2 text-sm text-white/85">Sin resultados para &quot;{termino.trim()}&quot;.</p>
             )}
 
             {!buscando && resultados.pacientes.length > 0 && (
               <div className="mb-1">
-                <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Pacientes</p>
+                <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-white/75">Pacientes</p>
                 {resultados.pacientes.map((p) => (
                   <button
                     key={p.id}
                     type="button"
                     onClick={() => seleccionarResultado('pacientes', p.nombre_completo)}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                    className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
                   >
-                    <IconoPersona className="h-4 w-4 shrink-0 text-brand-blue" />
+                    <IconoPersona className="h-4 w-4 shrink-0 text-brand-amber-400" />
                     {p.nombre_completo}
                   </button>
                 ))}
@@ -163,17 +163,17 @@ export function AdminHeader({ onNavegar }) {
 
             {!buscando && resultados.mascotas.length > 0 && (
               <div className="mb-1">
-                <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Mascotas</p>
+                <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-white/75">Mascotas</p>
                 {resultados.mascotas.map((m) => (
                   <button
                     key={m.mascota_id}
                     type="button"
                     onClick={() => seleccionarResultado('pacientes', m.mascota_nombre)}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                    className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
                   >
-                    <IconoPata className="h-4 w-4 shrink-0 text-brand-blue" />
+                    <IconoPata className="h-4 w-4 shrink-0 text-brand-amber-400" />
                     {m.mascota_nombre}
-                    <span className="truncate text-xs text-slate-400">· {m.cliente_nombre}</span>
+                    <span className="truncate text-xs text-white/75">· {m.cliente_nombre}</span>
                   </button>
                 ))}
               </div>
@@ -181,15 +181,15 @@ export function AdminHeader({ onNavegar }) {
 
             {!buscando && resultados.medicos.length > 0 && (
               <div className="mb-1">
-                <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Médicos</p>
+                <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-white/75">Médicos</p>
                 {resultados.medicos.map((m) => (
                   <button
                     key={m.id}
                     type="button"
                     onClick={() => seleccionarResultado('medicos', m.nombre_completo)}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                    className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
                   >
-                    <IconoMedicos className="h-4 w-4 shrink-0 text-brand-blue" />
+                    <IconoMedicos className="h-4 w-4 shrink-0 text-brand-amber-400" />
                     {m.nombre_completo}
                   </button>
                 ))}
@@ -198,15 +198,15 @@ export function AdminHeader({ onNavegar }) {
 
             {!buscando && resultados.servicios.length > 0 && (
               <div>
-                <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Servicios</p>
+                <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-white/75">Servicios</p>
                 {resultados.servicios.map((s) => (
                   <button
                     key={s.id}
                     type="button"
                     onClick={() => seleccionarResultado('servicios', s.nombre)}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                    className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
                   >
-                    <IconoJeringa className="h-4 w-4 shrink-0 text-brand-blue" />
+                    <IconoJeringa className="h-4 w-4 shrink-0 text-brand-amber-400" />
                     {s.nombre}
                   </button>
                 ))}
@@ -240,12 +240,13 @@ export function AdminHeader({ onNavegar }) {
           </button>
 
           {menuAbierto && (
-            <div className="absolute right-0 top-full mt-2 w-44 rounded-xl bg-white py-1.5 shadow-lg ring-1 ring-slate-200">
+            <div className="vidrio-azul absolute right-0 top-full z-50 mt-2 w-full min-w-44 rounded-boton p-1.5">
               <button
                 type="button"
                 onClick={salir}
-                className="w-full px-4 py-2 text-left text-sm text-slate-600 transition hover:bg-slate-50"
+                className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
               >
+                <IconoSalir className="h-4 w-4 shrink-0" />
                 Cerrar sesión
               </button>
             </div>

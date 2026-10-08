@@ -185,8 +185,8 @@ export function PanelGaleria() {
       <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="max-w-2xl">
-            <p className="font-heading text-base font-semibold text-brand-navy">Galería del inicio</p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="font-heading text-base font-semibold text-white">Galería del inicio</p>
+            <p className="mt-1 text-sm text-white/90">
               Estas fotos rotan en la portada de la página pública, en el orden en que aparecen aquí.
               {!cargando && !errorCarga && ` ${fotos.length} de ${maximo} fotos, ${visibles} visibles.`}
             </p>
@@ -224,10 +224,10 @@ export function PanelGaleria() {
               </p>
             )}
             {fotos.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
-                <IconoImagen className="h-10 w-10 text-slate-300" peso="duotone" />
-                <p className="text-sm font-medium text-slate-700">La galería está vacía</p>
-                <p className="text-sm text-slate-500">Sube la primera foto con el botón “Subir foto”.</p>
+              <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/45 px-6 py-12 text-center">
+                <IconoImagen className="h-10 w-10 text-white/70" peso="duotone" />
+                <p className="text-sm font-medium text-white">La galería está vacía</p>
+                <p className="text-sm text-white/85">Sube la primera foto con el botón “Subir foto”.</p>
               </div>
             ) : (
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

@@ -185,8 +185,8 @@ export function PanelCampos() {
       <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="max-w-2xl">
-            <p className="font-heading text-base font-semibold text-brand-navy">Campos del formulario de {nombreEntidad.toLowerCase()}</p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="font-heading text-base font-semibold text-white">Campos del formulario de {nombreEntidad.toLowerCase()}</p>
+            <p className="mt-1 text-sm text-white/90">
               Agrega campos al formulario sin programar. Aparecen al final, en “Información adicional”, en el orden de esta lista.
               {!cargando && !errorCarga && ` ${campos.length} ${campos.length === 1 ? 'campo' : 'campos'}, ${activos} ${activos === 1 ? 'activo' : 'activos'}.`}
             </p>
@@ -238,10 +238,10 @@ export function PanelCampos() {
             }}
           />
         ) : campos.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
-            <IconoDocumento className="h-10 w-10 text-slate-300" peso="duotone" />
-            <p className="text-sm font-medium text-slate-700">Este formulario aún no tiene campos adicionales</p>
-            <p className="text-sm text-slate-500">Crea el primero con el botón “Nuevo campo”.</p>
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/45 px-6 py-12 text-center">
+            <IconoDocumento className="h-10 w-10 text-white/70" peso="duotone" />
+            <p className="text-sm font-medium text-white">Este formulario aún no tiene campos adicionales</p>
+            <p className="text-sm text-white/85">Crea el primero con el botón “Nuevo campo”.</p>
           </div>
         ) : (
           <ol className="flex flex-col gap-2">
