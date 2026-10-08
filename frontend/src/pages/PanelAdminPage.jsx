@@ -72,8 +72,8 @@ export function PanelAdminPage() {
             {/* Superadministrador */}
             {esSuper && pestana === 'inicio' && <PanelInicioSistema onIr={irA} />}
             {esSuper && pestana === 'sedes' && <PanelHorarios />}
-            {esSuper && pestana === 'usuarios' && <PanelConfiguracion />}
-            {esSuper && pestana === 'servicios' && <PanelServicios />}
+            {esSuper && pestana === 'usuarios' && <PanelConfiguracion key={busquedaPorPestana.usuarios} busquedaInicial={busquedaPorPestana.usuarios} />}
+            {esSuper && pestana === 'servicios' && <PanelServicios busquedaInicial={busquedaPorPestana.servicios} />}
             {esSuper && pestana === 'web' && (
               <div className="flex flex-col gap-6">
                 <PageHeader title="Página web" subtitle="Lo que ve cualquier visitante en la página pública de la clínica." />

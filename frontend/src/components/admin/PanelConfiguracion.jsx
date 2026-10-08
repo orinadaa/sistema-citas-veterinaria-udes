@@ -27,7 +27,8 @@ import { CampoBusqueda } from '../form/CampoBusqueda';
 const ETIQUETA_ROL = { administrador: 'Administrador de sede', veterinario: 'Médico Veterinario', cliente: 'Cliente' };
 const FORM_VACIO = { nombreCompleto: '', correo: '', rol: 'veterinario', sedeId: '', telefono: '', activo: true };
 
-export function PanelConfiguracion() {
+// busquedaInicial: llega del buscador de la barra superior al elegir un usuario.
+export function PanelConfiguracion({ busquedaInicial }) {
   const { token, usuario } = useAuth();
 
   const [usuarios, setUsuarios] = useState([]);
@@ -35,7 +36,7 @@ export function PanelConfiguracion() {
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState('');
 
-  const [busqueda, setBusqueda] = useState('');
+  const [busqueda, setBusqueda] = useState(busquedaInicial || '');
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroRol, setFiltroRol] = useState('');
 
