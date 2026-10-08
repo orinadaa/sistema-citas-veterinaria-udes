@@ -483,7 +483,12 @@ html.barra-flotante body::-webkit-scrollbar {
   /* El area que recibe el mouse es mas ancha que la pildora visible. */
   padding: 0 5px;
   touch-action: none;
-  transition: padding 150ms ease-out;
+  transition: padding 150ms ease-out, opacity 450ms ease-out;
+}
+/* En el tope de arriba o de abajo (BarraPagina.jsx pone data-reposo) se
+   desvanece; vuelve al desplazarse, o al pasar el mouse por encima. */
+.barra-pagina[data-reposo]:not(:hover):not([data-arrastrando]) {
+  opacity: 0;
 }
 .barra-pagina::before {
   content: "";

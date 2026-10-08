@@ -15,12 +15,18 @@
 //   barra del sistema, que ya es flotante.
 // - Se oculta sola si la pagina no tiene scroll (ej. panel administrativo,
 //   que se desplaza por dentro: ahi aplica la barra CSS de vetui.css).
+// - En los topes se desvanece (pedido de Oriana): arriba de todo o al final
+//   la pagina no puede seguir en ese sentido, asi que la barra se apaga un
+//   momento despues de llegar y vuelve apenas se desplaza otra vez. Sigue
+//   ahi: pasar el mouse por el borde derecho la muestra para arrastrarla.
 // - aria-hidden: es un adorno del scroll; el teclado mueve la pagina igual.
 // - z-45: sobre la topbar (z-40), debajo de paneles y dialogos (z-50).
 import { useEffect, useRef } from 'react';
 
 const MARGEN_PX = 6;
 const LARGO_MINIMO_PX = 48;
+// Tiempo quieta en un tope antes de desvanecerse.
+const ESPERA_REPOSO_MS = 700;
 
 export function BarraPagina() {
   const barra = useRef(null);
@@ -31,6 +37,9 @@ export function BarraPagina() {
     const conMouse = window.matchMedia('(hover: hover) and (pointer: fine)');
     let cuadro = 0;
     let arrastre = null;
+    let reposo = null;
+    // Al cargar ya esta en el tope de arriba: arranca apagada, sin parpadeo.
+    let primerDibujo = true;
 
     // Largo y posicion de la pildora segun el scroll real de la pagina.
     function dibujar() {
@@ -48,6 +57,19 @@ export function BarraPagina() {
       elemento.hidden = false;
       elemento.style.height = `${largo}px`;
       elemento.style.transform = `translateY(${MARGEN_PX + (pista - largo) * avance}px)`;
+
+      const enTope = window.scrollY <= 1 || window.scrollY >= maximo - 1;
+      clearTimeout(reposo);
+      if (!enTope) {
+        delete elemento.dataset.reposo;
+      } else if (primerDibujo) {
+        elemento.dataset.reposo = '';
+      } else if (!('reposo' in elemento.dataset)) {
+        reposo = setTimeout(() => {
+          elemento.dataset.reposo = '';
+        }, ESPERA_REPOSO_MS);
+      }
+      primerDibujo = false;
     }
 
     function pedirDibujo() {
@@ -95,6 +117,7 @@ export function BarraPagina() {
 
     return () => {
       cancelAnimationFrame(cuadro);
+      clearTimeout(reposo);
       observador.disconnect();
       window.removeEventListener('scroll', pedirDibujo);
       window.removeEventListener('resize', pedirDibujo);

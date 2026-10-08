@@ -15,6 +15,7 @@ import {
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { ZonaImagen } from '../form/ZonaImagen';
+import { SelectorEncuadre } from '../form/SelectorEncuadre';
 import { StatusToggle } from '../ui/StatusToggle';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
@@ -22,72 +23,6 @@ import { IconoChevronAbajo, IconoImagen, IconoLapiz } from '../icons';
 
 const LARGO_MAXIMO_DESCRIPCION = 200;
 const FORM_VACIO = { descripcion: '', focoX: 50, focoY: 50, activo: true };
-
-// Encuadre: la foto completa con un punto que marca lo que debe quedar al
-// centro (clic sobre la foto o los dos deslizadores, para teclado), y al
-// lado como la recorta el inicio (mismo marco 4:3 y object-cover del Hero).
-function SelectorEncuadre({ src, focoX, focoY, onCambiar }) {
-  function alHacerClic(evento) {
-    const caja = evento.currentTarget.getBoundingClientRect();
-    onCambiar({
-      focoX: Math.round(Math.min(100, Math.max(0, ((evento.clientX - caja.left) / caja.width) * 100))),
-      focoY: Math.round(Math.min(100, Math.max(0, ((evento.clientY - caja.top) / caja.height) * 100))),
-    });
-  }
-
-  return (
-    <div className="flex flex-col gap-3">
-      <div>
-        <p className="text-sm font-medium text-slate-700">Encuadre</p>
-        <p className="text-xs text-slate-500">
-          Haz clic en la parte de la foto que debe verse siempre (por ejemplo, las caras).
-        </p>
-      </div>
-      {/* El clic es un atajo de mouse; los deslizadores de abajo hacen lo mismo con teclado. */}
-      <div onClick={alHacerClic} className="relative cursor-crosshair overflow-hidden rounded-xl bg-slate-100">
-        <img src={src} alt="" draggable={false} className="block h-auto w-full select-none" />
-        <span
-          aria-hidden="true"
-          style={{ left: `${focoX}%`, top: `${focoY}%` }}
-          className="pointer-events-none absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-brand-amber shadow-[0_0_0_1px_rgb(15_23_42/0.5)]"
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-xs font-medium text-slate-600">
-          Horizontal
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={focoX}
-            onChange={(e) => onCambiar({ focoX: Number(e.target.value), focoY })}
-            className="accent-brand-blue"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-xs font-medium text-slate-600">
-          Vertical
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={focoY}
-            onChange={(e) => onCambiar({ focoX, focoY: Number(e.target.value) })}
-            className="accent-brand-blue"
-          />
-        </label>
-      </div>
-      <div>
-        <p className="mb-1.5 text-xs font-medium text-slate-600">Así se recorta en el inicio</p>
-        <img
-          src={src}
-          alt=""
-          style={{ objectPosition: `${focoX}% ${focoY}%` }}
-          className="aspect-[4/3] w-40 rounded-xl object-cover"
-        />
-      </div>
-    </div>
-  );
-}
 
 export function PanelGaleria() {
   const { token } = useAuth();

@@ -51,3 +51,33 @@ export async function prepararImagen(archivo, { ladoMaximo = 1600, calidad = 0.8
     URL.revokeObjectURL(url);
   }
 }
+
+// true si la foto es clara en su mitad inferior, donde el slider de
+// servicios escribe el nombre en blanco: en ese caso el sitio la oscurece
+// mas para que el texto se lea (contraste AA). Se mide reduciendo la
+// imagen a 32x32 y promediando la luminancia de las filas de abajo.
+const UMBRAL_FONDO_CLARO = 0.42;
+
+export async function fondoEsClaro(blob) {
+  const url = URL.createObjectURL(blob);
+  try {
+    const imagen = await cargarImagen(url);
+    const lado = 32;
+    const lienzo = document.createElement('canvas');
+    lienzo.width = lado;
+    lienzo.height = lado;
+    const contexto = lienzo.getContext('2d');
+    contexto.drawImage(imagen, 0, 0, lado, lado);
+    const { data } = contexto.getImageData(0, lado / 2, lado, lado / 2);
+    let suma = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      suma += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+    }
+    return suma / (data.length / 4) > UMBRAL_FONDO_CLARO;
+  } catch {
+    // Ante la duda, se oscurece mas: el texto siempre queda legible.
+    return true;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}

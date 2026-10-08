@@ -9,6 +9,7 @@
     "seed:admin": "node src/scripts/seedAdmin.js",
     "seed:veterinarios": "node src/scripts/seedVeterinarios.js",
     "seed:galeria": "node src/scripts/seedGaleria.js",
+    "seed:fotos-servicios": "node src/scripts/seedFotosServicios.js",
     "test": "jest --runInBand"
   },
   "keywords": [],

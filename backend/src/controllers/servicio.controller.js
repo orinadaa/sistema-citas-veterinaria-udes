@@ -3,6 +3,18 @@
 // administrador.
 const servicioModel = require('../models/servicio.model');
 const categoriaServicioModel = require('../models/categoriaServicio.model');
+const { fotosServicios } = require('../middlewares/subirFoto.middleware');
+
+const LARGO_MAXIMO_DESCRIPCION_FOTO = 200;
+const PATRON_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Encuadre de la foto: porcentaje entero 0-100; undefined si no viene y
+// null si es invalido.
+function leerFoco(valor) {
+  if (valor === undefined) return undefined;
+  const numero = Number(valor);
+  return Number.isFinite(numero) && numero >= 0 && numero <= 100 ? Math.round(numero) : null;
+}
 
 function precioValido(precio) {
   return Number.isInteger(precio) && precio >= 0;
@@ -91,7 +103,33 @@ async function actualizar(req, res, next) {
       return res.status(400).json({ mensaje: 'La categoría indicada no existe.' });
     }
 
-    const servicio = await servicioModel.actualizar(id, { nombre, descripcion, categoriaId, precio, duracionMinutos, activo });
+    // Datos de la foto (la imagen en si se sube por POST /:id/foto).
+    let fotoDescripcion;
+    if (req.body.fotoDescripcion !== undefined) {
+      fotoDescripcion = typeof req.body.fotoDescripcion === 'string' ? req.body.fotoDescripcion.trim() : '';
+      if (fotoDescripcion.length > LARGO_MAXIMO_DESCRIPCION_FOTO) {
+        return res
+          .status(400)
+          .json({ mensaje: `La descripción de la foto no puede pasar de ${LARGO_MAXIMO_DESCRIPCION_FOTO} caracteres.` });
+      }
+    }
+    const fotoFocoX = leerFoco(req.body.fotoFocoX);
+    const fotoFocoY = leerFoco(req.body.fotoFocoY);
+    if (fotoFocoX === null || fotoFocoY === null) {
+      return res.status(400).json({ mensaje: 'El encuadre de la foto debe ser un porcentaje entre 0 y 100.' });
+    }
+
+    const servicio = await servicioModel.actualizar(id, {
+      nombre,
+      descripcion,
+      categoriaId,
+      precio,
+      duracionMinutos,
+      activo,
+      fotoDescripcion,
+      fotoFocoX,
+      fotoFocoY,
+    });
     if (!servicio) {
       return res.status(404).json({ mensaje: 'Servicio no encontrado.' });
     }
@@ -105,4 +143,46 @@ async function actualizar(req, res, next) {
   }
 }
 
-module.exports = { listar, listarAdmin, listarCategorias, crear, actualizar };
+// POST /api/servicios/:id/foto — solo administrador (multipart: "foto" y,
+// opcional, "fondoClaro"). Es la foto del servicio en la pagina publica.
+async function subirFoto(req, res, next) {
+  const archivoNuevo = req.file ? `${fotosServicios.rutaPublica}/${req.file.filename}` : null;
+  try {
+    if (!archivoNuevo) {
+      return res.status(400).json({ mensaje: 'Adjunta una imagen JPG o PNG en el campo "foto".' });
+    }
+    const { id } = req.params;
+    const anterior = PATRON_UUID.test(id)
+      ? await servicioModel.actualizarFoto(id, { fotoUrl: archivoNuevo, fondoClaro: req.body.fondoClaro !== 'false' })
+      : undefined;
+    if (anterior === undefined) {
+      await fotosServicios.borrar(archivoNuevo);
+      return res.status(404).json({ mensaje: 'Servicio no encontrado.' });
+    }
+    await fotosServicios.borrar(anterior);
+    const servicio = await servicioModel.buscarPorId(id);
+    return res.status(200).json({ servicio });
+  } catch (error) {
+    await fotosServicios.borrar(archivoNuevo);
+    next(error);
+  }
+}
+
+// DELETE /api/servicios/:id/foto — solo administrador. Sin foto, el
+// servicio deja de mostrarse en el slider del inicio.
+async function quitarFoto(req, res, next) {
+  try {
+    const { id } = req.params;
+    const anterior = PATRON_UUID.test(id) ? await servicioModel.actualizarFoto(id, { fotoUrl: null }) : undefined;
+    if (anterior === undefined) {
+      return res.status(404).json({ mensaje: 'Servicio no encontrado.' });
+    }
+    await fotosServicios.borrar(anterior);
+    const servicio = await servicioModel.buscarPorId(id);
+    return res.status(200).json({ servicio });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { listar, listarAdmin, listarCategorias, crear, actualizar, subirFoto, quitarFoto };

@@ -63,3 +63,33 @@ Los datos de prueba (foto de galería, sede temporal y foto del médico) se elim
 | PN-05 | Ocultar y volver a mostrar con el interruptor de la tarjeta | ✅ la galería pública pasa de 5 a 4 y vuelve a 5 |
 | PN-06 | Eliminar desde el panel de edición, con confirmación | ✅ desaparece la tarjeta y el archivo |
 | PN-07 | "Editar sede" y "Editar médico" ya no muestran el campo de enlace | ✅ sede con zona de archivo rectangular, médico con la zona circular |
+
+## Foto de cada servicio (ampliación)
+
+Las fotos de la sección **Servicios** de la página pública también estaban escritas en el código. Ahora cada servicio tiene su foto, que el administrador sube en **Servicios > Editar** (o al crear el servicio), con descripción y encuadre; también puede cambiarla o quitarla.
+
+Migración nueva: `incremento_6b_servicio_foto.sql` (columnas `foto_url`, `foto_descripcion`, `foto_foco_x`, `foto_foco_y` y `foto_fondo_claro` en `servicio`). Fotos predeterminadas: `npm run seed:fotos-servicios` en `backend/`.
+
+### Decisiones de alcance registradas
+
+- **Fotos predeterminadas**: las nueve que ya mostraba el inicio (`frontend/src/assets/servicios-foto`), con la misma descripción, el mismo encuadre y el mismo oscurecido. El script solo toca servicios que aún no tienen foto.
+- **Un servicio sin foto no aparece en la sección Servicios del inicio**, pero se puede agendar igual; el formulario lo avisa.
+- **Oscurecido automático**: al subir la foto, el navegador mide si es clara en la mitad inferior (donde va el nombre en blanco) y lo guarda en `foto_fondo_claro`; el inicio oscurece más esas fotos para que el texto se lea. El administrador no tiene que decidirlo.
+- **Descripción de la foto opcional**: si se deja vacía, el inicio usa "Foto del servicio (nombre)".
+- **Cambiar la foto reinicia el encuadre al centro**; quitarla borra el archivo, la descripción y el encuadre.
+- "Profilaxis dental" se sigue mostrando en el inicio como "Odontología" (etiqueta pública, no cambia el nombre del servicio).
+
+### Pruebas unitarias
+
+268/268 pruebas del backend pasando, entre ellas las nuevas de `servicioFoto.test.js`: permisos, archivo inválido, servicio inexistente, reemplazo y borrado del archivo, quitar foto y validación de descripción y encuadre.
+
+### Pruebas en el navegador (Edge, contra la API real y PostgreSQL local)
+
+| ID | Descripción | Entrada | Resultado esperado | Resultado obtenido |
+|---|---|---|---|---|
+| PN-08 | El inicio muestra las fotos de la base de datos | Abrir la sección Servicios sin sesión | 9 servicios con su foto de `/uploads/servicios`, descripción y encuadre | ✅ |
+| PN-09 | Un servicio sin foto avisa en el formulario | Editar un servicio temporal sin foto | Aviso "Sin foto, el servicio no aparece en la sección Servicios del inicio" | ✅ |
+| PN-10 | Subir la foto de un servicio desde la pantalla | Original de 3,5 MB, descripción y encuadre (30 %, 60 %) | Se guarda con esos datos, miniatura en la tabla y aparece en el catálogo público con foto | ✅ archivo de 135 KB |
+| PN-11 | Quitar la foto desde la pantalla | "Quitar foto" y guardar | `foto_url` y descripción vacías, archivo borrado del disco | ✅ |
+
+La primera corrida de PN-10 falló con un error de PostgreSQL al guardar la foto (tipo de dato ambiguo en la consulta); se corrigió en `servicio.model.js` y la prueba se repitió completa. El servicio temporal de la prueba se eliminó al terminar.
