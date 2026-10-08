@@ -43,7 +43,7 @@ Alcance actual: landing, flujo de agendar cita y panel del cliente (Mis citas, M
 
 ### Tipografía
 
-Inter (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/inter`).
+Raleway (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/raleway`).
 
 | Rol | Clases |
 |---|---|

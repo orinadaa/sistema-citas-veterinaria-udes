@@ -88,7 +88,7 @@ export function GuiaVetuiPage() {
             </div>
           </Bloque>
 
-          <Bloque titulo="Tipografía" descripcion="Inter en 400, 500, 600 y 700.">
+          <Bloque titulo="Tipografía" descripcion="Raleway en 400, 500, 600 y 700.">
             <div className="flex flex-col gap-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-blue-50">Antetítulo · xs semibold mayúsculas</p>
               <p className="text-4xl font-bold tracking-tight">Título de página · 4xl bold</p>
