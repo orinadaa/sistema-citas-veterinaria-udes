@@ -2,18 +2,27 @@
 // Encabezados de vetUI (escala tipográfica, Raleway):
 //   EncabezadoPagina  antetítulo + h1 + descripción, sobre el fondo.
 //                     `acciones` a la derecha, `imagen` decorativa.
+//                     `agrupado`: texto e imagen forman un solo bloque
+//                     centrado en la pagina (en vez de texto a la
+//                     izquierda e imagen contra el borde derecho).
 //   TituloSeccion     h2 de una Superficie (vidrio), con número de paso
 //                     opcional.
 // Sobre fondo oscuro el texto es blanco (títulos) y blue-50/blue-100
 // (cuerpo): ambos en AA sobre vidrio y fondo.
-export function EncabezadoPagina({ antetitulo, titulo, descripcion, acciones, imagen, className = '' }) {
+export function EncabezadoPagina({ antetitulo, titulo, descripcion, acciones, imagen, agrupado = false, className = '' }) {
   return (
     // lg:min-h-[17.25rem] (276px): con los 96px de la topbar, el contenido
     // que sigue empieza al menos a 372px. Es lo que necesita el scroll en dos
     // posiciones (useAnclaTopbar): la pildora termina de formarse a los 260px
     // de scroll, y a esa altura el contenido tiene que quedar debajo de ella
     // (112px), no detras.
-    <header className={`mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:min-h-[17.25rem] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center ${className}`}>
+    <header
+      className={`mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:min-h-[17.25rem] lg:items-center ${
+        agrupado
+          ? 'lg:grid-cols-[minmax(0,auto)_auto] lg:justify-center lg:gap-10 xl:gap-16'
+          : 'lg:grid-cols-[minmax(0,1fr)_auto]'
+      } ${className}`}
+    >
       <div>
         {antetitulo && <p className="text-xs font-semibold uppercase tracking-wider text-blue-50">{antetitulo}</p>}
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-white md:text-4xl">{titulo}</h1>
