@@ -185,7 +185,7 @@ export function PanelReportes() {
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-slate-500">Sede</label>
+          <label className="text-xs font-medium text-white/90">Sede</label>
           <Desplegable
             value={sedeId}
             onChange={(e) => setSedeId(e.target.value)}
@@ -204,7 +204,7 @@ export function PanelReportes() {
         <CampoFecha
           id="reporte-desde"
           etiqueta="Desde"
-          claseEtiqueta="text-xs font-medium text-slate-500"
+          claseEtiqueta="text-xs font-medium text-white/90"
           className="w-52"
           placeholder="Cualquier fecha"
           valor={desde}
@@ -215,7 +215,7 @@ export function PanelReportes() {
         <CampoFecha
           id="reporte-hasta"
           etiqueta="Hasta"
-          claseEtiqueta="text-xs font-medium text-slate-500"
+          claseEtiqueta="text-xs font-medium text-white/90"
           className="w-52"
           placeholder="Cualquier fecha"
           valor={hasta}
@@ -312,7 +312,7 @@ export function PanelReportes() {
 
           <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
             <div>
-              <p className="mb-3 font-heading text-sm font-semibold text-brand-navy">Últimas citas registradas</p>
+              <p className="mb-3 font-heading text-sm font-semibold text-white">Últimas citas registradas</p>
               <DataTable
                 filaVacia="No hay citas en el rango seleccionado."
                 columns={[

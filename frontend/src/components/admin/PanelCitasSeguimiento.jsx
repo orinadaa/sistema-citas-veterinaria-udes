@@ -141,20 +141,20 @@ export function PanelCitasSeguimiento() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={irSemanaAnterior} className="boton-texto rounded-boton p-2 text-slate-800 transition">
+        <button type="button" onClick={irSemanaAnterior} className="boton-texto rounded-boton p-2 text-white transition">
           <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
         </button>
-        <button type="button" onClick={irSemanaSiguiente} className="boton-texto rounded-boton p-2 text-slate-800 transition">
+        <button type="button" onClick={irSemanaSiguiente} className="boton-texto rounded-boton p-2 text-white transition">
           <IconoFlechaDerecha className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={irHoy}
-          className="rounded-boton bg-white/75 px-3.5 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-white transition"
+          className="rounded-boton bg-white/85 px-3.5 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-white transition"
         >
           Hoy
         </button>
-        <p className="font-heading text-sm font-semibold text-brand-navy">
+        <p className="font-heading text-sm font-semibold text-white">
           {formatearMesAnio(semanaInicio)} · {formatearRangoSemana(semanaInicio, fin)}
         </p>
       </div>

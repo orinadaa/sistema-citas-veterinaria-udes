@@ -134,17 +134,19 @@ export function AdminSidebar({ activo, onCambiar }) {
         })}
       </nav>
 
-      {/* Cerrar sesion, al fondo del menu. Texto e icono en rojo (pedido de
-          Oriana) sobre una pildora clara: ningun rojo llega a contraste AA
-          directo sobre el vidrio azul. */}
+      {/* Cerrar sesion, al fondo del menu (pedido de Oriana): solo el icono y
+          el texto en rojo, sin contenedor. Con el menu contraido, al pasar el
+          cursor o enfocarlo queda un circulo rojo con el icono blanco. */}
       <div className={`px-4 ${colapsado ? 'mt-5' : 'mt-6'}`}>
         <button
           type="button"
           onClick={salir}
           title={colapsado ? 'Cerrar sesión' : undefined}
           aria-label="Cerrar sesión"
-          className={`flex items-center gap-3 bg-white/85 text-sm font-semibold text-red-700 ring-1 ring-white transition ${
-            colapsado ? 'h-11 w-11 justify-center rounded-full' : 'w-full rounded-boton px-4 py-2.5'
+          className={`flex items-center gap-3 text-sm font-bold text-red-400 transition ${
+            colapsado
+              ? 'h-11 w-11 justify-center rounded-full hover:bg-red-600 hover:text-white focus-visible:bg-red-600 focus-visible:text-white'
+              : 'boton-texto w-full rounded-boton px-4 py-2.5'
           }`}
         >
           <IconoSalir className="h-5 w-5 shrink-0" />

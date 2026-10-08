@@ -169,7 +169,7 @@ export function PanelConfiguracion() {
         </p>
       )}
 
-      <Tabs items={TABS} activeItem={pestana} onChange={setPestana} />
+      <Tabs sobreVidrio items={TABS} activeItem={pestana} onChange={setPestana} />
 
       {pestana === 'sedes' && <PanelHorarios />}
 

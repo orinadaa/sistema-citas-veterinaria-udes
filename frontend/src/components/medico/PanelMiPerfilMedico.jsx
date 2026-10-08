@@ -336,7 +336,7 @@ export function PanelMiPerfilMedico() {
     <>
       <div className="flex flex-col gap-6" inert={editorFoto} aria-hidden={editorFoto}>
         <PageHeader title="Mi perfil" subtitle="Consulta y actualiza tu información personal y profesional." />
-        <Tabs items={TABS} activeItem={pestana} onChange={setPestana} />
+        <Tabs sobreVidrio items={TABS} activeItem={pestana} onChange={setPestana} />
 
         {pestana === 'personal' && (
           <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_260px]">
