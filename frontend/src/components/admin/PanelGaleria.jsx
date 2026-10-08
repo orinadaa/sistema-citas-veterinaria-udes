@@ -266,7 +266,7 @@ export function PanelGaleria() {
                             disabled={i === 0 || ocupada !== null}
                             aria-label={`Mover la foto ${i + 1} una posición antes`}
                             title="Mover antes"
-                            className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40"
+                            className="boton-texto rounded-boton p-2 text-slate-500 transition hover:text-slate-700 disabled:opacity-40"
                           >
                             <IconoChevronAbajo className="h-4 w-4 rotate-90" />
                           </button>
@@ -276,7 +276,7 @@ export function PanelGaleria() {
                             disabled={i === fotos.length - 1 || ocupada !== null}
                             aria-label={`Mover la foto ${i + 1} una posición después`}
                             title="Mover después"
-                            className="rounded-boton p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40"
+                            className="boton-texto rounded-boton p-2 text-slate-500 transition hover:text-slate-700 disabled:opacity-40"
                           >
                             <IconoChevronAbajo className="h-4 w-4 -rotate-90" />
                           </button>
@@ -284,7 +284,7 @@ export function PanelGaleria() {
                         <button
                           type="button"
                           onClick={() => abrir(foto)}
-                          className="inline-flex items-center gap-1.5 rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+                          className="inline-flex items-center gap-1.5 boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
                         >
                           <IconoLapiz className="h-4 w-4" />
                           Editar
@@ -312,7 +312,7 @@ export function PanelGaleria() {
                   type="button"
                   onClick={() => setConfirmandoEliminar(false)}
                   disabled={guardando}
-                  className="rounded-boton px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+                  className="boton-texto rounded-boton px-3 py-2 text-sm font-medium text-slate-600 transition"
                 >
                   No
                 </button>
@@ -332,7 +332,7 @@ export function PanelGaleria() {
                 <button
                   type="button"
                   onClick={() => setConfirmandoEliminar(true)}
-                  className="rounded-boton px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  className="boton-texto rounded-boton px-3 py-2 text-sm font-medium text-red-600 transition"
                 >
                   Eliminar foto
                 </button>

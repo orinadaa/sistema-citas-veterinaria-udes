@@ -493,7 +493,7 @@ export function PanelDisponibilidadMedico() {
                         type="button"
                         onClick={() => setConfirmandoEliminar(b.id)}
                         aria-label="Eliminar bloqueo"
-                        className="rounded-boton p-1.5 text-slate-400 hover:bg-red-50 hover:text-brand-red"
+                        className="boton-texto rounded-boton p-1.5 text-slate-400 hover:text-brand-red"
                       >
                         <IconoPapelera className="h-4 w-4" />
                       </button>

@@ -440,7 +440,7 @@ export function Navbar() {
           <div ref={grupoDerechoRef} className="flex items-center gap-2 justify-self-end md:justify-between md:justify-self-stretch">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
-                <button type="button" className="relative hidden rounded-boton p-2 xl:inline-flex text-white/80 transition hover:bg-white/10 hover:text-white">
+                <button type="button" className="relative hidden boton-texto rounded-boton p-2 xl:inline-flex text-white/80 transition hover:text-white">
                   <IconoCampana className="h-5 w-5" />
                 </button>
 
@@ -449,7 +449,7 @@ export function Navbar() {
                     type="button"
                     ref={perfilRef}
                     onClick={() => setMenuAbierto((v) => !v)}
-                    className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-white/10"
+                    className="boton-texto flex items-center gap-2 rounded-xl px-2 py-1.5 transition"
                   >
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
                       {iniciales || '·'}
@@ -468,13 +468,13 @@ export function Navbar() {
               <div className="hidden items-center gap-1 md:flex">
                 <Link
                   to="/iniciar-sesion"
-                  className="rounded-boton px-3 py-2 text-base font-medium text-white transition hover:bg-white/10"
+                  className="boton-texto rounded-boton px-3 py-2 text-base font-medium text-white transition"
                 >
                   Iniciar sesión
                 </Link>
                 <Link
                   to="/registrarse"
-                  className="hidden rounded-boton px-3 py-2 text-base font-medium text-white transition hover:bg-white/10 xl:inline-block"
+                  className="hidden boton-texto rounded-boton px-3 py-2 text-base font-medium text-white transition xl:inline-block"
                 >
                   Registrarse
                 </Link>

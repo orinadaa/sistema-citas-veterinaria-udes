@@ -250,7 +250,7 @@ export function FormularioMascotaPanel({
                   type="button"
                   onClick={() => setConfirmandoEliminar(true)}
                   aria-label={`Eliminar a ${mascota.nombre}`}
-                  className="mr-auto inline-flex items-center gap-1.5 rounded-boton px-3 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50"
+                  className="mr-auto inline-flex items-center gap-1.5 boton-texto rounded-boton px-3 py-2 text-sm font-semibold text-brand-red transition"
                 >
                   <IconoPapelera className="h-4 w-4" />
                   Eliminar

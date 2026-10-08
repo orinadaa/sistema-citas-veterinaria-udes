@@ -193,6 +193,12 @@ Todo el sistema usa la barra de vetUI en vez de la gris del navegador (diseño d
 - **En los topes no se ve** (todas las barras): quieta arriba de todo o al final, la barra se apaga, y vuelve al desplazarse o al pasar el mouse por su lugar. Un contenedor recién abierto arranca con la barra apagada. Lo maneja `BarraPagina.jsx` (`data-reposo` en la de la página, `data-barra-activa` en los contenedores).
 - Solo con mouse: en pantallas táctiles se deja la barra del sistema, que ya es flotante. En Firefox las barras de adentro usan el mismo color, sin el brillo.
 
+### Hover de los botones sin contenedor
+
+Un botón que a la vista es solo texto, solo icono o icono + texto ("Quitar foto", "Editar" de las tablas, la X de cerrar, flechas, la campana) lleva la clase `boton-texto`. Al pasar el mouse **brilla solo su contenido**, en su propio color (rojo si es rojo, azul si es azul). **No se le pone `hover:bg-*`**: una píldora que aparece al pasar el mouse sugiere un contenedor que el botón no tiene.
+
+Los botones con contenedor visible (relleno, borde o vidrio) siguen iluminando toda su forma. Las filas de un menú o de una lista, los días del calendario y las pestañas sí resaltan con fondo: ahí el fondo marca la fila o la celda, no un botón.
+
 ### Acciones destructivas en un panel
 
 Eliminar o desactivar va en el **pie fijo del panel, en el extremo izquierdo**, como botón de texto rojo sin relleno; Cancelar y la acción principal van juntas a la derecha. Así la acción siempre está a la vista (no al final de un formulario largo) y lejos de "Guardar". La confirmación reemplaza al pie en el mismo lugar, explica la consecuencia y ofrece primero la opción segura ("No, conservar"). Lo usan Editar mascota, Editar foto de la galería y Editar médico.

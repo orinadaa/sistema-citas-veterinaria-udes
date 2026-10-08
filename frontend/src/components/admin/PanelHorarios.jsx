@@ -306,7 +306,7 @@ export function PanelHorarios() {
             <button
               type="button"
               onClick={() => abrirEditar(sede)}
-              className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
             >
               Editar
             </button>
@@ -409,7 +409,7 @@ export function PanelHorarios() {
                         type="button"
                         disabled={guardandoDia === dia.numero}
                         onClick={() => guardarDia(dia)}
-                        className="rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition hover:bg-blue-50 disabled:opacity-60"
+                        className="boton-texto rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition disabled:opacity-60"
                       >
                         Guardar
                       </button>
@@ -417,7 +417,7 @@ export function PanelHorarios() {
                         type="button"
                         disabled={guardandoDia === dia.numero}
                         onClick={() => cerrarDia(dia)}
-                        className="rounded-boton px-2 py-1 text-xs font-medium text-brand-red transition hover:bg-red-50 disabled:opacity-60"
+                        className="boton-texto rounded-boton px-2 py-1 text-xs font-medium text-brand-red transition disabled:opacity-60"
                       >
                         Cerrar
                       </button>
@@ -427,7 +427,7 @@ export function PanelHorarios() {
                       type="button"
                       disabled={guardandoDia === dia.numero}
                       onClick={() => guardarDia(dia)}
-                      className="rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition hover:bg-blue-50 disabled:opacity-60"
+                      className="boton-texto rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition disabled:opacity-60"
                     >
                       Abrir 08:00–17:00
                     </button>

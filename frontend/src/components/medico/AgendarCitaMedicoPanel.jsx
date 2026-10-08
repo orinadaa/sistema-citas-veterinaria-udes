@@ -77,7 +77,7 @@ function TarjetaCliente({ cliente, onQuitar }) {
         <p className="truncate text-xs text-slate-500">{[cliente.correo, cliente.telefono].filter(Boolean).join(' · ')}</p>
       </div>
       {onQuitar && (
-        <button type="button" onClick={onQuitar} aria-label="Quitar paciente" className="rounded-boton p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600">
+        <button type="button" onClick={onQuitar} aria-label="Quitar paciente" className="boton-texto rounded-boton p-1.5 text-slate-400 hover:text-slate-600">
           <IconoX className="h-4 w-4" />
         </button>
       )}

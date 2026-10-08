@@ -80,7 +80,7 @@ export function EncuadreModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
-            className="rounded-boton p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            className="boton-texto rounded-boton p-1.5 text-slate-400 transition hover:text-slate-600"
           >
             <IconoX className="h-5 w-5" />
           </button>

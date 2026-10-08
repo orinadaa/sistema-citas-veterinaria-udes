@@ -372,7 +372,7 @@ export function PanelMedicos({ busquedaInicial }) {
             <button
               type="button"
               onClick={() => abrirEditar(m)}
-              className="rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition hover:bg-blue-50"
+              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
             >
               Editar
             </button>
