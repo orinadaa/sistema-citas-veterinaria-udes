@@ -164,3 +164,58 @@ export function BookingStepperLateral({ paginaActual, puedeIrAHito = () => false
     </nav>
   );
 }
+
+// Stepper horizontal generico para superficies CLARAS (ventanas y paneles):
+// los mismos estados que el del flujo del cliente (completado verde con
+// check, activo con anillo ambar, pendiente gris), con cualquier lista de
+// pasos. Lo usa "Nueva cita" del administrador (NuevaCitaModal).
+// pasos: [{ numero, etiqueta }]; actual: numero del paso activo;
+// puedeIr(numero) / onIr(numero): que pasos son navegables.
+export function PasosHorizontal({ pasos, actual, puedeIr = () => false, onIr }) {
+  return (
+    <ol className="flex items-start" aria-label="Pasos">
+      {pasos.map((paso, indice) => {
+        const estado = paso.numero < actual ? 'completado' : paso.numero === actual ? 'activo' : 'pendiente';
+        const siguiente = pasos[indice + 1];
+        const navegable = paso.numero !== actual && puedeIr(paso.numero);
+        return (
+          <li key={paso.numero} className="relative flex flex-1 justify-center" aria-current={estado === 'activo' ? 'step' : undefined}>
+            {siguiente && (
+              <span
+                aria-hidden="true"
+                className={`absolute left-1/2 top-[15px] h-[3px] w-full ${siguiente.numero <= actual ? 'bg-brand-green' : 'bg-slate-300'}`}
+              />
+            )}
+            <Hito
+              navegable={navegable}
+              onClick={() => onIr?.(paso.numero)}
+              etiqueta={etiquetaAccesible(paso, estado, navegable)}
+              className={`group relative z-10 flex flex-col items-center gap-1.5 text-center ${
+                navegable ? 'rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand-blue' : ''
+              }`}
+            >
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition ${
+                  estado === 'completado'
+                    ? 'bg-brand-green text-white'
+                    : estado === 'activo'
+                      ? 'bg-brand-blue-700 font-bold text-white ring-4 ring-brand-amber/70'
+                      : 'bg-white text-slate-600 ring-1 ring-slate-300'
+                } ${navegable ? 'group-hover:scale-110' : ''}`}
+              >
+                {estado === 'completado' ? <IconoCheck className="h-4 w-4" /> : paso.numero}
+              </span>
+              <span
+                className={`text-xs sm:text-sm ${estado === 'activo' ? 'font-semibold text-brand-navy' : 'font-medium text-slate-600'} ${
+                  navegable ? 'group-hover:underline' : ''
+                }`}
+              >
+                {paso.etiqueta}
+              </span>
+            </Hito>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}

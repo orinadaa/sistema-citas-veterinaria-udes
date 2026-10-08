@@ -67,7 +67,18 @@ function Aviso({ children, t }) {
 
 // medicoId (opcional): disponibilidad de un solo medico (el medico que
 // agenda desde su panel) en vez del agregado de la sede.
-export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, medicoId, sobreVidrio = false }) {
+// textoSinServicio: mensaje cuando ningun medico de la sede presta el
+// servicio (el administrador no puede "elegir otra sede": es la suya).
+export function TimeSlotPicker({
+  sedeId,
+  servicioId,
+  fecha,
+  valor,
+  onChange,
+  medicoId,
+  sobreVidrio = false,
+  textoSinServicio = 'Este servicio no se presta en la sede seleccionada. Elige otra sede.',
+}) {
   const t = sobreVidrio ? TONOS.vidrio : TONOS.claro;
   const { token } = useAuth();
   const clave = sedeId && servicioId && fecha ? `${sedeId}|${servicioId}|${fecha}|${medicoId || ''}` : null;
@@ -126,7 +137,7 @@ export function TimeSlotPicker({ sedeId, servicioId, fecha, valor, onChange, med
   // medicosEnSede: prestan el servicio en la sede algun dia; si hay pero
   // ninguno ese dia (horario propio del medico), se sugiere otra fecha.
   if ((medicosEnSede ?? medicosDisponiblesEnSede) === 0) {
-    return <Aviso t={t}>Este servicio no se presta en la sede seleccionada. Elige otra sede.</Aviso>;
+    return <Aviso t={t}>{textoSinServicio}</Aviso>;
   }
   if (medicosDisponiblesEnSede === 0) {
     return <Aviso t={t}>Ningún médico atiende este servicio ese día. Prueba con otra fecha.</Aviso>;

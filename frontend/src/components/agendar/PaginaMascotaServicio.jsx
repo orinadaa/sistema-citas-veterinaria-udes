@@ -32,12 +32,18 @@ export function PaginaMascotaServicio({
   onSeleccionarMascota,
   onSeleccionarServicio,
   onAgregarMascota,
+  // Para reutilizarla fuera de /agendar (Nueva cita del administrador):
+  // numero de cada seccion y textos que no hablen de "tu mascota".
+  numeroMascota = 1,
+  numeroServicio = 2,
+  descripcionMascota = '¿Para quién es la cita?',
+  descripcionServicio = '¿Qué necesita tu mascota?',
 }) {
   if (errorCarga) return <EstadoError mensaje={errorCarga} onReintentar={onReintentar} />;
 
   return (
     <div className="flex flex-col gap-6">
-      <Seccion numero={1} titulo="Selecciona la mascota" descripcion="¿Para quién es la cita?">
+      <Seccion numero={numeroMascota} titulo="Selecciona la mascota" descripcion={descripcionMascota}>
         {cargando ? (
           <Esqueleto />
         ) : (
@@ -73,7 +79,7 @@ export function PaginaMascotaServicio({
         )}
       </Seccion>
 
-      <Seccion numero={2} titulo="Selecciona el servicio" descripcion="¿Qué necesita tu mascota?">
+      <Seccion numero={numeroServicio} titulo="Selecciona el servicio" descripcion={descripcionServicio}>
         {cargando ? (
           <Esqueleto cantidad={6} />
         ) : servicios.length === 0 ? (
