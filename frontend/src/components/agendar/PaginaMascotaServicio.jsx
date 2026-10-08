@@ -90,7 +90,7 @@ export function PaginaMascotaServicio({
                 >
                   <div className="flex items-start gap-3 pr-6">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-brand-blue-700">
-                      <Icono className="h-5 w-5" />
+                      <Icono className="h-5 w-5" peso="duotone" />
                     </span>
                     <div className="min-w-0">
                       <p className="font-semibold text-slate-900">{servicio.nombre}</p>

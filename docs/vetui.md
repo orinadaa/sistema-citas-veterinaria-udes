@@ -54,6 +54,20 @@ Inter (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/inter`).
 | Cuerpo | `text-base` / `text-sm` |
 | Etiqueta de dato | `text-xs font-medium uppercase tracking-wide` |
 
+### Iconos
+
+Phosphor Icons (`@phosphor-icons/react`, licencia MIT, sin atribución). Todo el sistema los importa desde `components/icons.jsx` (`IconoPata`, `IconoCalendario`...), nunca directo del paquete: ahí se agrega cualquier icono nuevo.
+
+El tamaño y el color van por `className` (`h-5 w-5 text-brand-blue`); el icono toma el color del texto. La prop `peso` elige la variante:
+
+| Peso | Dónde |
+|---|---|
+| `regular` (por defecto) | Botones, menús, topbar, campos, tablas |
+| `duotone` | Solo iconos ilustrativos: servicios, tarjetas de indicadores, estados vacíos y de error |
+| `bold` | Casos puntuales que necesitan más peso (menú de tres puntos) |
+
+Phosphor no trae la cinta de oncología ni un endoscopio: esos dos están dibujados a mano en el mismo archivo, con el mismo trazo y los mismos pesos.
+
 ### Radios
 
 | Token | Clase | Uso |

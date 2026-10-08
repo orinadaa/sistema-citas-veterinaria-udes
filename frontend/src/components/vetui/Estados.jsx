@@ -42,7 +42,7 @@ export function EstadoError({ mensaje, onReintentar }) {
   return (
     <div className="vidrio flex flex-col items-center gap-3 rounded-superficie p-8 text-center">
       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500/20 text-red-100">
-        <IconoAlerta className="h-6 w-6" />
+        <IconoAlerta className="h-6 w-6" peso="duotone" />
       </span>
       <p className="text-sm text-blue-50">{mensaje}</p>
       <Boton variante="secundario" tamano="sm" onClick={onReintentar}>

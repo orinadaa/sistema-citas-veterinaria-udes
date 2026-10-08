@@ -290,7 +290,7 @@ export function PanelGaleria() {
             )}
             {fotos.length === 0 ? (
               <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
-                <IconoImagen className="h-10 w-10 text-slate-300" />
+                <IconoImagen className="h-10 w-10 text-slate-300" peso="duotone" />
                 <p className="text-sm font-medium text-slate-700">La galería está vacía</p>
                 <p className="text-sm text-slate-500">Sube la primera foto con el botón “Subir foto”.</p>
               </div>

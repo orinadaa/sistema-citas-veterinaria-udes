@@ -37,7 +37,7 @@ export function SedeListCard({ sede, horario, seleccionada, onSeleccionar }) {
         <img src={sede.foto_url} alt={sede.nombre} className="h-28 w-full shrink-0 rounded-xl object-cover sm:h-24 sm:w-32" />
       ) : (
         <span className="flex h-28 w-full shrink-0 items-center justify-center rounded-xl bg-blue-100 text-brand-blue-700 sm:h-24 sm:w-32">
-          <IconoSede className="h-8 w-8" />
+          <IconoSede className="h-8 w-8" peso="duotone" />
         </span>
       )}
 

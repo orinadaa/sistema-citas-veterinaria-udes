@@ -19,7 +19,7 @@ export function KPICard({ icon: Icono, color = 'blue', value, detalle, label, on
   return (
     <div className="relative rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <div className={`flex h-10 w-10 items-center justify-center rounded-full ${COLORES[color] ?? COLORES.blue}`}>
-        {Icono && <Icono className="h-5 w-5" />}
+        {Icono && <Icono className="h-5 w-5" peso="duotone" />}
       </div>
       <p className="mt-4 font-heading text-2xl font-bold text-brand-navy">{value}</p>
       {detalle && <p className="text-xs text-slate-400">{detalle}</p>}
