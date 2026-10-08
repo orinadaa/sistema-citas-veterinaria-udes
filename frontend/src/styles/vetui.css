@@ -454,6 +454,12 @@
       apaga hacia los lados, bajo el borde transparente (un box-shadow
       hacia afuera se recortaria al ancho de la barra).
 
+   En los topes no se ven (pedido de Oriana): quieta arriba de todo o al
+   final, la barra no puede seguir, asi que se apaga; vuelve al desplazarse
+   o al pasar el mouse por su lugar. La de la pagina lo hace con data-reposo
+   y las de adentro solo se pintan mientras su contenedor tiene
+   data-barra-activa (los dos atributos los maneja BarraPagina.jsx).
+
    El borde ambar oscuro de la pildora la deja legible tambien sobre blanco
    (>= 3:1, WCAG 1.4.11). Solo con mouse: en pantallas tactiles se deja la
    barra del sistema, que ya es flotante.
@@ -541,17 +547,28 @@ html:has([aria-modal="true"]:not([aria-hidden="true"]):not([aria-hidden="true"] 
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
+  /* En reposo (sin desplazar o quieta en un tope) la pildora existe pero no
+     se pinta. */
   ::-webkit-scrollbar-thumb {
     min-height: 48px;
     border: 5px solid transparent;
     border-radius: 9999px;
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb:horizontal {
+    min-width: 48px;
+  }
+  [data-barra-activa]::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb:hover,
+  ::-webkit-scrollbar-thumb:active {
     background:
       linear-gradient(to right, var(--color-brand-amber-400), var(--barra-ambar)) padding-box,
       linear-gradient(to right, transparent, var(--barra-brillo) 50%, transparent) border-box;
     box-shadow: inset 0 0 0 1px var(--barra-ambar-borde);
   }
-  ::-webkit-scrollbar-thumb:horizontal {
-    min-width: 48px;
+  [data-barra-activa]::-webkit-scrollbar-thumb:horizontal,
+  ::-webkit-scrollbar-thumb:horizontal:hover,
+  ::-webkit-scrollbar-thumb:horizontal:active {
     background:
       linear-gradient(to bottom, var(--color-brand-amber-400), var(--barra-ambar)) padding-box,
       linear-gradient(to bottom, transparent, var(--barra-brillo) 50%, transparent) border-box;
@@ -567,6 +584,9 @@ html:has([aria-modal="true"]:not([aria-hidden="true"]):not([aria-hidden="true"] 
   @supports not selector(::-webkit-scrollbar) {
     * {
       scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    [data-barra-activa] {
       scrollbar-color: var(--barra-ambar) transparent;
     }
   }
