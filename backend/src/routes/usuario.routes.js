@@ -1,8 +1,8 @@
 // routes/usuario.routes.js
 // Gestion de cuentas (RF-04, RF-05). Crear personal y cambiar roles es del
-// superadministrador. El administrador de sede solo lista clientes (para
-// agendarles) y activa/desactiva clientes; a sus medicos los gestiona en
-// /api/administracion/medicos.
+// superadministrador, igual que activar o desactivar cualquier cuenta. El
+// administrador de sede solo lista clientes (para agendarles); a sus medicos
+// los crea y edita en /api/administracion/medicos, sin poder desactivarlos.
 const express = require('express');
 const { listar, crearStaff, cambiarRol, actualizarPerfilUsuario } = require('../controllers/usuario.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
@@ -23,6 +23,6 @@ router.post('/', soloSuper, crearStaff);
 router.patch('/:id/rol', soloSuper, cambiarRol);
 
 // PATCH /api/usuarios/:id — activo/telefono/nombre (cualquier rol)
-router.patch('/:id', superOAdmin, actualizarPerfilUsuario);
+router.patch('/:id', soloSuper, actualizarPerfilUsuario);
 
 module.exports = router;

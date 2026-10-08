@@ -86,7 +86,14 @@ async function actualizarMedico(req, res, next) {
       return res.status(403).json({ mensaje: 'Solo puedes administrar médicos de tu propia sede.' });
     }
 
-    await medicoModel.actualizar(id, { nombreCompleto, telefono, documento, biografia, activo });
+    // Activar o desactivar una cuenta es solo del superadministrador (lo
+    // hace desde Usuarios). El administrador de sede edita el perfil de sus
+    // medicos, pero no su estado.
+    if (activo !== undefined && activo !== medico.activo) {
+      return res.status(403).json({ mensaje: 'Solo el superadministrador puede activar o desactivar cuentas.' });
+    }
+
+    await medicoModel.actualizar(id, { nombreCompleto, telefono, documento, biografia });
     const medicos = await medicoModel.listarConServicios(req.usuario.sedeId);
     return res.status(200).json({ medico: medicos.find((m) => m.id === id) });
   } catch (error) {

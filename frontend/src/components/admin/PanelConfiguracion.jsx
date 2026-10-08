@@ -24,7 +24,7 @@ import { Desplegable } from '../form/Desplegable';
 import { CampoBusqueda } from '../form/CampoBusqueda';
 
 
-const ETIQUETA_ROL = { administrador: 'Administrador de sede', veterinario: 'Médico Veterinario' };
+const ETIQUETA_ROL = { administrador: 'Administrador de sede', veterinario: 'Médico Veterinario', cliente: 'Cliente' };
 const FORM_VACIO = { nombreCompleto: '', correo: '', rol: 'veterinario', sedeId: '', telefono: '', activo: true };
 
 export function PanelConfiguracion() {
@@ -37,6 +37,7 @@ export function PanelConfiguracion() {
 
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
+  const [filtroRol, setFiltroRol] = useState('');
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState(null);
@@ -50,8 +51,10 @@ export function PanelConfiguracion() {
     setErrorCarga('');
     Promise.all([obtenerUsuarios(token), obtenerSedesAdmin(token)])
       .then(([usuariosDatos, sedesDatos]) => {
-        // Solo el personal: sin clientes, y sin el superadministrador (su cuenta no se edita desde el sistema).
-        setUsuarios(usuariosDatos.usuarios.filter((u) => u.rol === 'administrador' || u.rol === 'veterinario'));
+        // Todas las cuentas menos la del superadministrador (no se edita desde
+        // el sistema). Los clientes aparecen para poder activarlos o
+        // desactivarlos: es el unico rol que puede hacerlo.
+        setUsuarios(usuariosDatos.usuarios.filter((u) => u.rol !== 'superadministrador'));
         setSedes(sedesDatos.sedes);
       })
       .catch((err) => setErrorCarga(err.message || 'No se pudieron cargar los usuarios.'))
@@ -64,9 +67,10 @@ export function PanelConfiguracion() {
     return usuarios.filter((u) => {
       const coincideBusqueda = u.nombre_completo.toLowerCase().includes(busqueda.toLowerCase());
       const coincideEstado = !filtroEstado || (filtroEstado === 'activo' ? u.activo : !u.activo);
-      return coincideBusqueda && coincideEstado;
+      const coincideRol = !filtroRol || u.rol === filtroRol;
+      return coincideBusqueda && coincideEstado && coincideRol;
     });
-  }, [usuarios, busqueda, filtroEstado]);
+  }, [usuarios, busqueda, filtroEstado, filtroRol]);
 
   function abrirCrear() {
     setUsuarioEditando(null);
@@ -145,7 +149,7 @@ export function PanelConfiguracion() {
   return (
     <>
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
-      <PageHeader title="Usuarios" subtitle="Cuentas del personal: administradores de sede y médicos, con su sede y su estado." />
+      <PageHeader title="Usuarios" subtitle="Todas las cuentas del sistema. Solo desde aquí se activan o desactivan." />
 
       {aviso && (
         <p
@@ -178,6 +182,12 @@ export function PanelConfiguracion() {
               placeholder="Buscar usuario..."
               className="flex-1"
             />
+            <Desplegable value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)} className="campo px-3 py-2 text-sm">
+              <option value="">Todos los roles</option>
+              <option value="administrador">Administradores de sede</option>
+              <option value="veterinario">Médicos</option>
+              <option value="cliente">Clientes</option>
+            </Desplegable>
             <Desplegable
               value={filtroEstado}
               onChange={(e) => setFiltroEstado(e.target.value)}
@@ -231,7 +241,10 @@ export function PanelConfiguracion() {
                 },
               ]}
               rows={usuariosFiltrados}
-              actions={(u) => (
+              // Un cliente no tiene rol ni sede que editar: en su fila solo
+              // se cambia el estado de la cuenta.
+              actions={(u) =>
+                u.rol === 'cliente' ? null : (
                 <button
                   type="button"
                   onClick={() => abrirEditar(u)}
@@ -239,7 +252,8 @@ export function PanelConfiguracion() {
                 >
                   Editar
                 </button>
-              )}
+                )
+              }
             />
           )}
         </div>

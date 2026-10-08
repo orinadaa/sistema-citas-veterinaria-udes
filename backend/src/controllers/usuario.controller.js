@@ -136,7 +136,7 @@ async function cambiarRol(req, res, next) {
   }
 }
 
-// PATCH /api/usuarios/:id (superadministrador; administrador solo sobre clientes) — activo/telefono/nombre,
+// PATCH /api/usuarios/:id (solo superadministrador: es quien activa o desactiva cuentas) — activo/telefono/nombre,
 // para cualquier rol (Configuracion->Usuarios, toggle de Pacientes). No
 // cambia rol/sede (eso sigue siendo /:id/rol). Un admin no puede
 // desactivarse a si mismo (evita auto-bloqueo).
@@ -147,16 +147,6 @@ async function actualizarPerfilUsuario(req, res, next) {
 
     if (activo === false && id === req.usuario.id) {
       return res.status(400).json({ mensaje: 'No puedes desactivar tu propia cuenta.' });
-    }
-    // El administrador de sede solo cambia cuentas de clientes (Pacientes).
-    if (req.usuario.rol !== 'superadministrador') {
-      const objetivo = await buscarPorId(id);
-      if (!objetivo) {
-        return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
-      }
-      if (objetivo.rol !== 'cliente') {
-        return res.status(403).json({ mensaje: 'Solo el superadministrador puede cambiar cuentas de personal.' });
-      }
     }
 
     const usuarioActualizado = await actualizarPerfil(id, { nombreCompleto, telefono, activo });

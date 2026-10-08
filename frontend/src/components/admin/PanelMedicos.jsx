@@ -20,7 +20,6 @@ import { FotoMascotaModal } from '../cliente/FotoMascotaModal';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
 import { CategoryBadge } from '../ui/CategoryBadge';
-import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
@@ -163,7 +162,6 @@ export function PanelMedicos({ busquedaInicial }) {
             documento: form.documento || null,
             telefono: form.telefono || null,
             biografia: form.biografia || null,
-            activo: form.activo,
           },
           token
         );
@@ -207,25 +205,6 @@ export function PanelMedicos({ busquedaInicial }) {
     } finally {
       setGuardando(false);
     }
-  }
-
-  async function desactivarDesdeElPanel() {
-    if (!medicoEditando) return;
-    setGuardando(true);
-    try {
-      await actualizarMedico(medicoEditando.id, { activo: false }, token);
-      setPanelAbierto(false);
-      cargar();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setGuardando(false);
-    }
-  }
-
-  async function alternarActivo(medico) {
-    await actualizarMedico(medico.id, { activo: !medico.activo }, token);
-    cargar();
   }
 
   async function alternarEspecialidad(medico, categoriaId) {
@@ -364,7 +343,9 @@ export function PanelMedicos({ busquedaInicial }) {
             {
               header: 'Estado',
               render: (m) => (
-                <StatusToggle checked={m.activo} onChange={() => alternarActivo(m)} label={m.activo ? 'Activo' : 'Inactivo'} />
+<span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${m.activo ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}`}>
+                  {m.activo ? 'Activo' : 'Inactivo'}
+                </span>
               ),
             },
           ]}
@@ -389,18 +370,7 @@ export function PanelMedicos({ busquedaInicial }) {
       title={medicoEditando ? 'Editar médico' : 'Nuevo médico'}
       footer={
         <div className="flex items-center justify-between gap-3">
-          {medicoEditando ? (
-            <button
-              type="button"
-              disabled={guardando}
-              onClick={desactivarDesdeElPanel}
-              className="rounded-boton border border-red-200 px-4 py-2 text-sm font-semibold text-brand-red transition hover:bg-red-50 disabled:opacity-60"
-            >
-              Desactivar médico
-            </button>
-          ) : (
-            <span />
-          )}
+          <span />
           <button
             type="submit"
             form="form-medico"
@@ -518,12 +488,12 @@ export function PanelMedicos({ busquedaInicial }) {
             />
           </div>
 
-          <StatusToggle
-            checked={form.activo}
-            onChange={(valor) => setForm({ ...form, activo: valor })}
-            label="Médico activo"
-            helpText="Si se desactiva, no aparecerá en la agenda de citas."
-          />
+          {/* Activar o desactivar la cuenta es del superadministrador. */}
+          {medicoEditando && (
+            <p className="text-xs text-slate-600">
+              Cuenta {medicoEditando.activo ? 'activa' : 'inactiva'}. Solo el superadministrador puede activarla o desactivarla.
+            </p>
+          )}
 
           {error && <p className="text-sm text-red-600">{error}</p>}
         </form>

@@ -152,17 +152,37 @@ describe('PUT /api/administracion/medicos/:id', () => {
   });
 
   test('actualiza el perfil del medico', async () => {
-    usuarioModel.buscarPorId.mockResolvedValue({ id: 'vet-1', rol: 'veterinario', sede_id: ID_SEDE });
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'vet-1', rol: 'veterinario', sede_id: ID_SEDE, activo: true });
     medicoModel.actualizar.mockResolvedValue(true);
-    medicoModel.listarConServicios.mockResolvedValue([{ id: 'vet-1', nombre_completo: 'Dra. Ejemplo', activo: false }]);
+    medicoModel.listarConServicios.mockResolvedValue([{ id: 'vet-1', nombre_completo: 'Dra. Ejemplo', telefono: '3001112233', activo: true }]);
 
     const respuesta = await request(app)
       .put('/api/administracion/medicos/vet-1')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ activo: false });
+      .send({ telefono: '3001112233' });
 
     expect(respuesta.status).toBe(200);
-    expect(respuesta.body.medico.activo).toBe(false);
+    expect(respuesta.body.medico.telefono).toBe('3001112233');
+    // El estado de la cuenta nunca viaja al modelo desde esta ruta.
+    expect(medicoModel.actualizar.mock.calls[0][1].activo).toBeUndefined();
+  });
+
+  test('el administrador de sede no puede desactivar ni reactivar a un medico', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'vet-1', rol: 'veterinario', sede_id: ID_SEDE, activo: true });
+    const desactivar = await request(app)
+      .put('/api/administracion/medicos/vet-1')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ activo: false });
+
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'vet-1', rol: 'veterinario', sede_id: ID_SEDE, activo: false });
+    const reactivar = await request(app)
+      .put('/api/administracion/medicos/vet-1')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ activo: true });
+
+    expect(desactivar.status).toBe(403);
+    expect(reactivar.status).toBe(403);
+    expect(medicoModel.actualizar).not.toHaveBeenCalled();
   });
 });
 

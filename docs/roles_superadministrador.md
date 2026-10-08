@@ -10,12 +10,12 @@ Decisiones de Oriana (8 de octubre de 2026). El sistema tenía un solo rol
 | Alcance | Solo su sede (`usuario.sede_id`) | Todo el sistema (sin sede) |
 | Inicio | El día de su sede | Estado del sistema y de cada sede |
 | Citas | Agenda y consulta las de su sede | No opera citas |
-| Médicos | Crea, edita y asigna servicios a los de su sede | Los ve y gestiona como cuentas en Usuarios |
-| Pacientes | Consulta, activa o desactiva clientes | — |
+| Médicos | Crea, edita y asigna servicios a los de su sede; no los activa ni desactiva | Los ve y gestiona como cuentas en Usuarios |
+| Pacientes | Consulta los clientes y sus mascotas; no activa ni desactiva cuentas | — |
 | Servicios | Solo consulta el catálogo; en Médicos decide quién presta cada uno en su sede | Crea y edita el catálogo (es el de la página web) |
 | Horario | Cambia el horario de atención de su sede | Cambia el de cualquier sede |
 | Sedes | — | Crea, edita, activa y desactiva |
-| Usuarios | — | Crea administradores y médicos, les asigna rol y sede, los activa o desactiva |
+| Usuarios | — | Crea administradores y médicos y les asigna rol y sede. Es el único que activa o desactiva cuentas, de personal y de clientes |
 | Página web | — | Galería de la portada |
 | Campos | — | Campos adicionales de los formularios |
 | Reportes | Solo de su sede | De todas las sedes, con filtro |
@@ -74,7 +74,7 @@ Unitarias (`backend/tests`, modelos simulados):
 | El administrador de sede consulta sedes y catálogo | `GET /api/sedes/admin`, `GET /api/servicios/admin` | 200 | Correcto |
 | Solo lista clientes | `GET /api/usuarios?rol=cliente` / sin rol / `rol=veterinario` | 200 / 403 / 403 | Correcto |
 | No crea personal ni cambia roles | `POST /api/usuarios`, `PATCH /api/usuarios/:id/rol` | 403 | Correcto |
-| Solo cambia cuentas de clientes | `PATCH /api/usuarios/:id` sobre cliente / sobre administrador | 200 / 403 | Correcto |
+| No activa ni desactiva cuentas | `PATCH /api/usuarios/:id` sobre cliente o personal; `PUT /api/administracion/medicos/:id` con `activo` distinto | 403 | Correcto |
 | Horario solo de su sede | `PUT` y `DELETE /api/horarios` con administrador de otra sede | 403 | Correcto |
 | El superadministrador cambia cualquier horario | `PUT /api/horarios` | 200 | Correcto |
 | Reportes acotados a la sede | Administrador pide `sedeId` de otra sede | Se consulta su propia sede | Correcto |

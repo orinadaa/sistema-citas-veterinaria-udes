@@ -7,13 +7,11 @@ import {
   obtenerPacientes,
   obtenerDetallePaciente,
   obtenerSedesAdmin,
-  actualizarUsuario,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
-import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { Tabs } from '../ui/Tabs';
@@ -103,11 +101,6 @@ export function PanelPacientes({ busquedaInicial }) {
     } finally {
       setCargandoDetalle(false);
     }
-  }
-
-  async function alternarActivo(paciente) {
-    await actualizarUsuario(paciente.id, { activo: !paciente.activo }, token);
-    cargar();
   }
 
   // Tras agregar/editar/eliminar una mascota: refresca el detalle abierto
@@ -203,7 +196,9 @@ export function PanelPacientes({ busquedaInicial }) {
             {
               header: 'Estado',
               render: (p) => (
-                <StatusToggle checked={p.activo} onChange={() => alternarActivo(p)} label={p.activo ? 'Activo' : 'Inactivo'} />
+<span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${p.activo ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}`}>
+                  {p.activo ? 'Activo' : 'Inactivo'}
+                </span>
               ),
             },
           ]}
@@ -270,16 +265,11 @@ export function PanelPacientes({ busquedaInicial }) {
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Registrado desde</p>
                   <p className="text-sm text-slate-800">{formatearFechaLarga(detalle.cliente.creado_en)}</p>
                 </div>
-                <StatusToggle
-                  checked={detalle.cliente.activo}
-                  onChange={async (valor) => {
-                    await actualizarUsuario(detalle.cliente.id, { activo: valor }, token);
-                    setDetalle({ ...detalle, cliente: { ...detalle.cliente, activo: valor } });
-                    cargar();
-                  }}
-                  label="Cliente activo"
-                  helpText="Si se desactiva, la cuenta no podrá iniciar sesión."
-                />
+                {/* El estado de la cuenta solo lo cambia el superadministrador. */}
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Estado de la cuenta</p>
+                  <p className="text-sm text-slate-800">{detalle.cliente.activo ? 'Activa' : 'Inactiva'}</p>
+                </div>
               </div>
             )}
 
