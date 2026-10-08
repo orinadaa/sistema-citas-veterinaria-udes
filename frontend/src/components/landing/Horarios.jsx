@@ -9,9 +9,9 @@
 // - un dia por fila, en un bloque centrado dentro de la tarjeta: abreviatura
 //   en una pildora del color de la sede y la hora pegada a su lado; los dias
 //   sin atencion llevan "Cerrado" en rojo;
-// - al final, "Agendar cita" como enlace de solo texto con icono de
-//   calendario, que lleva a agendar con esa sede ya elegida
-//   (/agendar?sedeId=...).
+// - al final, "Agendar cita" como una barra que una flecha ambar llena de
+//   izquierda a derecha al pasar el cursor; lleva a agendar con esa sede
+//   ya elegida (/agendar?sedeId=...).
 // De fondo, motivos muy tenues (linea punteada, reloj).
 //
 // El color se asigna por orden (la primera azul, la segunda ambar, y se
@@ -27,7 +27,7 @@ import { obtenerSedes, obtenerHorarios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { detalleHorarioPorDia } from '../../utils/horarioTexto';
-import { IconoAlerta, IconoCalendario, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
+import { IconoAlerta, IconoCalendario, IconoFlechaDerecha, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
 import { SectionHeading } from './SectionHeading';
 import { HalosAmbientales } from './HalosAmbientales';
 import { TarjetaSlide } from './TarjetaSlide';
@@ -106,15 +106,28 @@ function TarjetaSede({ sede, horario, acento }) {
         })}
       </ul>
 
-      {/* Accion: enlace de solo texto e icono en ambar (sin pildora ambar),
-          lleva a agendar con esta sede ya elegida. */}
+      {/* Accion: barra que se llena. En reposo es una pista clara con borde
+          ambar; al pasar el cursor (o enfocarla con el teclado) una flecha
+          ambar la recorre de izquierda a derecha hasta llenarla, y la
+          flecha del final avanza. El texto es negro siempre (AA sobre la
+          pista y sobre el ambar). Lleva a agendar con esta sede elegida.
+          El relleno es mas ancho que la barra: la punta de la flecha sale
+          por la derecha y queda recortada, asi termina llena y pareja. */}
       <Link
         to={rutaAgendarCita(estaAutenticado, null, sede.id)}
         aria-label={`Agendar cita en la sede ${nombre}`}
-        className="boton-texto mx-auto mb-4 inline-flex items-center gap-2 rounded-boton px-3 py-1.5 text-base font-bold text-brand-amber-600 outline-none transition focus-visible:ring-2 focus-visible:ring-brand-blue-700"
+        className="group relative mx-5 mb-4 flex items-center justify-center gap-2 overflow-hidden rounded-boton bg-white/70 px-5 py-2.5 text-base font-bold text-slate-900 ring-1 ring-inset ring-brand-amber outline-none focus-visible:ring-2 focus-visible:ring-brand-amber-600"
       >
-        <IconoCalendario className="h-5 w-5" peso="bold" />
-        Agendar cita
+        <span
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 w-[calc(100%+1.75rem)] -translate-x-full bg-brand-amber transition-transform duration-500 ease-out [clip-path:polygon(0_0,calc(100%-1.75rem)_0,100%_50%,calc(100%-1.75rem)_100%,0_100%)] group-hover:translate-x-0 group-focus-visible:translate-x-0 motion-reduce:transition-none"
+        />
+        <IconoCalendario className="relative h-5 w-5" peso="bold" />
+        <span className="relative">Agendar cita</span>
+        <IconoFlechaDerecha
+          className="relative h-4 w-4 transition-transform duration-500 ease-out group-hover:translate-x-1.5 group-focus-visible:translate-x-1.5 motion-reduce:transition-none"
+          peso="bold"
+        />
       </Link>
     </article>
   );
