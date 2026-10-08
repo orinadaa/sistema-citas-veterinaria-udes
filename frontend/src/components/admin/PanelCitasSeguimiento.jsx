@@ -141,16 +141,16 @@ export function PanelCitasSeguimiento() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={irSemanaAnterior} className="boton-texto rounded-boton p-2 text-slate-500 transition">
+        <button type="button" onClick={irSemanaAnterior} className="boton-texto rounded-boton p-2 text-slate-800 transition">
           <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
         </button>
-        <button type="button" onClick={irSemanaSiguiente} className="boton-texto rounded-boton p-2 text-slate-500 transition">
+        <button type="button" onClick={irSemanaSiguiente} className="boton-texto rounded-boton p-2 text-slate-800 transition">
           <IconoFlechaDerecha className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={irHoy}
-          className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
+          className="rounded-boton bg-white/75 px-3.5 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-white transition"
         >
           Hoy
         </button>
@@ -183,7 +183,7 @@ export function PanelCitasSeguimiento() {
             </p>
             <div className="mt-3 flex flex-col gap-2">
               {citasDelDia.length === 0 ? (
-                <p className="text-sm text-slate-400">No hay citas ese día.</p>
+                <p className="text-sm text-slate-600">No hay citas ese día.</p>
               ) : (
                 citasDelDia.map((cita) => (
                   <button
@@ -197,7 +197,7 @@ export function PanelCitasSeguimiento() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium text-slate-800">{cita.mascota_nombre}</span>
-                      <span className="block truncate text-xs text-slate-400">
+                      <span className="block truncate text-xs text-slate-600">
                         {formatearHora(cita.fecha_hora)} · {cita.servicio_nombre}
                       </span>
                     </span>
@@ -233,28 +233,28 @@ export function PanelCitasSeguimiento() {
           <div className="flex flex-col gap-4">
             <CategoryBadge nombre={citaDetalle.categoria_nombre} color={citaDetalle.categoria_color} />
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Fecha y hora</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Fecha y hora</p>
               <p className="text-sm text-slate-800">
                 {formatearFechaLarga(citaDetalle.fecha_hora)} · {formatearHora(citaDetalle.fecha_hora)}
               </p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Servicio</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Servicio</p>
               <p className="text-sm text-slate-800">{citaDetalle.servicio_nombre}</p>
             </div>
             {esAdmin && (
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Médico</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Médico</p>
                 <p className="text-sm text-slate-800">{citaDetalle.medico_nombre}</p>
               </div>
             )}
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Cliente</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Cliente</p>
               <p className="text-sm text-slate-800">{citaDetalle.cliente_nombre}</p>
-              {citaDetalle.cliente_telefono && <p className="text-xs text-slate-400">{citaDetalle.cliente_telefono}</p>}
+              {citaDetalle.cliente_telefono && <p className="text-xs text-slate-600">{citaDetalle.cliente_telefono}</p>}
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Mascota</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Mascota</p>
               <p className="text-sm text-slate-800">
                 {citaDetalle.mascota_nombre}
                 {citaDetalle.mascota_especie ? ` (${citaDetalle.mascota_especie})` : ''}
@@ -262,12 +262,12 @@ export function PanelCitasSeguimiento() {
             </div>
             {citaDetalle.motivo && (
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Motivo</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Motivo</p>
                 <p className="text-sm text-slate-800">{citaDetalle.motivo}</p>
               </div>
             )}
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Estado</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Estado</p>
               <span
                 className={`mt-1 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${
                   citaDetalle.estado === 'agendada' ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'

@@ -278,6 +278,8 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 
 **Mensajes del inicio de sesión.** Correo inexistente y contraseña incorrecta responden el mismo mensaje genérico, y la recuperación responde igual exista o no el correo: así no se puede averiguar qué correos tienen cuenta (enumeración de cuentas). El único mensaje específico es "Tu cuenta está inactiva", y solo se muestra cuando la contraseña es correcta.
 
+**Panel administrativo y del médico en vidrio.** Fondo `FondoVetui variante="panel"` (azul del landing con más ámbar y manchas de azul oscuro). Nada va directo sobre el fondo: menú lateral en `vidrio` (contraído es una píldora que abraza sus iconos), barra superior sin contenedor con buscador, campana y perfil en píldoras `vidrio`, y hoja de trabajo en `cristal` con las tarjetas blancas adentro. El panel lateral (`ui/SidePanel.jsx`) flota en `cristal-fuerte` sobre el `velo`. Ojo: `backdrop-filter` en un ancestro atrapa los `position: fixed`; por eso el cristal de la hoja es una capa hermana del `<main>`. Texto sobre la hoja: slate-700 o más oscuro.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".
