@@ -121,12 +121,17 @@ export function AdminHeader({ onNavegar }) {
       className="relative z-30 flex shrink-0 items-center justify-between gap-4"
       style={{ height: '52px' }}
     >
-      {/* Con la vista previa de resultados abierta, todo lo demas se desenfoca
-          (pedido de Oriana): solo quedan nitidos el buscador y sus resultados,
-          que van por encima de este velo. Un clic en el velo la cierra (lo
-          hace el mousedown fuera del contenedor). */}
-      {vistaPreviaAbierta && (
-        <div aria-hidden="true" className="fixed inset-0 z-40 bg-brand-blue-800/25 backdrop-blur-md" />
+      {/* Con la vista previa de resultados o el menu del perfil abiertos, todo
+          lo demas se desenfoca (pedido de Oriana): solo queda nitido lo que
+          se abrio (buscador + resultados, o perfil + "Cerrar sesión"), que va
+          por encima de este velo. Nunca los dos a la vez: abrir uno cierra el
+          otro. Un clic en el velo cierra lo que este abierto. */}
+      {(vistaPreviaAbierta || menuAbierto) && (
+        <div
+          aria-hidden="true"
+          onMouseDown={() => setMenuAbierto(false)}
+          className="fixed inset-0 z-40 bg-brand-blue-800/25 backdrop-blur-md"
+        />
       )}
 
       <div ref={contenedorRef} className={`relative max-w-md flex-1 ${vistaPreviaAbierta ? 'z-50' : ''}`}>
@@ -138,8 +143,12 @@ export function AdminHeader({ onNavegar }) {
             onChange={(evento) => {
               setTermino(evento.target.value);
               setDropdownAbierto(true);
+              setMenuAbierto(false);
             }}
-            onFocus={() => setDropdownAbierto(true)}
+            onFocus={() => {
+              setDropdownAbierto(true);
+              setMenuAbierto(false);
+            }}
             disabled={!buscadorActivo}
             placeholder={esMedico ? 'Buscar paciente o mascota...' : 'Buscar paciente, médico o servicio...'}
             className="w-full bg-transparent text-sm font-medium text-white placeholder:text-white/80 focus:outline-none disabled:cursor-not-allowed"
@@ -233,10 +242,13 @@ export function AdminHeader({ onNavegar }) {
           <IconoCampana className="h-5 w-5" />
         </span>
 
-        <div className="relative">
+        <div className={`relative ${menuAbierto ? 'z-50' : ''}`}>
           <button
             type="button"
-            onClick={() => setMenuAbierto((v) => !v)}
+            onClick={() => {
+              setDropdownAbierto(false);
+              setMenuAbierto((v) => !v);
+            }}
             className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton pl-2 pr-4 transition"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-xs font-semibold text-white">
