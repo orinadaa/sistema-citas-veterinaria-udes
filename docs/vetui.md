@@ -43,7 +43,7 @@ Alcance actual: landing, flujo de agendar cita y panel del cliente (Mis citas, M
 
 ### Tipografía
 
-Josefin Sans (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/josefin-sans`).
+Inter (400, 500, 600, 700), empaquetada con el proyecto (`@fontsource/inter`).
 
 | Rol | Clases |
 |---|---|
