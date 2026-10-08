@@ -272,6 +272,8 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 
 **Calendario con marcas.** `DatePickerCalendar` acepta `marcas` (`{ "YYYY-MM-DD": ['proxima', ...] }`): dibuja un punto de color por estado bajo el día (azul próxima, verde completada, rojo cancelada) y lo dice en el nombre accesible del día. Lo usa "Mis citas" del cliente: lista a la izquierda y calendario a la derecha; tocar un día deja en la lista solo sus citas (`permiteQuitar`: tocarlo otra vez quita el filtro). En celular el calendario va arriba.
 
+**Agendar desde el administrador, en una ventana.** "Nueva cita" del panel administrativo es una ventana centrada (`admin/NuevaCitaModal.jsx`), no un panel lateral. Reutiliza el flujo de agendar del cliente (tarjetas de mascota y servicio, calendario y horas) en 3 pasos con `PasosHorizontal` (stepper para superficies claras, en `agendar/BookingStepper.jsx`): 1. Cliente, mascota y servicio; 2. Fecha, hora y médico; 3. Confirmar. Al cerrar con datos elegidos pide confirmar.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".

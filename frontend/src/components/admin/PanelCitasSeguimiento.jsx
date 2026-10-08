@@ -1,7 +1,8 @@
 // components/admin/PanelCitasSeguimiento.jsx
 // RF-12: seguimiento de citas programadas, como vista de calendario
 // semanal (reemplaza la tabla anterior). El administrador ademas puede
-// agendar citas en nombre de un cliente ("+ Nueva cita"); reprogramar y
+// agendar citas en nombre de un cliente ("+ Nueva cita", en una ventana
+// centrada: NuevaCitaModal); reprogramar y
 // cancelar siguen siendo exclusivas del cliente (RF-08/RF-09), no se
 // hacen desde aqui. Al hacer clic en una cita se abre un SidePanel con
 // el detalle (mismo patron que Servicios/Médicos).
@@ -11,26 +12,17 @@ import {
   obtenerServicios,
   obtenerClientes,
   obtenerHorarios,
-  agendarCita,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora, esMismoDia, sumarDias, inicioDeSemana, formatearMesAnio, formatearRangoSemana } from '../../utils/fecha';
 import { PageHeader } from '../ui/PageHeader';
 import { SidePanel } from '../ui/SidePanel';
 import { CategoryBadge, COLORES_CATEGORIA } from '../ui/CategoryBadge';
-import { Campo } from '../form/Campo';
 import { MiniCalendario } from '../citas/MiniCalendario';
 import { CalendarioSemanal } from '../citas/CalendarioSemanal';
-import { DatePickerCalendar } from '../agendar/DatePickerCalendar';
-import { TimeSlotPicker } from '../agendar/TimeSlotPicker';
-import { SelectorMedico } from '../citas/SelectorMedico';
-import { MascotaSelector } from '../citas/MascotaSelector';
+import { NuevaCitaModal } from './NuevaCitaModal';
 import { IconoFlechaDerecha, IconoPata } from '../icons';
 import { EstadoError } from '../ui/EstadoError';
-import { Desplegable } from '../form/Desplegable';
-import { CampoBusqueda } from '../form/CampoBusqueda';
-
-const FORM_VACIO = { clienteId: '', servicioId: '', fecha: '', franja: null, medicoId: '', mascotaId: '', motivo: '' };
 
 function hoyAMedianoche() {
   const hoy = new Date();
@@ -47,14 +39,12 @@ export function PanelCitasSeguimiento() {
   const [errorCarga, setErrorCarga] = useState('');
   const [servicios, setServicios] = useState([]);
   const [clientes, setClientes] = useState([]);
-  const [busquedaCliente, setBusquedaCliente] = useState('');
 
   const [diaSeleccionado, setDiaSeleccionado] = useState(hoyAMedianoche);
   const [semanaInicio, setSemanaInicio] = useState(() => inicioDeSemana(hoyAMedianoche()));
 
   const [citaDetalle, setCitaDetalle] = useState(null);
   const [panelNuevaAbierto, setPanelNuevaAbierto] = useState(false);
-  const [formNueva, setFormNueva] = useState(FORM_VACIO);
   // Dias de la semana en que atiende la sede (deshabilita los demas en el
   // calendario de "Nueva cita"); null mientras carga o si falla.
   const [diasAbiertos, setDiasAbiertos] = useState(null);
@@ -69,8 +59,6 @@ export function PanelCitasSeguimiento() {
       vigente = false;
     };
   }, [sedeIdUsuario]);
-  const [errorNueva, setErrorNueva] = useState('');
-  const [guardandoNueva, setGuardandoNueva] = useState(false);
 
   function cargarCitas() {
     setCargando(true);
@@ -117,12 +105,6 @@ export function PanelCitasSeguimiento() {
     return Array.from(vistos, ([nombre, color]) => ({ nombre, color }));
   }, [citas]);
 
-  const clientesFiltrados = useMemo(
-    () =>
-      clientes.filter((c) => c.nombre_completo.toLowerCase().includes(busquedaCliente.toLowerCase())),
-    [clientes, busquedaCliente]
-  );
-
   function irSemanaAnterior() {
     setSemanaInicio((s) => sumarDias(s, -7));
   }
@@ -140,40 +122,7 @@ export function PanelCitasSeguimiento() {
   }
 
   function abrirNueva() {
-    setFormNueva(FORM_VACIO);
-    setErrorNueva('');
-    setBusquedaCliente('');
     setPanelNuevaAbierto(true);
-  }
-
-  async function guardarNueva(evento) {
-    evento.preventDefault();
-    setErrorNueva('');
-    if (!formNueva.clienteId || !formNueva.servicioId || !formNueva.franja || !formNueva.medicoId || !formNueva.mascotaId) {
-      setErrorNueva('Completa cliente, servicio, franja, médico y la mascota.');
-      return;
-    }
-
-    setGuardandoNueva(true);
-    try {
-      await agendarCita(
-        {
-          clienteId: formNueva.clienteId,
-          servicioId: formNueva.servicioId,
-          medicoId: formNueva.medicoId,
-          fechaHora: formNueva.franja,
-          mascotaId: formNueva.mascotaId,
-          motivo: formNueva.motivo || null,
-        },
-        token
-      );
-      setPanelNuevaAbierto(false);
-      cargarCitas();
-    } catch (err) {
-      setErrorNueva(err.message);
-    } finally {
-      setGuardandoNueva(false);
-    }
   }
 
   const fin = sumarDias(semanaInicio, 5);
@@ -331,120 +280,20 @@ export function PanelCitasSeguimiento() {
         )}
       </SidePanel>
 
+      {/* "Nueva cita" abre una ventana centrada (NuevaCitaModal). */}
       {esAdmin && (
-        <SidePanel
-          isOpen={panelNuevaAbierto}
-          onClose={() => setPanelNuevaAbierto(false)}
-          title="Nueva cita"
-          footer={
-            <button
-              type="submit"
-              form="form-nueva-cita-admin"
-              disabled={guardandoNueva}
-              className="boton-glass-ambar w-full rounded-boton px-4 py-2 text-sm font-semibold text-brand-navy transition disabled:opacity-60"
-            >
-              {guardandoNueva ? 'Agendando...' : 'Agendar cita'}
-            </button>
-          }
-        >
-          <form id="form-nueva-cita-admin" onSubmit={guardarNueva} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="cliente-cita" className="text-sm font-medium text-slate-700">
-                Cliente<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
-              </label>
-              <CampoBusqueda
-                placeholder="Buscar cliente por nombre..."
-                value={busquedaCliente}
-                onChange={(e) => setBusquedaCliente(e.target.value)}
-              />
-              <Desplegable
-                id="cliente-cita"
-                value={formNueva.clienteId}
-                onChange={(e) => setFormNueva({ ...formNueva, clienteId: e.target.value, mascotaId: '' })}
-                className="campo px-3 py-2 text-sm"
-              >
-                <option value="">Selecciona un cliente</option>
-                {clientesFiltrados.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nombre_completo} ({c.correo})
-                  </option>
-                ))}
-              </Desplegable>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="servicio-cita-admin" className="text-sm font-medium text-slate-700">
-                Servicio<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
-              </label>
-              <Desplegable
-                id="servicio-cita-admin"
-                value={formNueva.servicioId}
-                onChange={(e) => setFormNueva({ ...formNueva, servicioId: e.target.value, franja: null, medicoId: '' })}
-                className="campo px-3 py-2 text-sm"
-              >
-                <option value="">Selecciona un servicio</option>
-                {servicios.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.nombre}
-                  </option>
-                ))}
-              </Desplegable>
-            </div>
-
-            {/* Mismo calendario y selector de horas del flujo de agendar del
-                cliente (disponibilidad agregada de la sede; el medico se
-                elige despues, entre los libres a esa hora). */}
-            <div className="flex flex-col gap-1.5">
-              <p className="text-sm font-medium text-slate-700">
-                Fecha y hora<span className="ml-0.5 text-red-500" aria-hidden="true">*</span>
-              </p>
-              {!formNueva.servicioId ? (
-                <p className="text-sm text-slate-500">Selecciona primero el servicio.</p>
-              ) : (
-                <div className="flex flex-col gap-5 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-                  <DatePickerCalendar
-                    valor={formNueva.fecha}
-                    onChange={(fecha) => setFormNueva({ ...formNueva, fecha, franja: null, medicoId: '' })}
-                    diasAbiertos={diasAbiertos}
-                  />
-                  <div className="border-t border-slate-200 pt-4">
-                    <p className="mb-3 font-heading text-sm font-semibold text-brand-navy">Horarios disponibles</p>
-                    <TimeSlotPicker
-                      sedeId={usuario.sedeId}
-                      servicioId={formNueva.servicioId}
-                      fecha={formNueva.fecha}
-                      valor={formNueva.franja}
-                      onChange={(valor) => setFormNueva({ ...formNueva, franja: valor, medicoId: '' })}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <SelectorMedico
-              sedeId={usuario.sedeId}
-              servicioId={formNueva.servicioId}
-              fechaHora={formNueva.franja}
-              valorSeleccionado={formNueva.medicoId}
-              onSeleccionar={(valor) => setFormNueva({ ...formNueva, medicoId: valor })}
-            />
-
-            <MascotaSelector
-              clienteId={formNueva.clienteId}
-              valorSeleccionado={formNueva.mascotaId}
-              onSeleccionar={(valor) => setFormNueva({ ...formNueva, mascotaId: valor })}
-            />
-
-            <Campo
-              id="motivo-cita-admin"
-              label="Motivo (opcional)"
-              value={formNueva.motivo}
-              onChange={(e) => setFormNueva({ ...formNueva, motivo: e.target.value })}
-            />
-
-            {errorNueva && <p className="text-sm text-red-600">{errorNueva}</p>}
-          </form>
-        </SidePanel>
+        <NuevaCitaModal
+          abierto={panelNuevaAbierto}
+          onCerrar={() => setPanelNuevaAbierto(false)}
+          onAgendada={() => {
+            setPanelNuevaAbierto(false);
+            cargarCitas();
+          }}
+          clientes={clientes}
+          servicios={servicios}
+          sedeId={usuario.sedeId}
+          diasAbiertos={diasAbiertos}
+        />
       )}
     </>
   );
