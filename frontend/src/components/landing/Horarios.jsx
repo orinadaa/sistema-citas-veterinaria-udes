@@ -12,7 +12,7 @@
 // - al final, "Agendar cita" como enlace de solo texto con icono de
 //   calendario, que lleva a agendar con esa sede ya elegida
 //   (/agendar?sedeId=...).
-// De fondo, motivos muy tenues (huella, linea punteada, reloj).
+// De fondo, motivos muy tenues (linea punteada, reloj).
 //
 // El color se asigna por orden (la primera azul, la segunda ambar, y se
 // repite), no por nombre de ciudad: el sistema soporta sedes nuevas
@@ -27,7 +27,7 @@ import { obtenerSedes, obtenerHorarios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
 import { detalleHorarioPorDia } from '../../utils/horarioTexto';
-import { IconoAlerta, IconoCalendario, IconoPata, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
+import { IconoAlerta, IconoCalendario, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
 import { SectionHeading } from './SectionHeading';
 import { HalosAmbientales } from './HalosAmbientales';
 import { TarjetaSlide } from './TarjetaSlide';
@@ -106,12 +106,12 @@ function TarjetaSede({ sede, horario, acento }) {
         })}
       </ul>
 
-      {/* Accion: enlace de solo texto e icono (sin pildora), lleva a agendar
-          con esta sede ya elegida. */}
+      {/* Accion: enlace de solo texto e icono en ambar (sin pildora ambar),
+          lleva a agendar con esta sede ya elegida. */}
       <Link
         to={rutaAgendarCita(estaAutenticado, null, sede.id)}
         aria-label={`Agendar cita en la sede ${nombre}`}
-        className="boton-texto mx-auto mb-4 inline-flex items-center gap-2 rounded-boton px-3 py-1.5 text-base font-bold text-brand-blue-800 outline-none transition focus-visible:ring-2 focus-visible:ring-brand-blue-700"
+        className="boton-texto mx-auto mb-4 inline-flex items-center gap-2 rounded-boton px-3 py-1.5 text-base font-bold text-brand-amber-600 outline-none transition focus-visible:ring-2 focus-visible:ring-brand-blue-700"
       >
         <IconoCalendario className="h-5 w-5" peso="bold" />
         Agendar cita
@@ -121,11 +121,11 @@ function TarjetaSede({ sede, horario, acento }) {
 }
 
 // Motivos de fondo, muy tenues y estaticos (no compiten con los halos
-// animados): huella, linea punteada curva y reloj. Solo desde md.
+// animados): linea punteada curva y reloj. Solo desde md. (Las huellas van
+// en todo el fondo del landing: HuellasFondo.)
 function Decoracion() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden overflow-hidden text-white md:block">
-      <IconoPata className="absolute -left-6 bottom-10 h-56 w-56 -rotate-12 opacity-[0.06]" peso="fill" />
       <IconoReloj className="absolute -right-10 top-24 h-64 w-64 rotate-12 opacity-[0.05]" />
       <svg viewBox="0 0 600 200" fill="none" className="absolute bottom-6 left-1/4 h-40 w-[36rem] opacity-[0.14]">
         <path d="M4 150C120 20 260 190 380 90s170-70 216-30" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="2 12" />
