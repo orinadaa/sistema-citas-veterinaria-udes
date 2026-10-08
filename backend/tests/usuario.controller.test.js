@@ -211,17 +211,13 @@ describe('Rutas /api/usuarios para el administrador de sede', () => {
     expect(usuarioModel.actualizarRol).not.toHaveBeenCalled();
   });
 
-  test('puede desactivar la cuenta de un cliente', async () => {
-    usuarioModel.buscarPorId.mockResolvedValue({ id: 'c1', rol: 'cliente' });
-    usuarioModel.actualizarPerfil.mockResolvedValue({ id: 'c1', rol: 'cliente', activo: false });
-    const respuesta = await conToken(request(app).patch('/api/usuarios/c1')).send({ activo: false });
-    expect(respuesta.status).toBe(200);
-  });
-
-  test('no puede cambiar la cuenta de otro administrador ni de un medico', async () => {
-    usuarioModel.buscarPorId.mockResolvedValue({ id: 'a2', rol: 'administrador' });
-    const respuesta = await conToken(request(app).patch('/api/usuarios/a2')).send({ activo: false });
-    expect(respuesta.status).toBe(403);
+  test('no puede activar ni desactivar ninguna cuenta (ni de clientes ni de personal)', async () => {
+    const cliente = await conToken(request(app).patch('/api/usuarios/c1')).send({ activo: false });
+    const reactivar = await conToken(request(app).patch('/api/usuarios/c1')).send({ activo: true });
+    const personal = await conToken(request(app).patch('/api/usuarios/a2')).send({ activo: false });
+    expect(cliente.status).toBe(403);
+    expect(reactivar.status).toBe(403);
+    expect(personal.status).toBe(403);
     expect(usuarioModel.actualizarPerfil).not.toHaveBeenCalled();
   });
 });
