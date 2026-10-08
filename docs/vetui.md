@@ -190,6 +190,7 @@ Todo el sistema usa la barra de vetUI en vez de la gris del navegador (diseño d
 
 - **Barra de la página** (inicio, agendar, panel del cliente, inicio de sesión): el componente `layout/BarraPagina.jsx`, montado una sola vez en `App.jsx`. La barra nativa de la página no puede ser transparente (siempre reserva una franja), así que se oculta y la píldora se dibuja encima del contenido, atada al scroll real; se puede arrastrar. Se oculta sola si la página no tiene scroll o mientras hay un panel o diálogo abierto.
 - **Barras de adentro** (paneles laterales, contenido del panel administrativo, tablas, áreas de texto): la barra nativa con el mismo aspecto, por CSS (final de `styles/vetui.css`).
+- **En los topes no se ve** (todas las barras): quieta arriba de todo o al final, la barra se apaga, y vuelve al desplazarse o al pasar el mouse por su lugar. Un contenedor recién abierto arranca con la barra apagada. Lo maneja `BarraPagina.jsx` (`data-reposo` en la de la página, `data-barra-activa` en los contenedores).
 - Solo con mouse: en pantallas táctiles se deja la barra del sistema, que ya es flotante. En Firefox las barras de adentro usan el mismo color, sin el brillo.
 
 ### Acciones destructivas en un panel

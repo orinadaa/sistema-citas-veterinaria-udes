@@ -15,10 +15,15 @@
 //   barra del sistema, que ya es flotante.
 // - Se oculta sola si la pagina no tiene scroll (ej. panel administrativo,
 //   que se desplaza por dentro: ahi aplica la barra CSS de vetui.css).
-// - En los topes se desvanece (pedido de Oriana): arriba de todo o al final
-//   la pagina no puede seguir en ese sentido, asi que la barra se apaga un
+// - En los topes no se ve (pedido de Oriana): arriba de todo o al final la
+//   pagina no puede seguir en ese sentido, asi que la barra se apaga un
 //   momento despues de llegar y vuelve apenas se desplaza otra vez. Sigue
 //   ahi: pasar el mouse por el borde derecho la muestra para arrastrarla.
+// - La misma regla vale para las barras de ADENTRO (paneles laterales,
+//   contenido del panel administrativo, tablas, areas de texto), que son
+//   nativas y se pintan por CSS: este componente escucha el scroll de
+//   cualquier elemento y le pone data-barra-activa solo mientras no esta
+//   en un tope; vetui.css muestra la barra unicamente con ese atributo.
 // - aria-hidden: es un adorno del scroll; el teclado mueve la pagina igual.
 // - z-45: sobre la topbar (z-40), debajo de paneles y dialogos (z-50).
 import { useEffect, useRef } from 'react';
@@ -27,6 +32,9 @@ const MARGEN_PX = 6;
 const LARGO_MINIMO_PX = 48;
 // Tiempo quieta en un tope antes de desvanecerse.
 const ESPERA_REPOSO_MS = 700;
+// Margen para considerar que se llego a un tope (con zoom del navegador o
+// escala de pantalla el scroll queda en decimales).
+const TOLERANCIA_TOPE_PX = 2;
 
 export function BarraPagina() {
   const barra = useRef(null);
@@ -58,7 +66,7 @@ export function BarraPagina() {
       elemento.style.height = `${largo}px`;
       elemento.style.transform = `translateY(${MARGEN_PX + (pista - largo) * avance}px)`;
 
-      const enTope = window.scrollY <= 1 || window.scrollY >= maximo - 1;
+      const enTope = window.scrollY <= TOLERANCIA_TOPE_PX || window.scrollY >= maximo - TOLERANCIA_TOPE_PX;
       clearTimeout(reposo);
       if (!enTope) {
         delete elemento.dataset.reposo;
@@ -103,6 +111,34 @@ export function BarraPagina() {
       delete elemento.dataset.arrastrando;
     }
 
+    // Barras de adentro: visibles solo mientras su contenedor no esta en un
+    // tope. El evento scroll no burbujea, por eso se escucha en captura.
+    const apagados = new WeakMap();
+    function alDesplazarAdentro(evento) {
+      const contenedor = evento.target;
+      if (!(contenedor instanceof Element) || contenedor === raiz || contenedor === document.body) return;
+      const maximoY = contenedor.scrollHeight - contenedor.clientHeight;
+      const maximoX = contenedor.scrollWidth - contenedor.clientWidth;
+      const topeY =
+        maximoY <= TOLERANCIA_TOPE_PX ||
+        contenedor.scrollTop <= TOLERANCIA_TOPE_PX ||
+        contenedor.scrollTop >= maximoY - TOLERANCIA_TOPE_PX;
+      const topeX =
+        maximoX <= TOLERANCIA_TOPE_PX ||
+        Math.abs(contenedor.scrollLeft) <= TOLERANCIA_TOPE_PX ||
+        Math.abs(contenedor.scrollLeft) >= maximoX - TOLERANCIA_TOPE_PX;
+      clearTimeout(apagados.get(contenedor));
+      if (topeY && topeX) {
+        apagados.set(
+          contenedor,
+          setTimeout(() => contenedor.removeAttribute('data-barra-activa'), ESPERA_REPOSO_MS)
+        );
+      } else {
+        contenedor.setAttribute('data-barra-activa', '');
+      }
+    }
+    document.addEventListener('scroll', alDesplazarAdentro, { capture: true, passive: true });
+
     alCambiarPuntero();
     // El alto del contenido cambia al navegar o al cargar datos.
     const observador = new ResizeObserver(pedirDibujo);
@@ -120,6 +156,7 @@ export function BarraPagina() {
       clearTimeout(reposo);
       observador.disconnect();
       window.removeEventListener('scroll', pedirDibujo);
+      document.removeEventListener('scroll', alDesplazarAdentro, { capture: true });
       window.removeEventListener('resize', pedirDibujo);
       conMouse.removeEventListener('change', alCambiarPuntero);
       elemento.removeEventListener('pointerdown', alPresionar);
