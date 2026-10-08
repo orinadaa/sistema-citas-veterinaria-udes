@@ -281,7 +281,6 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
             <SelectorEspecieRaza
               idPrefijo="admin-mascota"
               className="flex flex-col gap-3"
-              iconoEspecie={IconoPata}
               especie={form.especie}
               raza={form.raza}
               onChange={({ especie, raza }) => setForm((actual) => ({ ...actual, especie, raza }))}

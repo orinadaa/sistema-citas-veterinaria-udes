@@ -26,7 +26,7 @@ import { CampoFecha } from '../form/CampoFecha';
 import { ZonaFoto } from '../form/ZonaFoto';
 import { Boton, PanelLateral } from '../vetui';
 import { FotoMascotaModal } from './FotoMascotaModal';
-import { IconoPapelera, IconoPata } from '../icons';
+import { IconoPapelera } from '../icons';
 
 const FORM_VACIO = {
   nombre: '',
@@ -223,7 +223,6 @@ export function FormularioMascotaPanel({
 
           <SelectorEspecieRaza
             idPrefijo="mascota-cliente"
-            iconoEspecie={IconoPata}
             especie={form.especie}
             raza={form.raza}
             onChange={({ especie, raza }) => setForm((actual) => ({ ...actual, especie, raza }))}

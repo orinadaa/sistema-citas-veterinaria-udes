@@ -128,7 +128,7 @@ export function MascotaSelector({ clienteId, valorSeleccionado, onSeleccionar })
           <Campo id="nueva-mascota-nombre" label="Nombre" value={nombreNueva} onChange={(e) => setNombreNueva(e.target.value)} required />
           <SelectorEspecieRaza
             idPrefijo="nueva-mascota"
-            className="grid gap-3 sm:grid-cols-2"
+            className="flex flex-col gap-3"
             especie={especieNueva}
             raza={razaNueva}
             onChange={({ especie, raza }) => {
