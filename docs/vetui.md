@@ -184,6 +184,17 @@ Tamaños: `sm`, `md` (por defecto), `lg`, `icono`. Deshabilitado: 50 % de opacid
 - Al hacer scroll: píldora flotante de 64 px de alto y radio 32 px. Material vidrio claro en el landing y vidrio azul en el resto de pantallas (allí pasa sobre tarjetas claras).
 - Menú del perfil: mismo material que la píldora, mismo ancho que el botón del perfil, "nace" de la píldora cuando está formada.
 
+### Barra de desplazamiento
+
+Todo el sistema usa la barra de vetUI en vez de la gris del navegador (reglas al final de `styles/vetui.css`, sin clases que agregar): una píldora angosta y redondeada, sin canal visible.
+
+- Sobre superficies claras (paneles laterales, panel administrativo, tablas, áreas de texto): azul de marca translúcido, más intenso al pasar el mouse y al arrastrar.
+- Barra de la página en vistas de fondo oscuro (inicio, agendar, panel del cliente, inicio de sesión): blanca translúcida sobre un canal azul oscuro. La página se marca con el atributo `data-fondo-oscuro` (ya lo ponen `FondoVetui`, `LandingPage` y `AuthLayout`); una página oscura nueva que no use `FondoVetui` debe ponerlo.
+
+### Acciones destructivas en un panel
+
+Eliminar o desactivar va en el **pie fijo del panel, en el extremo izquierdo**, como botón de texto rojo sin relleno; Cancelar y la acción principal van juntas a la derecha. Así la acción siempre está a la vista (no al final de un formulario largo) y lejos de "Guardar". La confirmación reemplaza al pie en el mismo lugar, explica la consecuencia y ofrece primero la opción segura ("No, conservar"). Lo usan Editar mascota, Editar foto de la galería y Editar médico.
+
 ## 5. Accesibilidad
 
 - Contraste WCAG AA (4,5:1 texto normal, 3:1 texto grande) medido sobre capturas reales contra el píxel más desfavorable detrás de cada texto. Los controles deshabilitados quedan exentos, como indica WCAG.
