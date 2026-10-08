@@ -153,6 +153,55 @@ describe('POST /api/auth/login', () => {
     expect(typeof respuesta.body.token).toBe('string');
   });
 
+  test('correo inexistente y contraseña incorrecta responden el mismo mensaje (no revela que correos existen)', async () => {
+    usuarioModel.buscarPorCorreo.mockResolvedValue(null);
+    const sinCuenta = await request(app).post('/api/auth/login').send({ correo: 'nadie@correo.com', contrasena: 'password123' });
+
+    usuarioModel.buscarPorCorreo.mockResolvedValue({
+      id: 'u1',
+      correo: 'juan@correo.com',
+      contrasena_hash: await bcrypt.hash('claveCorrecta', 10),
+      rol: 'cliente',
+      activo: true,
+    });
+    const claveMala = await request(app).post('/api/auth/login').send({ correo: 'juan@correo.com', contrasena: 'claveIncorrecta' });
+
+    expect(sinCuenta.status).toBe(401);
+    expect(claveMala.status).toBe(401);
+    expect(sinCuenta.body).toEqual(claveMala.body);
+  });
+
+  test('cuenta inactiva con la contraseña correcta: avisa que esta inactiva y no entrega token', async () => {
+    usuarioModel.buscarPorCorreo.mockResolvedValue({
+      id: 'u1',
+      correo: 'juan@correo.com',
+      contrasena_hash: await bcrypt.hash('claveCorrecta', 10),
+      rol: 'cliente',
+      activo: false,
+    });
+
+    const respuesta = await request(app).post('/api/auth/login').send({ correo: 'juan@correo.com', contrasena: 'claveCorrecta' });
+
+    expect(respuesta.status).toBe(403);
+    expect(respuesta.body.mensaje).toMatch(/inactiva/);
+    expect(respuesta.body.token).toBeUndefined();
+  });
+
+  test('cuenta inactiva con contraseña incorrecta: mensaje generico, no revela el estado de la cuenta', async () => {
+    usuarioModel.buscarPorCorreo.mockResolvedValue({
+      id: 'u1',
+      correo: 'juan@correo.com',
+      contrasena_hash: await bcrypt.hash('claveCorrecta', 10),
+      rol: 'cliente',
+      activo: false,
+    });
+
+    const respuesta = await request(app).post('/api/auth/login').send({ correo: 'juan@correo.com', contrasena: 'otraClave' });
+
+    expect(respuesta.status).toBe(401);
+    expect(respuesta.body.mensaje).not.toMatch(/inactiva/);
+  });
+
   test('rechaza el inicio de sesion de una cuenta inactiva', async () => {
     usuarioModel.buscarPorCorreo.mockResolvedValue({
       id: 'u1',

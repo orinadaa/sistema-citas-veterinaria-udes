@@ -14,6 +14,9 @@ const CORREO_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RONDAS_SAL = 10;
 const MINUTOS_VIGENCIA_CODIGO = 15;
 const MAXIMO_INTENTOS_CODIGO = 5;
+const MENSAJE_CREDENCIALES = 'El correo o la contraseña no son correctos. Revísalos e inténtalo de nuevo.';
+const MENSAJE_CUENTA_INACTIVA =
+  'Tu cuenta está inactiva. Comunícate con la clínica para que la reactiven.';
 const MENSAJE_OLVIDE_CLAVE = 'Si el correo está registrado, se envió un código de recuperación.';
 const MENSAJE_CODIGO_INVALIDO = 'Código inválido o expirado.';
 
@@ -85,14 +88,24 @@ async function iniciarSesion(req, res, next) {
       return res.status(400).json({ mensaje: 'Correo y contraseña son obligatorios.' });
     }
 
+    // Correo inexistente y contraseña incorrecta responden EXACTAMENTE lo
+    // mismo: distinguirlos dejaria averiguar que correos tienen cuenta
+    // probando uno por uno (enumeracion de cuentas).
     const usuario = await buscarPorCorreo(correo);
-    if (!usuario || !usuario.activo) {
-      return res.status(401).json({ mensaje: 'Credenciales inválidas.' });
+    if (!usuario) {
+      return res.status(401).json({ mensaje: MENSAJE_CREDENCIALES });
     }
 
     const coincide = await bcrypt.compare(contrasena, usuario.contrasena_hash);
     if (!coincide) {
-      return res.status(401).json({ mensaje: 'Credenciales inválidas.' });
+      return res.status(401).json({ mensaje: MENSAJE_CREDENCIALES });
+    }
+
+    // "Cuenta inactiva" solo se dice a quien YA demostro ser el dueño (la
+    // contraseña es correcta), asi no revela nada a un tercero. Decision de
+    // Oriana (frente 5): es el unico mensaje especifico del inicio de sesion.
+    if (!usuario.activo) {
+      return res.status(403).json({ mensaje: MENSAJE_CUENTA_INACTIVA, codigo: 'CUENTA_INACTIVA' });
     }
 
     const token = generarToken(usuario);
