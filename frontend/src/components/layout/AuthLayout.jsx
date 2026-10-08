@@ -1,15 +1,19 @@
 // components/layout/AuthLayout.jsx
 // Envoltorio compartido por las pantallas de login, registro y
 // recuperacion de clave. Mismo material que las pantallas del cliente
-// (vetUI): fondo de marca con halos (FondoVetui) y el formulario en una
-// tarjeta de vidrio blanco flotante (texto oscuro: AA sobre el vidrio).
+// (vetUI) y que el panel: fondo de marca con mucho ambar (FondoVetui
+// variante "panel"), las huellas tenues del landing y el formulario en una
+// tarjeta de vidrio blanco flotante (texto oscuro: AA sobre el vidrio). El
+// enlace de abajo va directo sobre el fondo: por eso textoDirecto.
 import { Link } from 'react-router-dom';
 import { FondoVetui } from '../vetui';
+import { HuellasFondo } from '../landing/HuellasFondo';
 import logoBlanco from '../../assets/logoblanco.png';
 
 export function AuthLayout({ titulo, subtitulo, children, pieDePagina }) {
   return (
-    <FondoVetui className="flex min-h-[100dvh] flex-col items-center justify-center px-4 py-12">
+    <FondoVetui variante="panel" textoDirecto className="flex min-h-[100dvh] flex-col items-center justify-center px-4 py-12">
+      <HuellasFondo compacto />
       <Link to="/" className="mb-8">
         <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-[62px] w-auto" />
       </Link>

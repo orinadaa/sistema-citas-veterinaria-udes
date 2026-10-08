@@ -7,6 +7,7 @@
 // secciones), elegidas a mano para que no sigan un patron ni caigan dos
 // juntas; al ser fijas no cambian entre visitas ni saltan al recargar.
 // En celular se muestran solo algunas, para no ensuciar una pantalla chica.
+// Tambien las usan las pantallas de sesion (AuthLayout), en modo compacto.
 import { IconoPata } from '../icons';
 
 const HUELLAS = [
@@ -24,10 +25,14 @@ const HUELLAS = [
   { arriba: '93%', lado: { left: '22%' }, tamano: 'h-36 w-36', giro: '-rotate-[26deg]', opacidad: 'opacity-[0.05]', movil: false },
 ];
 
-export function HuellasFondo() {
+// compacto: para una pagina de una sola pantalla (inicio de sesion, registro,
+// recuperar contraseña). La lista esta pensada para las cinco pantallas del
+// landing; en una sola quedaria amontonada, asi que se usa una de cada dos.
+export function HuellasFondo({ compacto = false }) {
+  const huellas = compacto ? HUELLAS.filter((_, indice) => indice % 2 === 0) : HUELLAS;
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden text-white">
-      {HUELLAS.map((h) => (
+      {huellas.map((h) => (
         <span key={h.arriba} className={`absolute ${h.movil ? 'block' : 'hidden md:block'}`} style={{ top: h.arriba, ...h.lado }}>
           <IconoPata peso="fill" className={`${h.tamano} ${h.giro} ${h.opacidad}`} />
         </span>
