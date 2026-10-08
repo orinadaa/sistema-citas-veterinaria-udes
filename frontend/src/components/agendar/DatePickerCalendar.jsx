@@ -11,6 +11,12 @@
 // hoy (no se agenda en el pasado); minimo={null} = sin limite inferior
 // (fecha de nacimiento, reportes).
 //
+// marcas (opcional): { "YYYY-MM-DD": ['proxima', 'completada', ...] }. Dibuja
+// un punto de color por estado debajo del numero del dia (vista "Mis citas"
+// del cliente: que dias tienen cita). El color nunca va solo: el nombre
+// accesible del dia dice cuantas citas hay y de que estado.
+// permiteQuitar: un clic sobre el dia ya elegido lo desmarca (onChange('')).
+//
 // En todos los calendarios del sistema (pedido de Oriana) el mes y el año
 // del encabezado se pueden pulsar: el mes abre la grilla de los 12 meses
 // y el año una lista de años para recorrer, ademas de las flechas de mes.
@@ -72,9 +78,42 @@ function generarCeldas(mes) {
   return Array.from({ length: 42 }, (_, i) => sumarDias(inicio, i));
 }
 
+// Punto de cada estado de cita (mismos colores que la Insignia de estado);
+// sobre el dia elegido, que es azul, los puntos van en blanco.
+const PUNTO_MARCA = {
+  proxima: 'bg-brand-blue-600',
+  completada: 'bg-emerald-600',
+  cancelada: 'bg-red-600',
+};
+const NOMBRE_MARCA = {
+  proxima: ['cita próxima', 'citas próximas'],
+  completada: ['cita completada', 'citas completadas'],
+  cancelada: ['cita cancelada', 'citas canceladas'],
+};
+
+// "2 citas próximas, 1 cita cancelada" para el nombre accesible del dia.
+function describirMarcas(estados) {
+  const conteo = {};
+  estados.forEach((estado) => {
+    conteo[estado] = (conteo[estado] || 0) + 1;
+  });
+  return Object.entries(conteo)
+    .map(([estado, n]) => `${n} ${(NOMBRE_MARCA[estado] ?? ['cita', 'citas'])[n === 1 ? 0 : 1]}`)
+    .join(', ');
+}
+
 // diasAbiertos: Set de dia_semana (0=domingo..6=sabado) con horario, o
 // null mientras carga (en ese caso no se deshabilita por dia de semana).
-export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio = false, minimo, maximo }) {
+export function DatePickerCalendar({
+  valor,
+  onChange,
+  diasAbiertos,
+  sobreVidrio = false,
+  minimo,
+  maximo,
+  marcas,
+  permiteQuitar = false,
+}) {
   const t = sobreVidrio ? TONOS.vidrio : TONOS.claro;
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
@@ -234,6 +273,10 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
           const deshabilitado = !delMes || fueraDeLimites || cerrado;
           const esHoy = esMismoDia(celda, hoy);
           const esElegido = seleccionada && esMismoDia(celda, seleccionada);
+          const fechaCelda = aFechaLocal(celda);
+          const estados = marcas?.[fechaCelda] ?? [];
+          // Un punto por estado distinto (maximo tres: los tres estados).
+          const puntos = [...new Set(estados)];
 
           if (!delMes) return <span key={celda.toISOString()} aria-hidden="true" />;
 
@@ -242,14 +285,26 @@ export function DatePickerCalendar({ valor, onChange, diasAbiertos, sobreVidrio 
               key={celda.toISOString()}
               type="button"
               disabled={deshabilitado}
-              onClick={() => onChange(aFechaLocal(celda))}
+              onClick={() => onChange(permiteQuitar && esElegido ? '' : fechaCelda)}
               aria-pressed={Boolean(esElegido)}
+              aria-label={estados.length > 0 ? `${celda.getDate()}, ${describirMarcas(estados)}` : undefined}
               title={cerrado && !fueraDeLimites ? 'La sede no atiende este día' : undefined}
-              className={`mx-auto flex h-10 w-10 items-center justify-center rounded-boton text-sm transition ${
+              className={`relative mx-auto flex h-10 w-10 items-center justify-center rounded-boton text-sm transition ${
                 esElegido ? t.elegido : deshabilitado ? t.deshabilitado : esHoy ? t.hoy : t.normal
-              }`}
+              } ${puntos.length > 0 && !esElegido && !deshabilitado ? 'font-semibold' : ''}`}
             >
-              {celda.getDate()}
+              {/* Con puntos, el numero sube un poco para dejarles lugar. */}
+              <span className={puntos.length > 0 ? '-translate-y-1' : ''}>{celda.getDate()}</span>
+              {puntos.length > 0 && (
+                <span aria-hidden="true" className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 gap-0.5">
+                  {puntos.map((estado) => (
+                    <span
+                      key={estado}
+                      className={`h-1.5 w-1.5 rounded-full ${esElegido ? 'bg-white' : PUNTO_MARCA[estado] ?? 'bg-slate-500'}`}
+                    />
+                  ))}
+                </span>
+              )}
             </button>
           );
         })}

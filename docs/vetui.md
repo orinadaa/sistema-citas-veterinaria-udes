@@ -261,6 +261,8 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 
 **Tareas con calendario, en una ventana.** Reprogramar una cita se hace en la ventana "Reprogramar cita" (`citas/ReprogramarCitaModal.jsx`), que se abre sobre el detalle de la cita: calendario a la izquierda, horas disponibles a la derecha, resumen y acciones abajo. No se despliega un calendario dentro de un panel lateral.
 
+**Calendario con marcas.** `DatePickerCalendar` acepta `marcas` (`{ "YYYY-MM-DD": ['proxima', ...] }`): dibuja un punto de color por estado bajo el día (azul próxima, verde completada, rojo cancelada) y lo dice en el nombre accesible del día. Lo usa "Mis citas" del cliente: calendario a la izquierda y lista a la derecha; tocar un día deja en la lista solo sus citas (`permiteQuitar`: tocarlo otra vez quita el filtro). En celular el calendario va arriba.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".
