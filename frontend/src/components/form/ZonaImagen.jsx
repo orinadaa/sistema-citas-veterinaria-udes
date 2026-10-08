@@ -21,6 +21,8 @@ export function ZonaImagen({
   ladoMaximo = 1600,
   // Proporcion del recuadro (clase de Tailwind).
   proporcion = 'aspect-[16/9]',
+  // Encuadre de la foto dentro del recuadro (object-position), si lo tiene.
+  posicion,
   className = '',
 }) {
   const entrada = useRef(null);
@@ -75,7 +77,12 @@ export function ZonaImagen({
         }`}
       >
         {imagenUrl ? (
-          <img src={imagenUrl} alt={alt} className="h-full w-full rounded-lg object-cover" />
+          <img
+            src={imagenUrl}
+            alt={alt}
+            style={posicion ? { objectPosition: posicion } : undefined}
+            className="h-full w-full rounded-lg object-cover"
+          />
         ) : (
           <>
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-brand-blue">

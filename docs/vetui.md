@@ -235,6 +235,8 @@ Las horas sueltas (horarios de atención, pausas, hora de un recordatorio) sigue
 
 Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaImagen` (`components/form/`): la misma zona punteada, pero rectangular; se hace clic o se arrastra el archivo (JPG/PNG de máx. 15 MB) y la imagen se reduce en el navegador antes de subirla (`utils/imagen.js`).
 
+**Ajustes de la foto, en una ventana aparte.** El formulario muestra solo la foto y sus acciones (Cambiar, Ajustar, Quitar). El encuadre (qué parte debe verse siempre) y la descripción de la foto se editan en la ventana "Ajustar foto" (`form/EncuadreModal.jsx`), con la misma forma que el editor de fotos circulares: lo opcional y avanzado no ocupa el formulario. La ventana trabaja sobre un borrador que solo se guarda con "Aplicar". Hoy la usa la foto de cada servicio.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".

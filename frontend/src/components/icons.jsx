@@ -31,6 +31,7 @@ import { CatIcon } from '@phosphor-icons/react/dist/csr/Cat';
 import { ChartBarIcon } from '@phosphor-icons/react/dist/csr/ChartBar';
 import { CheckIcon } from '@phosphor-icons/react/dist/csr/Check';
 import { ClockIcon } from '@phosphor-icons/react/dist/csr/Clock';
+import { CropIcon } from '@phosphor-icons/react/dist/csr/Crop';
 import { DogIcon } from '@phosphor-icons/react/dist/csr/Dog';
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/csr/DotsThreeVertical';
 import { EnvelopeIcon } from '@phosphor-icons/react/dist/csr/Envelope';
@@ -150,6 +151,10 @@ export function IconoCamara(props) {
 }
 export function IconoRotar(props) {
   return <Icono de={ArrowClockwiseIcon} {...props} />;
+}
+// Ajustar el encuadre de una foto.
+export function IconoEncuadre(props) {
+  return <Icono de={CropIcon} {...props} />;
 }
 export function IconoImagen(props) {
   return <Icono de={ImageIcon} {...props} />;

@@ -8,6 +8,8 @@
 //
 // proporcionVista: proporcion del marco donde se mostrara (clase de
 // Tailwind), para que la vista previa recorte igual que el sitio.
+// mostrarVista={false}: sin la vista previa (EncuadreModal la dibuja
+// aparte, mas grande).
 export function SelectorEncuadre({
   src,
   focoX,
@@ -15,6 +17,7 @@ export function SelectorEncuadre({
   onCambiar,
   proporcionVista = 'aspect-[4/3]',
   textoVista = 'Así se recorta en el inicio',
+  mostrarVista = true,
 }) {
   function alHacerClic(evento) {
     const caja = evento.currentTarget.getBoundingClientRect();
@@ -65,15 +68,17 @@ export function SelectorEncuadre({
           />
         </label>
       </div>
-      <div>
-        <p className="mb-1.5 text-xs font-medium text-slate-600">{textoVista}</p>
-        <img
-          src={src}
-          alt=""
-          style={{ objectPosition: `${focoX}% ${focoY}%` }}
-          className={`${proporcionVista} w-40 rounded-xl object-cover`}
-        />
-      </div>
+      {mostrarVista && (
+        <div>
+          <p className="mb-1.5 text-xs font-medium text-slate-600">{textoVista}</p>
+          <img
+            src={src}
+            alt=""
+            style={{ objectPosition: `${focoX}% ${focoY}%` }}
+            className={`${proporcionVista} w-40 rounded-xl object-cover`}
+          />
+        </div>
+      )}
     </div>
   );
 }
