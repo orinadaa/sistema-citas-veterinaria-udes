@@ -107,8 +107,8 @@ function TarjetaSede({ sede, horario, acento }) {
       </ul>
 
       {/* Accion: boton de vidrio flotante que se llena de "agua" ambar. En
-          reposo es vidrio claro con borde de luz y un resplandor ambar
-          suave; al pasar el cursor (o enfocarlo con el teclado) el liquido
+          reposo es una capsula de vidrio transparente (se ve la tarjeta a
+          traves de ella; solo la delatan el borde de luz y los reflejos); al pasar el cursor (o enfocarlo con el teclado) el liquido
           ambar entra por la izquierda y lo llena, con el frente curvo y un
           brillo arriba, y el resplandor crece. El texto es negro siempre
           (AA sobre el vidrio y sobre el ambar). Lleva a agendar con esta
@@ -118,7 +118,7 @@ function TarjetaSede({ sede, horario, acento }) {
         to={rutaAgendarCita(estaAutenticado, null, sede.id)}
         aria-label={`Agendar cita en la sede ${nombre}`}
         style={{ '--brillo': 'color-mix(in oklab, var(--color-brand-amber) 80%, transparent)' }}
-        className="group relative mx-5 mb-5 flex items-center justify-center gap-2 overflow-hidden rounded-boton bg-white/45 px-5 py-2.5 text-base font-bold text-slate-900 shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_0_0_1px_rgb(255_255_255/0.7),0_10px_26px_-10px_rgb(247_167_28/0.75)] outline-none backdrop-blur-md transition-shadow duration-500 hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_0_0_1px_rgb(255_255_255/0.7),0_12px_34px_-6px_rgb(247_167_28/0.95)] focus-visible:ring-2 focus-visible:ring-brand-amber-600"
+        className="group relative mx-5 mb-5 flex items-center justify-center gap-2 overflow-hidden rounded-boton bg-[linear-gradient(to_bottom,rgb(255_255_255/0.28),rgb(255_255_255/0.04)_55%,rgb(255_255_255/0.14))] px-5 py-2.5 text-base font-bold text-slate-900 shadow-[inset_0_2px_1px_rgb(255_255_255/0.95),inset_0_-3px_6px_rgb(15_23_42/0.12),inset_0_0_0_1.5px_rgb(255_255_255/0.85),0_10px_24px_-12px_rgb(6_51_138/0.55)] outline-none backdrop-blur-[2px] transition-shadow duration-500 hover:shadow-[inset_0_2px_1px_rgb(255_255_255/0.95),inset_0_-3px_6px_rgb(15_23_42/0.12),inset_0_0_0_1.5px_rgb(255_255_255/0.85),0_12px_34px_-6px_rgb(247_167_28/0.95)] focus-visible:ring-2 focus-visible:ring-brand-amber-600"
       >
         <span
           aria-hidden="true"
