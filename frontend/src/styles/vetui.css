@@ -273,6 +273,14 @@
    blanco de antes no llegan a AA sobre el cristal. Se oscurecen un paso en
    toda la hoja, sin tocar cada pantalla (CSS sin capa: gana sobre las
    utilidades). */
+/* Hoja que encierra cada modulo: el mismo vidrio translucido de la barra,
+   pero con mucho mas desenfoque (pedido de Oriana): a traves de ella no se
+   distinguen las manchas del fondo, solo un color difuso. */
+.vidrio-hoja {
+  -webkit-backdrop-filter: blur(64px) saturate(150%) brightness(75%);
+  backdrop-filter: blur(64px) saturate(150%) brightness(75%);
+}
+
 /* Tarjetas de la hoja (indicadores, tablas, calendario): blancas pero no
    solidas, vidrio empañado flotante. No llevan backdrop-filter propio: lo
    de atras ya es la hoja desenfocada, y un backdrop-filter por tarjeta
