@@ -14,8 +14,7 @@ CREATE TABLE IF NOT EXISTS notificacion (
     tipo VARCHAR(30) NOT NULL,
     titulo VARCHAR(120) NOT NULL,
     mensaje VARCHAR(400) NOT NULL,
-    -- A donde lleva al pulsarla: una ruta ("/panel?tab=citas") o, en el panel
-    -- de administracion, el nombre de un modulo ("citas").
+    -- A donde lleva al pulsarla: una ruta ("/panel?tab=citas", "/medico").
     enlace VARCHAR(120),
     leida BOOLEAN NOT NULL DEFAULT false,
     creado_en TIMESTAMP DEFAULT NOW()

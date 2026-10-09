@@ -2,22 +2,23 @@
 
 ## Qué hace
 
-**La campana.** En la píldora del cliente y del médico y en la barra del
-panel de administración. Muestra el número de avisos sin leer y, al pulsarla,
+**La campana.** En la píldora del cliente y del médico. El administrador de
+sede y el superadministrador no tienen notificaciones (decisión de Oriana): ni
+campana en su panel ni avisos, y el servidor les niega la ruta. Muestra el número de avisos sin leer y, al pulsarla,
 las últimas 30 notificaciones. Pulsar una la marca como leída y lleva a donde
 corresponde; "Marcar todas como leídas" limpia el contador. Se actualiza sola
 cada minuto.
 
 **Qué genera un aviso y a quién.**
 
-| Evento | Cliente | Médico de la cita | Administradores de la sede |
-|---|---|---|---|
-| Cita agendada | Sí | Sí | Sí |
-| Cita reprogramada | Sí | Sí | Sí |
-| Cita cancelada | Sí | Sí | Sí |
-| Mascota registrada (por él o por la clínica) | Sí | — | — |
-| Recordatorio creado por el médico | Sí | — | — |
-| Recordatorio previo a la cita (24 horas antes) | Sí, y por correo | — | — |
+| Evento | Cliente | Médico de la cita |
+|---|---|---|
+| Cita agendada | Sí | Sí |
+| Cita reprogramada | Sí | Sí |
+| Cita cancelada | Sí | Sí |
+| Mascota registrada (por él o por la clínica) | Sí | — |
+| Recordatorio creado por el médico | Sí | — |
+| Recordatorio previo a la cita (24 horas antes) | Sí, y por correo | — |
 
 Quien hace la acción no recibe su propio aviso, salvo el cliente, que siempre
 ve el registro de sus citas y mascotas.
@@ -43,15 +44,16 @@ Un aviso que no se puede guardar nunca hace fallar la acción que lo originó.
 
 ## Pruebas
 
-Unitarias: `backend/tests/notificaciones.test.js` (17). Total del servidor: 379.
+Unitarias: `backend/tests/notificaciones.test.js` (18). Total del servidor: 380.
 
 | Descripción | Entrada | Resultado esperado | Resultado obtenido |
 |---|---|---|---|
 | La campana exige sesión | `GET /api/notificaciones` sin token | 401 | Correcto |
 | Solo las propias | Listar; marcar una de otro usuario; id inválido | Las del usuario; 404; 404 | Correcto |
 | Marcar todas | `PATCH /api/notificaciones/leidas` | 204, contador en 0 | Correcto |
-| Cita agendada por el cliente | Servicio | 4 avisos: cliente, médico y 2 administradores | Correcto |
-| Cita agendada por el médico o un administrador | Servicio | Quien agenda no se avisa a sí mismo | Correcto |
+| Cita agendada por el cliente | Servicio | 2 avisos: cliente y médico | Correcto |
+| Sin notificaciones para administración | `GET /api/notificaciones` como administrador o superadministrador | 403 | Correcto |
+| Cita agendada por el médico o un administrador | Servicio | El médico no se avisa a sí mismo; el administrador nunca recibe aviso | Correcto |
 | Reprogramada | Servicio | El aviso dice de qué fecha a qué fecha | Correcto |
 | Fallo al guardar un aviso | Modelo que falla | La acción no se rompe | Correcto |
 | Recordatorio previo | Citas de las próximas 24 h | Aviso y correo; no repite | Correcto |
