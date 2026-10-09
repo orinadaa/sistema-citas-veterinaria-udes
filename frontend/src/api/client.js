@@ -31,6 +31,37 @@ export function iniciarSesion(datos) {
   return solicitar('/auth/login', { metodo: 'POST', cuerpo: datos });
 }
 
+// Primera entrada con clave temporal: establece la contraseña propia y
+// devuelve la sesion normal ({ usuario, token }).
+export function establecerPrimeraClave(contrasenaNueva, token) {
+  return solicitar('/auth/primera-clave', { metodo: 'POST', cuerpo: { contrasenaNueva }, token });
+}
+
+// "Mi perfil" del cliente.
+export function obtenerPerfilCliente(token) {
+  return solicitar('/cuenta/perfil', { token });
+}
+
+export function actualizarPerfilCliente(datos, token) {
+  return solicitar('/cuenta/perfil', { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function solicitarCambioCorreoCliente(correoNuevo, token) {
+  return solicitar('/cuenta/correo', { metodo: 'POST', cuerpo: { correoNuevo }, token });
+}
+
+export function confirmarCambioCorreoCliente(codigo, token) {
+  return solicitar('/cuenta/correo/confirmar', { metodo: 'POST', cuerpo: { codigo }, token });
+}
+
+export function solicitarCodigoContrasenaCliente(token) {
+  return solicitar('/cuenta/contrasena/codigo', { metodo: 'POST', token });
+}
+
+export function cambiarContrasenaCliente(datos, token) {
+  return solicitar('/cuenta/contrasena', { metodo: 'PUT', cuerpo: datos, token });
+}
+
 export function solicitarCodigoRecuperacion(datos) {
   return solicitar('/auth/olvide-clave', { metodo: 'POST', cuerpo: datos });
 }

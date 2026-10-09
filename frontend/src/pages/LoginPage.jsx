@@ -36,6 +36,12 @@ export function LoginPage() {
     try {
       const respuesta = await iniciarSesionApi(datos);
       iniciarSesion(respuesta);
+      // Entro con la clave temporal que le genero el sistema: antes de
+      // cualquier otra cosa debe establecer su propia contraseña.
+      if (respuesta.usuario.debeCambiarContrasena) {
+        navegar('/crear-clave', { replace: true });
+        return;
+      }
       navegar(destinoTrasLogin(siguienteExplicito, respuesta.usuario.rol), { replace: true });
     } catch (err) {
       setError(err.message);
