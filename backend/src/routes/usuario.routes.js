@@ -6,6 +6,7 @@
 const express = require('express');
 const { listar, crearStaff, cambiarRol, actualizarPerfilUsuario } = require('../controllers/usuario.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
+const { auditar } = require('../middlewares/bitacora.middleware');
 
 const router = express.Router();
 
@@ -17,12 +18,12 @@ const superOAdmin = verificarRol('superadministrador', 'administrador');
 router.get('/', superOAdmin, listar);
 
 // POST /api/usuarios — alta de administrador/veterinario
-router.post('/', soloSuper, crearStaff);
+router.post('/', soloSuper, auditar('Crear cuenta de personal', 'usuario'), crearStaff);
 
 // PATCH /api/usuarios/:id/rol
-router.patch('/:id/rol', soloSuper, cambiarRol);
+router.patch('/:id/rol', soloSuper, auditar('Cambiar rol o sede de una cuenta', 'usuario'), cambiarRol);
 
 // PATCH /api/usuarios/:id — activo/telefono/nombre (cualquier rol)
-router.patch('/:id', soloSuper, actualizarPerfilUsuario);
+router.patch('/:id', soloSuper, auditar('Editar o activar/desactivar cuenta', 'usuario'), actualizarPerfilUsuario);
 
 module.exports = router;

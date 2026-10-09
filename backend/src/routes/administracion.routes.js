@@ -16,6 +16,7 @@ const { obtenerReporte } = require('../controllers/reportes.controller');
 const { obtenerTableroSede, obtenerResumenSistema } = require('../controllers/tablero.controller');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
+const { auditar } = require('../middlewares/bitacora.middleware');
 
 const router = express.Router();
 
@@ -31,19 +32,19 @@ router.get('/sistema', verificarRol('superadministrador'), obtenerResumenSistema
 router.get('/medicos', verificarRol('administrador'), listarMedicos);
 
 // POST /api/administracion/medicos — solo administrador
-router.post('/medicos', verificarRol('administrador'), crearMedico);
+router.post('/medicos', verificarRol('administrador'), auditar('Crear médico', 'usuario'), crearMedico);
 
 // PUT /api/administracion/medicos/:id — solo administrador
-router.put('/medicos/:id', verificarRol('administrador'), actualizarMedico);
+router.put('/medicos/:id', verificarRol('administrador'), auditar('Editar médico', 'usuario'), actualizarMedico);
 
 // POST /api/administracion/medicos/:id/foto — solo administrador (multipart, campo "foto")
 router.post('/medicos/:id/foto', verificarRol('administrador'), fotosUsuarios.middleware, subirFotoMedico);
 
 // PUT /api/administracion/medicos/:id/servicios — solo administrador
-router.put('/medicos/:id/servicios', verificarRol('administrador'), actualizarServiciosDeMedico);
+router.put('/medicos/:id/servicios', verificarRol('administrador'), auditar('Cambiar servicios de un médico', 'usuario'), actualizarServiciosDeMedico);
 
 // PUT /api/administracion/medicos/:id/especialidades — solo administrador
-router.put('/medicos/:id/especialidades', verificarRol('administrador'), actualizarEspecialidadesDeMedico);
+router.put('/medicos/:id/especialidades', verificarRol('administrador'), auditar('Cambiar especialidades de un médico', 'usuario'), actualizarEspecialidadesDeMedico);
 
 // GET /api/administracion/citas — administrador o veterinario
 router.get('/citas', verificarRol('administrador', 'veterinario'), listarCitas);

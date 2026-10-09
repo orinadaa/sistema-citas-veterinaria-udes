@@ -18,6 +18,7 @@ const administracionRoutes = require('./routes/administracion.routes');
 const medicoRoutes = require('./routes/medico.routes');
 const galeriaRoutes = require('./routes/galeria.routes');
 const catalogoRoutes = require('./routes/catalogo.routes');
+const datosRoutes = require('./routes/datos.routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/administracion', administracionRoutes);
 app.use('/api/medico', medicoRoutes);
 app.use('/api/galeria', galeriaRoutes);
 app.use('/api/catalogos', catalogoRoutes);
+app.use('/api/datos', datosRoutes);
 
 app.get('/', (req, res) => {
   res.send('API del sistema de citas - Clinica Veterinaria UDES');
