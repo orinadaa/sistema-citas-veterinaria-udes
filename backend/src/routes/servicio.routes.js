@@ -11,6 +11,7 @@ const {
 } = require('../controllers/servicio.controller');
 const { fotosServicios } = require('../middlewares/subirFoto.middleware');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
+const { auditar } = require('../middlewares/bitacora.middleware');
 
 const router = express.Router();
 
@@ -24,15 +25,15 @@ router.get('/categorias', listarCategorias);
 router.get('/admin', verificarToken, verificarRol('superadministrador', 'administrador'), listarAdmin);
 
 // POST /api/servicios — solo administrador
-router.post('/', verificarToken, verificarRol('superadministrador'), crear);
+router.post('/', verificarToken, verificarRol('superadministrador'), auditar('Crear servicio', 'servicio'), crear);
 
 // PUT /api/servicios/:id — solo administrador
-router.put('/:id', verificarToken, verificarRol('superadministrador'), actualizar);
+router.put('/:id', verificarToken, verificarRol('superadministrador'), auditar('Editar servicio', 'servicio'), actualizar);
 
 // POST /api/servicios/:id/foto — solo administrador (multipart, campo "foto")
-router.post('/:id/foto', verificarToken, verificarRol('superadministrador'), fotosServicios.middleware, subirFoto);
+router.post('/:id/foto', verificarToken, verificarRol('superadministrador'), auditar('Cambiar foto de servicio', 'servicio'), fotosServicios.middleware, subirFoto);
 
 // DELETE /api/servicios/:id/foto — solo administrador
-router.delete('/:id/foto', verificarToken, verificarRol('superadministrador'), quitarFoto);
+router.delete('/:id/foto', verificarToken, verificarRol('superadministrador'), auditar('Quitar foto de servicio', 'servicio'), quitarFoto);
 
 module.exports = router;
