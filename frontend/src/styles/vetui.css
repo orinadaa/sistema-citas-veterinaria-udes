@@ -318,6 +318,15 @@
 .hoja-panel :where(.text-slate-500) {
   color: var(--color-slate-700);
 }
+/* grises-legibles: lo mismo, para piezas compartidas con el panel (calendario
+   semanal, mini calendario) cuando van dentro de un vidrio blanco en una
+   pagina vetUI (vista del medico): sus grises claros no llegan a AA ahi. */
+.grises-legibles :where(.text-slate-400) {
+  color: var(--color-slate-600);
+}
+.grises-legibles :where(.text-slate-500) {
+  color: var(--color-slate-700);
+}
 
 /* Dentro de un vidrio blanco: las piezas pensadas para fondo oscuro pasan
    a su versión clara sin tocar cada pantalla (CSS sin capa: gana sobre las

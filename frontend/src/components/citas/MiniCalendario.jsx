@@ -19,7 +19,9 @@ function generarCeldas(mesMostrado) {
   return Array.from({ length: 42 }, (_, indice) => sumarDias(inicioGrid, indice));
 }
 
-export function MiniCalendario({ diaSeleccionado, onSeleccionarDia }) {
+// clase: el contenedor. Por defecto la tarjeta blanca del panel; la vista del
+// medico (vetUI) pasa un vidrio blanco.
+export function MiniCalendario({ diaSeleccionado, onSeleccionarDia, clase = 'rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200' }) {
   const [mesMostrado, setMesMostrado] = useState(() => inicioDeMes(diaSeleccionado));
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export function MiniCalendario({ diaSeleccionado, onSeleccionarDia }) {
   const hoy = new Date();
 
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <div className={clase}>
       <div className="flex items-center justify-between">
         <p className="font-heading text-sm font-semibold text-brand-navy">{formatearMesAnio(mesMostrado)}</p>
         <div className="flex gap-1">

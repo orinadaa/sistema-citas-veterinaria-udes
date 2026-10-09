@@ -1,6 +1,11 @@
 // components/medico/PanelMisCitasMedico.jsx
-// "Mis citas": pantalla de inicio del medico veterinario. Solo sus
+// "Mis citas": pestaña de inicio de la vista del medico (/medico). Solo sus
 // citas (GET /api/administracion/citas ya las filtra por medico).
+// Presentacion vetUI, igual que la vista del cliente: va directo sobre el
+// fondo de marca, con los indicadores, el calendario y las tarjetas de la
+// derecha en vidrio blanco (TarjetaDato / Tarjeta) y los controles en
+// vidrio (Pestanas, boton-glass-claro). El titulo y "Agendar nueva cita" los
+// pone la pagina (PanelMedicoPage), junto a las pestañas.
 // - 4 KPIs reales: citas esta semana, citas hoy, proximas citas y
 //   pacientes (mascotas) atendidos este mes.
 // - Vistas Semana / Dia (mismo grid del admin, CalendarioSemanal) y
@@ -21,9 +26,7 @@ import {
   inicioDeSemana,
   sumarDias,
 } from '../../utils/fecha';
-import { PageHeader } from '../ui/PageHeader';
-import { KPICard } from '../ui/KPICard';
-import { EstadoError } from '../ui/EstadoError';
+import { EstadoError, Pestanas, Tarjeta, TarjetaDato } from '../vetui';
 import { COLORES_CATEGORIA } from '../ui/CategoryBadge';
 import { MiniCalendario } from '../citas/MiniCalendario';
 import { CalendarioSemanal } from '../citas/CalendarioSemanal';
@@ -146,19 +149,11 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
   return (
     <>
       <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
-        <PageHeader
-          title="Mis citas"
-          subtitle="Consulta tu agenda y gestiona tus citas programadas."
-          actionLabel="Agendar nueva cita"
-          actionColor="blue"
-          onAction={() => setAgendarAbierto(true)}
-        />
-
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <KPICard icon={IconoCalendario} color="blue" value={kpis.semana} label="Citas esta semana" />
-          <KPICard icon={IconoReloj} color="green" value={kpis.hoy} label="Citas hoy" />
-          <KPICard icon={IconoFlechaDerecha} color="amber" value={kpis.proximas} label="Próximas citas" />
-          <KPICard icon={IconoCorazon} color="purple" value={kpis.atendidosMes} label="Pacientes atendidos este mes" />
+          <TarjetaDato icono={IconoCalendario} tono="azul" valor={kpis.semana} etiqueta="Citas esta semana" />
+          <TarjetaDato icono={IconoReloj} tono="verde" valor={kpis.hoy} etiqueta="Citas hoy" />
+          <TarjetaDato icono={IconoFlechaDerecha} tono="ambar" valor={kpis.proximas} etiqueta="Próximas citas" />
+          <TarjetaDato icono={IconoCorazon} tono="rosa" valor={kpis.atendidosMes} etiqueta="Pacientes atendidos este mes" />
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -172,37 +167,22 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
             <button
               type="button"
               onClick={() => setDiaSeleccionado(hoyAMedianoche())}
-              className="rounded-boton bg-white/85 px-3.5 py-1.5 text-sm font-semibold text-slate-800 ring-1 ring-white transition"
+              className="boton-glass-claro rounded-boton px-4 py-1.5 text-sm font-semibold text-white transition"
             >
               Hoy
             </button>
-            <p className="ml-1 font-heading text-sm font-semibold text-white">{etiquetaRango}</p>
+            <p className="ml-1 font-heading text-base font-semibold text-white">{etiquetaRango}</p>
           </div>
 
-          <div className="flex rounded-xl bg-slate-100 p-1" role="tablist" aria-label="Vista del calendario">
-            {VISTAS.map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                role="tab"
-                aria-selected={vista === v.id}
-                onClick={() => setVista(v.id)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                  vista === v.id ? 'bg-white text-brand-blue shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                {v.etiqueta}
-              </button>
-            ))}
-          </div>
+          <Pestanas items={VISTAS} activo={vista} onCambiar={setVista} etiqueta="Vista del calendario" />
         </div>
 
         <div className="flex flex-col gap-6 xl:flex-row">
-          <div className="min-w-0 flex-1 overflow-x-auto rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
+          <Tarjeta material="blanco" className="grises-legibles min-w-0 flex-1 overflow-x-auto p-4">
             {cargando ? (
               <div className="flex flex-col gap-2 p-4">
                 {[0, 1, 2, 3].map((k) => (
-                  <div key={k} className="h-10 animate-pulse rounded-lg bg-slate-100" />
+                  <div key={k} className="h-10 animate-pulse rounded-lg bg-slate-400/25" />
                 ))}
               </div>
             ) : errorCarga ? (
@@ -222,34 +202,34 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
                 onSeleccionarCita={setCitaDetalle}
               />
             )}
-          </div>
+          </Tarjeta>
 
           <div className="flex w-full shrink-0 flex-col gap-4 xl:w-80">
-            <MiniCalendario diaSeleccionado={diaSeleccionado} onSeleccionarDia={setDiaSeleccionado} />
+            <MiniCalendario diaSeleccionado={diaSeleccionado} onSeleccionarDia={setDiaSeleccionado} clase="grises-legibles vidrio-blanco rounded-superficie p-5" />
 
-            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-              <p className="font-heading text-sm font-semibold text-brand-navy">Citas de hoy</p>
+            <Tarjeta material="blanco" className="p-5">
+              <p className="font-heading text-base font-semibold text-brand-navy">Citas de hoy</p>
               <div className="mt-3 flex flex-col gap-1">
                 {citasDeHoy.length === 0 ? (
-                  <p className="text-sm text-slate-400">No tienes citas hoy.</p>
+                  <p className="text-sm text-slate-700">No tienes citas hoy.</p>
                 ) : (
                   citasDeHoy.map((cita) => (
                     <button
                       key={cita.id}
                       type="button"
                       onClick={() => setCitaDetalle(cita)}
-                      className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-50"
+                      className="hover-ilumina flex items-center gap-2.5 rounded-tarjeta px-2 py-1.5 text-left transition hover:bg-white/70"
                     >
                       <span aria-hidden="true" className={`h-2 w-2 shrink-0 rounded-full ${COLOR_ESTADO[estadoDeCita(cita)]}`} />
-                      <span className="w-16 shrink-0 text-xs font-semibold text-slate-600">{formatearHora(cita.fecha_hora)}</span>
+                      <span className="w-16 shrink-0 text-xs font-semibold text-slate-700">{formatearHora(cita.fecha_hora)}</span>
                       <AvatarMascota
                         mascota={{ nombre: cita.mascota_nombre, foto_url: cita.mascota_foto_url }}
                         className="h-8 w-8"
                         iconoClassName="h-4 w-4"
                       />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium text-slate-800">{cita.mascota_nombre}</span>
-                        <span className="block truncate text-xs text-slate-400">
+                        <span className="block truncate text-sm font-semibold text-slate-900">{cita.mascota_nombre}</span>
+                        <span className="block truncate text-xs text-slate-700">
                           {cita.cliente_nombre} · {cita.servicio_nombre}
                         </span>
                       </span>
@@ -257,27 +237,27 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
                   ))
                 )}
               </div>
-            </div>
+            </Tarjeta>
 
-            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-              <p className="font-heading text-sm font-semibold text-brand-navy">Tipos de servicio (esta semana)</p>
+            <Tarjeta material="blanco" className="p-5">
+              <p className="font-heading text-base font-semibold text-brand-navy">Tipos de servicio (esta semana)</p>
               <div className="mt-3 flex flex-col gap-2">
                 {tiposSemana.length === 0 ? (
-                  <p className="text-sm text-slate-400">Sin citas esta semana.</p>
+                  <p className="text-sm text-slate-700">Sin citas esta semana.</p>
                 ) : (
                   tiposSemana.map((t) => (
-                    <div key={t.nombre} className="flex items-center gap-2 text-sm text-slate-600">
+                    <div key={t.nombre} className="flex items-center gap-2 text-sm text-slate-800">
                       <span
                         className="h-2.5 w-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: (COLORES_CATEGORIA[t.color] ?? COLORES_CATEGORIA.blue).dot }}
                       />
                       <span className="flex-1">{t.nombre}</span>
-                      <span className="font-semibold text-slate-800">{t.total}</span>
+                      <span className="font-semibold text-slate-900">{t.total}</span>
                     </div>
                   ))
                 )}
               </div>
-            </div>
+            </Tarjeta>
           </div>
         </div>
       </div>
@@ -328,7 +308,7 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
 function VistaAgenda({ dias, citas, onSeleccionar }) {
   const conCitas = dias.map((dia) => ({ dia, citas: citas.filter((c) => esMismoDia(new Date(c.fecha_hora), dia)) }));
   if (citas.length === 0) {
-    return <p className="p-6 text-center text-sm text-slate-400">No tienes citas en esta semana.</p>;
+    return <p className="p-6 text-center text-sm text-slate-700">No tienes citas en esta semana.</p>;
   }
   return (
     <div className="flex flex-col gap-5 p-2">
@@ -336,7 +316,7 @@ function VistaAgenda({ dias, citas, onSeleccionar }) {
         .filter((grupo) => grupo.citas.length > 0)
         .map((grupo) => (
           <div key={grupo.dia.toISOString()}>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{formatearFechaLarga(grupo.dia)}</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-700">{formatearFechaLarga(grupo.dia)}</p>
             <div className="flex flex-col gap-2">
               {grupo.citas.map((cita) => {
                 const tono = COLORES_CATEGORIA[cita.categoria_color] ?? COLORES_CATEGORIA.blue;
@@ -345,19 +325,19 @@ function VistaAgenda({ dias, citas, onSeleccionar }) {
                     key={cita.id}
                     type="button"
                     onClick={() => onSeleccionar(cita)}
-                    className="hover-ilumina flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition hover:bg-slate-50"
+                    className="hover-ilumina flex items-center gap-3 rounded-tarjeta bg-white/60 p-3 text-left ring-1 ring-slate-900/10 transition"
                   >
                     <span className="w-1 self-stretch rounded-full" style={{ backgroundColor: tono.dot }} aria-hidden="true" />
                     <span className="w-20 shrink-0 text-sm font-semibold text-slate-700">{formatearHora(cita.fecha_hora)}</span>
                     <AvatarMascota mascota={{ nombre: cita.mascota_nombre, foto_url: cita.mascota_foto_url }} className="h-9 w-9" iconoClassName="h-4 w-4" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold text-slate-900">{cita.mascota_nombre}</span>
-                      <span className="block truncate text-xs text-slate-500">
+                      <span className="block truncate text-xs text-slate-700">
                         {cita.cliente_nombre} · {cita.servicio_nombre}
                       </span>
                     </span>
                     {cita.estado === 'cancelada' && (
-                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-brand-red">Cancelada</span>
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">Cancelada</span>
                     )}
                   </button>
                 );

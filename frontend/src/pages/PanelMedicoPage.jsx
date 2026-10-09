@@ -16,13 +16,13 @@ import { useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
-import { EncabezadoPagina, FondoVetui, Pestanas } from '../components/vetui';
+import { Boton, EncabezadoPagina, FondoVetui, Pestanas } from '../components/vetui';
 import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
 import { PanelMisPacientesMedico } from '../components/medico/PanelMisPacientesMedico';
 import { PanelMiPerfilMedico } from '../components/medico/PanelMiPerfilMedico';
 import { useAuth } from '../context/AuthContext';
 import fotoMain from '../assets/foto-main.png';
-import { IconoCalendario, IconoFlechaDerecha, IconoPata } from '../components/icons';
+import { IconoCalendario, IconoFlechaDerecha, IconoMas, IconoPata } from '../components/icons';
 
 const TABS = [
   { id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario },
@@ -93,10 +93,23 @@ export function PanelMedicoPage({ seccion = 'inicio' }) {
                 onCambiar={(id) => setParametros(id === 'pacientes' ? { tab: 'pacientes' } : {})}
                 etiqueta="Panel médico"
               />
+              {/* Accion primaria a la altura de las pestañas, como en el cliente. */}
+              {pestana === 'citas' && (
+                <Boton icono={IconoMas} onClick={agendar}>
+                  Agendar nueva cita
+                </Boton>
+              )}
             </div>
-            <div className="hoja-panel mt-6 text-white">
-              {pestana === 'citas' ? <PanelMisCitasMedico senalAgendar={senalAgendar} /> : <PanelMisPacientesMedico />}
-            </div>
+            {pestana === 'citas' ? (
+              <div className="mt-6">
+                <PanelMisCitasMedico senalAgendar={senalAgendar} />
+              </div>
+            ) : (
+              // hoja-panel: provisional hasta pasar Mis pacientes a vetUI.
+              <div className="hoja-panel mt-6 text-white">
+                <PanelMisPacientesMedico />
+              </div>
+            )}
           </>
         )}
       </main>
