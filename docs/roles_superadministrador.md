@@ -3,6 +3,8 @@
 Decisiones de Oriana (8 de octubre de 2026). El sistema tenía un solo rol
 `administrador` que hacía todo; se separó en dos.
 
+El médico veterinario no usa este panel: su vista es `/medico` (ver `docs/vetui.md`).
+
 ## Reparto
 
 | | Administrador de sede | Superadministrador |
