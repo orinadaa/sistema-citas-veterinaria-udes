@@ -1,4 +1,8 @@
 // components/medico/PanelMisPacientesMedico.jsx
+// Presentacion vetUI, igual que la vista del cliente: va directo sobre el fondo
+// de marca, con indicadores en TarjetaDato, el filtro de estado en Chips con
+// conteo real y una tarjeta de vidrio blanco por mascota (como "Mis citas" del
+// cliente) en vez de una tabla.
 // "Mis pacientes" del medico: dueños y mascotas que ha atendido o que
 // tienen cita con el (una fila por mascota). Sin "+ Agregar paciente":
 // el medico no crea cuentas de cliente (decision de la usuaria); solo
@@ -8,77 +12,31 @@
 //   dueño y "Limpiar filtros".
 // - "Agendar" en la columna de proxima cita abre el panel de agendar con
 //   ese dueño ya elegido.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { obtenerPacientesMedico, obtenerSedes } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaCorta, formatearHora } from '../../utils/fecha';
-import { iniciales } from '../../utils/texto';
-import { PageHeader } from '../ui/PageHeader';
-import { KPICard } from '../ui/KPICard';
-import { DataTable } from '../ui/DataTable';
-import { EstadoError } from '../ui/EstadoError';
+import { Boton, Chips, EstadoError, EstadoVacio, Esqueleto, Insignia, Tarjeta, TarjetaDato } from '../vetui';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { DetallePacienteMedicoPanel } from './DetallePacienteMedicoPanel';
 import { AgendarCitaMedicoPanel } from './AgendarCitaMedicoPanel';
 import { CrearRecordatorioPanel } from './CrearRecordatorioPanel';
-import { IconoBuscar, IconoCalendario, IconoCampana, IconoCorazon, IconoPata, IconoPersona, IconoPuntos } from '../icons';
+import { IconoCalendario, IconoCampana, IconoCorazon, IconoPata, IconoPersona } from '../icons';
 import { Desplegable } from '../form/Desplegable';
 import { CampoBusqueda } from '../form/CampoBusqueda';
 
 const CLASE_FILTRO =
   'campo px-3 py-2 text-sm';
 
-function MenuFila({ opciones }) {
-  const [abierto, setAbierto] = useState(false);
-  const contenedor = useRef(null);
-
-  useEffect(() => {
-    if (!abierto) return undefined;
-    function alHacerClic(evento) {
-      if (contenedor.current && !contenedor.current.contains(evento.target)) setAbierto(false);
-    }
-    document.addEventListener('mousedown', alHacerClic);
-    return () => document.removeEventListener('mousedown', alHacerClic);
-  }, [abierto]);
-
-  return (
-    <div className="relative" ref={contenedor}>
-      <button
-        type="button"
-        aria-label="Más acciones"
-        aria-expanded={abierto}
-        onClick={() => setAbierto((a) => !a)}
-        className="boton-texto rounded-boton p-1.5 text-slate-400 transition hover:text-slate-600"
-      >
-        <IconoPuntos className="h-5 w-5" />
-      </button>
-      {abierto && (
-        <div className="absolute right-0 top-full z-10 mt-1 w-48 overflow-hidden rounded-lg bg-white py-1 text-left shadow-lg ring-1 ring-slate-200">
-          {opciones.map((opcion) => (
-            <button
-              key={opcion.etiqueta}
-              type="button"
-              onClick={() => {
-                setAbierto(false);
-                opcion.onClick();
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              <opcion.icono className="h-4 w-4" />
-              {opcion.etiqueta}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+// Cuantas tarjetas se muestran de entrada y cuantas agrega "Ver más".
+const POR_TANDA = 8;
 
 export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
   const { token } = useAuth();
   const [busqueda, setBusqueda] = useState(busquedaInicial);
   const [sedeId, setSedeId] = useState('');
   const [estado, setEstado] = useState('todos');
+  const [visibles, setVisibles] = useState(POR_TANDA);
   const [sedes, setSedes] = useState([]);
   const [resultado, setResultado] = useState({ clave: null, pacientes: [], kpis: null, error: '' });
   const [intento, setIntento] = useState(0);
@@ -123,6 +81,20 @@ export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
     .filter((p) => estado === 'todos' || (estado === 'activo' ? p.cliente_activo : !p.cliente_activo))
     .map((p) => ({ ...p, id: `${p.cliente_id}-${p.mascota_id}` }));
   const hayFiltros = termino || sedeId || estado !== 'todos';
+  // Filtro de estado como botones con conteo real (pocas opciones fijas).
+  const todos = resultado.pacientes;
+  const ESTADOS = [
+    { id: 'todos', etiqueta: 'Todos', conteo: todos.length },
+    { id: 'activo', etiqueta: 'Activos', conteo: todos.filter((x) => x.cliente_activo).length },
+    { id: 'inactivo', etiqueta: 'Inactivos', conteo: todos.filter((x) => !x.cliente_activo).length },
+  ];
+  // Al cambiar un filtro se vuelve a la primera tanda (ajuste durante el render).
+  const claveFiltros = `${termino}|${sedeId}|${estado}`;
+  const [filtrosVistos, setFiltrosVistos] = useState(claveFiltros);
+  if (claveFiltros !== filtrosVistos) {
+    setFiltrosVistos(claveFiltros);
+    setVisibles(POR_TANDA);
+  }
   const kpis = resultado.kpis;
   const panelAbierto = Boolean(clienteDetalleId) || Boolean(agendarPara) || Boolean(recordatorioPara);
 
@@ -133,40 +105,33 @@ export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
   return (
     <>
       <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
-        <PageHeader
-          title="Mis pacientes"
-          subtitle="Consulta la información de los dueños y mascotas que has atendido o tienen citas contigo."
-        />
-
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <KPICard icon={IconoPersona} color="blue" value={kpis?.pacientes ?? '—'} label="Pacientes en total" />
-          <KPICard icon={IconoCalendario} color="green" value={kpis?.conCitasProximas ?? '—'} label="Con citas próximas" />
-          <KPICard icon={IconoCorazon} color="amber" value={kpis?.frecuentes ?? '—'} label="Pacientes frecuentes" />
-          <KPICard icon={IconoPata} color="purple" value={kpis?.mascotas ?? '—'} label="Mascotas en total" />
+          <TarjetaDato icono={IconoPersona} tono="azul" valor={kpis?.pacientes ?? '—'} etiqueta="Pacientes en total" />
+          <TarjetaDato icono={IconoCalendario} tono="verde" valor={kpis?.conCitasProximas ?? '—'} etiqueta="Con citas próximas" />
+          <TarjetaDato icono={IconoCorazon} tono="ambar" valor={kpis?.frecuentes ?? '—'} etiqueta="Pacientes frecuentes" />
+          <TarjetaDato icono={IconoPata} tono="rosa" valor={kpis?.mascotas ?? '—'} etiqueta="Mascotas en total" />
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-white">Mis pacientes</h2>
+          <p className="mt-1 text-sm text-blue-50">Dueños y mascotas que has atendido o que tienen cita contigo.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[220px] flex-1">
-            <IconoBuscar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <CampoBusqueda
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar dueño o mascota..."
-              className={`${CLASE_FILTRO} w-full pl-9`}
-            />
-          </div>
+          <Chips items={ESTADOS} activo={estado} onCambiar={setEstado} />
+          <CampoBusqueda
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar dueño o mascota..."
+            className="min-w-[220px] flex-1"
+          />
           <Desplegable aria-label="Sede" value={sedeId} onChange={(e) => setSedeId(e.target.value)} className={CLASE_FILTRO}>
             <option value="">Todas las sedes</option>
-            {sedes.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.ciudad}
+            {sedes.map((sede) => (
+              <option key={sede.id} value={sede.id}>
+                {sede.ciudad}
               </option>
             ))}
-          </Desplegable>
-          <Desplegable aria-label="Estado" value={estado} onChange={(e) => setEstado(e.target.value)} className={CLASE_FILTRO}>
-            <option value="todos">Todos los estados</option>
-            <option value="activo">Activos</option>
-            <option value="inactivo">Inactivos</option>
           </Desplegable>
           {hayFiltros && (
             <button
@@ -176,7 +141,7 @@ export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
                 setSedeId('');
                 setEstado('todos');
               }}
-              className="text-sm font-semibold text-brand-blue hover:underline"
+              className="boton-texto rounded-boton px-2 py-1 text-sm font-semibold text-white transition"
             >
               Limpiar filtros
             </button>
@@ -186,87 +151,92 @@ export function PanelMisPacientesMedico({ busquedaInicial = '' }) {
         {resultado.error ? (
           <EstadoError mensaje={resultado.error} onReintentar={() => setIntento((n) => n + 1)} />
         ) : cargando ? (
-          <div className="flex flex-col gap-2">
-            {[0, 1, 2, 3].map((k) => (
-              <div key={k} className="h-14 animate-pulse rounded-xl bg-slate-100" />
+          <div className="flex flex-col gap-3">
+            {[0, 1, 2].map((k) => (
+              <Esqueleto key={k} className="h-28" />
             ))}
           </div>
+        ) : filas.length === 0 ? (
+          <EstadoVacio>{hayFiltros ? 'No hay pacientes que coincidan con los filtros.' : 'Todavía no tienes pacientes.'}</EstadoVacio>
         ) : (
-          <DataTable
-            filaVacia={hayFiltros ? 'No hay pacientes que coincidan con los filtros.' : 'Todavía no tienes pacientes.'}
-            rows={filas}
-            columns={[
-              {
-                header: 'Dueño',
-                render: (p) => (
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-blue text-xs font-bold text-white">
-                      {iniciales(p.cliente_nombre)}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-900">{p.cliente_nombre}</p>
-                      <p className="truncate text-xs text-slate-400">{[p.cliente_correo, p.cliente_telefono].filter(Boolean).join(' · ')}</p>
+          <>
+            {/* Una tarjeta por mascota, como las citas del cliente. */}
+            <div className="flex flex-col gap-3">
+              {filas.slice(0, visibles).map((paciente) => (
+                <Tarjeta
+                  key={paciente.id}
+                  material="blanco"
+                  className="grid grid-cols-1 items-center gap-4 p-4 md:grid-cols-[9rem_minmax(0,1.2fr)_minmax(0,1fr)_auto] md:gap-5"
+                >
+                  {/* 1. Mascota */}
+                  <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+                    <AvatarMascota
+                      mascota={{ nombre: paciente.mascota_nombre, foto_url: paciente.mascota_foto_url }}
+                      className="h-20 w-20 shadow-md ring-4 ring-white"
+                      iconoClassName="h-9 w-9"
+                    />
+                    <div className="min-w-0 max-w-full">
+                      <p className="truncate font-semibold text-slate-900">{paciente.mascota_nombre}</p>
+                      <p className="line-clamp-2 text-sm text-slate-700">{[paciente.mascota_especie, paciente.mascota_raza].filter(Boolean).join(' · ')}</p>
                     </div>
                   </div>
-                ),
-              },
-              {
-                header: 'Mascota',
-                render: (p) => (
-                  <div className="flex items-center gap-2.5">
-                    <AvatarMascota mascota={{ nombre: p.mascota_nombre, foto_url: p.mascota_foto_url }} className="h-9 w-9" iconoClassName="h-4 w-4" />
+
+                  {/* 2. Dueño */}
+                  <div className="flex min-w-0 items-start gap-2.5">
+                    <IconoPersona className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue-700" />
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-900">{p.mascota_nombre}</p>
-                      <p className="truncate text-xs text-slate-400">{[p.mascota_especie, p.mascota_raza].filter(Boolean).join(' · ')}</p>
+                      <p className="truncate font-semibold text-slate-900">{paciente.cliente_nombre}</p>
+                      {paciente.cliente_correo && <p className="truncate text-sm text-slate-700">{paciente.cliente_correo}</p>}
+                      {paciente.cliente_telefono && <p className="truncate text-sm text-slate-700">{paciente.cliente_telefono}</p>}
                     </div>
                   </div>
-                ),
-              },
-              {
-                header: 'Última cita',
-                render: (p) => (p.ultima_cita ? formatearFechaCorta(p.ultima_cita) : <span className="text-slate-400">—</span>),
-              },
-              {
-                header: 'Próxima cita',
-                render: (p) =>
-                  p.proxima_cita ? (
-                    <div>
-                      <p className="text-slate-800">{formatearFechaCorta(p.proxima_cita)}</p>
-                      <p className="text-xs text-slate-400">{formatearHora(p.proxima_cita)}</p>
+
+                  {/* 3. Citas */}
+                  <div className="flex min-w-0 items-start gap-2.5">
+                    <IconoCalendario className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue-700" />
+                    <div className="min-w-0 text-sm text-slate-700">
+                      <p>
+                        Próxima:{' '}
+                        <span className="font-semibold text-slate-900">
+                          {paciente.proxima_cita ? `${formatearFechaCorta(paciente.proxima_cita)}, ${formatearHora(paciente.proxima_cita)}` : 'sin agendar'}
+                        </span>
+                      </p>
+                      <p>
+                        Última: <span className="font-semibold text-slate-900">{paciente.ultima_cita ? formatearFechaCorta(paciente.ultima_cita) : '—'}</span>
+                      </p>
                     </div>
-                  ) : (
+                  </div>
+
+                  {/* 4. Estado y acciones */}
+                  <div className="flex flex-row flex-wrap items-center gap-2 md:flex-col md:items-end">
+                    <Insignia tono={paciente.cliente_activo ? 'verde' : 'gris'}>{paciente.cliente_activo ? 'Activo' : 'Inactivo'}</Insignia>
+                    <Boton variante="contorno" tamano="sm" onClick={() => setClienteDetalleId(paciente.cliente_id)}>
+                      Ver detalles
+                    </Boton>
                     <button
                       type="button"
-                      onClick={() => agendarCon(p)}
-                      className="rounded-boton border border-brand-blue px-2.5 py-1 text-xs font-semibold text-brand-blue transition hover:bg-blue-50"
+                      onClick={() => agendarCon(paciente)}
+                      className="boton-texto inline-flex items-center gap-1.5 rounded-boton px-2 py-1 text-sm font-semibold text-brand-blue-700 transition"
                     >
-                      Agendar
+                      <IconoCalendario className="h-4 w-4" />
+                      Agendar cita
                     </button>
-                  ),
-              },
-              {
-                header: 'Estado',
-                render: (p) => (
-                  <span className={`inline-flex items-center gap-1.5 text-sm ${p.cliente_activo ? 'text-brand-green' : 'text-slate-400'}`}>
-                    <span aria-hidden="true" className={`h-2 w-2 rounded-full ${p.cliente_activo ? 'bg-brand-green' : 'bg-slate-300'}`} />
-                    {p.cliente_activo ? 'Activo' : 'Inactivo'}
-                  </span>
-                ),
-              },
-            ]}
-            actions={(p) => (
-              <div className="flex items-center justify-end gap-1">
-                <button
-                  type="button"
-                  onClick={() => setClienteDetalleId(p.cliente_id)}
-                  className="rounded-boton border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                >
-                  Ver detalles
-                </button>
-                <MenuFila opciones={[{ etiqueta: 'Agendar cita', icono: IconoCalendario, onClick: () => agendarCon(p) }]} />
-              </div>
-            )}
-          />
+                  </div>
+                </Tarjeta>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-blue-50">
+              <span>
+                Mostrando {Math.min(visibles, filas.length)} de {filas.length}
+              </span>
+              {visibles < filas.length && (
+                <Boton variante="secundario" tamano="sm" onClick={() => setVisibles((n) => n + POR_TANDA)}>
+                  Ver más
+                </Boton>
+              )}
+            </div>
+          </>
         )}
       </div>
 

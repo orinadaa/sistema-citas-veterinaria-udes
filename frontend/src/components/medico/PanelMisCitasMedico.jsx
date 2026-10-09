@@ -26,7 +26,9 @@ import {
   inicioDeSemana,
   sumarDias,
 } from '../../utils/fecha';
-import { EstadoError, Pestanas, Tarjeta, TarjetaDato } from '../vetui';
+import { Pestanas, Tarjeta, TarjetaDato } from '../vetui';
+// EstadoError del panel (claro): aca se muestra dentro de un vidrio blanco.
+import { EstadoError } from '../ui/EstadoError';
 import { COLORES_CATEGORIA } from '../ui/CategoryBadge';
 import { MiniCalendario } from '../citas/MiniCalendario';
 import { CalendarioSemanal } from '../citas/CalendarioSemanal';

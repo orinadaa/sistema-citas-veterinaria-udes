@@ -100,16 +100,7 @@ export function PanelMedicoPage({ seccion = 'inicio' }) {
                 </Boton>
               )}
             </div>
-            {pestana === 'citas' ? (
-              <div className="mt-6">
-                <PanelMisCitasMedico senalAgendar={senalAgendar} />
-              </div>
-            ) : (
-              // hoja-panel: provisional hasta pasar Mis pacientes a vetUI.
-              <div className="hoja-panel mt-6 text-white">
-                <PanelMisPacientesMedico />
-              </div>
-            )}
+            <div className="mt-6">{pestana === 'citas' ? <PanelMisCitasMedico senalAgendar={senalAgendar} /> : <PanelMisPacientesMedico />}</div>
           </>
         )}
       </main>
