@@ -7,7 +7,7 @@ const { pool } = require('../config/db');
 
 async function buscarPorCorreo(correo) {
   const resultado = await pool.query(
-    'SELECT id, nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, activo FROM usuario WHERE correo = $1',
+    'SELECT id, nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, activo, debe_cambiar_contrasena FROM usuario WHERE correo = $1',
     [correo]
   );
   return resultado.rows[0] || null;
@@ -33,12 +33,14 @@ async function crearCliente({ nombreCompleto, correo, contrasenaHash, telefono }
 
 // Crea cuentas de personal (administrador o veterinario). A diferencia del
 // registro publico, estas siempre requieren una sede y las crea un admin.
-async function crearPersonal({ nombreCompleto, correo, contrasenaHash, rol, sedeId, telefono }) {
+// claveTemporal: la contraseña la genero el sistema (no la eligio la
+// persona): al entrar por primera vez debera establecer la suya.
+async function crearPersonal({ nombreCompleto, correo, contrasenaHash, rol, sedeId, telefono, claveTemporal = false }) {
   const resultado = await pool.query(
-    `INSERT INTO usuario (nombre_completo, correo, contrasena_hash, rol, sede_id, telefono)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO usuario (nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, debe_cambiar_contrasena)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING id, nombre_completo, correo, rol, sede_id, telefono, creado_en`,
-    [nombreCompleto, correo, contrasenaHash, rol, sedeId, telefono || null]
+    [nombreCompleto, correo, contrasenaHash, rol, sedeId, telefono || null, claveTemporal]
   );
   return resultado.rows[0];
 }
@@ -93,8 +95,19 @@ async function actualizarPerfil(id, { nombreCompleto, telefono, activo }) {
   return resultado.rows[0] || null;
 }
 
+// Cualquier cambio de contraseña hecho por la propia persona (primera
+// entrada, perfil, recuperacion por codigo) apaga la marca de clave temporal.
 async function actualizarContrasena(id, contrasenaHash) {
-  await pool.query('UPDATE usuario SET contrasena_hash = $2 WHERE id = $1', [id, contrasenaHash]);
+  await pool.query('UPDATE usuario SET contrasena_hash = $2, debe_cambiar_contrasena = false WHERE id = $1', [id, contrasenaHash]);
+}
+
+// Para establecer la contraseña propia: la cuenta completa, con su hash.
+async function buscarConHashPorId(id) {
+  const resultado = await pool.query(
+    'SELECT id, nombre_completo, correo, contrasena_hash, rol, sede_id, activo, debe_cambiar_contrasena FROM usuario WHERE id = $1',
+    [id]
+  );
+  return resultado.rows[0] || null;
 }
 
 module.exports = {
@@ -107,4 +120,5 @@ module.exports = {
   actualizarRol,
   actualizarPerfil,
   actualizarContrasena,
+  buscarConHashPorId,
 };

@@ -83,6 +83,8 @@ async function crearStaff(req, res, next) {
       rol,
       sedeId,
       telefono,
+      // Clave generada por el sistema: debera cambiarla al entrar.
+      claveTemporal: true,
     });
 
     let correoEnviado = true;

@@ -1,7 +1,7 @@
 // routes/auth.routes.js
 const express = require('express');
-const { registrar, iniciarSesion, olvideClave, restablecerClave } = require('../controllers/auth.controller');
-const { verificarToken } = require('../middlewares/auth.middleware');
+const { registrar, iniciarSesion, olvideClave, restablecerClave, establecerPrimeraClave } = require('../controllers/auth.controller');
+const { verificarToken, verificarTokenClaveTemporal } = require('../middlewares/auth.middleware');
 const { obtenerPerfilPropio } = require('../controllers/usuario.controller');
 
 const router = express.Router();
@@ -20,5 +20,8 @@ router.post('/restablecer-clave', restablecerClave);
 
 // GET /api/auth/perfil — cualquier usuario autenticado consulta su propia sesion
 router.get('/perfil', verificarToken, obtenerPerfilPropio);
+
+// POST /api/auth/primera-clave — la cuenta con clave temporal establece la suya
+router.post('/primera-clave', verificarTokenClaveTemporal, establecerPrimeraClave);
 
 module.exports = router;

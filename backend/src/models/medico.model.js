@@ -110,8 +110,10 @@ async function listarConServicios(sedeId) {
 
 async function crear({ nombreCompleto, correo, contrasenaHash, documento, telefono, sedeId }) {
   const resultado = await pool.query(
-    `INSERT INTO usuario (nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, documento)
-     VALUES ($1, $2, $3, 'veterinario', $4, $5, $6)
+    // debe_cambiar_contrasena: el medico nace con una clave temporal generada
+    // por el sistema y debe establecer la suya al entrar por primera vez.
+    `INSERT INTO usuario (nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, documento, debe_cambiar_contrasena)
+     VALUES ($1, $2, $3, 'veterinario', $4, $5, $6, true)
      RETURNING id`,
     [nombreCompleto, correo, contrasenaHash, sedeId, telefono || null, documento || null]
   );

@@ -5,7 +5,7 @@
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { buscarPorCorreo, crearCliente, actualizarContrasena } = require('../models/usuario.model');
+const { buscarPorCorreo, crearCliente, actualizarContrasena, buscarConHashPorId } = require('../models/usuario.model');
 const recuperacionModel = require('../models/recuperacion.model');
 const correoService = require('../services/correo.service');
 const { generarCodigoRecuperacion } = require('../utils/contrasena.util');
@@ -22,7 +22,14 @@ const MENSAJE_CODIGO_INVALIDO = 'Código inválido o expirado.';
 
 function generarToken(usuario) {
   return jwt.sign(
-    { id: usuario.id, rol: usuario.rol, sedeId: usuario.sede_id || null },
+    {
+      id: usuario.id,
+      rol: usuario.rol,
+      sedeId: usuario.sede_id || null,
+      // Con clave temporal el token solo sirve para establecer la propia
+      // (ver auth.middleware.js).
+      ...(usuario.debe_cambiar_contrasena ? { cambiarClave: true } : {}),
+    },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRACION || '8h' }
   );
@@ -35,6 +42,7 @@ function datosPublicos(usuario) {
     correo: usuario.correo,
     rol: usuario.rol,
     sedeId: usuario.sede_id || null,
+    debeCambiarContrasena: Boolean(usuario.debe_cambiar_contrasena),
   };
 }
 
@@ -195,4 +203,31 @@ async function restablecerClave(req, res, next) {
   }
 }
 
-module.exports = { registrar, iniciarSesion, olvideClave, restablecerClave };
+// POST /api/auth/primera-clave — { contrasenaNueva }. Para la cuenta que
+// entro con la clave temporal que le genero el sistema: establece su propia
+// contraseña y devuelve una sesion normal (token sin la marca).
+async function establecerPrimeraClave(req, res, next) {
+  try {
+    const nueva = String(req.body.contrasenaNueva || '');
+    if (nueva.length < 8) {
+      return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 8 caracteres.' });
+    }
+    const usuario = await buscarConHashPorId(req.usuario.id);
+    if (!usuario || !usuario.activo) {
+      return res.status(401).json({ mensaje: MENSAJE_CREDENCIALES });
+    }
+    if (!usuario.debe_cambiar_contrasena) {
+      return res.status(400).json({ mensaje: 'Tu cuenta ya tiene una contraseña propia.' });
+    }
+    if (await bcrypt.compare(nueva, usuario.contrasena_hash)) {
+      return res.status(400).json({ mensaje: 'Elige una contraseña distinta a la temporal que recibiste por correo.' });
+    }
+    await actualizarContrasena(usuario.id, await bcrypt.hash(nueva, RONDAS_SAL));
+    const actualizado = { ...usuario, debe_cambiar_contrasena: false };
+    return res.status(200).json({ usuario: datosPublicos(actualizado), token: generarToken(actualizado) });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { registrar, iniciarSesion, olvideClave, restablecerClave, establecerPrimeraClave };
