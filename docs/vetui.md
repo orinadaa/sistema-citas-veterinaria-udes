@@ -282,6 +282,8 @@ Las fotos que no son un retrato (foto de sede, galería del inicio) usan `ZonaIm
 
 **Barra de desplazamiento en contenedores redondeados.** El recorrido de la barra empieza y termina donde acaba la curva de la esquina (margen del `::-webkit-scrollbar-track` igual al radio, por clase `rounded-*`, en vetui.css). Un contenedor con scroll y un radio nuevo debe sumarse a esa lista.
 
+**Vista del médico veterinario.** Vive en `/medico` (`pages/PanelMedicoPage.jsx`), fuera del panel `/admin`, con la misma estructura de la vista del cliente: `FondoVetui variante="panel" textoDirecto`, la píldora flotante (`Navbar`, variante médico: accesos a Mis citas, Mis pacientes y Disponibilidad; "Mi perfil" en el menú del avatar; "Agendar cita" abre su panel), `EncabezadoPagina` y `Pestanas` (Mis citas / Mis pacientes). "Mi perfil" es la página `/medico/perfil`. Los módulos de `components/medico/` usan los componentes de `components/vetui/` (`TarjetaDato`, `Tarjeta material="blanco"`, `Pestanas`, `Chips`, `Boton`); las piezas compartidas con el panel (calendario semanal, mini calendario) van dentro de un vidrio blanco con la clase `grises-legibles`. Los paneles laterales siguen siendo `ui/SidePanel`.
+
 **Nunca un enlace.** Ningún formulario pide pegar la dirección de una foto: siempre se sube el archivo.
 
 Ambos se pueden probar en `/vetui`, bloque "Fechas y fotos".

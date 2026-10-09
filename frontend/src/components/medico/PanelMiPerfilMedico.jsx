@@ -1,5 +1,7 @@
 // components/medico/PanelMiPerfilMedico.jsx
-// "Mi perfil" del medico veterinario. Tabs:
+// "Mi perfil" del medico veterinario (/medico/perfil). Presentacion vetUI,
+// como la vista del cliente: secciones en el control segmentado de vidrio
+// (Pestanas) y cada bloque en una tarjeta de vidrio blanco. Secciones:
 // - Informacion personal: resumen con foto (editor de foto reutilizado
 //   del de mascotas), datos personales editables, cambio de correo con
 //   codigo de verificacion enviado al correo nuevo, cambio de contraseña,
@@ -19,9 +21,7 @@ import {
   subirFotoPerfilMedico,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { PageHeader } from '../ui/PageHeader';
-import { Tabs } from '../ui/Tabs';
-import { EstadoError } from '../ui/EstadoError';
+import { EstadoError, Pestanas } from '../vetui';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { Campo } from '../form/Campo';
 import { CampoCodigo } from '../form/CampoCodigo';
@@ -34,9 +34,9 @@ import { IconoCalendario, IconoCamara, IconoCorreo, IconoEstetoscopio, IconoPata
 import { Desplegable } from '../form/Desplegable';
 
 const TABS = [
-  { id: 'personal', label: 'Información personal', icon: IconoPersona },
-  { id: 'profesional', label: 'Información profesional', icon: IconoEstetoscopio },
-  { id: 'disponibilidad', label: 'Disponibilidad', icon: IconoReloj },
+  { id: 'personal', etiqueta: 'Información personal', icono: IconoPersona },
+  { id: 'profesional', etiqueta: 'Información profesional', icono: IconoEstetoscopio },
+  { id: 'disponibilidad', etiqueta: 'Disponibilidad', icono: IconoReloj },
 ];
 const ANIOS_EXPERIENCIA = [
   { valor: '0-1', etiqueta: 'Menos de 1 año' },
@@ -50,7 +50,7 @@ const CLASE_CAMPO =
 
 function Tarjeta({ titulo, children, className = '' }) {
   return (
-    <section className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 ${className}`}>
+    <section className={`grises-legibles vidrio-blanco rounded-superficie p-5 sm:p-6 ${className}`}>
       {titulo && <h2 className="mb-4 font-heading text-base font-semibold text-brand-navy">{titulo}</h2>}
       {children}
     </section>
@@ -327,7 +327,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
     return (
       <div className="flex flex-col gap-3">
         {[0, 1, 2].map((k) => (
-          <div key={k} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+          <div key={k} className="h-24 animate-pulse rounded-superficie bg-white/15" />
         ))}
       </div>
     );
@@ -336,8 +336,8 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
   return (
     <>
       <div className="flex flex-col gap-6" inert={editorFoto} aria-hidden={editorFoto}>
-        <PageHeader title="Mi perfil" subtitle="Consulta y actualiza tu información personal y profesional." />
-        <Tabs sobreVidrio items={TABS} activeItem={pestana} onChange={setPestana} />
+        {/* El titulo lo pone la pagina (/medico/perfil); aca, las secciones. */}
+        <Pestanas items={TABS} activo={pestana} onCambiar={setPestana} etiqueta="Secciones de mi perfil" />
 
         {pestana === 'personal' && (
           <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_260px]">

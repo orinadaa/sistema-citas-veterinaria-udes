@@ -24,7 +24,6 @@ import {
   IconoMedicos,
   IconoSede,
   IconoPersona,
-  IconoPata,
   IconoGrafica,
   IconoInicio,
   IconoGlobo,
@@ -60,13 +59,6 @@ const ITEMS_SUPER = [
   { id: 'reportes', etiqueta: 'Reportes', icono: IconoGrafica },
 ];
 
-// Panel propio del medico veterinario.
-const ITEMS_MEDICO = [
-  { id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario },
-  { id: 'pacientes', etiqueta: 'Mis pacientes', icono: IconoPata },
-  { id: 'perfil', etiqueta: 'Mi perfil', icono: IconoPersona },
-];
-
 const CLAVE_COLAPSADO = 'udes_veterinaria_sidebar_colapsado';
 const ANCHO_EXPANDIDO = '244px';
 const ANCHO_COLAPSADO = '76px';
@@ -82,7 +74,7 @@ function leerColapsadoGuardado() {
 export function AdminSidebar({ activo, onCambiar }) {
   const { usuario } = useAuth();
   const [colapsado, setColapsado] = useState(leerColapsadoGuardado);
-  const items = { superadministrador: ITEMS_SUPER, administrador: ITEMS_NAV }[usuario?.rol] ?? ITEMS_MEDICO;
+  const items = usuario?.rol === 'superadministrador' ? ITEMS_SUPER : ITEMS_NAV;
 
   function alternarColapsado() {
     setColapsado((anterior) => {

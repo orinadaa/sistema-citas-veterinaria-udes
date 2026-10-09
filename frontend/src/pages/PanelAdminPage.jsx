@@ -1,12 +1,12 @@
 // pages/PanelAdminPage.jsx
-// Panel interno (/admin). Tres roles, cada uno con sus modulos (el menu
-// lateral, AdminSidebar, muestra los mismos):
+// Panel interno (/admin). Dos roles, cada uno con sus modulos (el menu
+// lateral, AdminSidebar, muestra los mismos). El medico veterinario ya no
+// entra aca: tiene su propia vista en /medico (PanelMedicoPage).
 // - Superadministrador: administra el sistema completo sin programar
 //   (sedes, cuentas, catalogo de servicios, pagina web, catalogos, datos y
 //   reportes de todas las sedes). No opera citas.
 // - Administrador de sede: el dia a dia de SU sede (inicio, citas, medicos,
 //   pacientes, horario, reportes de su sede; los servicios, solo consulta).
-// - Medico veterinario: su propio modulo (components/medico/).
 // Los permisos reales los impone el servidor; aca solo se decide que mostrar.
 import { useState } from 'react';
 import { AdminSidebar } from '../components/layout/AdminSidebar';
@@ -26,17 +26,13 @@ import { PanelGaleria } from '../components/admin/PanelGaleria';
 import { PanelCatalogos } from '../components/admin/PanelCatalogos';
 import { PanelDatos } from '../components/admin/PanelDatos';
 import { PanelReportes } from '../components/admin/PanelReportes';
-import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
-import { PanelMisPacientesMedico } from '../components/medico/PanelMisPacientesMedico';
-import { PanelMiPerfilMedico } from '../components/medico/PanelMiPerfilMedico';
 
 export function PanelAdminPage() {
   const { usuario } = useAuth();
   const rol = usuario?.rol;
   const esSuper = rol === 'superadministrador';
   const esAdministrador = rol === 'administrador';
-  const esMedico = !esSuper && !esAdministrador;
-  const [pestana, setPestana] = useState(esMedico ? 'citas' : 'inicio');
+  const [pestana, setPestana] = useState('inicio');
   // Termino de busqueda precargado por pestana: lo llena la busqueda
   // global del topbar (AdminHeader) cuando se elige un resultado, y
   // cada panel lo usa para inicializar su propio filtro de busqueda.
@@ -92,13 +88,6 @@ export function PanelAdminPage() {
             {esAdministrador && pestana === 'servicios' && <PanelServicios soloLectura busquedaInicial={busquedaPorPestana.servicios} />}
             {esAdministrador && pestana === 'horarios' && <PanelHorarios sedeFija={usuario.sedeId} />}
             {esAdministrador && pestana === 'reportes' && <PanelReportes sedeFija={usuario.sedeId} />}
-
-            {/* Panel propio del medico veterinario */}
-            {esMedico && pestana === 'citas' && <PanelMisCitasMedico />}
-            {esMedico && pestana === 'pacientes' && (
-              <PanelMisPacientesMedico key={busquedaPorPestana.pacientes} busquedaInicial={busquedaPorPestana.pacientes} />
-            )}
-            {esMedico && pestana === 'perfil' && <PanelMiPerfilMedico />}
           </main>
         </div>
       </div>

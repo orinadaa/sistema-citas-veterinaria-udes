@@ -77,11 +77,9 @@ export function PanelMedicoPage({ seccion = 'inicio' }) {
                 Volver a mis citas
               </Link>
             </div>
-            {/* hoja-panel: provisional mientras los modulos del medico se pasan
-                a los componentes del cliente (vetUI). Les da el mismo vidrio que
-                tenian en el panel anterior. */}
-            <div className="hoja-panel mt-6 text-white">
-              <PanelMiPerfilMedico pestanaInicial={parametros.get('tab')} />
+            <div className="mt-6">
+              {/* key: "Disponibilidad" de la pildora abre esa seccion aunque ya se este en el perfil. */}
+              <PanelMiPerfilMedico key={parametros.get('tab') ?? 'personal'} pestanaInicial={parametros.get('tab')} />
             </div>
           </>
         ) : (

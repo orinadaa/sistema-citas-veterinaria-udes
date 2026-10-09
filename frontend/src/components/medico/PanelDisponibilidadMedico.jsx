@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { crearBloqueoMedico, eliminarBloqueoMedico, guardarHorarioMedico, obtenerDisponibilidadMedico } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { hoyComoFechaLocal } from '../../utils/fecha';
-import { EstadoError } from '../ui/EstadoError';
+import { EstadoError } from '../vetui';
 import { CampoFecha } from '../form/CampoFecha';
 import { IconoPapelera, IconoReloj, IconoSede } from '../icons';
 import { Desplegable } from '../form/Desplegable';
@@ -41,7 +41,7 @@ function fechaLegible(texto) {
 
 function Tarjeta({ titulo, subtitulo, children }) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+    <section className="grises-legibles vidrio-blanco rounded-superficie p-5 sm:p-6">
       <h2 className="font-heading text-base font-semibold text-brand-navy">{titulo}</h2>
       {subtitulo && <p className="mt-0.5 text-sm text-slate-500">{subtitulo}</p>}
       <div className="mt-4">{children}</div>
@@ -126,7 +126,7 @@ export function PanelDisponibilidadMedico() {
       />
     );
   }
-  if (!datos) return <div className="h-64 animate-pulse rounded-2xl bg-slate-100" />;
+  if (!datos) return <div className="h-64 animate-pulse rounded-superficie bg-white/15" />;
 
   const sedePorId = new Map(datos.sedes.map((s) => [s.id, s]));
   const horarioSede = (sedeId, dia) => sedePorId.get(sedeId)?.horario.find((h) => h.dia_semana === dia);
