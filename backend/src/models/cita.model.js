@@ -148,7 +148,9 @@ async function buscarPorId(id) {
 
 async function reprogramar(id, nuevaFechaHora) {
   const resultado = await pool.query(
-    `UPDATE cita SET fecha_hora = $2, actualizado_en = NOW()
+    // recordatorio_enviado_en vuelve a NULL: la fecha nueva merece su propio
+    // recordatorio previo (RF-18).
+    `UPDATE cita SET fecha_hora = $2, actualizado_en = NOW(), recordatorio_enviado_en = NULL
      WHERE id = $1 AND estado = 'agendada'
      RETURNING *`,
     [id, nuevaFechaHora]
