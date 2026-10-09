@@ -1,16 +1,7 @@
 // routes/mascota.routes.js
 const express = require('express');
-const {
-  misMascotas,
-  listarDeCliente,
-  crear,
-  actualizar,
-  eliminar,
-  subirFoto,
-  subirArchivoCampo,
-  quitarArchivoCampo,
-} = require('../controllers/mascota.controller');
-const { subirFotoMascota, adjuntos } = require('../middlewares/subirFoto.middleware');
+const { misMascotas, listarDeCliente, crear, actualizar, eliminar, subirFoto } = require('../controllers/mascota.controller');
+const { subirFotoMascota } = require('../middlewares/subirFoto.middleware');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
@@ -32,16 +23,6 @@ router.put('/:id', verificarRol('cliente', 'administrador', 'veterinario'), actu
 
 // POST /api/mascotas/:id/foto — dueño o administrador (multipart, campo "foto")
 router.post('/:id/foto', verificarRol('cliente', 'administrador', 'veterinario'), subirFotoMascota, subirFoto);
-
-// Adjunto de un campo personalizado de tipo archivo (multipart, campo
-// "archivo": PDF, JPG o PNG) — dueño, administrador o medico del paciente
-router.post(
-  '/:id/campos/:clave/archivo',
-  verificarRol('cliente', 'administrador', 'veterinario'),
-  adjuntos.middleware,
-  subirArchivoCampo
-);
-router.delete('/:id/campos/:clave/archivo', verificarRol('cliente', 'administrador', 'veterinario'), quitarArchivoCampo);
 
 // DELETE /api/mascotas/:id — solo el cliente dueño (baja logica). El
 // administrador puede editar los datos de la mascota, no eliminarla

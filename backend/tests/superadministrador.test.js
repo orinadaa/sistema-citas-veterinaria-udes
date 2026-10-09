@@ -1,7 +1,7 @@
 // tests/superadministrador.test.js
 // Reparto de permisos entre el administrador de sede y el
 // superadministrador, y los paneles de inicio de cada uno.
-// - Configurar el sistema (sedes, catalogo de servicios, galeria, campos)
+// - Configurar el sistema (sedes, catalogo de servicios, galeria)
 //   es del superadministrador: el administrador de sede recibe 403.
 // - Cada panel de inicio es solo de su rol.
 
@@ -9,7 +9,6 @@ jest.mock('../src/models/tablero.model');
 jest.mock('../src/models/sede.model');
 jest.mock('../src/models/servicio.model');
 jest.mock('../src/models/galeria.model');
-jest.mock('../src/models/definicionCampo.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -34,8 +33,6 @@ describe('El administrador de sede no configura el sistema', () => {
     ['quitar la foto de un servicio', () => request(app).delete('/api/servicios/s1/foto')],
     ['ver la galeria de administracion', () => request(app).get('/api/galeria/admin')],
     ['reordenar la galeria', () => request(app).put('/api/galeria/orden').send({ ids: [] })],
-    ['crear un campo', () => request(app).post('/api/campos').send({ entidad: 'mascota', etiqueta: 'X', tipo: 'texto' })],
-    ['reordenar campos', () => request(app).put('/api/campos/orden').send({ entidad: 'mascota', ids: [] })],
   ])('no puede %s (403)', async (_nombre, peticion) => {
     const respuesta = await con(peticion(), TOKEN_ADMIN);
     expect(respuesta.status).toBe(403);
