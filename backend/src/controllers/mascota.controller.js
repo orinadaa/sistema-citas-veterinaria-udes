@@ -3,6 +3,7 @@
 // verlas/crearlas/editarlas para cualquier cliente (pantalla de
 // Pacientes del panel administrativo).
 const mascotaModel = require('../models/mascota.model');
+const notificaciones = require('../services/notificaciones.service');
 const usuarioModel = require('../models/usuario.model');
 const pacienteMedicoModel = require('../models/pacienteMedico.model');
 const fs = require('fs/promises');
@@ -147,6 +148,7 @@ async function crear(req, res, next) {
       condicionesMedicas,
       observaciones,
     });
+    await notificaciones.mascotaRegistrada(mascota, req.usuario.id);
     return res.status(201).json({ mascota });
   } catch (error) {
     next(error);

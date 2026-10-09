@@ -8,6 +8,7 @@ const citaModel = require('../models/cita.model');
 const pacienteMedicoModel = require('../models/pacienteMedico.model');
 const recordatorioModel = require('../models/recordatorio.model');
 const correoService = require('../services/correo.service');
+const notificaciones = require('../services/notificaciones.service');
 
 // Mismo umbral que "frecuente" en Pacientes del administrador.
 const UMBRAL_FRECUENTE = 3;
@@ -166,6 +167,20 @@ async function crearRecordatorio(req, res, next) {
     } catch (error) {
       correoEnviado = false;
       console.error('No se pudo enviar el correo del recordatorio:', error.message);
+    }
+    // Aviso en la campana del dueño (aunque el correo haya fallado).
+    try {
+      const medico = await usuarioModel.buscarPorId(req.usuario.id);
+      await notificaciones.recordatorioDelMedico({
+        clienteId: mascota.cliente_id,
+        nombreMascota: mascota.nombre,
+        nombreMedico: medico?.nombre_completo ?? 'Tu médico veterinario',
+        titulo: recordatorio.titulo,
+        fechaTexto: formatoFechaRecordatorio.format(momento),
+        hora,
+      });
+    } catch (error) {
+      console.error('No se pudo crear la notificación del recordatorio:', error.message);
     }
 
     return res.status(201).json({ recordatorio, correoEnviado });

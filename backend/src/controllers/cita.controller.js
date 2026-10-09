@@ -17,6 +17,7 @@ const usuarioModel = require('../models/usuario.model');
 const horarioModel = require('../models/horario.model');
 const mascotaModel = require('../models/mascota.model');
 const correoService = require('../services/correo.service');
+const notificaciones = require('../services/notificaciones.service');
 const { generarFranjasEntreHoras, DURACION_SLOT_MINUTOS } = require('../utils/franjas');
 const disponibilidadModel = require('../models/disponibilidadMedico.model');
 const { medicoAtiende } = require('../utils/disponibilidadMedico');
@@ -352,6 +353,7 @@ async function crear(req, res, next) {
 
     const detalle = (await citaModel.buscarDetallePorId(creada.id)) || creada;
     const correoEnviado = await intentarEnviarConfirmacion(detalle);
+    await notificaciones.citaAgendada(creada.id, req.usuario.id);
 
     return res.status(201).json({ cita: detalle, correoEnviado });
   } catch (error) {
@@ -436,6 +438,7 @@ async function reprogramarCita(req, res, next) {
     }
 
     const actualizada = await citaModel.reprogramar(id, fecha);
+    if (actualizada && !esLaMismaFranjaActual) await notificaciones.citaReprogramada(id, req.usuario.id, cita.fecha_hora);
     return res.status(200).json({ cita: actualizada });
   } catch (error) {
     if (error.code === '23505') {
@@ -460,6 +463,7 @@ async function cancelarCita(req, res, next) {
     }
 
     const actualizada = await citaModel.cancelar(id);
+    if (actualizada) await notificaciones.citaCancelada(id, req.usuario.id);
     return res.status(200).json({ cita: actualizada });
   } catch (error) {
     next(error);

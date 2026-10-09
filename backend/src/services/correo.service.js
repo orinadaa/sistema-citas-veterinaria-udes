@@ -184,7 +184,31 @@ async function enviarRecordatorioCreado({ correo, nombreCliente, nombreMascota, 
   });
 }
 
+// RF-18: recordatorio automatico de una cita que empieza en las proximas 24
+// horas. `cita` viene de notificacion.model.js#detalleCita, con fechaTexto.
+async function enviarRecordatorioCita(cita) {
+  await enviarCorreo({
+    para: cita.cliente_correo,
+    asunto: `Recordatorio de tu cita ${cita.codigo} — Clínica Veterinaria UDES`,
+    texto: [
+      `Hola ${cita.cliente_nombre},`,
+      '',
+      `Te recordamos que ${cita.mascota_nombre} tiene una cita pronto:`,
+      '',
+      `Servicio: ${cita.servicio_nombre}`,
+      `Fecha y hora: ${cita.fechaTexto}`,
+      `Sede: ${cita.sede_nombre}`,
+      `Médico veterinario: ${cita.medico_nombre}`,
+      '',
+      'Te recomendamos llegar 10 minutos antes. Si no puedes asistir, reprograma o cancela desde "Mis citas" en tu cuenta.',
+      '',
+      'Clínica Veterinaria UDES',
+    ].join('\n'),
+  });
+}
+
 module.exports = {
+  enviarRecordatorioCita,
   enviarCredenciales,
   enviarBienvenidaCliente,
   enviarCodigoRecuperacion,
