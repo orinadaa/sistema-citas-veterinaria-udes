@@ -31,7 +31,15 @@ export function PanelClientePage({ seccion = 'inicio' }) {
   const [parametros] = useSearchParams();
   // ?tab=mascotas (ej. desde el atajo "Mis mascotas" del menu del
   // navbar, Navbar.jsx) preselecciona esa pestaña al entrar.
-  const [pestana, setPestana] = useState(parametros.get('tab') === 'mascotas' ? 'mascotas' : 'citas');
+  const tabUrl = parametros.get('tab');
+  const [pestana, setPestana] = useState(tabUrl === 'mascotas' ? 'mascotas' : 'citas');
+  // Si la URL cambia de pestaña estando ya en la pagina (una notificacion o
+  // el menu del avatar), se sigue (ajuste durante el render).
+  const [tabVista, setTabVista] = useState(tabUrl);
+  if (tabUrl !== tabVista) {
+    setTabVista(tabUrl);
+    if (tabUrl === 'mascotas' || tabUrl === 'citas') setPestana(tabUrl);
+  }
 
   const [citas, setCitas] = useState([]);
   const [cargandoCitas, setCargandoCitas] = useState(true);

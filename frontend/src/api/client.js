@@ -37,6 +37,19 @@ export function establecerPrimeraClave(contrasenaNueva, token) {
   return solicitar('/auth/primera-clave', { metodo: 'POST', cuerpo: { contrasenaNueva }, token });
 }
 
+// La campana: notificaciones de quien inicio sesion.
+export function obtenerNotificaciones(token) {
+  return solicitar('/notificaciones', { token });
+}
+
+export function marcarNotificacionLeida(id, token) {
+  return solicitar(`/notificaciones/${id}/leida`, { metodo: 'PATCH', token });
+}
+
+export function marcarNotificacionesLeidas(token) {
+  return solicitar('/notificaciones/leidas', { metodo: 'PATCH', token });
+}
+
 // "Mi perfil" del cliente.
 export function obtenerPerfilCliente(token) {
   return solicitar('/cuenta/perfil', { token });

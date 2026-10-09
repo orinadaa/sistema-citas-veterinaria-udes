@@ -8,8 +8,9 @@
 // precarga el filtro de esa pantalla con el termino buscado. (El medico
 // veterinario ya no usa este panel: su vista es /medico.)
 import { useEffect, useRef, useState } from 'react';
-import { IconoBuscar, IconoCampana, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona, IconoSalir, IconoSede } from '../icons';
+import { IconoBuscar, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona, IconoSalir, IconoSede } from '../icons';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
+import { Notificaciones } from './Notificaciones';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerSedesAdmin, obtenerUsuarios } from '../../api/client';
 
 // 'veterinario' se usa para rotular resultados de busqueda de usuarios.
@@ -264,11 +265,9 @@ export function AdminHeader({ onNavegar }) {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Campana: adorno hasta que exista el modulo de notificaciones. No
-            es un boton (no hace nada): no reacciona al mouse ni recibe foco. */}
-        <span aria-hidden="true" className="vidrio flex h-[52px] w-[52px] items-center justify-center rounded-full text-white">
-          <IconoCampana className="h-5 w-5" />
-        </span>
+        {/* Campana: notificaciones. El enlace de un aviso del panel es el
+            nombre de un modulo (ej. "citas"). */}
+        <Notificaciones variante="panel" onIr={(enlace) => !enlace.startsWith('/') && onNavegar?.(enlace)} />
 
         <div className={`relative ${menuAbierto ? 'z-50' : ''}`}>
           <button

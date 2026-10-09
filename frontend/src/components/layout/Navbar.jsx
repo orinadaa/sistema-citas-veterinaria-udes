@@ -37,7 +37,8 @@ import logoCortoBlanco from '../../assets/logocortoblanco.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
 import { salirConPermiso } from '../../utils/guardiaSalida';
-import { IconoCalendario, IconoCampana, IconoChevronAbajo, IconoSalir } from '../icons';
+import { IconoCalendario, IconoChevronAbajo, IconoSalir } from '../icons';
+import { Notificaciones } from './Notificaciones';
 
 // 260px de scroll para toda la transicion: con 160px una sola vuelta de
 // la rueda del mouse (~100px) se comia mas de media transicion de golpe.
@@ -461,13 +462,8 @@ export function Navbar({ onAgendar } = {}) {
           <div ref={grupoDerechoRef} className="flex items-center gap-2 justify-self-end md:justify-between md:justify-self-stretch">
             {estaAutenticado ? (
               <div className="hidden items-center gap-2 sm:flex">
-                {/* Campana: adorno hasta que exista el modulo de notificaciones
-                    (incremento 5). No es un boton: no hace nada, asi que no
-                    reacciona al mouse ni recibe foco. Conserva su tamaño para
-                    no mover el centrado de la topbar. */}
-                <span aria-hidden="true" className="relative hidden p-2 text-white/80 xl:inline-flex">
-                  <IconoCampana className="h-5 w-5" />
-                </span>
+                {/* Campana: notificaciones del cliente o del medico. */}
+                <Notificaciones variante="pildora" onIr={(enlace) => enlace.startsWith('/') && navegar(enlace)} />
 
                 <div className="relative">
                   <button
