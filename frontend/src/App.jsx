@@ -7,6 +7,7 @@ import { RegistroPage } from './pages/RegistroPage';
 import { OlvideClavePage } from './pages/OlvideClavePage';
 import { PanelClientePage } from './pages/PanelClientePage';
 import { ROLES_DEL_PANEL } from './utils/rutas';
+import { PanelMedicoPage } from './pages/PanelMedicoPage';
 import { PanelAdminPage } from './pages/PanelAdminPage';
 import { AgendarCitaPage } from './pages/AgendarCitaPage';
 import { GuiaVetuiPage } from './pages/GuiaVetuiPage';
@@ -34,6 +35,22 @@ function Rutas() {
             element={
               <ProtectedRoute rolesPermitidos={['cliente']}>
                 <AgendarCitaPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medico"
+            element={
+              <ProtectedRoute rolesPermitidos={['veterinario']}>
+                <PanelMedicoPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/medico/perfil"
+            element={
+              <ProtectedRoute rolesPermitidos={['veterinario']}>
+                <PanelMedicoPage seccion="perfil" />
               </ProtectedRoute>
             }
           />

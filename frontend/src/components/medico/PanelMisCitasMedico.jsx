@@ -48,7 +48,9 @@ function hoyAMedianoche() {
   return hoy;
 }
 
-export function PanelMisCitasMedico() {
+// senalAgendar: contador que sube cada vez que se pulsa "Agendar cita" en la
+// pildora (PanelMedicoPage); al cambiar, se abre el panel de agendar.
+export function PanelMisCitasMedico({ senalAgendar = 0 }) {
   const { token } = useAuth();
   const [citas, setCitas] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -57,7 +59,13 @@ export function PanelMisCitasMedico() {
   const [vista, setVista] = useState('semana');
   const [diaSeleccionado, setDiaSeleccionado] = useState(hoyAMedianoche);
   const [citaDetalle, setCitaDetalle] = useState(null);
-  const [agendarAbierto, setAgendarAbierto] = useState(false);
+  const [agendarAbierto, setAgendarAbierto] = useState(senalAgendar > 0);
+  // Ajuste durante el render (sin efecto): una señal nueva abre el panel.
+  const [senalVista, setSenalVista] = useState(senalAgendar);
+  if (senalAgendar !== senalVista) {
+    setSenalVista(senalAgendar);
+    setAgendarAbierto(true);
+  }
   const [recordatorioPara, setRecordatorioPara] = useState(null); // { mascota, dueno }
 
   const cargar = useCallback(() => {

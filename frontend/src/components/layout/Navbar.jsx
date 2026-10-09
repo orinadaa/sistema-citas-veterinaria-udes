@@ -125,13 +125,19 @@ function aplicarFlow(elemento, t, material) {
   estilo.boxShadow = material.sombra(t);
 }
 
-export function Navbar() {
+// onAgendar (opcional, solo medico): lo que hace su boton "Agendar cita"
+// (abrir su panel de agendar). Sin el, lleva a /medico con el panel abierto.
+export function Navbar({ onAgendar } = {}) {
   const { estaAutenticado, usuario } = useAuth();
   const navegar = useNavigate();
   const ubicacion = useLocation();
   const enLanding = ubicacion.pathname === '/';
   const [menuAbierto, setMenuAbierto] = useState(false);
   const esCliente = usuario?.rol === 'cliente';
+  // Medico veterinario: la misma pildora, con accesos a SU trabajo en vez de
+  // los enlaces publicos, "Mi perfil" en el menu del avatar y "Agendar cita"
+  // que abre su panel de agendar (decisiones de Oriana).
+  const esMedico = usuario?.rol === 'veterinario';
   const barraRef = useRef(null);
   const headerRef = useRef(null);
   const perfilRef = useRef(null);
@@ -195,7 +201,7 @@ export function Navbar() {
     if (navRef.current) observador.observe(navRef.current);
     if (grupoDerechoRef.current) observador.observe(grupoDerechoRef.current);
     return () => observador.disconnect();
-  }, [estaAutenticado, enLanding]);
+  }, [estaAutenticado, enLanding, esMedico]);
 
   // Menu del perfil: mismo material que la pildora. Vive fuera de ella,
   // como hermano dentro del <header>: si estuviera dentro, su
@@ -313,6 +319,11 @@ export function Navbar() {
     .toUpperCase();
 
   function irAAgendar() {
+    if (esMedico) {
+      if (onAgendar) onAgendar();
+      else navegar('/medico', { state: { agendar: true } });
+      return;
+    }
     navegar(rutaAgendarCita(estaAutenticado));
   }
 
@@ -348,9 +359,19 @@ export function Navbar() {
                   solo desde el landing: si el usuario esta en /panel, primero
                   navega a "/" y LandingPage.jsx hace scroll al hash una vez
                   montada (ver su useEffect sobre location.hash). */}
-              <Link to="/#servicios" className="hover-texto-ilumina transition hover:text-white">Servicios</Link>
-              <Link to="/#sedes" className="hover-texto-ilumina transition hover:text-white">Sedes</Link>
-              <Link to="/#horarios" className="hover-texto-ilumina transition hover:text-white">Horarios</Link>
+              {esMedico ? (
+                <>
+                  <Link to="/medico" className="hover-texto-ilumina transition hover:text-white">Mis citas</Link>
+                  <Link to="/medico?tab=pacientes" className="hover-texto-ilumina transition hover:text-white">Mis pacientes</Link>
+                  <Link to="/medico/perfil?tab=disponibilidad" className="hover-texto-ilumina transition hover:text-white">Disponibilidad</Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/#servicios" className="hover-texto-ilumina transition hover:text-white">Servicios</Link>
+                  <Link to="/#sedes" className="hover-texto-ilumina transition hover:text-white">Sedes</Link>
+                  <Link to="/#horarios" className="hover-texto-ilumina transition hover:text-white">Horarios</Link>
+                </>
+              )}
             </nav>
           </div>
 
@@ -361,8 +382,8 @@ export function Navbar() {
               pildora (64px) y todo el contenido se veria corrido hacia abajo. */}
           <Link
             ref={logoRef}
-            to="/"
-            aria-label="Clínica Veterinaria UDES, ir al inicio"
+            to={esMedico ? '/medico' : '/'}
+            aria-label={esMedico ? 'Clínica Veterinaria UDES, ir a mis citas' : 'Clínica Veterinaria UDES, ir al inicio'}
             // El Link solo cambia la ruta: si ya se esta en el landing (o se
             // viene de otra pagina con scroll) la vista no subiria sola. Se
             // lleva arriba aca: suave dentro del landing, directo desde otra.
@@ -522,7 +543,15 @@ export function Navbar() {
           {/* Atajos para volver al panel propio despues de
               navegar a una seccion del landing (Servicios/Sedes/
               Horarios) sin perder la sesion. */}
-          {esCliente ? (
+          {esMedico ? (
+            <Link
+              to="/medico/perfil"
+              onClick={() => setMenuAbierto(false)}
+              className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+            >
+              Mi perfil
+            </Link>
+          ) : esCliente ? (
             <>
               <Link
                 to="/panel?tab=citas"

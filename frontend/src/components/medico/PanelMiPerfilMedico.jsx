@@ -234,9 +234,10 @@ function CambioCorreo({ correoActual, onCambiado }) {
   );
 }
 
-export function PanelMiPerfilMedico() {
+// pestanaInicial: 'disponibilidad' llega del acceso "Disponibilidad" de la pildora.
+export function PanelMiPerfilMedico({ pestanaInicial }) {
   const { token, usuario, iniciarSesion } = useAuth();
-  const [pestana, setPestana] = useState('personal');
+  const [pestana, setPestana] = useState(['profesional', 'disponibilidad'].includes(pestanaInicial) ? pestanaInicial : 'personal');
   const [perfil, setPerfil] = useState(null);
   const [errorCarga, setErrorCarga] = useState('');
   const [intento, setIntento] = useState(0);
