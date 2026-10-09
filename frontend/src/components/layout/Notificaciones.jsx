@@ -12,9 +12,13 @@
 // - Se cierra con Escape o con un clic afuera.
 // - Lo no leido no se distingue solo por color: lleva un punto y negrita, y
 //   el boton anuncia el numero a los lectores de pantalla.
-// El panel es azul opaco (no vidrio): en la pildora quedaria anidado dentro
-// de otro vidrio y el navegador no desenfocaria la pagina de atras.
-import { useCallback, useEffect, useRef, useState } from 'react';
+// El panel es el mismo vidrio azul translucido del menu del perfil de la
+// pildora (pedido de Oriana). Se dibuja en <body> (portal), no dentro de la
+// pildora: ahi quedaria anidado en otro vidrio y el navegador solo
+// desenfocaria la pildora, no la pagina de atras. Por eso se ubica a mano,
+// debajo de la campana, y se reubica al desplazar o cambiar el tamaño.
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { marcarNotificacionLeida, marcarNotificacionesLeidas, obtenerNotificaciones } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { IconoCalendario, IconoCampana, IconoPata, IconoReloj, IconoX } from '../icons';
@@ -51,6 +55,7 @@ export function Notificaciones({ variante = 'pildora', onIr }) {
   const [datos, setDatos] = useState({ notificaciones: [], sinLeer: 0 });
   const [cargado, setCargado] = useState(false);
   const contenedor = useRef(null);
+  const panel = useRef(null);
 
   const cargar = useCallback(() => {
     obtenerNotificaciones(token)
@@ -71,7 +76,8 @@ export function Notificaciones({ variante = 'pildora', onIr }) {
   useEffect(() => {
     if (!abierto) return undefined;
     function alHacerClic(evento) {
-      if (contenedor.current && !contenedor.current.contains(evento.target)) setAbierto(false);
+      if (contenedor.current?.contains(evento.target) || panel.current?.contains(evento.target)) return;
+      setAbierto(false);
     }
     function alPulsarTecla(evento) {
       if (evento.key === 'Escape') setAbierto(false);
@@ -81,6 +87,24 @@ export function Notificaciones({ variante = 'pildora', onIr }) {
     return () => {
       document.removeEventListener('mousedown', alHacerClic);
       document.removeEventListener('keydown', alPulsarTecla);
+    };
+  }, [abierto]);
+
+  // Ubica el panel bajo la campana, alineado a su borde derecho.
+  useLayoutEffect(() => {
+    if (!abierto) return undefined;
+    function ubicar() {
+      const boton = contenedor.current?.getBoundingClientRect();
+      if (!boton || !panel.current) return;
+      panel.current.style.top = `${boton.bottom + 14}px`;
+      panel.current.style.right = `${Math.max(16, window.innerWidth - boton.right)}px`;
+    }
+    ubicar();
+    window.addEventListener('scroll', ubicar, { passive: true });
+    window.addEventListener('resize', ubicar);
+    return () => {
+      window.removeEventListener('scroll', ubicar);
+      window.removeEventListener('resize', ubicar);
     };
   }, [abierto]);
 
@@ -131,11 +155,15 @@ export function Notificaciones({ variante = 'pildora', onIr }) {
         )}
       </button>
 
-      {abierto && (
+      {abierto &&
+        createPortal(
         <div
+          ref={panel}
           role="dialog"
           aria-label="Notificaciones"
-          className="absolute right-0 top-full z-50 mt-3 flex max-h-[min(32rem,calc(100vh-7rem))] w-[23rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden whitespace-normal rounded-superficie bg-brand-blue-800 text-left text-white shadow-[0_24px_60px_-20px_rgb(0_0_0/0.6)] ring-1 ring-white/20"
+          // Mismo material del menu del perfil (Navbar): brand-blue-800 al
+          // 50% con el fondo desenfocado y oscurecido.
+          className="fixed z-50 flex max-h-[min(32rem,calc(100vh-7rem))] w-[23rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden whitespace-normal rounded-superficie bg-brand-blue-800/50 text-left text-white shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5),inset_0_0_0_1px_rgb(203_213_225/0.2),inset_0_1px_0_rgb(226_232_240/0.3)] backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]"
         >
           <div className="flex items-center justify-between gap-3 border-b border-white/15 px-5 py-3.5">
             <p className="font-heading text-base font-semibold">Notificaciones</p>
@@ -187,8 +215,9 @@ export function Notificaciones({ variante = 'pildora', onIr }) {
               })}
             </ul>
           )}
-        </div>
-      )}
+        </div>,
+        document.body
+        )}
     </div>
   );
 }
