@@ -25,7 +25,6 @@ beforeEach(() => {
   process.env.NOTIFICACIONES_EN_PRUEBAS = '1';
   notificacionModel.crear.mockResolvedValue();
   notificacionModel.detalleCita.mockResolvedValue(CITA);
-  notificacionModel.administradoresDeSede.mockResolvedValue(['a1', 'a2']);
 });
 afterAll(() => delete process.env.NOTIFICACIONES_EN_PRUEBAS);
 
@@ -35,6 +34,14 @@ const para = (usuarioId) => creadas().filter((a) => a.usuarioId === usuarioId);
 describe('La campana (/api/notificaciones)', () => {
   test('exige sesion', async () => {
     expect((await request(app).get('/api/notificaciones')).status).toBe(401);
+  });
+
+  test('el administrador y el superadministrador no tienen notificaciones; el medico si', async () => {
+    const como = (datos) => request(app).get('/api/notificaciones').set('Authorization', 'Bearer ' + jwt.sign(datos, process.env.JWT_SECRET));
+    notificacionModel.listarDeUsuario.mockResolvedValue({ notificaciones: [], sinLeer: 0 });
+    expect((await como({ id: 'a1', rol: 'administrador', sedeId: 's1' })).status).toBe(403);
+    expect((await como({ id: 'su', rol: 'superadministrador' })).status).toBe(403);
+    expect((await como({ id: 'm1', rol: 'veterinario', sedeId: 's1' })).status).toBe(200);
   });
 
   test('lista solo las del usuario que inicio sesion', async () => {
@@ -60,14 +67,12 @@ describe('La campana (/api/notificaciones)', () => {
 });
 
 describe('Avisos de citas', () => {
-  test('cita agendada por el cliente: avisa al cliente, al medico y a los administradores de la sede', async () => {
+  test('cita agendada por el cliente: avisa al cliente y al medico, y a nadie mas', async () => {
     await servicio.citaAgendada('ci1', 'c1');
-    expect(creadas()).toHaveLength(4);
+    expect(creadas()).toHaveLength(2);
     expect(para('c1')[0]).toMatchObject({ tipo: 'cita_agendada', titulo: 'Cita agendada', enlace: '/panel?tab=citas' });
     expect(para('c1')[0].mensaje).toMatch(/^Agendaste Vacunación para Luna/);
     expect(para('m1')[0]).toMatchObject({ titulo: 'Nueva cita', enlace: '/medico' });
-    expect(para('a1')[0]).toMatchObject({ enlace: 'citas' });
-    expect(para('a1')[0].mensaje).toMatch(/Médico: Dr\. Ruiz/);
   });
 
   test('si la agenda el medico, el no recibe su propio aviso y al cliente se le dice que fue la clinica', async () => {
@@ -76,10 +81,9 @@ describe('Avisos de citas', () => {
     expect(para('c1')[0].mensaje).toMatch(/^La clínica agendó/);
   });
 
-  test('si la agenda un administrador, ese administrador no se avisa a si mismo', async () => {
+  test('si la agenda un administrador, se avisa al cliente y al medico, nunca al administrador', async () => {
     await servicio.citaAgendada('ci1', 'a1');
-    expect(para('a1')).toHaveLength(0);
-    expect(para('a2')).toHaveLength(1);
+    expect(creadas().map((a) => a.usuarioId).sort()).toEqual(['c1', 'm1']);
   });
 
   test('reprogramada: dice de que fecha a que fecha', async () => {
@@ -89,9 +93,9 @@ describe('Avisos de citas', () => {
     expect(para('m1')).toHaveLength(1);
   });
 
-  test('cancelada: avisa a los tres', async () => {
+  test('cancelada: avisa al cliente y al medico', async () => {
     await servicio.citaCancelada('ci1', 'c1');
-    expect(creadas().map((a) => a.tipo)).toEqual(['cita_cancelada', 'cita_cancelada', 'cita_cancelada', 'cita_cancelada']);
+    expect(creadas().map((a) => a.tipo)).toEqual(['cita_cancelada', 'cita_cancelada']);
   });
 
   test('un fallo al guardar el aviso no rompe la accion', async () => {

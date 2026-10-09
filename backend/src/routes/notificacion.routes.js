@@ -1,11 +1,12 @@
 // routes/notificacion.routes.js
-// La campana: cualquier usuario con sesion ve y marca SUS notificaciones.
+// La campana: el cliente y el medico ven y marcan SUS notificaciones. Los
+// administradores y el superadministrador no tienen notificaciones.
 const express = require('express');
 const notificacionModel = require('../models/notificacion.model');
-const { verificarToken } = require('../middlewares/auth.middleware');
+const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
-router.use(verificarToken);
+router.use(verificarToken, verificarRol('cliente', 'veterinario'));
 
 // GET /api/notificaciones — las ultimas 30 y cuantas hay sin leer
 router.get('/', async (req, res, next) => {

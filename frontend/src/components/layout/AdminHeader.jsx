@@ -10,7 +10,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { IconoBuscar, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona, IconoSalir, IconoSede } from '../icons';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
-import { Notificaciones } from './Notificaciones';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerSedesAdmin, obtenerUsuarios } from '../../api/client';
 
 // 'veterinario' se usa para rotular resultados de busqueda de usuarios.
@@ -265,9 +264,8 @@ export function AdminHeader({ onNavegar }) {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Campana: notificaciones. El enlace de un aviso del panel es el
-            nombre de un modulo (ej. "citas"). */}
-        <Notificaciones variante="panel" onIr={(enlace) => !enlace.startsWith('/') && onNavegar?.(enlace)} />
+        {/* Sin campana: el administrador y el superadministrador no tienen
+            notificaciones (decision de Oriana); son del cliente y del medico. */}
 
         <div className={`relative ${menuAbierto ? 'z-50' : ''}`}>
           <button

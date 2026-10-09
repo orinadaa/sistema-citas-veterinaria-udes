@@ -316,7 +316,7 @@ async function quitar() {
     const citas = await cliente.query(`DELETE FROM cita WHERE cliente_id IN (${demo}) OR medico_id IN (${demo})`);
     await cliente.query(`DELETE FROM recordatorio WHERE cliente_id IN (${demo}) OR medico_id IN (${demo}) OR mascota_id IN (SELECT id FROM mascota WHERE cliente_id IN (${demo}))`);
     const mascotas = await cliente.query(`DELETE FROM mascota WHERE cliente_id IN (${demo})`);
-    for (const tabla of ['servicio_medico|medico_id', 'usuario_especialidad|usuario_id', 'horario_medico|medico_id', 'bloqueo_medico|medico_id', 'codigo_recuperacion|usuario_id', 'verificacion_correo|usuario_id']) {
+    for (const tabla of ['notificacion|usuario_id', 'servicio_medico|medico_id', 'usuario_especialidad|usuario_id', 'horario_medico|medico_id', 'bloqueo_medico|medico_id', 'codigo_recuperacion|usuario_id', 'verificacion_correo|usuario_id']) {
       const [nombre, columna] = tabla.split('|');
       await cliente.query(`DELETE FROM ${nombre} WHERE ${columna} IN (${demo})`);
     }

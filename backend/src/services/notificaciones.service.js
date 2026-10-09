@@ -8,8 +8,9 @@
 //   guardar, se anota en la consola y la cita (o la mascota) queda igual.
 // - No se avisa a quien hizo la accion de lo que el mismo acaba de hacer,
 //   salvo al cliente, que siempre ve el registro de sus citas y mascotas.
-// - Destinatarios de una cita: el cliente, el medico que la atiende y los
-//   administradores de esa sede.
+// - Destinatarios de una cita: el cliente y el medico que la atiende. Los
+//   administradores y el superadministrador NO reciben notificaciones
+//   (decision de Oriana): ven las citas en su panel.
 // - En las pruebas automaticas no escribe (los modelos estan simulados).
 const notificacionModel = require('../models/notificacion.model');
 const correoService = require('./correo.service');
@@ -34,23 +35,18 @@ async function enviar(avisos) {
   );
 }
 
-// Arma los avisos de una cita para cliente, medico y administradores de la
-// sede. `actorId` es quien hizo la accion: no recibe su propio aviso, salvo
-// que sea el cliente.
+// Arma los avisos de una cita para el cliente y el medico. `actorId` es
+// quien hizo la accion: no recibe su propio aviso, salvo que sea el cliente.
 async function avisarCita(citaId, actorId, textos) {
   if (!activo()) return;
   try {
     const cita = await notificacionModel.detalleCita(citaId);
     if (!cita) return;
-    const admins = await notificacionModel.administradoresDeSede(cita.sede_id);
     const t = textos(cita, actorId === cita.cliente_id);
     const avisos = [{ usuarioId: cita.cliente_id, tipo: t.tipo, titulo: t.titulo, mensaje: t.cliente, enlace: '/panel?tab=citas' }];
     if (cita.medico_id !== actorId) {
       avisos.push({ usuarioId: cita.medico_id, tipo: t.tipo, titulo: t.tituloPersonal, mensaje: t.personal, enlace: '/medico' });
     }
-    admins
-      .filter((id) => id !== actorId)
-      .forEach((id) => avisos.push({ usuarioId: id, tipo: t.tipo, titulo: t.tituloPersonal, mensaje: `${t.personal} Médico: ${cita.medico_nombre}.`, enlace: 'citas' }));
     await enviar(avisos);
   } catch (error) {
     console.error('No se pudieron crear las notificaciones de la cita:', error.message);

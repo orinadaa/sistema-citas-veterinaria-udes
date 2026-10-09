@@ -2,12 +2,12 @@
 // La campana: boton con el numero de avisos sin leer y, al pulsarlo, el panel
 // con las ultimas notificaciones de quien inicio sesion (cita agendada,
 // reprogramada o cancelada, mascota registrada, recordatorio del medico y
-// recordatorio previo a la cita). La usan la pildora del cliente y del medico
-// (Navbar) y la barra del panel de administracion (AdminHeader).
+// recordatorio previo a la cita). Es del cliente y del medico (Navbar); el
+// administrador y el superadministrador no tienen notificaciones.
 //
 // - Se actualiza sola cada minuto y al abrir el panel.
 // - Pulsar un aviso lo marca como leido y lleva a donde corresponde (onIr
-//   recibe el enlace: una ruta, o el nombre de un modulo en el panel).
+//   recibe el enlace, una ruta).
 // - "Marcar todas como leídas" limpia el contador.
 // - Se cierra con Escape o con un clic afuera.
 // - Lo no leido no se distingue solo por color: lleva un punto y negrita, y
@@ -42,10 +42,7 @@ function haceCuanto(iso) {
 }
 
 const BOTON = {
-  // En la pildora flotante (cliente y medico): sin contenedor.
   pildora: 'boton-texto relative inline-flex rounded-boton p-2 text-white/90 transition',
-  // En el panel de administracion: una pildora de vidrio redonda.
-  panel: 'vidrio relative flex h-[52px] w-[52px] items-center justify-center rounded-full text-white transition',
 };
 
 export function Notificaciones({ variante = 'pildora', onIr }) {

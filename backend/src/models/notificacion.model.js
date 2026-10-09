@@ -49,11 +49,6 @@ async function detalleCita(citaId) {
   return resultado.rows[0] || null;
 }
 
-async function administradoresDeSede(sedeId) {
-  const resultado = await pool.query("SELECT id FROM usuario WHERE rol = 'administrador' AND activo AND sede_id = $1", [sedeId]);
-  return resultado.rows.map((fila) => fila.id);
-}
-
 // Recordatorio previo (RF-18): toma las citas activas que empiezan dentro
 // de `horas` y aun no lo tienen, y las marca en la MISMA consulta: asi dos
 // ejecuciones a la vez nunca avisan dos veces de la misma cita.
@@ -68,4 +63,4 @@ async function tomarCitasParaRecordar(horas) {
   return resultado.rows.map((fila) => fila.id);
 }
 
-module.exports = { crear, listarDeUsuario, marcarLeida, marcarTodasLeidas, detalleCita, administradoresDeSede, tomarCitasParaRecordar };
+module.exports = { crear, listarDeUsuario, marcarLeida, marcarTodasLeidas, detalleCita, tomarCitasParaRecordar };
