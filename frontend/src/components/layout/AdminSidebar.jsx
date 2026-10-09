@@ -28,7 +28,6 @@ import {
   IconoGrafica,
   IconoInicio,
   IconoGlobo,
-  IconoCampos,
   IconoCatalogo,
   IconoFlechaDerecha,
   IconoSalir,
@@ -55,7 +54,6 @@ const ITEMS_SUPER = [
   { id: 'usuarios', etiqueta: 'Usuarios', icono: IconoMedicos },
   { id: 'servicios', etiqueta: 'Servicios', icono: IconoJeringa },
   { id: 'web', etiqueta: 'Página web', icono: IconoGlobo },
-  { id: 'campos', etiqueta: 'Campos', icono: IconoCampos },
   { id: 'catalogos', etiqueta: 'Catálogos', icono: IconoCatalogo },
   { id: 'reportes', etiqueta: 'Reportes', icono: IconoGrafica },
 ];

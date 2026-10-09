@@ -49,7 +49,6 @@ import { PawPrintIcon } from '@phosphor-icons/react/dist/csr/PawPrint';
 import { PencilSimpleIcon } from '@phosphor-icons/react/dist/csr/PencilSimple';
 import { GlobeIcon } from '@phosphor-icons/react/dist/csr/Globe';
 import { HouseIcon } from '@phosphor-icons/react/dist/csr/House';
-import { ListBulletsIcon } from '@phosphor-icons/react/dist/csr/ListBullets';
 import { StackIcon } from '@phosphor-icons/react/dist/csr/Stack';
 import { PillIcon } from '@phosphor-icons/react/dist/csr/Pill';
 import { PlusIcon } from '@phosphor-icons/react/dist/csr/Plus';
@@ -161,15 +160,12 @@ export function IconoRotar(props) {
 export function IconoDestello(props) {
   return <Icono de={SparkleIcon} {...props} />;
 }
-// Menu del panel: inicio, pagina web, campos de formulario y catalogos.
+// Menu del panel: inicio, pagina web y catalogos.
 export function IconoInicio(props) {
   return <Icono de={HouseIcon} {...props} />;
 }
 export function IconoGlobo(props) {
   return <Icono de={GlobeIcon} {...props} />;
-}
-export function IconoCampos(props) {
-  return <Icono de={ListBulletsIcon} {...props} />;
 }
 export function IconoCatalogo(props) {
   return <Icono de={StackIcon} {...props} />;

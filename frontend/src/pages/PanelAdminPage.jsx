@@ -2,8 +2,8 @@
 // Panel interno (/admin). Tres roles, cada uno con sus modulos (el menu
 // lateral, AdminSidebar, muestra los mismos):
 // - Superadministrador: administra el sistema completo sin programar
-//   (sedes, cuentas, catalogo de servicios, pagina web, campos de los
-//   formularios, catalogos, reportes de todas las sedes). No opera citas.
+//   (sedes, cuentas, catalogo de servicios, pagina web, catalogos, datos y
+//   reportes de todas las sedes). No opera citas.
 // - Administrador de sede: el dia a dia de SU sede (inicio, citas, medicos,
 //   pacientes, horario, reportes de su sede; los servicios, solo consulta).
 // - Medico veterinario: su propio modulo (components/medico/).
@@ -23,7 +23,6 @@ import { PanelCitasSeguimiento } from '../components/admin/PanelCitasSeguimiento
 import { PanelPacientes } from '../components/admin/PanelPacientes';
 import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
 import { PanelGaleria } from '../components/admin/PanelGaleria';
-import { PanelCampos } from '../components/admin/PanelCampos';
 import { PanelCatalogos } from '../components/admin/PanelCatalogos';
 import { PanelReportes } from '../components/admin/PanelReportes';
 import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
@@ -78,12 +77,6 @@ export function PanelAdminPage() {
               <div className="flex flex-col gap-6">
                 <PageHeader title="Página web" subtitle="Lo que ve cualquier visitante en la página pública de la clínica." />
                 <PanelGaleria />
-              </div>
-            )}
-            {esSuper && pestana === 'campos' && (
-              <div className="flex flex-col gap-6">
-                <PageHeader title="Campos" subtitle="Agrega campos a los formularios del sistema sin programar." />
-                <PanelCampos />
               </div>
             )}
             {esSuper && pestana === 'catalogos' && <PanelCatalogos />}

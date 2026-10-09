@@ -17,7 +17,6 @@ Decisiones de Oriana (8 de octubre de 2026). El sistema tenía un solo rol
 | Sedes | — | Crea, edita, activa y desactiva |
 | Usuarios | — | Crea administradores y médicos y les asigna rol y sede. Es el único que activa o desactiva cuentas, de personal y de clientes |
 | Página web | — | Galería de la portada |
-| Campos | — | Campos adicionales de los formularios |
 | Reportes | Solo de su sede | De todas las sedes, con filtro |
 
 Reglas que lo sostienen:
@@ -29,7 +28,7 @@ Reglas que lo sostienen:
   médico activo de esa sede lo tiene asignado. No hay una tabla aparte.
 - El rol `superadministrador` no se puede asignar ni quitar desde el sistema.
   La cuenta se crea con un comando (`npm run crear:superadmin`).
-- Nada se elimina: sedes, servicios, cuentas y campos solo se desactivan.
+- Nada se elimina: sedes, servicios y cuentas solo se desactivan.
 
 ## Panel de inicio del administrador de sede
 
@@ -70,7 +69,7 @@ Unitarias (`backend/tests`, modelos simulados):
 
 | Descripción | Entrada | Resultado esperado | Resultado obtenido |
 |---|---|---|---|
-| El administrador de sede no configura el sistema | Token de administrador contra crear/editar sede, crear/editar servicio, galería y campos (9 casos) | 403 en todos | Correcto |
+| El administrador de sede no configura el sistema | Token de administrador contra crear/editar sede, crear/editar servicio y galería (7 casos) | 403 en todos | Correcto |
 | El administrador de sede consulta sedes y catálogo | `GET /api/sedes/admin`, `GET /api/servicios/admin` | 200 | Correcto |
 | Solo lista clientes | `GET /api/usuarios?rol=cliente` / sin rol / `rol=veterinario` | 200 / 403 / 403 | Correcto |
 | No crea personal ni cambia roles | `POST /api/usuarios`, `PATCH /api/usuarios/:id/rol` | 403 | Correcto |

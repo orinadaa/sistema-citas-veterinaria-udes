@@ -1,8 +1,8 @@
 // components/admin/PanelConfiguracion.jsx
 // Configuracion, acotada a lo que tiene respaldo real: gestion de
 // cuentas de personal (Usuarios), Sedes (reutiliza PanelHorarios tal
-// cual), Galeria (fotos de la portada del sitio, PanelGaleria) y Campos
-// (campos personalizados de los formularios, PanelCampos). El resto de pestanas del mockup (Notificaciones, Seguridad,
+// cual). Desde la separacion de roles es el modulo "Usuarios" del
+// superadministrador. El resto de pestanas del mockup (Notificaciones, Seguridad,
 // Respaldo, Preferencias, Apariencia) no se construyen: sin RF/RNF ni
 // backend detras, ver docs/incremento_3_pruebas.md.
 import { useEffect, useMemo, useState } from 'react';

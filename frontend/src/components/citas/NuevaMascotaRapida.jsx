@@ -1,17 +1,14 @@
 // components/citas/NuevaMascotaRapida.jsx
 // Alta rapida de una mascota mientras el administrador agenda una cita
-// para un cliente (NuevaCitaModal): nombre, especie, raza y los campos
-// personalizados OBLIGATORIOS; el resto del perfil se completa despues en
-// la ficha del paciente. Crea la mascota a nombre del cliente indicado y
+// para un cliente (NuevaCitaModal): nombre, especie y raza; el resto del
+// perfil se completa despues en la ficha del paciente. Crea la mascota a nombre del cliente indicado y
 // avisa con onCreada(mascota) para dejarla elegida.
 // (Reemplaza al alta que traia el antiguo MascotaSelector.)
 import { useState } from 'react';
 import { crearMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { useCamposAdicionales } from '../../hooks/useCamposAdicionales';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
-import { CamposAdicionales } from '../form/CamposAdicionales';
 import { Boton } from '../vetui';
 
 export function NuevaMascotaRapida({ clienteId, onCreada, onCancelar }) {
@@ -21,7 +18,6 @@ export function NuevaMascotaRapida({ clienteId, onCreada, onCancelar }) {
   const [raza, setRaza] = useState('');
   const [creando, setCreando] = useState(false);
   const [error, setError] = useState('');
-  const campos = useCamposAdicionales('mascota');
 
   async function crear() {
     setError('');
@@ -29,21 +25,10 @@ export function NuevaMascotaRapida({ clienteId, onCreada, onCancelar }) {
       setError('Nombre, especie y raza de la mascota son obligatorios.');
       return;
     }
-    const faltaAdicional = campos.errorObligatorios();
-    if (faltaAdicional) {
-      setError(faltaAdicional);
-      return;
-    }
-
     setCreando(true);
     try {
-      const { mascota } = await crearMascota(
-        { nombre: nombre.trim(), especie, raza: raza.trim(), clienteId, camposAdicionales: campos.valoresParaEnviar() },
-        token
-      );
-      // La mascota ya existe: si un adjunto falla, se avisa pero se sigue.
-      const avisoArchivos = await campos.guardarArchivos(mascota.id);
-      onCreada(mascota, avisoArchivos);
+      const { mascota } = await crearMascota({ nombre: nombre.trim(), especie, raza: raza.trim(), clienteId }, token);
+      onCreada(mascota);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -65,7 +50,6 @@ export function NuevaMascotaRapida({ clienteId, onCreada, onCancelar }) {
           setRaza(valor.raza);
         }}
       />
-      <CamposAdicionales campos={campos} idPrefijo="nueva-mascota-extra" soloObligatorios titulo="Datos obligatorios adicionales" />
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

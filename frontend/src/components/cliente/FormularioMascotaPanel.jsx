@@ -21,8 +21,6 @@ import { useAuth } from '../../context/AuthContext';
 import { hoyComoFechaLocal } from '../../utils/fecha';
 import { Campo } from '../form/Campo';
 import { SelectorEspecieRaza } from '../form/SelectorEspecieRaza';
-import { CamposAdicionales } from '../form/CamposAdicionales';
-import { useCamposAdicionales } from '../../hooks/useCamposAdicionales';
 import { SelectorSexo } from '../form/SelectorSexo';
 import { CampoFecha } from '../form/CampoFecha';
 import { ZonaFoto } from '../form/ZonaFoto';
@@ -100,8 +98,6 @@ export function FormularioMascotaPanel({
 }) {
   const { token } = useAuth();
   const [form, setForm] = useState(() => formDesdeMascota(mascota));
-  // Campos personalizados que el administrador definio para la mascota.
-  const campos = useCamposAdicionales('mascota');
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
 
@@ -122,7 +118,6 @@ export function FormularioMascotaPanel({
     setAperturaPrevia({ isOpen, mascota, confirmarAlAbrir });
     if (isOpen) {
       setForm(formDesdeMascota(mascota));
-      campos.reiniciar(mascota);
       setError('');
       setErrorEliminar('');
       setConfirmandoEliminar(Boolean(mascota && confirmarAlAbrir));
@@ -160,11 +155,6 @@ export function FormularioMascotaPanel({
       setError('Nombre, especie y raza son obligatorios.');
       return;
     }
-    const faltaAdicional = campos.errorObligatorios();
-    if (faltaAdicional) {
-      setError(faltaAdicional);
-      return;
-    }
 
     setGuardando(true);
     // Los textos opcionales se mandan como texto (aunque vacio) para que
@@ -182,7 +172,6 @@ export function FormularioMascotaPanel({
       medicamentos: form.medicamentos.trim(),
       condicionesMedicas: form.condicionesMedicas.trim(),
       observaciones: form.observaciones.trim(),
-      camposAdicionales: campos.valoresParaEnviar(),
     };
 
     let guardada;
@@ -205,9 +194,6 @@ export function FormularioMascotaPanel({
         avisoFoto = `${guardada.nombre} se guardó, pero la foto no se pudo subir: ${err.message}`;
       }
     }
-    // Adjuntos de los campos personalizados de tipo archivo: mismo criterio.
-    const avisoArchivos = await campos.guardarArchivos(guardada.id);
-    if (avisoArchivos) avisoFoto = [avisoFoto, `${guardada.nombre} se guardó. ${avisoArchivos}`].filter(Boolean).join(' ');
     setGuardando(false);
     onGuardada(guardada, { avisoFoto });
   }
@@ -354,8 +340,6 @@ export function FormularioMascotaPanel({
             />
             <AreaTexto id="observaciones-mascota" label="Observaciones" value={form.observaciones} onChange={actualizar('observaciones')} />
           </fieldset>
-
-          <CamposAdicionales campos={campos} idPrefijo="mascota-cliente-extra" />
 
           {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">{error}</p>}
 

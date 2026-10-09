@@ -16,7 +16,7 @@ import { EstadoError } from '../ui/EstadoError';
 import { AvisosAtencion } from './AvisosAtencion';
 import { IconoSede, IconoMedicos, IconoPersona, IconoJeringa } from '../icons';
 
-const MODULOS = { catalogos: 'Ir a Catálogos', usuarios: 'Ir a Usuarios', sedes: 'Ir a Sedes', servicios: 'Ir a Servicios', web: 'Ir a Página web' };
+const MODULOS = { usuarios: 'Ir a Usuarios', sedes: 'Ir a Sedes', servicios: 'Ir a Servicios', web: 'Ir a Página web' };
 
 function Dato({ etiqueta, valor, alerta = false }) {
   return (
