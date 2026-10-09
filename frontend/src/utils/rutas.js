@@ -18,9 +18,12 @@ export function rutaAgendarCita(estaAutenticado, servicioId, sedeId) {
 // A donde va cada rol despues de iniciar sesion cuando no hay un
 // "next" explicito en la URL: /panel es la vista del cliente, /admin
 // es el panel administrativo/veterinario (ver App.jsx).
-export const ROLES_DEL_PANEL = ['superadministrador', 'administrador', 'veterinario'];
+// /admin: panel del superadministrador y del administrador de sede. El
+// medico veterinario tiene su propia vista en /medico (PanelMedicoPage).
+export const ROLES_DEL_PANEL = ['superadministrador', 'administrador'];
 
 export function rutaPanelPorRol(rol) {
+  if (rol === 'veterinario') return '/medico';
   return ROLES_DEL_PANEL.includes(rol) ? '/admin' : '/panel';
 }
 
@@ -37,14 +40,14 @@ const RUTAS_DEL_ROL = {
   cliente: ['/panel', '/agendar'],
   superadministrador: ['/admin'],
   administrador: ['/admin'],
-  veterinario: ['/admin'],
+  veterinario: ['/medico'],
 };
 
 export function destinoTrasLogin(siguienteExplicito, rol) {
   const panelDelRol = rutaPanelPorRol(rol);
   if (!siguienteExplicito) return panelDelRol;
   const permitido = (RUTAS_DEL_ROL[rol] || []).some(
-    (ruta) => siguienteExplicito === ruta || siguienteExplicito.startsWith(`${ruta}?`)
+    (ruta) => siguienteExplicito === ruta || siguienteExplicito.startsWith(`${ruta}?`) || siguienteExplicito.startsWith(`${ruta}/`)
   );
   return permitido ? siguienteExplicito : panelDelRol;
 }
