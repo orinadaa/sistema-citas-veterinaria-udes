@@ -37,7 +37,7 @@ import logoCortoBlanco from '../../assets/logocortoblanco.png';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
 import { salirConPermiso } from '../../utils/guardiaSalida';
-import { IconoCalendario, IconoChevronAbajo, IconoSalir } from '../icons';
+import { IconoCalendario, IconoChevronAbajo, IconoInicio, IconoPata, IconoPersona, IconoReloj, IconoSalir } from '../icons';
 import { Notificaciones } from './Notificaciones';
 
 // 260px de scroll para toda la transicion: con 160px una sola vuelta de
@@ -125,6 +125,12 @@ function aplicarFlow(elemento, t, material) {
   // Sombra exterior + borde de luz + brillo de 1px arriba (vidrio).
   estilo.boxShadow = material.sombra(t);
 }
+
+// Opciones del menu del perfil: el texto se alinea con el nombre (--sangria)
+// y el icono va a su izquierda, debajo del avatar, igual que "Cerrar sesión".
+const CLASE_OPCION =
+  'relative block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina';
+const CLASE_ICONO_OPCION = 'absolute left-[calc(var(--sangria,2.5rem)-1.5rem)] top-1/2 h-4 w-4 -translate-y-1/2';
 
 // onAgendar (opcional, solo medico): lo que hace su boton "Agendar cita"
 // (abrir su panel de agendar). Sin el, lleva a /medico con el panel abierto.
@@ -362,9 +368,18 @@ export function Navbar({ onAgendar } = {}) {
                   montada (ver su useEffect sobre location.hash). */}
               {esMedico ? (
                 <>
-                  <Link to="/medico" className="hover-texto-ilumina transition hover:text-white">Mis citas</Link>
-                  <Link to="/medico?tab=pacientes" className="hover-texto-ilumina transition hover:text-white">Mis pacientes</Link>
-                  <Link to="/medico/perfil?tab=disponibilidad" className="hover-texto-ilumina transition hover:text-white">Disponibilidad</Link>
+                  <Link to="/medico" className="hover-texto-ilumina inline-flex items-center gap-2 transition hover:text-white">
+                    <IconoCalendario className="h-4 w-4" />
+                    Mis citas
+                  </Link>
+                  <Link to="/medico?tab=pacientes" className="hover-texto-ilumina inline-flex items-center gap-2 transition hover:text-white">
+                    <IconoPata className="h-4 w-4" />
+                    Mis pacientes
+                  </Link>
+                  <Link to="/medico/perfil?tab=disponibilidad" className="hover-texto-ilumina inline-flex items-center gap-2 transition hover:text-white">
+                    <IconoReloj className="h-4 w-4" />
+                    Disponibilidad
+                  </Link>
                 </>
               ) : (
                 <>
@@ -543,8 +558,9 @@ export function Navbar({ onAgendar } = {}) {
             <Link
               to="/medico/perfil"
               onClick={() => setMenuAbierto(false)}
-              className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+              className={CLASE_OPCION}
             >
+              <IconoPersona className={CLASE_ICONO_OPCION} />
               Mi perfil
             </Link>
           ) : esCliente ? (
@@ -552,22 +568,25 @@ export function Navbar({ onAgendar } = {}) {
               <Link
                 to="/panel?tab=citas"
                 onClick={() => setMenuAbierto(false)}
-                className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+                className={CLASE_OPCION}
               >
+                <IconoCalendario className={CLASE_ICONO_OPCION} />
                 Mis citas
               </Link>
               <Link
                 to="/panel?tab=mascotas"
                 onClick={() => setMenuAbierto(false)}
-                className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+                className={CLASE_OPCION}
               >
+                <IconoPata className={CLASE_ICONO_OPCION} />
                 Mis mascotas
               </Link>
               <Link
                 to="/panel/perfil"
                 onClick={() => setMenuAbierto(false)}
-                className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+                className={CLASE_OPCION}
               >
+                <IconoPersona className={CLASE_ICONO_OPCION} />
                 Mi perfil
               </Link>
             </>
@@ -575,8 +594,9 @@ export function Navbar({ onAgendar } = {}) {
             <Link
               to={rutaPanelPorRol(usuario?.rol)}
               onClick={() => setMenuAbierto(false)}
-              className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+              className={CLASE_OPCION}
             >
+              <IconoInicio className={CLASE_ICONO_OPCION} />
               Ir al panel
             </Link>
           )}
