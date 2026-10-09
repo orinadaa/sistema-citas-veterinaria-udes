@@ -11,19 +11,22 @@ import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
 import { Boton, EncabezadoPagina, FondoVetui, Pestanas, TarjetaDato } from '../components/vetui';
 import { PanelMisCitas } from '../components/cliente/PanelMisCitas';
 import { PanelMisMascotas } from '../components/cliente/PanelMisMascotas';
+import { PanelMiPerfilCliente } from '../components/cliente/PanelMiPerfilCliente';
 import { estadoDeCita } from '../components/citas/DetalleCitaPanel';
 import { obtenerMisCitas, obtenerMisMascotas } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { formatearFechaLarga, formatearHora } from '../utils/fecha';
 import fotoMain from '../assets/foto-main.png';
-import { IconoCalendario, IconoPata, IconoCorazon, IconoMas } from '../components/icons';
+import { IconoCalendario, IconoFlechaDerecha, IconoPata, IconoCorazon, IconoMas } from '../components/icons';
 
 const TABS = [
   { id: 'citas', etiqueta: 'Mis citas', icono: IconoCalendario },
   { id: 'mascotas', etiqueta: 'Mis mascotas', icono: IconoPata },
 ];
 
-export function PanelClientePage() {
+// seccion="perfil": /panel/perfil (Mi perfil), que se abre desde el menu del
+// avatar. Sin ella, la pagina de siempre con Mis citas y Mis mascotas.
+export function PanelClientePage({ seccion = 'inicio' }) {
   const { usuario, token } = useAuth();
   const [parametros] = useSearchParams();
   // ?tab=mascotas (ej. desde el atajo "Mis mascotas" del menu del
@@ -51,6 +54,8 @@ export function PanelClientePage() {
       .catch((err) => console.error('No se pudieron cargar las mascotas:', err));
   }, [token]);
 
+  const enPerfil = seccion === 'perfil';
+
   const proximaCita = citas
     .filter((cita) => estadoDeCita(cita) === 'proxima')
     .sort((a, b) => new Date(a.fecha_hora) - new Date(b.fecha_hora))[0];
@@ -66,9 +71,13 @@ export function PanelClientePage() {
       <Navbar />
 
       <EncabezadoPagina
-        antetitulo="Mi cuenta"
-        titulo={`Hola, ${usuario?.nombreCompleto?.split(' ')[0] ?? ''} 👋`}
-        descripcion="Aquí puedes gestionar tus citas y las mascotas de tu cuenta de forma rápida y sencilla."
+        antetitulo={enPerfil ? 'Mi perfil' : 'Mi cuenta'}
+        titulo={enPerfil ? usuario?.nombreCompleto ?? '' : `Hola, ${usuario?.nombreCompleto?.split(' ')[0] ?? ''} 👋`}
+        descripcion={
+          enPerfil
+            ? 'Consulta y actualiza tus datos personales, tu correo y tu contraseña.'
+            : 'Aquí puedes gestionar tus citas y las mascotas de tu cuenta de forma rápida y sencilla.'
+        }
         className="py-6"
         // Saludo e ilustracion forman un solo bloque centrado en la pagina
         // (pedido de Oriana): el texto queda un poco corrido a la derecha y
@@ -88,6 +97,20 @@ export function PanelClientePage() {
           mascota), la pagina alcanza a bajar hasta el ancla; sin eso
           useAnclaTopbar se desactiva y se ve la topbar a medio formar. */}
       <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:min-h-[calc(100vh-7rem)]">
+        {enPerfil ? (
+          <>
+            <div data-ancla-topbar className="scroll-mt-28">
+              <Link to="/panel" className="boton-texto inline-flex items-center gap-2 rounded-boton px-2 py-1 text-sm font-semibold text-white transition">
+                <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
+                Volver a mi cuenta
+              </Link>
+            </div>
+            <div className="mt-6">
+              <PanelMiPerfilCliente />
+            </div>
+          </>
+        ) : (
+          <>
         <div data-ancla-topbar className="grid scroll-mt-28 grid-cols-1 gap-4 sm:grid-cols-3">
           <TarjetaDato
             icono={IconoCalendario}
@@ -134,6 +157,8 @@ export function PanelClientePage() {
             <PanelMisMascotas />
           )}
         </div>
+          </>
+        )}
       </main>
     </FondoVetui>
   );

@@ -8,6 +8,7 @@ import { OlvideClavePage } from './pages/OlvideClavePage';
 import { PanelClientePage } from './pages/PanelClientePage';
 import { ROLES_DEL_PANEL } from './utils/rutas';
 import { PanelMedicoPage } from './pages/PanelMedicoPage';
+import { CrearClavePage } from './pages/CrearClavePage';
 import { PanelAdminPage } from './pages/PanelAdminPage';
 import { AgendarCitaPage } from './pages/AgendarCitaPage';
 import { GuiaVetuiPage } from './pages/GuiaVetuiPage';
@@ -20,6 +21,8 @@ function Rutas() {
           <Route path="/iniciar-sesion" element={<LoginPage />} />
           <Route path="/registrarse" element={<RegistroPage />} />
           <Route path="/olvide-clave" element={<OlvideClavePage />} />
+          {/* Primera entrada con clave temporal: establecer la contraseña propia. */}
+          <Route path="/crear-clave" element={<CrearClavePage />} />
           {/* Guia visual del sistema de diseño vetUI (publica, solo referencia). */}
           <Route path="/vetui" element={<GuiaVetuiPage />} />
           <Route
@@ -27,6 +30,14 @@ function Rutas() {
             element={
               <ProtectedRoute rolesPermitidos={['cliente']}>
                 <PanelClientePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/panel/perfil"
+            element={
+              <ProtectedRoute rolesPermitidos={['cliente']}>
+                <PanelClientePage seccion="perfil" />
               </ProtectedRoute>
             }
           />

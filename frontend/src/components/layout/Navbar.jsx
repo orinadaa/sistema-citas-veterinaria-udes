@@ -567,6 +567,13 @@ export function Navbar({ onAgendar } = {}) {
               >
                 Mis mascotas
               </Link>
+              <Link
+                to="/panel/perfil"
+                onClick={() => setMenuAbierto(false)}
+                className="block py-2 pl-[var(--sangria,1rem)] pr-4 text-left text-sm text-white/90 transition hover:bg-white/10 hover:text-white hover-texto-ilumina"
+              >
+                Mi perfil
+              </Link>
             </>
           ) : (
             <Link

@@ -12,6 +12,12 @@ export function ProtectedRoute({ children, rolesPermitidos }) {
     return <Navigate to={destino} replace />;
   }
 
+  // Con clave temporal no se entra a ninguna pantalla hasta establecer la
+  // propia (el servidor tambien lo impide).
+  if (usuario.debeCambiarContrasena) {
+    return <Navigate to="/crear-clave" replace />;
+  }
+
   if (rolesPermitidos && !rolesPermitidos.includes(usuario.rol)) {
     return <Navigate to="/" replace />;
   }
