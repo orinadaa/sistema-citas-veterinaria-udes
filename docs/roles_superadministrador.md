@@ -81,7 +81,7 @@ Unitarias (`backend/tests`, modelos simulados):
 | Inicio de sede | `GET /api/administracion/tablero` | Datos de su sede y avisos; 403 para otros roles | Correcto |
 | Inicio del sistema | `GET /api/administracion/sistema` | Resumen y avisos; las sedes inactivas no generan avisos; 403 para el administrador | Correcto |
 
-Total del servidor: 353 pruebas pasan.
+Total del servidor: 344 pruebas pasan (tras retirar las del módulo Campos).
 
 Aceptación (base de datos real, solo lectura):
 
@@ -135,6 +135,62 @@ Pruebas:
 Los registros temporales de la prueba se borraron al terminar. No probado:
 renombrar una especie o raza que ya tienen mascotas reales, ni guardar desde la
 pantalla de Catálogos (solo se abrió para mirar).
+
+## Datos (superadministrador)
+
+Ver y cuidar la información sin abrir la base de datos. Decisión de Oriana:
+tres niveles (consultar, corregir, respaldar) y ningún editor libre de tablas.
+
+- **Explorar (solo lectura).** Usuarios, mascotas, citas, servicios, sedes y
+  horarios, con búsqueda, filtros, orden, páginas de 25 y exportación a CSV
+  (abre en Excel). Al abrir una fila se ve el registro completo y lo
+  relacionado (las mascotas y citas de un cliente, las citas de una mascota).
+  Las contraseñas no están en ninguna lista de columnas. Cada entidad se
+  describe en `backend/src/models/datos.model.js`; lo que pide el navegador
+  (entidad, orden, filtros) se valida contra esa descripción.
+- **Correcciones puntuales**, cada una con sus reglas:
+  - cuenta: nombre, teléfono o correo mal escritos (no la del
+    superadministrador; el correo no puede repetirse);
+  - mascota: pasarla a otro dueño (cliente activo; sus citas pasan con ella,
+    en una transacción) y reactivarla si la baja fue un error;
+  - cita: estado (agendada / cancelada) y médico (solo uno activo de esa sede
+    que preste ese servicio; no puede quedar con dos citas a la misma hora).
+- **Bitácora.** Tabla `bitacora` (migración `incremento_9a_bitacora.sql`):
+  quién, cuándo, qué acción y un resumen de lo enviado, sin contraseñas,
+  códigos ni tokens. La escribe el middleware `auditar` en las rutas de
+  configuración (sedes, cuentas, servicios, galería, catálogos, horarios,
+  médicos), en las correcciones, en las exportaciones y en la copia de
+  seguridad. Solo se inserta y se consulta.
+- **Copia de seguridad.** Descarga un `.sql` de toda la base con `pg_dump`
+  (si no está en el PATH del servidor, se indica en `PG_DUMP_PATH`).
+  Restaurar no se hace desde el sistema.
+
+Pruebas (28 unitarias en `datos.controller.test.js`, más aceptación sobre la
+base real con registros temporales "ZZ" que se borraron al terminar):
+
+| Descripción | Entrada | Resultado esperado | Resultado obtenido |
+|---|---|---|---|
+| Solo el superadministrador | Token de administrador contra 8 rutas de Datos | 403 | Correcto |
+| Sin edición libre ni eliminación | `DELETE`, `PUT` y `POST` directos sobre una entidad | 404 | Correcto |
+| Explorador (base real) | Listar, ordenar, filtrar, buscar y abrir en las 6 entidades | 200 en todas, sin contraseñas | Correcto |
+| Entradas maliciosas | Orden con SQL, filtro fuera de la lista | Se ignoran; la consulta no cambia | Correcto |
+| Exportar | CSV de citas agendadas; celda que empieza con `=` | Encabezados legibles; la fórmula queda neutralizada | Correcto |
+| Corregir cuenta | Nombre, teléfono, correo; correo repetido; correo inválido | 200 / 409 / 400 | Correcto |
+| Reasignar mascota | A otro cliente; a un no-cliente; a su mismo dueño | 200 y el dueño cambia / 400 / 400 | Correcto |
+| Reactivar mascota | Dada de baja; ya activa | 200 / 400 | Correcto |
+| Corregir cita | Estado inválido; médico que no es de la sede; médico ocupado | 400 / 400 / 409 | Correcto |
+| Bitácora | Tras las correcciones de prueba | Una fila por acción exitosa; las rechazadas no se anotan | Correcto |
+| Copia de seguridad (base real) | Descargar | Archivo `.sql` de 54 KB con `CREATE TABLE` | Correcto |
+
+No probado: guardar una corrección desde la pantalla (se abrió el formulario,
+no se guardó), ni cambiar de verdad el estado o el médico de una cita real.
+
+## Módulo Campos retirado
+
+El módulo de campos personalizados (incremento 7a) se quitó por completo a
+pedido de Oriana: pantallas, rutas, pruebas y la sección "Información
+adicional" de los formularios de mascota. La migración
+`incremento_8c_quitar_campos.sql` quita su tabla y su columna; estaban vacías.
 
 ## Pendiente
 

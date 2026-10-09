@@ -378,6 +378,69 @@ export function eliminarFotoGaleria(id, token) {
   return solicitar(`/galeria/${id}`, { metodo: 'DELETE', token });
 }
 
+// Datos (superadministrador): explorador de solo lectura, correcciones
+// puntuales, bitacora y descargas.
+function consultaDe(parametros = {}) {
+  const limpios = Object.entries(parametros).filter(([, valor]) => valor !== undefined && valor !== null && valor !== '');
+  return limpios.length ? `?${new URLSearchParams(limpios)}` : '';
+}
+
+export function obtenerEntidadesDatos(token) {
+  return solicitar('/datos', { token });
+}
+
+export function obtenerRegistrosDatos(entidad, parametros, token) {
+  return solicitar(`/datos/${entidad}${consultaDe(parametros)}`, { token });
+}
+
+export function obtenerRegistroDatos(entidad, id, token) {
+  return solicitar(`/datos/${entidad}/${id}`, { token });
+}
+
+export function obtenerBitacora(parametros, token) {
+  return solicitar(`/datos/bitacora${consultaDe(parametros)}`, { token });
+}
+
+export function corregirUsuarioDatos(id, datos, token) {
+  return solicitar(`/datos/usuarios/${id}/corregir`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function reasignarMascotaDatos(id, clienteId, token) {
+  return solicitar(`/datos/mascotas/${id}/dueno`, { metodo: 'PUT', cuerpo: { clienteId }, token });
+}
+
+export function reactivarMascotaDatos(id, token) {
+  return solicitar(`/datos/mascotas/${id}/reactivar`, { metodo: 'PUT', token });
+}
+
+export function obtenerMedicosParaCita(id, token) {
+  return solicitar(`/datos/citas/${id}/medicos`, { token });
+}
+
+export function corregirCitaDatos(id, datos, token) {
+  return solicitar(`/datos/citas/${id}/corregir`, { metodo: 'PUT', cuerpo: datos, token });
+}
+
+// Descarga un archivo (CSV o copia de seguridad) con la sesion del usuario:
+// un enlace normal no enviaria el token. Devuelve el nombre del archivo.
+export async function descargarDatos(ruta, parametros, token, nombrePorDefecto) {
+  const respuesta = await fetch(`/api${ruta}${consultaDe(parametros)}`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!respuesta.ok) {
+    const datos = await respuesta.json().catch(() => ({}));
+    throw new Error(datos.mensaje || `No se pudo descargar (${respuesta.status})`);
+  }
+  const nombre = /filename="([^"]+)"/.exec(respuesta.headers.get('Content-Disposition') || '')?.[1] || nombrePorDefecto;
+  const url = URL.createObjectURL(await respuesta.blob());
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  URL.revokeObjectURL(url);
+  return nombre;
+}
+
 // Catalogos (superadministrador): categorias de servicio / especialidades,
 // y especies y razas. obtenerEspecies es publica: la usan los formularios
 // de mascota.

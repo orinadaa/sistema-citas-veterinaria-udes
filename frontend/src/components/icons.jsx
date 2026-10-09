@@ -47,6 +47,8 @@ import { MagnifyingGlassIcon } from '@phosphor-icons/react/dist/csr/MagnifyingGl
 import { MapPinIcon } from '@phosphor-icons/react/dist/csr/MapPin';
 import { PawPrintIcon } from '@phosphor-icons/react/dist/csr/PawPrint';
 import { PencilSimpleIcon } from '@phosphor-icons/react/dist/csr/PencilSimple';
+import { DatabaseIcon } from '@phosphor-icons/react/dist/csr/Database';
+import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/csr/DownloadSimple';
 import { GlobeIcon } from '@phosphor-icons/react/dist/csr/Globe';
 import { HouseIcon } from '@phosphor-icons/react/dist/csr/House';
 import { StackIcon } from '@phosphor-icons/react/dist/csr/Stack';
@@ -160,12 +162,18 @@ export function IconoRotar(props) {
 export function IconoDestello(props) {
   return <Icono de={SparkleIcon} {...props} />;
 }
-// Menu del panel: inicio, pagina web y catalogos.
+// Menu del panel: inicio, pagina web, catalogos y datos.
 export function IconoInicio(props) {
   return <Icono de={HouseIcon} {...props} />;
 }
 export function IconoGlobo(props) {
   return <Icono de={GlobeIcon} {...props} />;
+}
+export function IconoBaseDatos(props) {
+  return <Icono de={DatabaseIcon} {...props} />;
+}
+export function IconoDescargar(props) {
+  return <Icono de={DownloadSimpleIcon} {...props} />;
 }
 export function IconoCatalogo(props) {
   return <Icono de={StackIcon} {...props} />;

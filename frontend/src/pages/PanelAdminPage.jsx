@@ -24,6 +24,7 @@ import { PanelPacientes } from '../components/admin/PanelPacientes';
 import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
 import { PanelGaleria } from '../components/admin/PanelGaleria';
 import { PanelCatalogos } from '../components/admin/PanelCatalogos';
+import { PanelDatos } from '../components/admin/PanelDatos';
 import { PanelReportes } from '../components/admin/PanelReportes';
 import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
 import { PanelMisPacientesMedico } from '../components/medico/PanelMisPacientesMedico';
@@ -80,6 +81,7 @@ export function PanelAdminPage() {
               </div>
             )}
             {esSuper && pestana === 'catalogos' && <PanelCatalogos />}
+            {esSuper && pestana === 'datos' && <PanelDatos />}
             {esSuper && pestana === 'reportes' && <PanelReportes />}
 
             {/* Administrador de sede */}
