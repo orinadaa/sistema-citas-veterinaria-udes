@@ -284,7 +284,7 @@ export function PanelGaleria() {
                         <button
                           type="button"
                           onClick={() => abrir(foto)}
-                          className="inline-flex items-center gap-1.5 boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+                          className="inline-flex items-center gap-1.5 boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue-600 transition"
                         >
                           <IconoLapiz className="h-4 w-4" />
                           Editar
@@ -343,7 +343,7 @@ export function PanelGaleria() {
                 type="submit"
                 form="form-galeria"
                 disabled={guardando}
-                className="rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+                className="rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:opacity-60"
               >
                 {guardando ? 'Guardando...' : fotoEditando ? 'Guardar cambios' : 'Subir foto'}
               </button>

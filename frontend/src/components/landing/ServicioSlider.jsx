@@ -269,7 +269,7 @@ export function ServicioSlider({ slides }) {
               onClick={() => navegar(i)}
               aria-label={`Ver ${slide.titulo}`}
               aria-current={activa ? 'true' : undefined}
-              className="group rounded-full p-1.5 outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="group rounded-full px-1.5 py-[9px] outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <span
                 className={`block h-1.5 rounded-full transition-all duration-300 motion-reduce:transition-none ${

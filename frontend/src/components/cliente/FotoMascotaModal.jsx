@@ -236,6 +236,7 @@ export function FotoMascotaModal({
         isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
       aria-hidden={!isOpen}
+      inert={!isOpen}
     >
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
 
@@ -278,7 +279,7 @@ export function FotoMascotaModal({
                 >
                   <span
                     className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-                      activo ? 'bg-brand-blue text-white' : 'bg-slate-100 text-slate-500'
+                      activo ? 'bg-brand-blue-600 text-white' : 'bg-slate-100 text-slate-500'
                     }`}
                   >
                     {indice + 1}
@@ -364,7 +365,7 @@ export function FotoMascotaModal({
                   <Recorte {...ajustes} lado={40} interactivo={false} />
                 </div>
                 <p className="flex items-center gap-1.5 text-sm text-slate-500">
-                  <IconoCheck className="h-4 w-4 text-brand-green" />
+                  <IconoCheck className="h-4 w-4 text-emerald-700" />
                   Así se verá en tu perfil y en tus citas.
                 </p>
               </div>
@@ -432,7 +433,7 @@ export function FotoMascotaModal({
             type="button"
             disabled={!imagen || guardando}
             onClick={guardar}
-            className="rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-boton bg-brand-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {guardando ? 'Procesando...' : 'Guardar foto'}
           </button>

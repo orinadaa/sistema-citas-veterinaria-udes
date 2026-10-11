@@ -31,14 +31,15 @@
 // listener de scroll.
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logoCorto from '../../assets/logocorto.png';
-import logoGrande from '../../assets/logoblanco.png';
-import logoCortoBlanco from '../../assets/logocortoblanco.png';
+import logoCorto from '../../assets/logocorto.webp';
+import logoGrande from '../../assets/logoblanco.webp';
+import logoCortoBlanco from '../../assets/logocortoblanco.webp';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
 import { salirConPermiso } from '../../utils/guardiaSalida';
 import { IconoCalendario, IconoChevronAbajo, IconoInicio, IconoPata, IconoPersona, IconoReloj, IconoSalir } from '../icons';
 import { Notificaciones } from './Notificaciones';
+import { MenuMovil } from './MenuMovil';
 
 // 260px de scroll para toda la transicion: con 160px una sola vuelta de
 // la rueda del mouse (~100px) se comia mas de media transicion de golpe.
@@ -361,6 +362,8 @@ export function Navbar({ onAgendar } = {}) {
               entre si y centrados dentro de su columna (pedido de Oriana;
               antes se repartian en todo el ancho con justify-between). */}
           <div className="justify-self-start md:justify-self-stretch">
+            {/* Por debajo de md los enlaces no caben: van en el menu. */}
+            <MenuMovil estaAutenticado={estaAutenticado} usuario={usuario} onSalir={salir} />
             <nav ref={navRef} className="hidden items-center justify-center gap-8 text-base font-medium text-white/90 md:flex">
               {/* Link (no <a>) para que funcionen desde cualquier pagina, no
                   solo desde el landing: si el usuario esta en /panel, primero
@@ -476,14 +479,16 @@ export function Navbar({ onAgendar } = {}) {
               igual (stretch + justify-between) para conservar la simetria. */}
           <div ref={grupoDerechoRef} className="flex items-center gap-2 justify-self-end md:justify-between md:justify-self-stretch">
             {estaAutenticado ? (
-              <div className="hidden items-center gap-2 sm:flex">
+              <div className="flex items-center gap-2">
                 {/* Campana: notificaciones del cliente o del medico. */}
                 <Notificaciones variante="pildora" onIr={(enlace) => enlace.startsWith('/') && navegar(enlace)} />
 
-                <div className="relative">
+                <div className="relative hidden sm:block">
                   <button
                     type="button"
                     ref={perfilRef}
+                    aria-haspopup="menu"
+                    aria-expanded={menuAbierto}
                     onClick={() => setMenuAbierto((v) => !v)}
                     className="boton-texto flex items-center gap-2 rounded-xl px-2 py-1.5 transition"
                   >

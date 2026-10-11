@@ -79,7 +79,7 @@ export function Sedes() {
                       aria-label={`Ver ${sede.nombre} en Google Maps (abre en una pestaña nueva)`}
                       className="cristal hover-ilumina-claro block h-full overflow-hidden rounded-tarjeta">
                       {sede.foto_url ? (
-                        <img src={sede.foto_url} alt={sede.nombre} className="h-80 w-full object-cover sm:h-96 lg:h-[clamp(12rem,calc(100svh-28rem),34rem)]" />
+                        <img src={sede.foto_url} alt={sede.nombre} loading="lazy" decoding="async" className="h-80 w-full object-cover sm:h-96 lg:h-[clamp(12rem,calc(100svh-28rem),34rem)]" />
                       ) : (
                         <div className="flex h-80 w-full items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 sm:h-96 lg:h-[clamp(12rem,calc(100svh-28rem),34rem)]">
                           <IconoSede className="h-12 w-12 text-brand-blue/40" peso="duotone" />

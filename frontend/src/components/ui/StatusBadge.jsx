@@ -8,7 +8,7 @@
 // inversion temporal a verde/azul).
 const CONFIG = {
   proxima: { texto: 'Próxima', className: 'bg-blue-50 text-brand-blue' },
-  completada: { texto: 'Completada', className: 'bg-emerald-50 text-brand-green' },
+  completada: { texto: 'Completada', className: 'bg-emerald-50 text-emerald-700' },
   cancelada: { texto: 'Cancelada', className: 'bg-red-50 text-brand-red' },
 };
 

@@ -21,7 +21,7 @@ import { PanelMisCitasMedico } from '../components/medico/PanelMisCitasMedico';
 import { PanelMisPacientesMedico } from '../components/medico/PanelMisPacientesMedico';
 import { PanelMiPerfilMedico } from '../components/medico/PanelMiPerfilMedico';
 import { useAuth } from '../context/AuthContext';
-import fotoMain from '../assets/foto-main.png';
+import fotoMain from '../assets/foto-main.webp';
 import { IconoCalendario, IconoFlechaDerecha, IconoMas, IconoPata } from '../components/icons';
 
 const TABS = [

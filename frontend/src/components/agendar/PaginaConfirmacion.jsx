@@ -48,7 +48,7 @@ function PasoSiguiente({ icono: Icono, titulo, descripcion, completado, ultimo }
         <p className="flex flex-wrap items-center gap-2 font-semibold text-slate-900">
           {titulo}
           <span
-            className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
               completado ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
             }`}
           >

@@ -33,8 +33,8 @@ import {
   IconoSalir,
 } from '../icons';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
-import logoColor from '../../assets/logocolor.png';
-import logoCorto from '../../assets/logocorto.png';
+import logoColor from '../../assets/logocolor.webp';
+import logoCorto from '../../assets/logocorto.webp';
 
 // Administrador de sede: el dia a dia de SU sede.
 const ITEMS_NAV = [
@@ -69,6 +69,36 @@ function leerColapsadoGuardado() {
   } catch {
     return false;
   }
+}
+
+// Por debajo de lg el menu lateral no cabe y se oculta: esta franja de
+// pestañas (se desliza con el dedo) lo reemplaza. Antes, en tableta o
+// celular el panel se quedaba sin forma de cambiar de modulo.
+export function AdminNavMovil({ activo, onCambiar }) {
+  const { usuario } = useAuth();
+  const items = usuario?.rol === 'superadministrador' ? ITEMS_SUPER : ITEMS_NAV;
+  return (
+    <nav aria-label="Módulos del panel" className="vidrio flex shrink-0 gap-1 overflow-x-auto rounded-boton p-1.5 lg:hidden">
+      {items.map((item) => {
+        const Icono = item.icono;
+        const esActivo = activo === item.id;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onCambiar(item.id)}
+            aria-current={esActivo ? 'page' : undefined}
+            className={`flex min-h-11 shrink-0 items-center gap-2 rounded-boton px-4 text-sm font-medium transition ${
+              esActivo ? 'bg-brand-amber text-brand-navy' : 'text-white hover:bg-white/15'
+            }`}
+          >
+            <Icono className="h-5 w-5 shrink-0" />
+            {item.etiqueta}
+          </button>
+        );
+      })}
+    </nav>
+  );
 }
 
 export function AdminSidebar({ activo, onCambiar }) {
@@ -108,6 +138,8 @@ export function AdminSidebar({ activo, onCambiar }) {
           type="button"
           onClick={alternarColapsado}
           title={colapsado ? 'Expandir menú' : 'Contraer menú'}
+          aria-label={colapsado ? 'Expandir menú' : 'Contraer menú'}
+          aria-expanded={!colapsado}
           className="flex h-8 w-8 shrink-0 items-center justify-center boton-texto rounded-boton text-white/70 transition hover:text-white"
         >
           <IconoFlechaDerecha className={`h-4 w-4 transition-transform duration-200 ${colapsado ? '' : 'rotate-180'}`} />
@@ -122,7 +154,7 @@ export function AdminSidebar({ activo, onCambiar }) {
         )}
       </div>
 
-      <nav className={`flex flex-1 flex-col gap-1 px-4 ${colapsado ? 'mt-5' : 'mt-8'}`}>
+      <nav aria-label="Módulos del panel" className={`flex flex-1 flex-col gap-1 px-4 ${colapsado ? 'mt-5' : 'mt-8'}`}>
         {items.map((item) => {
           const Icono = item.icono;
           const esActivo = activo === item.id;
@@ -132,6 +164,8 @@ export function AdminSidebar({ activo, onCambiar }) {
               type="button"
               onClick={() => onCambiar(item.id)}
               title={colapsado ? item.etiqueta : undefined}
+              aria-label={colapsado ? item.etiqueta : undefined}
+              aria-current={esActivo ? 'page' : undefined}
               className={`flex items-center gap-3 text-sm font-medium transition ${
                 colapsado ? 'h-11 w-11 justify-center rounded-full' : 'rounded-boton px-4 py-2.5'
               } ${esActivo ? 'bg-brand-amber text-brand-navy' : 'hover-texto-ilumina text-white/80 hover:bg-white/15 hover:text-white'}`}

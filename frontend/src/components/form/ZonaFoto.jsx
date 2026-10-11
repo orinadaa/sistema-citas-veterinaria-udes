@@ -38,12 +38,12 @@ export function ZonaFoto({
         )}
       </button>
       {fotoUrl ? (
-        <button type="button" onClick={onClick} className="text-center text-xs font-medium text-brand-blue hover:underline">
+        <button type="button" onClick={onClick} className="text-center text-xs font-medium text-brand-blue-600 hover:underline">
           Cambiar foto
         </button>
       ) : (
         // Fuera del circulo: adentro, a 130px de ancho, no cabia sin apretarse.
-        <p className="text-center text-[11px] leading-tight text-slate-500">
+        <p className="text-center text-xs leading-tight text-slate-500">
           {ayuda}
           <br />
           JPG, PNG. Máx. 5 MB.

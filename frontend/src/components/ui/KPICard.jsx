@@ -8,7 +8,7 @@ import { IconoFlechaDerecha } from '../icons';
 
 const COLORES = {
   blue: 'bg-blue-50 text-brand-blue',
-  green: 'bg-emerald-50 text-brand-green',
+  green: 'bg-emerald-50 text-emerald-700',
   red: 'bg-red-50 text-brand-red',
   amber: 'bg-amber-50 text-brand-amber',
   pink: 'bg-[#FDE6F0] text-[#C23E80]',

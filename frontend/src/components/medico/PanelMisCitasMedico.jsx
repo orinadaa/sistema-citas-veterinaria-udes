@@ -282,7 +282,7 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
                 dueno: cita.cliente_nombre,
               })
             }
-            className="inline-flex w-full items-center justify-center gap-2 rounded-boton border border-brand-blue px-4 py-2.5 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-boton border border-brand-blue px-4 py-2.5 text-sm font-semibold text-brand-blue-600 transition hover:bg-blue-50"
           >
             <IconoCampana className="h-4 w-4" />
             Crear recordatorio

@@ -3,6 +3,7 @@
 // no se pierda al recargar la pagina. RF-02, RF-05.
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { EVENTO_SESION_TERMINADA, EVENTO_TOKEN_RENOVADO } from '../api/client';
 
 const AuthContext = createContext(null);
 // Exportada para poder limpiarla directamente (sin pasar por React state)
@@ -11,6 +12,9 @@ const AuthContext = createContext(null);
 // actual (todavia protegida) antes de que la recarga tenga efecto, lo
 // que causaba un flash de /iniciar-sesion antes de llegar al landing.
 export const CLAVE_ALMACENAMIENTO = 'udes_veterinaria_sesion';
+// Aviso de una sola vez para la pantalla de inicio de sesion ("tu sesion
+// termino"): vive solo en esta pestaña.
+export const CLAVE_AVISO_SESION = 'udes_veterinaria_aviso_sesion';
 
 function leerSesionGuardada() {
   try {
@@ -31,6 +35,34 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(CLAVE_ALMACENAMIENTO);
     }
   }, [sesion]);
+
+  // El servidor rechazo el token (vencio a las 8 horas, la cuenta se
+  // desactivo o cambio la contraseña en otro equipo): se cierra la sesion
+  // local y ProtectedRoute lleva a iniciar sesion. Antes el panel seguia
+  // abierto y cada accion fallaba con "token invalido".
+  useEffect(() => {
+    function alTerminar(evento) {
+      setSesion((actual) => {
+        if (actual) {
+          try {
+            sessionStorage.setItem(CLAVE_AVISO_SESION, evento.detail || 'Tu sesión terminó. Inicia sesión de nuevo.');
+          } catch {
+            // sessionStorage no disponible: solo se pierde el aviso.
+          }
+        }
+        return null;
+      });
+    }
+    function alRenovar(evento) {
+      setSesion((actual) => (actual ? { ...actual, token: evento.detail } : actual));
+    }
+    window.addEventListener(EVENTO_SESION_TERMINADA, alTerminar);
+    window.addEventListener(EVENTO_TOKEN_RENOVADO, alRenovar);
+    return () => {
+      window.removeEventListener(EVENTO_SESION_TERMINADA, alTerminar);
+      window.removeEventListener(EVENTO_TOKEN_RENOVADO, alRenovar);
+    };
+  }, []);
 
   function iniciarSesion({ usuario, token }) {
     setSesion({ usuario, token });

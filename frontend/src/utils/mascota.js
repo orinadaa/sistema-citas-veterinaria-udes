@@ -4,7 +4,7 @@
 
 // "3 años", "1 año", "5 meses", "Menos de 1 mes" a partir de la fecha
 // de nacimiento (DATE de PostgreSQL, "YYYY-MM-DD..."). null si no hay.
-export function edadDeMascota(fechaNacimiento) {
+function edadDeMascota(fechaNacimiento) {
   if (!fechaNacimiento) return null;
   const [anio, mes, dia] = String(fechaNacimiento).slice(0, 10).split('-').map(Number);
   const nacimiento = new Date(anio, mes - 1, dia);

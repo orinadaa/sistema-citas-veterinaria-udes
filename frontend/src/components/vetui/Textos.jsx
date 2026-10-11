@@ -16,7 +16,8 @@ export function EncabezadoPagina({ antetitulo, titulo, descripcion, acciones, im
     // posiciones (useAnclaTopbar): la pildora termina de formarse a los 260px
     // de scroll, y a esa altura el contenido tiene que quedar debajo de ella
     // (112px), no detras.
-    <header
+    <section
+      aria-label={typeof titulo === 'string' ? titulo : undefined}
       className={`mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:min-h-[17.25rem] lg:items-center ${
         agrupado
           ? 'lg:grid-cols-[minmax(0,auto)_auto] lg:justify-center lg:gap-10 xl:gap-16'
@@ -32,7 +33,7 @@ export function EncabezadoPagina({ antetitulo, titulo, descripcion, acciones, im
         {acciones && <div className="mt-5 flex flex-wrap gap-3">{acciones}</div>}
       </div>
       {imagen}
-    </header>
+    </section>
   );
 }
 

@@ -249,7 +249,7 @@ export function PanelConfiguracion({ busquedaInicial }) {
                 <button
                   type="button"
                   onClick={() => abrirEditar(u)}
-                  className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+                  className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue-600 transition"
                 >
                   Editar
                 </button>
@@ -271,7 +271,7 @@ export function PanelConfiguracion({ busquedaInicial }) {
           type="submit"
           form="form-usuario-config"
           disabled={guardando}
-          className="w-full rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+          className="w-full rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:opacity-60"
         >
           {guardando ? 'Guardando...' : 'Guardar cambios'}
         </button>

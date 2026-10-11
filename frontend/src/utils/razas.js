@@ -103,7 +103,3 @@ export const RAZAS_POR_ESPECIE = {
   ],
 };
 
-// true si la especie usa texto libre en vez de lista.
-export function razaEsTextoLibre(especie) {
-  return Boolean(especie) && !RAZAS_POR_ESPECIE[especie];
-}

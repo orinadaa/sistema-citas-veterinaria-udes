@@ -42,12 +42,18 @@ export function SidePanel({ isOpen, onClose, title, children, footer }) {
         isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'
       }`}
       aria-hidden={!isOpen}
+      // inert: cerrado, sus botones y campos no reciben foco ni lector de pantalla.
+      inert={!isOpen}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
     >
       <div className="flex items-center justify-between border-b border-slate-900/10 px-6 py-5">
         <h2 className="font-heading text-lg font-semibold text-brand-navy">{title}</h2>
         <button
           type="button"
           onClick={onClose}
+          aria-label="Cerrar panel"
           className="boton-texto rounded-boton p-1.5 text-slate-600 transition hover:text-slate-900"
         >
           <IconoX className="h-5 w-5" />

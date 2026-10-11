@@ -2,6 +2,19 @@
 // Cliente HTTP minimo para hablar con el backend. El proxy de Vite
 // redirige "/api/..." al backend en desarrollo (ver vite.config.js).
 
+// Eventos que escucha AuthContext (este modulo no conoce a React).
+export const EVENTO_SESION_TERMINADA = 'udes:sesion-terminada';
+export const EVENTO_TOKEN_RENOVADO = 'udes:token-renovado';
+
+// 401 en una peticion hecha CON token = el token ya no sirve (vencio, la
+// cuenta se desactivo o cambio la contraseña). El de la clave temporal
+// (CAMBIO_CLAVE_OBLIGATORIO) es un 403 y no pasa por aqui.
+function avisarSiLaSesionTermino(respuesta, datos, token) {
+  if (respuesta.status === 401 && token) {
+    window.dispatchEvent(new CustomEvent(EVENTO_SESION_TERMINADA, { detail: datos.mensaje || '' }));
+  }
+}
+
 async function solicitar(ruta, { metodo = 'GET', cuerpo, token } = {}) {
   const encabezados = { 'Content-Type': 'application/json' };
   if (token) {
@@ -15,6 +28,13 @@ async function solicitar(ruta, { metodo = 'GET', cuerpo, token } = {}) {
   });
 
   const datos = await respuesta.json().catch(() => ({}));
+
+  avisarSiLaSesionTermino(respuesta, datos, token);
+  // Tras cambiar la contraseña el servidor entrega un token nuevo (los
+  // anteriores dejan de servir): la sesion abierta sigue con el.
+  if (respuesta.ok && datos.tokenRenovado) {
+    window.dispatchEvent(new CustomEvent(EVENTO_TOKEN_RENOVADO, { detail: datos.tokenRenovado }));
+  }
 
   if (!respuesta.ok) {
     throw new Error(datos.mensaje || `Error inesperado (${respuesta.status})`);
@@ -141,10 +161,6 @@ export function crearSede(datos, token) {
 
 export function actualizarSede(id, datos, token) {
   return solicitar(`/sedes/${id}`, { metodo: 'PUT', cuerpo: datos, token });
-}
-
-export function obtenerPerfil(token) {
-  return solicitar('/auth/perfil', { token });
 }
 
 export function obtenerServicios() {
@@ -313,6 +329,7 @@ export async function subirFotoMascota(id, archivo, token) {
     body: datos,
   });
   const cuerpo = await respuesta.json().catch(() => ({}));
+  avisarSiLaSesionTermino(respuesta, cuerpo, token);
   if (!respuesta.ok) throw new Error(cuerpo.mensaje || `Error inesperado (${respuesta.status})`);
   return cuerpo;
 }

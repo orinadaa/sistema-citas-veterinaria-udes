@@ -134,7 +134,7 @@ export function EncuadreModal({
           <button
             type="button"
             onClick={() => onAplicar({ ...borrador, descripcion: borrador.descripcion.trim() })}
-            className="rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600"
+            className="rounded-boton bg-brand-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
           >
             Aplicar
           </button>

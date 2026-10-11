@@ -344,7 +344,7 @@ export function PanelServicios({ busquedaInicial, soloLectura = false }) {
             <button
               type="button"
               onClick={() => abrirEditar(s)}
-              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue-600 transition"
             >
               Editar
             </button>
@@ -376,7 +376,7 @@ export function PanelServicios({ busquedaInicial, soloLectura = false }) {
             type="submit"
             form="form-servicio"
             disabled={guardando}
-            className="rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+            className="rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:opacity-60"
           >
             {guardando ? 'Guardando...' : 'Guardar cambios'}
           </button>
@@ -404,7 +404,7 @@ export function PanelServicios({ busquedaInicial, soloLectura = false }) {
                   <button
                     type="button"
                     onClick={() => setAjusteAbierto(true)}
-                    className="inline-flex items-center gap-2 rounded-boton border border-brand-blue px-3.5 py-2 text-sm font-semibold text-brand-blue transition hover:bg-blue-50"
+                    className="inline-flex items-center gap-2 rounded-boton border border-brand-blue px-3.5 py-2 text-sm font-semibold text-brand-blue-600 transition hover:bg-blue-50"
                   >
                     <IconoEncuadre className="h-4 w-4" />
                     Ajustar foto

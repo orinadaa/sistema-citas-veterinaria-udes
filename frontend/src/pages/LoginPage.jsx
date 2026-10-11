@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Campo } from '../components/form/Campo';
 import { iniciarSesion as iniciarSesionApi } from '../api/client';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, CLAVE_AVISO_SESION } from '../context/AuthContext';
 import { destinoTrasLogin } from '../utils/rutas';
 
 export function LoginPage() {
@@ -22,6 +22,17 @@ export function LoginPage() {
 
   const [datos, setDatos] = useState({ correo: '', contrasena: '' });
   const [error, setError] = useState('');
+  // "Tu sesion termino": lo deja AuthContext cuando el servidor rechaza el
+  // token. Se lee una vez y se borra.
+  const [avisoSesion] = useState(() => {
+    try {
+      const aviso = sessionStorage.getItem(CLAVE_AVISO_SESION);
+      sessionStorage.removeItem(CLAVE_AVISO_SESION);
+      return aviso;
+    } catch {
+      return null;
+    }
+  });
   const [enviando, setEnviando] = useState(false);
 
   function actualizarCampo(evento) {
@@ -98,6 +109,12 @@ export function LoginPage() {
         >
           ¿Olvidaste tu contraseña?
         </Link>
+
+        {avisoSesion && !error && (
+          <p role="status" className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 ring-1 ring-amber-200">
+            {avisoSesion}
+          </p>
+        )}
 
         {error && (
           <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">
