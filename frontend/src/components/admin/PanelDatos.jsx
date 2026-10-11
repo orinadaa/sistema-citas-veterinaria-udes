@@ -29,25 +29,15 @@ import { EstadoError } from '../ui/EstadoError';
 import { Campo } from '../form/Campo';
 import { CampoBusqueda } from '../form/CampoBusqueda';
 import { Desplegable } from '../form/Desplegable';
-import { IconoAlerta, IconoBaseDatos, IconoChevronAbajo, IconoDescargar, IconoFlechaDerecha } from '../icons';
+import { IconoAlerta, IconoBaseDatos, IconoChevronAbajo, IconoDescargar, IconoLapiz, IconoOjo } from '../icons';
+import { ROLES_DATOS as ROLES, TITULO_DETALLE, formatearDato as formatear } from '../../utils/datos';
+import { DetalleRegistro, FilaRelacionada } from './DetalleRegistroDatos';
 
 const TABS = [
   { id: 'explorar', label: 'Explorar' },
   { id: 'bitacora', label: 'Bitácora' },
   { id: 'respaldo', label: 'Copia de seguridad' },
 ];
-
-const ROLES = { superadministrador: 'Superadministrador', administrador: 'Administrador de sede', veterinario: 'Médico', cliente: 'Cliente' };
-
-function formatear(valor, columna) {
-  if (valor === null || valor === undefined || valor === '') return '—';
-  if (columna.tipo === 'booleano') return valor ? 'Sí' : 'No';
-  if (columna.tipo === 'fecha') return new Date(valor).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: String(valor).length <= 10 ? 'UTC' : undefined });
-  if (columna.tipo === 'fechaHora') return new Date(valor).toLocaleString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
-  if (columna.tipo === 'dinero') return `$ ${Number(valor).toLocaleString('es-CO')}`;
-  const opcion = columna.opciones?.find((o) => o.valor === String(valor));
-  return opcion ? opcion.etiqueta : String(valor);
-}
 
 function Paginas({ pagina, total, porPagina, onCambiar }) {
   const ultima = Math.max(1, Math.ceil(total / porPagina));
@@ -274,13 +264,13 @@ const RELACIONADOS = {
   usuarios: (r) =>
     r.rol === 'cliente'
       ? [
-          { titulo: 'Sus mascotas', entidad: 'mascotas', filtro: { cliente_id: r.id }, columnas: ['nombre', 'especie', 'raza', 'activo'] },
-          { titulo: 'Sus citas', entidad: 'citas', filtro: { cliente_id: r.id }, columnas: ['fecha', 'mascota', 'servicio', 'estado'] },
+          { titulo: 'Sus mascotas', vacio: 'No tiene mascotas registradas.', entidad: 'mascotas', filtro: { cliente_id: r.id }, columnas: ['nombre', 'especie', 'raza', 'activo'] },
+          { titulo: 'Sus citas', vacio: 'No tiene citas.', entidad: 'citas', filtro: { cliente_id: r.id }, columnas: ['fecha', 'mascota', 'servicio', 'estado'] },
         ]
       : r.rol === 'veterinario'
-        ? [{ titulo: 'Citas que atiende', entidad: 'citas', filtro: { medico_id: r.id }, columnas: ['fecha', 'cliente', 'mascota', 'estado'] }]
+        ? [{ titulo: 'Citas que atiende', vacio: 'No tiene citas asignadas.', entidad: 'citas', filtro: { medico_id: r.id }, columnas: ['fecha', 'mascota', 'cliente', 'estado'] }]
         : [],
-  mascotas: (r) => [{ titulo: 'Sus citas', entidad: 'citas', filtro: { mascota_id: r.id }, columnas: ['fecha', 'servicio', 'medico', 'estado'] }],
+  mascotas: (r) => [{ titulo: 'Sus citas', vacio: 'No tiene citas.', entidad: 'citas', filtro: { mascota_id: r.id }, columnas: ['fecha', 'servicio', 'medico', 'estado'] }],
 };
 
 function Relacionado({ definicion, entidades, token }) {
@@ -300,30 +290,24 @@ function Relacionado({ definicion, entidades, token }) {
   }, [definicion.entidad, filtro, token]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-sm font-semibold text-slate-900">
+    <section className="flex flex-col gap-3">
+      <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-700">
         {definicion.titulo}
-        {datos && <span className="ml-1 font-normal text-slate-700">({datos.total})</span>}
-      </p>
+        {datos && <span className="rounded-full bg-slate-900/10 px-2 py-0.5 text-xs font-semibold tabular-nums text-slate-800">{datos.total}</span>}
+      </h3>
       {!datos ? (
-        <div className="h-10 animate-pulse rounded-lg bg-slate-200" />
+        <div className="h-14 animate-pulse rounded-xl bg-slate-200" />
       ) : datos.filas.length === 0 ? (
-        <p className="text-sm text-slate-700">Ninguno.</p>
+        <p className="rounded-xl bg-white/50 px-3 py-4 text-center text-sm text-slate-700 ring-1 ring-slate-900/10">{definicion.vacio}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-slate-900/10 rounded-xl bg-white/70 ring-1 ring-slate-900/10">
           {datos.filas.slice(0, 8).map((fila) => (
-            <li key={fila.id} className="flex flex-wrap gap-x-3 px-3 py-2 text-sm text-slate-800">
-              {columnas.map((c, i) => (
-                <span key={c.clave} className={i === 0 ? 'font-medium text-slate-900' : ''}>
-                  {formatear(fila[c.clave], c)}
-                </span>
-              ))}
-            </li>
+            <FilaRelacionada key={fila.id} entidad={definicion.entidad} fila={fila} columnas={columnas} />
           ))}
           {datos.total > 8 && <li className="px-3 py-2 text-xs text-slate-700">y {datos.total - 8} más.</li>}
         </ul>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -473,7 +457,7 @@ function Explorar({ token }) {
                       );
                     })}
                     {/* La columna Ver queda fija a la derecha: en tablas anchas (Citas) no hay que desplazarse para abrir un registro. */}
-                    <th scope="col" className="sticky right-0 bg-[#eef2fb] px-4 py-3 text-right">
+                    <th scope="col" className="sticky right-0 bg-[#eef2fb] px-4 py-3 text-left">
                       Ver
                     </th>
                   </tr>
@@ -499,15 +483,16 @@ function Explorar({ token }) {
                             {formatear(fila[c.clave], c)}
                           </td>
                         ))}
-                        <td className="sticky right-0 bg-[#eef2fb] px-4 py-2.5 text-right shadow-[-8px_0_12px_-10px_rgb(15_23_42/0.35)]">
+                        <td className="sticky right-0 bg-[#eef2fb] px-4 py-1.5 text-left shadow-[-8px_0_12px_-10px_rgb(15_23_42/0.35)]">
+                          {/* -ml-2: el ojo queda alineado con el titulo de la columna. */}
                           <button
                             type="button"
                             onClick={() => abrir(fila.id)}
                             aria-label={`Ver ${formatear(fila[entidad.columnas[0].clave], entidad.columnas[0])}`}
-                            className="boton-texto inline-flex items-center gap-1 rounded-boton px-2 py-1 text-sm font-medium text-brand-blue-700 transition"
+                            title="Ver detalle"
+                            className="-ml-2 flex h-9 w-9 items-center justify-center rounded-full text-brand-blue-700 transition hover:bg-brand-blue-600 hover:text-white"
                           >
-                            Ver
-                            <IconoFlechaDerecha className="h-3.5 w-3.5" />
+                            <IconoOjo className="h-5 w-5" />
                           </button>
                         </td>
                       </tr>
@@ -521,18 +506,11 @@ function Explorar({ token }) {
         )}
       </div>
 
-      <SidePanel isOpen={Boolean(abierto)} onClose={() => setAbierto(null)} title={abierto ? formatear(abierto.registro[abierto.columnas[0].clave], abierto.columnas[0]) : ''}>
+      <SidePanel isOpen={Boolean(abierto)} onClose={() => setAbierto(null)} title={TITULO_DETALLE[nombre] ?? 'Detalle del registro'}>
         {abierto && (
           <div className="flex flex-col gap-6">
             <Mensaje estado={aviso} />
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-              {abierto.columnas.map((c) => (
-                <div key={c.clave} className="min-w-0">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-700">{c.etiqueta}</dt>
-                  <dd className="break-words text-sm text-slate-900">{c.clave === 'rol' ? ROLES[abierto.registro.rol] ?? abierto.registro.rol : formatear(abierto.registro[c.clave], c)}</dd>
-                </div>
-              ))}
-            </dl>
+            <DetalleRegistro entidad={nombre} registro={abierto.registro} columnas={abierto.columnas} />
 
             {relacionados.map((definicion) => (
               <Relacionado key={definicion.titulo} definicion={definicion} entidades={entidades} token={token} />
@@ -567,8 +545,9 @@ function Explorar({ token }) {
                         setAviso(null);
                         setCorrigiendo(true);
                       }}
-                      className="self-start rounded-boton bg-white px-4 py-2 text-sm font-semibold text-brand-blue-700 ring-1 ring-brand-blue transition"
+                      className="inline-flex items-center gap-2 self-start rounded-boton bg-white px-4 py-2 text-sm font-semibold text-brand-blue-700 ring-1 ring-brand-blue transition"
                     >
+                      <IconoLapiz className="h-4 w-4" />
                       Corregir un dato
                     </button>
                   </>
