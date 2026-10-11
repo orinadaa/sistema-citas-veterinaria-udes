@@ -8,6 +8,10 @@
 // llega a cualquier minuto. Los controles exactos son ademas la via de
 // teclado: el reloj es solo para el puntero.
 // value: "HH:MM" en 24 horas. onChange recibe el nuevo "HH:MM".
+// reinicio (opcional): al cambiar, el reloj vuelve a las horas.
+// Movimiento: la manecilla gira por el camino corto, los numeros entran con
+// un fundido al pasar de horas a minutos; con "reducir movimiento" no hay
+// animaciones.
 import { useRef, useState } from 'react';
 import { IconoChevronAbajo } from '../icons';
 
@@ -41,7 +45,7 @@ function Perilla({ id, etiqueta, valor, minimo, maximo, activa, onCambiar, onEnf
     onEnfocar?.();
     onCambiar(((valor - minimo + paso + rango) % rango) + minimo);
   };
-  const claseFlecha = 'flex h-7 w-full items-center justify-center rounded-boton text-brand-blue-700 transition hover:bg-blue-100';
+  const claseFlecha = 'flex h-7 w-full items-center justify-center rounded-boton text-brand-blue-700 transition duration-150 hover:bg-blue-100 active:scale-90 motion-reduce:active:scale-100';
   return (
     <div className="flex w-14 flex-col items-center gap-1">
       <button type="button" onClick={() => mover(1)} aria-label={`Subir ${etiqueta}`} className={claseFlecha}>
@@ -71,8 +75,8 @@ function Perilla({ id, etiqueta, valor, minimo, maximo, activa, onCambiar, onEnf
           }
         }}
         className={`w-full rounded-boton px-0 py-1.5 text-center text-xl font-bold tabular-nums outline-none transition ${
-          activa ? 'bg-brand-blue-600 text-white ring-2 ring-brand-blue-600' : 'campo text-slate-900'
-        }`}
+          activa ? 'scale-105 bg-brand-blue-600 text-white ring-2 ring-brand-blue-600' : 'campo text-slate-900'
+        } duration-200 motion-reduce:transition-none`}
       />
       <button type="button" onClick={() => mover(-1)} aria-label={`Bajar ${etiqueta}`} className={claseFlecha}>
         <IconoChevronAbajo className="h-4 w-4" peso="bold" />
@@ -82,10 +86,19 @@ function Perilla({ id, etiqueta, valor, minimo, maximo, activa, onCambiar, onEnf
   );
 }
 
-export function RelojHora({ id = 'reloj', value, onChange }) {
+export function RelojHora({ id = 'reloj', value, onChange, reinicio }) {
   const actual = partes(value);
   const [modo, setModo] = useState('hora'); // hora | minuto
+  // Cuando cambia `reinicio` (se pasa a editar otra hora) el reloj vuelve a
+  // empezar por las horas, sin desmontarse: asi la manecilla gira hasta alla.
+  const [reinicioPrevio, setReinicioPrevio] = useState(reinicio);
+  if (reinicioPrevio !== reinicio) {
+    setReinicioPrevio(reinicio);
+    setModo('hora');
+  }
   const arrastrando = useRef(false);
+  // Mientras se arrastra, la manecilla sigue al dedo casi sin retraso.
+  const [arrastra, setArrastra] = useState(false);
   const esfera = useRef(null);
 
   const cambiar = (cambios) => onChange(armar({ ...actual, ...cambios }));
@@ -102,7 +115,11 @@ export function RelojHora({ id = 'reloj', value, onChange }) {
   }
 
   const fraccion = modo === 'hora' ? (actual.hora12 % 12) / 12 : actual.minuto / 60;
-  const punta = punto(fraccion);
+  // Giro acumulado de la manecilla: siempre va por el camino corto (de 11 a
+  // 1 avanza dos marcas, no retrocede diez).
+  const [giro, setGiro] = useState(fraccion * 360);
+  const destino = giro + ((((fraccion * 360 - giro) % 360) + 540) % 360) - 180;
+  if (Math.abs(destino - giro) > 0.01) setGiro(destino);
   const marcas = modo === 'hora' ? HORAS : MINUTOS;
   const elegido = modo === 'hora' ? actual.hora12 : actual.minuto;
   const enMarca = modo === 'hora' || actual.minuto % 5 === 0;
@@ -119,6 +136,7 @@ export function RelojHora({ id = 'reloj', value, onChange }) {
           className="shrink-0 cursor-pointer touch-none select-none"
           onPointerDown={(e) => {
             arrastrando.current = true;
+            setArrastra(true);
             e.currentTarget.setPointerCapture(e.pointerId);
             elegirEn(e);
           }}
@@ -126,19 +144,32 @@ export function RelojHora({ id = 'reloj', value, onChange }) {
           onPointerUp={() => {
             if (!arrastrando.current) return;
             arrastrando.current = false;
+            setArrastra(false);
             // Elegida la hora, el reloj pasa solo a los minutos.
             if (modo === 'hora') setModo('minuto');
           }}
           onPointerCancel={() => {
             arrastrando.current = false;
+            setArrastra(false);
           }}
         >
           <circle cx={CENTRO} cy={CENTRO} r={CENTRO - 2} fill="#E8F1FD" stroke="rgb(15 23 42 / 0.1)" />
-          {/* Manecilla */}
-          <line x1={CENTRO} y1={CENTRO} x2={punta.x} y2={punta.y} stroke="var(--color-brand-blue-600)" strokeWidth="2" />
+          {/* Manecilla: se dibuja apuntando a las 12 y se gira; el giro va animado. */}
+          <g
+            style={{
+              transform: `rotate(${giro}deg)`,
+              transformOrigin: `${CENTRO}px ${CENTRO}px`,
+              transition: `transform ${arrastra ? 90 : 320}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
+            }}
+            className="motion-reduce:!transition-none"
+          >
+            <line x1={CENTRO} y1={CENTRO} x2={CENTRO} y2={CENTRO - RADIO} stroke="var(--color-brand-blue-600)" strokeWidth="2" />
+            {/* Sobre una marca, la punta la envuelve; en un minuto intermedio es un punto pequeño que no tapa los numeros. */}
+            <circle cx={CENTRO} cy={CENTRO - RADIO} r={enMarca ? 17 : 6} fill="var(--color-brand-blue-600)" style={{ transition: 'r 200ms ease-out' }} className="motion-reduce:!transition-none" />
+          </g>
           <circle cx={CENTRO} cy={CENTRO} r="4" fill="var(--color-brand-blue-600)" />
-          {/* Sobre una marca, la punta la envuelve; en un minuto intermedio es un punto pequeño que no tapa los numeros. */}
-          <circle cx={punta.x} cy={punta.y} r={enMarca ? 17 : 6} fill="var(--color-brand-blue-600)" />
+          {/* key: al pasar de horas a minutos los numeros entran de nuevo, con un fundido. */}
+          <g key={modo} style={{ transformOrigin: `${CENTRO}px ${CENTRO}px` }} className="animate-entra-suave motion-reduce:animate-none">
           {marcas.map((numero, indice) => {
             const p = punto(indice / 12);
             return (
@@ -151,11 +182,13 @@ export function RelojHora({ id = 'reloj', value, onChange }) {
                 fontSize="14"
                 fontWeight="600"
                 fill={numero === elegido ? '#fff' : '#1e293b'}
+                style={{ transition: 'fill 220ms ease-out' }}
               >
                 {modo === 'hora' ? numero : dos(numero)}
               </text>
             );
           })}
+          </g>
         </svg>
       </div>
 
@@ -179,7 +212,7 @@ export function RelojHora({ id = 'reloj', value, onChange }) {
               role="radio"
               aria-checked={actual.pm === pm}
               onClick={() => cambiar({ pm })}
-              className={`rounded-boton px-3 py-1.5 text-sm font-semibold transition ${actual.pm === pm ? 'bg-brand-blue-600 text-white' : 'text-slate-700 hover:bg-slate-100'}`}
+              className={`rounded-boton px-3 py-1.5 text-sm font-semibold transition duration-200 ${actual.pm === pm ? 'bg-brand-blue-600 text-white' : 'text-slate-700 hover:bg-slate-100'}`}
             >
               {texto}
             </button>

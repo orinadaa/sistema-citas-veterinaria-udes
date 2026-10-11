@@ -56,7 +56,7 @@ export function EditorHorarioSemana({ dias, guardandoDia, onCambiar, onGuardar, 
               aria-selected={elegido}
               aria-label={`${d.nombre}: ${d.abierto ? `abre de ${hora12(d.horaInicio)} a ${hora12(d.horaFin)}` : 'cerrado'}`}
               onClick={() => elegirDia(d.numero)}
-              className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2 transition ${
+              className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2 transition duration-200 active:scale-95 motion-reduce:active:scale-100 ${
                 elegido ? 'bg-brand-blue-600 text-white shadow-sm' : 'bg-white/70 text-slate-800 ring-1 ring-slate-900/10 hover:bg-white'
               }`}
             >
@@ -67,7 +67,8 @@ export function EditorHorarioSemana({ dias, guardandoDia, onCambiar, onGuardar, 
         })}
       </div>
 
-      <div className="flex flex-col gap-4 rounded-2xl bg-white/70 p-4 ring-1 ring-slate-900/10">
+      {/* key: al cambiar de dia la tarjeta entra con un fundido corto. */}
+      <div key={dia.numero} className="flex animate-entra-suave flex-col gap-4 rounded-2xl bg-white/70 p-4 ring-1 ring-slate-900/10 motion-reduce:animate-none">
         <div className="flex items-center justify-between gap-3">
           <p className="font-heading text-base font-semibold text-brand-navy">{dia.nombre}</p>
           <Insignia tono={dia.abierto ? 'verde' : 'gris'}>{dia.abierto ? 'Abierto' : 'Cerrado'}</Insignia>
@@ -85,7 +86,7 @@ export function EditorHorarioSemana({ dias, guardandoDia, onCambiar, onGuardar, 
               role="radio"
               aria-checked={extremo === clave}
               onClick={() => setExtremo(clave)}
-              className={`flex flex-col items-start rounded-xl px-3 py-2 text-left transition ${
+              className={`flex flex-col items-start rounded-xl px-3 py-2 text-left transition duration-200 ${
                 extremo === clave ? 'bg-blue-50 ring-2 ring-brand-blue' : 'bg-white ring-1 ring-slate-300 hover:bg-slate-50'
               }`}
             >
@@ -95,8 +96,8 @@ export function EditorHorarioSemana({ dias, guardandoDia, onCambiar, onGuardar, 
           ))}
         </div>
 
-        {/* key: al cambiar de dia o de extremo el reloj vuelve a empezar por la hora. */}
-        <RelojHora key={`${dia.numero}-${extremo}`} id={`reloj-${dia.numero}-${extremo}`} value={dia[extremo]} onChange={(valor) => onCambiar(dia.numero, { [extremo]: valor })} />
+        {/* Un solo reloj por dia: al pasar de "Abre" a "Cierra" la manecilla gira hasta la otra hora. */}
+        <RelojHora key={dia.numero} reinicio={extremo} id={`reloj-${dia.numero}`} value={dia[extremo]} onChange={(valor) => onCambiar(dia.numero, { [extremo]: valor })} />
 
         {invalido && (
           <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">
