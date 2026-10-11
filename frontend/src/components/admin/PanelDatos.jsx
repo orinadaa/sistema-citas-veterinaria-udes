@@ -632,12 +632,20 @@ function Bitacora({ token }) {
 function Respaldo({ token }) {
   const [estado, setEstado] = useState(null);
   const [descargando, setDescargando] = useState(false);
+  // La copia contiene toda la base: se confirma con la contraseña.
+  const [contrasena, setContrasena] = useState('');
 
-  async function descargar() {
+  async function descargar(evento) {
+    evento.preventDefault();
+    if (!contrasena) {
+      setEstado({ tipo: 'error', texto: 'Escribe tu contraseña para descargar la copia.' });
+      return;
+    }
     setDescargando(true);
     setEstado(null);
     try {
-      const nombre = await descargarDatos('/datos/respaldo', {}, token, 'respaldo-clinica.sql');
+      const nombre = await descargarDatos('/datos/respaldo', {}, token, 'respaldo-clinica.sql', { contrasena });
+      setContrasena('');
       setEstado({ tipo: 'ok', texto: `Copia descargada: ${nombre}. Guárdala en un lugar seguro.` });
     } catch (err) {
       setEstado({ tipo: 'error', texto: err.message });
@@ -663,11 +671,24 @@ function Respaldo({ token }) {
           El archivo contiene datos personales de clientes y las contraseñas cifradas. No lo compartas ni lo dejes en un equipo de uso común. Restaurar una copia no se hace desde el sistema: es una operación manual sobre la base de datos.
         </span>
       </p>
-      <Mensaje estado={estado} />
-      <button type="button" onClick={descargar} disabled={descargando} className={`inline-flex items-center gap-2 self-start ${CLASE_BOTON}`}>
-        <IconoDescargar className="h-4 w-4" />
-        {descargando ? 'Generando la copia...' : 'Descargar copia de seguridad'}
-      </button>
+      <form onSubmit={descargar} className="flex flex-col gap-4">
+        <div className="max-w-sm">
+          <Campo
+            id="contrasena-respaldo"
+            label="Tu contraseña, para confirmar"
+            type="password"
+            autoComplete="current-password"
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
+            required
+          />
+        </div>
+        <Mensaje estado={estado} />
+        <button type="submit" disabled={descargando} className={`inline-flex items-center gap-2 self-start ${CLASE_BOTON}`}>
+          <IconoDescargar className="h-4 w-4" />
+          {descargando ? 'Generando la copia...' : 'Descargar copia de seguridad'}
+        </button>
+      </form>
     </section>
   );
 }

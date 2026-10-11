@@ -78,6 +78,7 @@ export function PanelHorarios({ sedeFija = null }) {
   const [form, setForm] = useState(FORM_VACIO);
   const [diasHorario, setDiasHorario] = useState(diasVacios());
   const [error, setError] = useState('');
+  const [avisoCitas, setAvisoCitas] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [guardandoDia, setGuardandoDia] = useState(null);
   // Foto de la sede: se sube como archivo (ya no es un enlace). `foto` es
@@ -191,15 +192,26 @@ export function PanelHorarios({ sedeFija = null }) {
     }
   }
 
+  // Las citas ya agendadas no se mueven solas al cambiar el horario: el
+  // servidor dice cuantas quedaron fuera y aqui se avisa para reprogramarlas.
+  function avisarCitasAfectadas(cantidad, motivo) {
+    setAvisoCitas(
+      cantidad > 0
+        ? `Horario guardado. Ojo: ${cantidad} ${cantidad === 1 ? 'cita ya agendada' : 'citas ya agendadas'} ${motivo}. No se cancelan solas: revísalas en Citas.`
+        : ''
+    );
+  }
+
   async function guardarDia(dia) {
     if (!sedeEditando) return false;
     setGuardandoDia(dia.numero);
     setError('');
     try {
-      await actualizarHorario(
+      const { citasAfectadas } = await actualizarHorario(
         { sedeId: sedeEditando.id, diaSemana: dia.numero, horaInicio: dia.horaInicio, horaFin: dia.horaFin },
         token
       );
+      avisarCitasAfectadas(citasAfectadas, 'quedaron fuera del horario nuevo');
       setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, abierto: true } : d)));
       cargar();
       return true;
@@ -216,7 +228,8 @@ export function PanelHorarios({ sedeFija = null }) {
     setGuardandoDia(dia.numero);
     setError('');
     try {
-      await cerrarDiaHorario(sedeEditando.id, dia.numero, token);
+      const { citasAfectadas } = await cerrarDiaHorario(sedeEditando.id, dia.numero, token);
+      avisarCitasAfectadas(citasAfectadas, 'quedaron en un día que ahora está cerrado');
       setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, abierto: false } : d)));
       cargar();
       return true;
@@ -397,7 +410,12 @@ export function PanelHorarios({ sedeFija = null }) {
           </>
           )}
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+          {avisoCitas && (
+            <p role="status" className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 ring-1 ring-amber-200">
+              {avisoCitas}
+            </p>
+          )}
 
           {sedeEditando ? (
             <div className={`flex flex-col gap-3 ${sedeFija ? '' : 'mt-2 border-t border-slate-900/10 pt-4'}`}>

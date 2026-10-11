@@ -17,6 +17,8 @@ import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora, esMismoDia, sumarDias, inicioDeSemana, formatearMesAnio, formatearRangoSemana } from '../../utils/fecha';
 import { PageHeader } from '../ui/PageHeader';
 import { SidePanel } from '../ui/SidePanel';
+import { PieCancelarCita } from '../citas/PieCancelarCita';
+import { sePuedeCancelar } from '../../utils/citaCancelable';
 import { CategoryBadge, COLORES_CATEGORIA } from '../ui/CategoryBadge';
 import { MiniCalendario } from '../citas/MiniCalendario';
 import { CalendarioSemanal } from '../citas/CalendarioSemanal';
@@ -228,7 +230,22 @@ export function PanelCitasSeguimiento() {
 
     </div>
 
-    <SidePanel isOpen={Boolean(citaDetalle)} onClose={() => setCitaDetalle(null)} title="Detalle de la cita">
+    <SidePanel
+      isOpen={Boolean(citaDetalle)}
+      onClose={() => setCitaDetalle(null)}
+      title="Detalle de la cita"
+      footer={
+        sePuedeCancelar(citaDetalle) ? (
+          <PieCancelarCita
+            cita={citaDetalle}
+            onCancelada={() => {
+              setCitaDetalle(null);
+              cargarCitas();
+            }}
+          />
+        ) : undefined
+      }
+    >
         {citaDetalle && (
           <div className="flex flex-col gap-4">
             <CategoryBadge nombre={citaDetalle.categoria_nombre} color={citaDetalle.categoria_color} />
