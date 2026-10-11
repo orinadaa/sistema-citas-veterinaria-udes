@@ -47,6 +47,17 @@ export function registrarCliente(datos) {
   return solicitar('/auth/registro', { metodo: 'POST', cuerpo: datos });
 }
 
+// Paso 2 del registro: { correo, solicitudId, codigo }. Crea la cuenta y
+// devuelve la sesion iniciada.
+export function verificarRegistro(datos) {
+  return solicitar('/auth/registro/verificar', { metodo: 'POST', cuerpo: datos });
+}
+
+// { correo, solicitudId }: codigo nuevo para un registro sin confirmar.
+export function reenviarCodigoRegistro(datos) {
+  return solicitar('/auth/registro/reenviar', { metodo: 'POST', cuerpo: datos });
+}
+
 export function iniciarSesion(datos) {
   return solicitar('/auth/login', { metodo: 'POST', cuerpo: datos });
 }

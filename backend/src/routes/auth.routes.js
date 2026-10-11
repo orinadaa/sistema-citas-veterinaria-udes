@@ -1,6 +1,14 @@
 // routes/auth.routes.js
 const express = require('express');
-const { registrar, iniciarSesion, olvideClave, restablecerClave, establecerPrimeraClave } = require('../controllers/auth.controller');
+const {
+  registrar,
+  verificarRegistro,
+  reenviarCodigoRegistro,
+  iniciarSesion,
+  olvideClave,
+  restablecerClave,
+  establecerPrimeraClave,
+} = require('../controllers/auth.controller');
 const { verificarToken, verificarTokenClaveTemporal } = require('../middlewares/auth.middleware');
 const { obtenerPerfilPropio } = require('../controllers/usuario.controller');
 
@@ -21,8 +29,14 @@ const limiteLoginPorCuenta = limitarIntentos({
 const limiteRegistro = limitarIntentos({ ventanaMinutos: 60, maximo: 10, mensaje: 'Se crearon demasiadas cuentas desde esta conexión. Inténtalo más tarde.' });
 const limiteCodigos = limitarIntentos({ ventanaMinutos: 15, maximo: 10 });
 
-// POST /api/auth/registro
+// POST /api/auth/registro — paso 1: envia el codigo al correo
 router.post('/registro', limiteRegistro, registrar);
+
+// POST /api/auth/registro/verificar — paso 2: con el codigo crea la cuenta
+router.post('/registro/verificar', limiteCodigos, verificarRegistro);
+
+// POST /api/auth/registro/reenviar — codigo nuevo para un registro pendiente
+router.post('/registro/reenviar', limiteCodigos, reenviarCodigoRegistro);
 
 // POST /api/auth/login
 router.post('/login', limiteLogin, limiteLoginPorCuenta, iniciarSesion);

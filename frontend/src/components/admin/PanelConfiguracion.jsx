@@ -195,13 +195,13 @@ export function PanelConfiguracion({ busquedaInicial }) {
               placeholder="Buscar usuario..."
               className="flex-1"
             />
-            <Desplegable value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)} className="campo px-3 py-2 text-sm">
+            <Desplegable aria-label="Filtrar por rol" value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)} className="campo px-3 py-2 text-sm">
               <option value="">Todos los roles</option>
               <option value="administrador">Administradores de sede</option>
               <option value="veterinario">Médicos</option>
               <option value="cliente">Clientes</option>
             </Desplegable>
-            <Desplegable
+            <Desplegable aria-label="Filtrar por estado"
               value={filtroEstado}
               onChange={(e) => setFiltroEstado(e.target.value)}
               className="campo px-3 py-2 text-sm"

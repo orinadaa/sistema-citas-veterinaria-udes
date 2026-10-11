@@ -19,6 +19,11 @@ if (process.env.JWT_SECRET.length < 32) {
   console.error('JWT_SECRET debe tener al menos 32 caracteres. Genera uno con: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'hex\'))"');
   process.exit(1);
 }
+// El correo no impide arrancar, pero sin el no llega el codigo que confirma
+// el correo al registrarse: nadie podria crear una cuenta.
+if (!process.env.SMTP_USER || !process.env.SMTP_APP_PASSWORD) {
+  console.warn('Aviso: faltan SMTP_USER o SMTP_APP_PASSWORD en backend/.env. No se enviarán correos y nadie podrá registrarse.');
+}
 
 const app = require('./app');
 const { iniciarRecordatorios } = require('./services/notificaciones.service');

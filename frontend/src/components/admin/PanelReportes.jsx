@@ -188,7 +188,7 @@ export function PanelReportes({ sedeFija = null }) {
       <div className="flex flex-wrap items-end gap-3">
         <div className={`flex-col gap-1.5 ${sedeFija ? 'hidden' : 'flex'}`}>
           <label className="text-xs font-medium text-white/90">Sede</label>
-          <Desplegable
+          <Desplegable aria-label="Filtrar por sede"
             value={sedeId}
             onChange={(e) => setSedeId(e.target.value)}
             className="campo px-3 py-2 text-sm"

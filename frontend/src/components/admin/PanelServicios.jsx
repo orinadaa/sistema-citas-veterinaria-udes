@@ -261,7 +261,7 @@ export function PanelServicios({ busquedaInicial, soloLectura = false }) {
           placeholder="Buscar servicio..."
           className="flex-1"
         />
-        <Desplegable
+        <Desplegable aria-label="Filtrar por categoría"
           value={filtroCategoria}
           onChange={(e) => setFiltroCategoria(e.target.value)}
           className="campo px-3 py-2 text-sm"
@@ -273,7 +273,7 @@ export function PanelServicios({ busquedaInicial, soloLectura = false }) {
             </option>
           ))}
         </Desplegable>
-        <Desplegable
+        <Desplegable aria-label="Filtrar por estado"
           value={filtroEstado}
           onChange={(e) => setFiltroEstado(e.target.value)}
           className="campo px-3 py-2 text-sm"

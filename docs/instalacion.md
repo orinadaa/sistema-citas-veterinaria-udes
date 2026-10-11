@@ -22,7 +22,7 @@ psql -U postgres -d clinica_veterinaria_udes -f database/datos_iniciales.sql
 
 `database/esquema.sql` equivale a ejecutar en orden todos los `incremento_*.sql`, que se conservan solo como historial de cómo creció la base. No hace falta ejecutarlos.
 
-Si la base ya existía de antes, no uses `esquema.sql`: ejecuta solo los `incremento_*.sql` que falten. El más reciente es `incremento_13a_seguridad_auditoria.sql`.
+Si la base ya existía de antes, no uses `esquema.sql`: ejecuta solo los `incremento_*.sql` que falten. Los más recientes son `incremento_13a_seguridad_auditoria.sql` e `incremento_13b_verificacion_correo.sql`.
 
 ## 2. Servidor (backend)
 
@@ -38,7 +38,7 @@ Abre `backend/.env` y llena al menos `DB_PASSWORD` y `JWT_SECRET`. El servidor n
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
-Los correos (confirmación de cita, códigos, credenciales del personal) necesitan `SMTP_USER` y `SMTP_APP_PASSWORD`. Sin ellos el sistema funciona, pero no envía correos.
+Los correos (confirmación de cita, códigos, credenciales del personal) necesitan `SMTP_USER` y `SMTP_APP_PASSWORD`. Sin ellos el sistema funciona, pero no envía correos y **nadie puede registrarse**: el registro confirma el correo con un código (ver `docs/verificacion_correo_pruebas.md`).
 
 Cuentas y fotos iniciales:
 

@@ -74,6 +74,24 @@ Clínica Veterinaria UDES`,
   });
 }
 
+// Codigo para confirmar el correo al registrarse: la cuenta se crea solo
+// cuando la persona lo escribe.
+async function enviarCodigoRegistro({ correo, nombreCompleto, codigo }) {
+  await enviarCorreo({
+    para: correo,
+    asunto: 'Confirma tu correo — Clínica Veterinaria UDES',
+    texto: `Hola ${nombreCompleto},
+
+Para terminar de crear tu cuenta en el Sistema de Citas de la Clínica Veterinaria UDES, escribe este código en la página de registro:
+
+${codigo}
+
+Este código vence en 15 minutos. Si no fuiste tú, ignora este mensaje: no se creará ninguna cuenta.
+
+Clínica Veterinaria UDES`,
+  });
+}
+
 // Codigo de recuperacion de clave (cualquier rol).
 async function enviarCodigoRecuperacion({ correo, nombreCompleto, codigo }) {
   await enviarCorreo({
@@ -222,6 +240,7 @@ module.exports = {
   enviarRecordatorioCita,
   enviarCredenciales,
   enviarBienvenidaCliente,
+  enviarCodigoRegistro,
   enviarCodigoRecuperacion,
   enviarConfirmacionCita,
   enviarRecordatorioCreado,
