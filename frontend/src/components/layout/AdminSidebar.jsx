@@ -33,8 +33,7 @@ import {
   IconoSalir,
 } from '../icons';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
-import logoColor from '../../assets/logocolor.webp';
-import logoCorto from '../../assets/logocorto.webp';
+import { useLogos } from '../../hooks/useLogos';
 
 // Administrador de sede: el dia a dia de SU sede.
 const ITEMS_NAV = [
@@ -103,6 +102,7 @@ export function AdminNavMovil({ activo, onCambiar }) {
 
 export function AdminSidebar({ activo, onCambiar }) {
   const { usuario } = useAuth();
+  const logos = useLogos();
   const [colapsado, setColapsado] = useState(leerColapsadoGuardado);
   const items = usuario?.rol === 'superadministrador' ? ITEMS_SUPER : ITEMS_NAV;
 
@@ -148,9 +148,9 @@ export function AdminSidebar({ activo, onCambiar }) {
 
       <div className={`mt-4 flex items-center px-4 ${colapsado ? 'justify-center px-0' : ''}`}>
         {colapsado ? (
-          <img src={logoCorto} alt="Clínica Veterinaria UDES" className="h-10 w-10 object-contain" />
+          <img src={logos.corto_color} alt="Clínica Veterinaria UDES" className="h-10 w-10 object-contain" />
         ) : (
-          <img src={logoColor} alt="Clínica Veterinaria UDES" className="h-auto w-full max-w-[200px] object-contain" />
+          <img src={logos.principal_color} alt="Clínica Veterinaria UDES" className="h-auto w-full max-w-[200px] object-contain" />
         )}
       </div>
 

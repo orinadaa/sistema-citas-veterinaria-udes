@@ -22,7 +22,7 @@ psql -U postgres -d clinica_veterinaria_udes -f database/datos_iniciales.sql
 
 `database/esquema.sql` equivale a ejecutar en orden todos los `incremento_*.sql`, que se conservan solo como historial de cómo creció la base. No hace falta ejecutarlos.
 
-Si la base ya existía de antes, no uses `esquema.sql`: ejecuta solo los `incremento_*.sql` que falten. Los más recientes son `incremento_13a_seguridad_auditoria.sql` e `incremento_13b_verificacion_correo.sql`.
+Si la base ya existía de antes, no uses `esquema.sql`: ejecuta solo los `incremento_*.sql` que falten. Los más recientes son `incremento_13a_seguridad_auditoria.sql`, `incremento_13b_verificacion_correo.sql` e `incremento_14a_logos.sql`.
 
 ## 2. Servidor (backend)
 

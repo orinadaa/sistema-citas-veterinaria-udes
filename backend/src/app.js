@@ -22,6 +22,7 @@ const datosRoutes = require('./routes/datos.routes');
 const cuentaRoutes = require('./routes/cuenta.routes');
 const notificacionRoutes = require('./routes/notificacion.routes');
 const clinicaRoutes = require('./routes/clinica.routes');
+const logoRoutes = require('./routes/logo.routes');
 const miCuentaRoutes = require('./routes/miCuenta.routes');
 const errorHandler = require('./middlewares/errorHandler');
 const { cabecerasSeguridad, origenesPermitidos, forzarHttps } = require('./middlewares/seguridad.middleware');
@@ -61,6 +62,7 @@ app.use('/api/datos', datosRoutes);
 app.use('/api/cuenta', cuentaRoutes);
 app.use('/api/notificaciones', notificacionRoutes);
 app.use('/api/clinica', clinicaRoutes);
+app.use('/api/logos', logoRoutes);
 app.use('/api/mi-cuenta', miCuentaRoutes);
 
 app.get('/', (req, res) => {

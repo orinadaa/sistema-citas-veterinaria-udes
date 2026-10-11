@@ -6,16 +6,17 @@
 // politica institucional de tratamiento de datos personales.
 import { Link } from 'react-router-dom';
 import { FondoVetui } from '../components/vetui';
-import logoBlanco from '../assets/logoblanco.webp';
+import { useLogos } from '../hooks/useLogos';
 
 const ACTUALIZADO = 'Octubre de 2026';
 
 function Marco({ titulo, children }) {
+  const logos = useLogos();
   return (
     <FondoVetui variante="sesion" textoDirecto className="flex min-h-[100dvh] flex-col items-center px-4 py-10">
       <header className="mb-6">
       <Link to="/">
-        <img src={logoBlanco} alt="Clínica Veterinaria UDES, ir al inicio" width="93" height="62" className="h-[62px] w-auto" />
+        <img src={logos.principal_blanco} alt="Clínica Veterinaria UDES, ir al inicio" width="93" height="62" className="h-[62px] w-auto" />
       </Link>
       </header>
       <main className="vidrio-blanco w-full max-w-3xl rounded-superficie p-6 sm:p-10">
