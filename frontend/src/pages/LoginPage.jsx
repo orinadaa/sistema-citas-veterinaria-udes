@@ -70,7 +70,7 @@ export function LoginPage() {
           ¿No tienes cuenta?{' '}
           <Link
             to={`/registrarse?next=${encodeURIComponent(siguienteExplicito || '/panel')}`}
-            className="font-medium text-brand-amber hover:text-amber-300"
+            className="inline-block py-1 font-medium text-brand-amber hover:text-amber-300"
           >
             Regístrate
           </Link>
@@ -105,7 +105,7 @@ export function LoginPage() {
 
         <Link
           to="/olvide-clave"
-          className="-mt-2 self-end text-sm font-medium text-brand-blue-700 hover:text-brand-blue-800"
+          className="-mt-2 self-end py-1 text-sm font-medium text-brand-blue-700 hover:text-brand-blue-800"
         >
           ¿Olvidaste tu contraseña?
         </Link>

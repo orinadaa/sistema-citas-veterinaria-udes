@@ -1,16 +1,42 @@
-# React + Vite
+# Frontend · Sistema de citas Clínica Veterinaria UDES
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web en React + Vite + Tailwind CSS v4.
 
-Currently, two official plugins are available:
+## Comandos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev       # desarrollo, en http://localhost:5173
+npm run build     # versión para publicar, en dist/
+npm run lint
+```
 
-## React Compiler
+En desarrollo, Vite reenvía `/api` y `/uploads` al backend (`http://localhost:4000`, ver `vite.config.js`). El backend debe estar corriendo.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Estructura
 
-## Expanding the ESLint configuration
+- `src/pages/`: una pantalla por ruta. Se cargan bajo demanda (ver `App.jsx`).
+- `src/components/`: por área (`landing`, `agendar`, `cliente`, `medico`, `admin`, `layout`, `form`, `ui`, `vetui`).
+- `src/api/client.js`: todas las llamadas al servidor.
+- `src/context/AuthContext.jsx`: sesión del usuario.
+- `src/styles/vetui.css`: tokens y utilidades del sistema de diseño.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Rutas
+
+| Ruta | Quién | Pantalla |
+|---|---|---|
+| `/` | Público | Inicio |
+| `/iniciar-sesion`, `/registrarse`, `/olvide-clave`, `/crear-clave` | Público | Sesión |
+| `/privacidad`, `/aviso-legal` | Público | Textos legales |
+| `/panel`, `/panel/perfil`, `/agendar` | Cliente | Citas, mascotas, perfil y agendamiento |
+| `/medico`, `/medico/perfil` | Médico veterinario | Agenda, pacientes, perfil y horario |
+| `/admin` | Administrador de sede y superadministrador | Panel de administración |
+| `/vetui` | Solo en desarrollo | Guía visual del sistema de diseño |
+
+Cualquier otra dirección muestra la página "No encontramos esta página".
+
+## Documentación
+
+- Sistema de diseño: `../docs/vetui.md`.
+- Instalación completa: `../docs/instalacion.md`.
+- Publicación: `../docs/despliegue.md`.

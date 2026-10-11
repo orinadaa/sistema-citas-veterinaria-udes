@@ -59,7 +59,7 @@ export function RegistroPage() {
           ¿Ya tienes cuenta?{' '}
           <Link
             to={`/iniciar-sesion?next=${encodeURIComponent(siguiente)}`}
-            className="font-medium text-brand-amber hover:text-amber-300"
+            className="inline-block py-1 font-medium text-brand-amber hover:text-amber-300"
           >
             Inicia sesión
           </Link>

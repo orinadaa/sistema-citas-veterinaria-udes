@@ -85,7 +85,7 @@ export function OlvideClavePage() {
           : 'Ingresa el código que recibiste y tu nueva contraseña.'
       }
       pieDePagina={
-        <Link to="/iniciar-sesion" className="font-medium text-brand-amber hover:text-amber-300">
+        <Link to="/iniciar-sesion" className="inline-block py-1 font-medium text-brand-amber hover:text-amber-300">
           Volver a iniciar sesión
         </Link>
       }
