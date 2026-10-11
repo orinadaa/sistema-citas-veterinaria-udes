@@ -21,7 +21,7 @@ import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoSede } from '../icons';
-import { CampoHora } from '../form/CampoHora';
+import { EditorHorarioSemana } from './EditorHorarioSemana';
 
 const DIAS = [
   { numero: 1, letra: 'L', nombre: 'Lunes' },
@@ -192,7 +192,7 @@ export function PanelHorarios({ sedeFija = null }) {
   }
 
   async function guardarDia(dia) {
-    if (!sedeEditando) return;
+    if (!sedeEditando) return false;
     setGuardandoDia(dia.numero);
     setError('');
     try {
@@ -202,23 +202,27 @@ export function PanelHorarios({ sedeFija = null }) {
       );
       setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, abierto: true } : d)));
       cargar();
+      return true;
     } catch (err) {
       setError(err.message);
+      return false;
     } finally {
       setGuardandoDia(null);
     }
   }
 
   async function cerrarDia(dia) {
-    if (!sedeEditando) return;
+    if (!sedeEditando) return false;
     setGuardandoDia(dia.numero);
     setError('');
     try {
       await cerrarDiaHorario(sedeEditando.id, dia.numero, token);
       setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, abierto: false } : d)));
       cargar();
+      return true;
     } catch (err) {
       setError(err.message);
+      return false;
     } finally {
       setGuardandoDia(null);
     }
@@ -396,57 +400,17 @@ export function PanelHorarios({ sedeFija = null }) {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           {sedeEditando ? (
-            <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 pt-4">
-              <p className="text-sm font-medium text-slate-700">Horario de atención</p>
-              {diasHorario.map((dia) => (
-                <div key={dia.numero} className="flex flex-wrap items-center gap-2">
-                  <span className="w-24 shrink-0 text-sm text-slate-600">{dia.nombre}</span>
-                  {dia.abierto ? (
-                    <>
-                      <CampoHora
-                        value={dia.horaInicio}
-                        onChange={(e) =>
-                          setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, horaInicio: e.target.value } : d)))
-                        }
-                        className="campo px-2 py-1 text-sm"
-                      />
-                      <span className="text-xs text-slate-400">a</span>
-                      <CampoHora
-                        value={dia.horaFin}
-                        onChange={(e) =>
-                          setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, horaFin: e.target.value } : d)))
-                        }
-                        className="campo px-2 py-1 text-sm"
-                      />
-                      <button
-                        type="button"
-                        disabled={guardandoDia === dia.numero}
-                        onClick={() => guardarDia(dia)}
-                        className="boton-texto rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition disabled:opacity-60"
-                      >
-                        Guardar
-                      </button>
-                      <button
-                        type="button"
-                        disabled={guardandoDia === dia.numero}
-                        onClick={() => cerrarDia(dia)}
-                        className="boton-texto rounded-boton px-2 py-1 text-xs font-medium text-brand-red transition disabled:opacity-60"
-                      >
-                        Cerrar
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={guardandoDia === dia.numero}
-                      onClick={() => guardarDia(dia)}
-                      className="boton-texto rounded-boton px-2 py-1 text-xs font-medium text-brand-blue transition disabled:opacity-60"
-                    >
-                      Abrir 08:00–17:00
-                    </button>
-                  )}
-                </div>
-              ))}
+            <div className={`flex flex-col gap-3 ${sedeFija ? '' : 'mt-2 border-t border-slate-900/10 pt-4'}`}>
+              {!sedeFija && <p className="text-sm font-medium text-slate-700">Horario de atención</p>}
+              <p className="text-xs text-slate-700">Elige un día, ajusta sus horas en el reloj y guárdalo. Cada día se guarda por separado.</p>
+              <EditorHorarioSemana
+                key={sedeEditando.id}
+                dias={diasHorario}
+                guardandoDia={guardandoDia}
+                onCambiar={(numero, cambios) => setDiasHorario((anterior) => anterior.map((d) => (d.numero === numero ? { ...d, ...cambios } : d)))}
+                onGuardar={guardarDia}
+                onCerrar={cerrarDia}
+              />
             </div>
           ) : (
             <p className="text-xs text-slate-400">Guarda la sede primero para configurar su horario de atención.</p>
