@@ -75,10 +75,7 @@ export function PanelInfoClinica() {
 
   return (
     <form onSubmit={guardar} className="flex flex-col gap-6" noValidate>
-      <div>
-        <p className="font-heading text-base font-semibold text-white">Información de la clínica</p>
-        <p className="mt-1 max-w-2xl text-sm text-white/90">Datos de contacto que ve cualquier visitante en la página pública.</p>
-      </div>
+      <p className="max-w-2xl text-sm text-white/90">Datos de contacto que ve cualquier visitante en la página pública.</p>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
