@@ -30,7 +30,7 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
     // -- la pagina nueva arranca ya sin sesion, sin ningun render
     // intermedio sobre /admin.
     localStorage.removeItem(CLAVE_ALMACENAMIENTO);
-    window.location.href = '/';
+    window.location.href = import.meta.env.BASE_URL;
   }
 
   const [menuAbierto, setMenuAbierto] = useState(false);
