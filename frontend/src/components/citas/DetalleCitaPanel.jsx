@@ -33,7 +33,8 @@ import {
   IconoUbicacion,
 } from '../icons';
 
-const ETIQUETA_SEXO = { macho: 'Macho', hembra: 'Hembra' };
+import { ETIQUETA_SEXO } from '../../utils/sexo';
+import { IconoSexo } from '../ui/EtiquetaSexo';
 
 // Texto fijo definido por la usuaria (especificacion final del panel).
 const RECOMENDACIONES = [
@@ -231,9 +232,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
               <div className="mt-1.5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-slate-600">
                 {cita.mascota_sexo && (
                   <span className="inline-flex items-center gap-1">
-                    <span aria-hidden="true" className="text-base leading-none text-brand-blue">
-                      {cita.mascota_sexo === 'hembra' ? '♀' : '♂'}
-                    </span>
+                    <IconoSexo sexo={cita.mascota_sexo} className="h-4 w-4 text-brand-blue" />
                     {ETIQUETA_SEXO[cita.mascota_sexo] ?? cita.mascota_sexo}
                   </span>
                 )}

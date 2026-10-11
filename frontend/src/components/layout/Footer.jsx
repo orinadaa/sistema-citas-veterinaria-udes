@@ -1,5 +1,16 @@
 // components/layout/Footer.jsx
+// Las redes sociales las configura el superadministrador (RF-23, Pagina web >
+// Informacion de la clinica): solo sale el icono de las que tienen enlace.
 import logoBlanco from '../../assets/logoblanco.png';
+import { useInfoClinica } from '../../hooks/useInfoClinica';
+import { IconoFacebook, IconoInstagram, IconoTiktok, IconoYoutube } from '../icons';
+
+const REDES = [
+  { clave: 'instagramUrl', nombre: 'Instagram', Icono: IconoInstagram },
+  { clave: 'facebookUrl', nombre: 'Facebook', Icono: IconoFacebook },
+  { clave: 'tiktokUrl', nombre: 'TikTok', Icono: IconoTiktok },
+  { clave: 'youtubeUrl', nombre: 'YouTube', Icono: IconoYoutube },
+];
 
 const ENLACES_RAPIDOS = [
   { href: '#servicios', etiqueta: 'Servicios' },
@@ -12,6 +23,8 @@ const ENLACES_RAPIDOS = [
 // ultimo punto del landing paginado (data-slide + snap), asi la rueda baja
 // hasta el y no rebota de vuelta a Horarios.
 export function Footer() {
+  const clinica = useInfoClinica();
+  const redes = REDES.filter((red) => clinica?.[red.clave]);
   return (
     <footer data-slide className="text-slate-300 lg:snap-start lg:snap-always" style={{ backgroundColor: '#0E172C' }}>
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-7 sm:px-6 md:grid-cols-3 md:gap-10">
@@ -42,6 +55,24 @@ export function Footer() {
           <p className="mt-2 text-sm text-slate-400">
             Clínica Veterinaria UDES, un servicio de la Vicerrectoría de Extensión.
           </p>
+          {redes.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-2" aria-label="Redes sociales">
+              {redes.map(({ clave, nombre, Icono }) => (
+                <li key={clave}>
+                  <a
+                    href={clinica[clave]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${nombre} (se abre en una pestaña nueva)`}
+                    title={nombre}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-slate-200 transition hover:bg-white/20 hover:text-white"
+                  >
+                    <Icono className="h-5 w-5" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 

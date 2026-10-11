@@ -24,6 +24,7 @@ import { hoyComoFechaLocal } from '../../utils/fecha';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { edadYPeso } from '../../utils/mascota';
 import { IconoLapiz, IconoMas, IconoPata, IconoPuntos } from '../icons';
+import { IconoSexo } from '../ui/EtiquetaSexo';
 
 const MAX_CARACTERISTICAS = 200;
 
@@ -78,9 +79,7 @@ function TarjetaMascota({ mascota, onEditar, accionesExtra = [] }) {
             <p className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
               {mascota.sexo && (
                 <span className="inline-flex items-center gap-1">
-                  <span aria-hidden="true" className={mascota.sexo === 'hembra' ? 'text-pink-500' : 'text-brand-blue'}>
-                    {mascota.sexo === 'hembra' ? '♀' : '♂'}
-                  </span>
+                  <IconoSexo sexo={mascota.sexo} className={`h-3.5 w-3.5 ${mascota.sexo === 'hembra' ? 'text-pink-500' : 'text-brand-blue'}`} />
                   {mascota.sexo === 'hembra' ? 'Hembra' : 'Macho'}
                 </span>
               )}

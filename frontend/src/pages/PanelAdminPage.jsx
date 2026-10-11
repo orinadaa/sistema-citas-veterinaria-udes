@@ -23,6 +23,8 @@ import { PanelCitasSeguimiento } from '../components/admin/PanelCitasSeguimiento
 import { PanelPacientes } from '../components/admin/PanelPacientes';
 import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
 import { PanelGaleria } from '../components/admin/PanelGaleria';
+import { PanelInfoClinica } from '../components/admin/PanelInfoClinica';
+import { PanelMiCuenta } from '../components/admin/PanelMiCuenta';
 import { PanelCatalogos } from '../components/admin/PanelCatalogos';
 import { PanelDatos } from '../components/admin/PanelDatos';
 import { PanelReportes } from '../components/admin/PanelReportes';
@@ -60,11 +62,14 @@ export function PanelAdminPage() {
       <AdminSidebar activo={pestana} onCambiar={irA} />
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
-        <AdminHeader onNavegar={navegarDesdeBusqueda} />
+        <AdminHeader onNavegar={navegarDesdeBusqueda} onMiCuenta={() => irA('cuenta')} />
 
         <div className="relative min-h-0 flex-1">
           <div aria-hidden="true" className="vidrio vidrio-hoja absolute inset-0 rounded-superficie" />
           <main className="hoja-panel relative h-full overflow-y-auto rounded-superficie px-6 py-8 text-white sm:px-8">
+            {/* Mi cuenta: se abre desde el menu del avatar, no desde el menu lateral. */}
+            {pestana === 'cuenta' && <PanelMiCuenta />}
+
             {/* Superadministrador */}
             {esSuper && pestana === 'inicio' && <PanelInicioSistema onIr={irA} />}
             {esSuper && pestana === 'sedes' && <PanelHorarios />}
@@ -73,6 +78,7 @@ export function PanelAdminPage() {
             {esSuper && pestana === 'web' && (
               <div className="flex flex-col gap-6">
                 <PageHeader title="Página web" subtitle="Lo que ve cualquier visitante en la página pública de la clínica." />
+                <PanelInfoClinica />
                 <PanelGaleria />
               </div>
             )}

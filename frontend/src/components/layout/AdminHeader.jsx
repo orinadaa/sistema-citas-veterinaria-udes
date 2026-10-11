@@ -16,7 +16,7 @@ import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerSe
 const ETIQUETA_ROL = { superadministrador: 'Superadministrador', administrador: 'Administrador de sede', veterinario: 'Médico Veterinario' };
 const RESULTADOS_VACIOS = { pacientes: [], medicos: [], servicios: [], usuarios: [], sedes: [] };
 
-export function AdminHeader({ onNavegar }) {
+export function AdminHeader({ onNavegar, onMiCuenta }) {
   const { usuario, token } = useAuth();
   const esAdmin = usuario?.rol === 'administrador';
   const esSuper = usuario?.rol === 'superadministrador';
@@ -294,6 +294,17 @@ export function AdminHeader({ onNavegar }) {
           {menuAbierto && (
             <div className="vidrio vidrio-hoja absolute inset-x-0 top-0 overflow-hidden rounded-[26px]">
               <div aria-hidden="true" className="h-[52px]" />
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuAbierto(false);
+                  onMiCuenta?.();
+                }}
+                className="hover-texto-ilumina relative block w-full border-t border-white/10 py-2.5 pl-[3.375rem] pr-4 text-left text-sm font-medium text-white transition hover:bg-white/10"
+              >
+                <IconoPersona className="absolute left-[1.125rem] top-1/2 h-4 w-4 -translate-y-1/2" />
+                Mi cuenta
+              </button>
               <button
                 type="button"
                 onClick={salir}
