@@ -80,7 +80,7 @@ export function PanelClientePage({ seccion = 'inicio' }) {
 
       <EncabezadoPagina
         antetitulo={enPerfil ? 'Mi perfil' : 'Mi cuenta'}
-        titulo={enPerfil ? usuario?.nombreCompleto ?? '' : `Hola, ${usuario?.nombreCompleto?.split(' ')[0] ?? ''} 👋`}
+        titulo={enPerfil ? usuario?.nombreCompleto ?? '' : `Hola, ${usuario?.nombreCompleto?.split(' ')[0] ?? ''}`}
         descripcion={
           enPerfil
             ? 'Consulta y actualiza tus datos personales, tu correo y tu contraseña.'

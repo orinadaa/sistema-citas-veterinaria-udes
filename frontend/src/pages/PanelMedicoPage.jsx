@@ -57,7 +57,7 @@ export function PanelMedicoPage({ seccion = 'inicio' }) {
 
       <EncabezadoPagina
         antetitulo={enPerfil ? 'Mi perfil' : 'Panel médico'}
-        titulo={enPerfil ? usuario?.nombreCompleto ?? '' : `Hola, ${nombre} 👋`}
+        titulo={enPerfil ? usuario?.nombreCompleto ?? '' : `Hola, ${nombre}`}
         descripcion={
           enPerfil
             ? 'Consulta y actualiza tu información personal, profesional y tu disponibilidad.'
