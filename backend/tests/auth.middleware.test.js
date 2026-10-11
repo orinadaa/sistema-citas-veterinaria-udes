@@ -34,13 +34,13 @@ describe('verificarToken', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  test('acepta un token valido y adjunta el usuario decodificado a req.usuario', () => {
+  test('acepta un token valido y adjunta el usuario decodificado a req.usuario', async () => {
     const token = jwt.sign({ id: 'abc123', rol: 'cliente' }, process.env.JWT_SECRET);
     const req = { headers: { authorization: `Bearer ${token}` } };
     const res = crearRespuestaFalsa();
     const next = jest.fn();
 
-    verificarToken(req, res, next);
+    await verificarToken(req, res, next);
 
     expect(next).toHaveBeenCalled();
     expect(req.usuario.id).toBe('abc123');

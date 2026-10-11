@@ -16,6 +16,23 @@ const CARPETA_UPLOADS = path.join(__dirname, '..', '..', 'uploads');
 const TAMANO_MAXIMO_BYTES = 5 * 1024 * 1024; // 5 MB
 const TIPOS_PERMITIDOS = { 'image/jpeg': '.jpg', 'image/png': '.png' };
 
+// Firma del archivo: JPG empieza por FF D8 FF; PNG por 89 50 4E 47 0D 0A 1A 0A.
+const FIRMA_PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+async function esImagenReal(ruta) {
+  let archivo;
+  try {
+    archivo = await fs.open(ruta, 'r');
+    const { buffer, bytesRead } = await archivo.read(Buffer.alloc(8), 0, 8, 0);
+    if (bytesRead < 8) return false;
+    const esJpg = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+    return esJpg || buffer.equals(FIRMA_PNG);
+  } catch {
+    return false;
+  } finally {
+    await archivo?.close();
+  }
+}
+
 function crearReceptorFoto(subcarpeta) {
   const carpeta = path.join(CARPETA_UPLOADS, subcarpeta);
   const rutaPublica = `/uploads/${subcarpeta}`;
@@ -37,8 +54,16 @@ function crearReceptorFoto(subcarpeta) {
   // Envuelve multer para responder 400 con un mensaje claro en vez de
   // dejar que sus errores lleguen como 500 al errorHandler generico.
   function middleware(req, res, next) {
-    receptor(req, res, (error) => {
-      if (!error) return next();
+    receptor(req, res, async (error) => {
+      if (!error) {
+        // El tipo que declara el navegador se puede falsear: se leen los
+        // primeros bytes y, si no son de un JPG o PNG real, se descarta.
+        if (req.file && !(await esImagenReal(req.file.path))) {
+          await fs.unlink(req.file.path).catch(() => {});
+          return res.status(400).json({ mensaje: 'El archivo no es una imagen JPG o PNG válida.' });
+        }
+        return next();
+      }
       if (error.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ mensaje: 'La foto no puede pesar más de 5 MB.' });
       }
