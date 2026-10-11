@@ -18,6 +18,7 @@ const SI_NO = [
 const DIA = `(ARRAY['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'])[h.dia_semana + 1]`;
 
 // columnas: { clave, etiqueta, sql, tipo?, opciones? (se puede filtrar), soloDetalle? }
+// interna: no se muestra como columna; con enFilas viaja ademas en cada fila del listado.
 // tipo: texto (por defecto) | fecha | fechaHora | booleano | numero | dinero
 const ENTIDADES = {
   usuarios: {
@@ -70,6 +71,9 @@ const ENTIDADES = {
       { clave: 'color', etiqueta: 'Color', sql: 'm.color', soloDetalle: true },
       { clave: 'dueno_correo', etiqueta: 'Correo del dueño', sql: 'c.correo', soloDetalle: true },
       { clave: 'cliente_id', etiqueta: 'cliente_id', sql: 'm.cliente_id', interna: true },
+      // La foto no es una columna de la tabla ni del CSV: viaja con cada fila
+      // para dibujar el avatar de la mascota.
+      { clave: 'foto_url', etiqueta: 'foto_url', sql: 'm.foto_url', interna: true, enFilas: true },
     ],
   },
   citas: {
@@ -194,7 +198,8 @@ function ordenValido(entidad, orden, direccion) {
 async function listar(nombre, { busqueda, filtros, relaciones, orden, direccion, limite, desplazamiento }) {
   const entidad = ENTIDADES[nombre];
   const { donde, valores } = condiciones(entidad, { busqueda, filtros, relaciones });
-  const seleccion = columnasDe(entidad)
+  const seleccion = entidad.columnas
+    .filter((c) => c.enFilas || (!c.soloDetalle && !c.interna))
     .map((c) => `${c.sql} AS "${c.clave}"`)
     .join(', ');
   const paginado = limite ? `LIMIT $${valores.length + 1} OFFSET $${valores.length + 2}` : '';
