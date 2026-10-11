@@ -344,7 +344,7 @@ export function Navbar({ onAgendar } = {}) {
     // confirmar antes (utils/guardiaSalida.js).
     salirConPermiso(() => {
       localStorage.removeItem(CLAVE_ALMACENAMIENTO);
-      window.location.href = '/';
+      window.location.href = import.meta.env.BASE_URL;
     });
   }
 
