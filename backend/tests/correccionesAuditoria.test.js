@@ -4,6 +4,7 @@
 // sesiones, mascotas, horario de atencion y copia de seguridad.
 jest.mock('../src/config/db', () => ({ pool: { query: jest.fn() } }));
 jest.mock('../src/models/usuario.model');
+jest.mock('../src/models/registroPendiente.model');
 jest.mock('../src/models/mascota.model');
 jest.mock('../src/models/pacienteMedico.model');
 jest.mock('../src/models/horario.model');
@@ -40,10 +41,26 @@ describe('Registro', () => {
   const registrar = (datos) => request(app).post('/api/auth/registro').send({ ...REGISTRO, ...datos });
 
   test('guarda el correo en minusculas y deja constancia de la autorizacion', async () => {
+    const registroPendienteModel = require('../src/models/registroPendiente.model');
     usuarioModel.buscarPorCorreo.mockResolvedValue(null);
-    usuarioModel.crearCliente.mockResolvedValue({ id: 'c1', nombre_completo: 'Ana Pérez', correo: 'ana@correo.com', rol: 'cliente' });
+    registroPendienteModel.guardar.mockResolvedValue('s1');
     const respuesta = await registrar({});
-    expect(respuesta.status).toBe(201);
+    expect(respuesta.status).toBe(202);
+    expect(registroPendienteModel.guardar).toHaveBeenCalledWith(expect.objectContaining({ correo: 'ana@correo.com' }));
+
+    registroPendienteModel.buscarPorCorreo.mockResolvedValue({
+      id: 's1',
+      correo: 'ana@correo.com',
+      nombre_completo: 'Ana Pérez',
+      contrasena_hash: 'hash',
+      telefono: null,
+      codigo_hash: await bcrypt.hash('123456', 4),
+      intentos: 0,
+      expira_en: new Date(Date.now() + 60000),
+    });
+    usuarioModel.crearCliente.mockResolvedValue({ id: 'c1', nombre_completo: 'Ana Pérez', correo: 'ana@correo.com', rol: 'cliente' });
+    const confirmada = await request(app).post('/api/auth/registro/verificar').send({ correo: ' Ana@Correo.com', solicitudId: 's1', codigo: '123456' });
+    expect(confirmada.status).toBe(201);
     expect(usuarioModel.crearCliente).toHaveBeenCalledWith(expect.objectContaining({ correo: 'ana@correo.com', autorizaTratamiento: true }));
   });
 

@@ -133,7 +133,7 @@ export function PanelPacientes({ busquedaInicial }) {
           placeholder="Buscar por nombre..."
           className="flex-1"
         />
-        <Desplegable
+        <Desplegable aria-label="Filtrar por sede"
           value={filtroSede}
           onChange={(e) => setFiltroSede(e.target.value)}
           className="campo px-3 py-2 text-sm"
@@ -145,7 +145,7 @@ export function PanelPacientes({ busquedaInicial }) {
             </option>
           ))}
         </Desplegable>
-        <Desplegable
+        <Desplegable aria-label="Filtrar por estado"
           value={filtroEstado}
           onChange={(e) => setFiltroEstado(e.target.value)}
           className="campo px-3 py-2 text-sm"

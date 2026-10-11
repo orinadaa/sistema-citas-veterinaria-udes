@@ -2,7 +2,9 @@
 
 Estado de cada observación de `docs/auditoria_sistema_2026-10-11.pdf` después de las correcciones del mismo día. Los identificadores son los del informe.
 
-Verificación: 431 pruebas del servidor pasan (24 nuevas en `backend/tests/correccionesAuditoria.test.js` y `cita.controller.test.js`), las consultas nuevas se probaron contra la base real en modo lectura, y las páginas públicas y la vista del médico se revisaron en el navegador con axe-core. **Las pantallas del administrador y del superadministrador no se abrieron en el navegador**: sus cambios compilan y pasan el lint, pero falta verlos en uso.
+Verificación: 431 pruebas del servidor pasan (24 nuevas en `backend/tests/correccionesAuditoria.test.js` y `cita.controller.test.js`), las consultas nuevas se probaron contra la base real en modo lectura, y las páginas públicas y la vista del médico se revisaron en el navegador con axe-core.
+
+Las pantallas del administrador de sede y del superadministrador se revisaron después, el mismo día, solo mirando (sin guardar, cancelar ni borrar; la base quedó idéntica): Médicos > Horario, la franja de módulos en celular y tableta, el detalle de una cita con la confirmación de cancelar, el horario de atención, y en el superadministrador Inicio, Sedes, Usuarios, Servicios, Página web, Catálogos, Datos (con la copia de seguridad) y Reportes. axe-core encontró 12 botones sin nombre que la auditoría no había visto (filtros desplegables, flechas de semana y accesos de las tarjetas del inicio); quedaron corregidos y ninguna de esas pantallas tiene ya observaciones. **Falta guardar algo desde ellas**: el botón "Guardar horario", "Agregar bloqueo", "Sí, cancelar la cita" y "Descargar copia de seguridad" no se pulsaron.
 
 ## Corregido
 
@@ -10,6 +12,7 @@ Verificación: 431 pruebas del servidor pasan (24 nuevas en `backend/tests/corre
 |---|---|
 | SEG-01 | El rol y la sede se leen de la base en cada petición (`utils/estadoCuenta.js`); un cambio de rol vale de inmediato. |
 | SEG-02 | Cambiar o restablecer la contraseña invalida los tokens anteriores (`usuario.sesiones_validas_desde`). Quien la cambia desde su perfil sigue con un token nuevo. |
+| SEG-04 | El registro verifica el correo con un código de 6 dígitos antes de crear la cuenta (ver `docs/verificacion_correo_pruebas.md`). Además: nombre validado, campo trampa contra bots y autorización obligatoria. |
 | SEG-05 | Los correos se guardan y se buscan en minúsculas y sin espacios. |
 | SEG-06 | Validación de nombre, teléfono, documento, textos y fecha de la mascota, y horas del horario. Además, los errores de dato que lleguen a la base responden 400 en vez de 500. |
 | SEG-07 | El médico solo consulta las mascotas de sus pacientes. |
@@ -34,7 +37,7 @@ Verificación: 431 pruebas del servidor pasan (24 nuevas en `backend/tests/corre
 | COD-01 | Borrados los restos de la plantilla y los PNG pesados. Las fotos de `servicios-foto/` se conservan: las usa `npm run seed:fotos-servicios` (el informe las contó como sin uso por error). |
 | COD-02 | Ícono de la pestaña: el logo corto a color sobre el azul de la píldora. |
 | COD-03 | Eliminadas las funciones sin uso. |
-| ACC-01 | Nombre accesible en las flechas del calendario, el cierre de los paneles y el menú lateral contraído. |
+| ACC-01 | Nombre accesible en las flechas del calendario, el cierre de los paneles, el menú lateral contraído y, en el panel de administración, los filtros desplegables, las flechas de semana y los accesos de las tarjetas. |
 | ACC-02 | Los paneles y ventanas cerrados quedan `inert`. |
 | ACC-03 | Corregidas las combinaciones medidas: insignias de categoría, verde de estado, botón azul, texto azul sobre blanco y pie de página. |
 | ACC-04 | Título de pestaña por página. |
@@ -54,7 +57,6 @@ Verificación: 431 pruebas del servidor pasan (24 nuevas en `backend/tests/corre
 | N.º | Hecho | Falta |
 |---|---|---|
 | SEG-03 | Guía de la política de contenido (CSP) en `docs/despliegue.md`. | Se configura en el hosting. La sesión sigue en localStorage. |
-| SEG-04 | Nombre validado, campo trampa contra bots y autorización obligatoria. | **Verificar el correo con un código al registrarse.** Cambia el flujo de registro: requiere tu decisión. |
 | SEG-10 | Opción `DB_SSL` y pasos para crear un usuario propio de base de datos. | Aplicarlo al desplegar. |
 | SEG-13 | La bitácora registra inicios de sesión fallidos, accesos denegados y contraseñas restablecidas. | Guardar los registros del servidor con retención (despliegue). |
 | SEG-17 | `npm audit fix`: quedan 0 avisos altos en el frontend. | 2 moderados por `exceljs` y los de herramientas de desarrollo dependen de sus autores. |
@@ -84,10 +86,10 @@ Sin cambio: ACC-08 (la descripción de cada foto de la portada ya se anuncia en 
 
 ## Cambios que conviene saber
 
-- **Registro:** ahora exige marcar la autorización de datos.
+- **Registro:** exige marcar la autorización de datos y confirmar el correo con un código. Sin el correo configurado en el servidor nadie puede registrarse.
 - **Inicio de sesión:** tras 10 intentos con el mismo correo en 15 minutos, esa cuenta espera.
 - **Cambio de contraseña:** cierra las demás sesiones abiertas de esa cuenta.
 - **Agendar:** un cliente no puede tener más de 10 citas por atender ni dos citas de la misma mascota a la vez.
 - **Horario de atención:** solo horas en punto o y media.
 - **Copia de seguridad:** pide la contraseña.
-- **Base de datos:** se aplicó `database/incremento_13a_seguridad_auditoria.sql` en la base local (dos columnas nuevas en `usuario` y cinco índices; no modifica datos).
+- **Base de datos:** se aplicó `database/incremento_13a_seguridad_auditoria.sql` en la base local (dos columnas nuevas en `usuario` y cinco índices; no modifica datos) y `database/incremento_13b_verificacion_correo.sql` (una tabla nueva, `registro_pendiente`).

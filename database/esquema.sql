@@ -304,6 +304,25 @@ CREATE TABLE public.recordatorio (
 
 
 --
+-- Name: registro_pendiente; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.registro_pendiente (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    correo character varying(150) NOT NULL,
+    nombre_completo character varying(150) NOT NULL,
+    contrasena_hash character varying(255) NOT NULL,
+    telefono character varying(20),
+    codigo_hash character varying(255) NOT NULL,
+    intentos integer DEFAULT 0 NOT NULL,
+    expira_en timestamp with time zone NOT NULL,
+    codigo_enviado_en timestamp with time zone DEFAULT now() NOT NULL,
+    autorizo_tratamiento_en timestamp with time zone DEFAULT now() NOT NULL,
+    creado_en timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: sede; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -584,6 +603,22 @@ ALTER TABLE ONLY public.raza
 
 ALTER TABLE ONLY public.recordatorio
     ADD CONSTRAINT recordatorio_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: registro_pendiente registro_pendiente_correo_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registro_pendiente
+    ADD CONSTRAINT registro_pendiente_correo_key UNIQUE (correo);
+
+
+--
+-- Name: registro_pendiente registro_pendiente_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registro_pendiente
+    ADD CONSTRAINT registro_pendiente_pkey PRIMARY KEY (id);
 
 
 --

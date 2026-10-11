@@ -7,7 +7,7 @@ El alcance del proyecto es entrega en entorno local. Esta guía reúne lo que ha
 1. **Quitar los datos de ejemplo:** `cd backend && npm run demo:quitar`.
 2. **Revisar los textos legales** (`frontend/src/pages/LegalPage.jsx`). Son un borrador: la Universidad de Santander debe aprobarlos y alinearlos con su política institucional de tratamiento de datos (Ley 1581 de 2012).
 3. **Completar la dirección de cada sede** y subir fotos propias desde el panel (Sedes). Hoy las fotos se cargan desde sitios de terceros.
-4. **Decidir la verificación de correo al registrarse** (pendiente; ver `docs/correcciones_auditoria.md`).
+4. **Configurar el correo** (`SMTP_USER` y `SMTP_APP_PASSWORD`). El registro verifica el correo con un código: sin correo nadie puede crear una cuenta. Conviene una cuenta de correo institucional y no una personal.
 
 ## Base de datos
 

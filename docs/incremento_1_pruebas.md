@@ -17,7 +17,7 @@ Ejecutadas con Jest + Supertest, con el modelo de datos (`usuario.model.js`) moc
 | ID | Descripción | Entrada | Resultado esperado | Resultado obtenido |
 |---|---|---|---|---|
 | PA-01 | Login con la cuenta de administrador sembrada por `npm run seed:admin` | `POST /api/auth/login` `{correo: admin@udes.edu.co, contrasena: CambiarEsta123}` | 200, devuelve `usuario` con `rol: administrador` y un `token` JWT | ✅ Igual a lo esperado |
-| PA-02 | Registro autoservicio de un cliente nuevo (RF-01) | `POST /api/auth/registro` con nombre, correo y contraseña válidos | 201, `usuario.rol = cliente`, `usuario.sedeId = null`, incluye `token` | ✅ Igual a lo esperado |
+| PA-02 (hasta el 10 de octubre de 2026; desde el 11 el registro confirma el correo con un código, ver `verificacion_correo_pruebas.md`) | Registro autoservicio de un cliente nuevo (RF-01) | `POST /api/auth/registro` con nombre, correo y contraseña válidos | 201, `usuario.rol = cliente`, `usuario.sedeId = null`, incluye `token` | ✅ Igual a lo esperado |
 | PA-03 | Registro con correo ya existente | Mismo correo del caso PA-02 | 409, mensaje "Ya existe una cuenta registrada con este correo." | ✅ Igual a lo esperado |
 | PA-04 | Consulta pública de sedes sin autenticación (RF-03) | `GET /api/sedes` sin token | 200, lista con Bucaramanga y Valledupar | ✅ Igual a lo esperado |
 | PA-05 | Acceso a `/api/usuarios` sin token (RF-05/RNF-04) | `GET /api/usuarios` sin header `Authorization` | 401 | ✅ Igual a lo esperado |

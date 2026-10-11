@@ -143,10 +143,10 @@ export function PanelCitasSeguimiento() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={irSemanaAnterior} className="boton-texto rounded-boton p-2 text-white transition">
+        <button type="button" aria-label="Semana anterior" onClick={irSemanaAnterior} className="boton-texto rounded-boton p-2 text-white transition">
           <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
         </button>
-        <button type="button" onClick={irSemanaSiguiente} className="boton-texto rounded-boton p-2 text-white transition">
+        <button type="button" aria-label="Semana siguiente" onClick={irSemanaSiguiente} className="boton-texto rounded-boton p-2 text-white transition">
           <IconoFlechaDerecha className="h-4 w-4" />
         </button>
         <button

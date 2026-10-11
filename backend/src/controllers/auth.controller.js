@@ -2,10 +2,18 @@
 // RF-01 (registro de clientes), RF-02 (inicio de sesion).
 // El registro publico solo crea usuarios con rol "cliente": las cuentas de
 // administrador/veterinario las crea un administrador (ver usuario.controller.js).
+// El registro va en dos pasos: 1) se guardan los datos como solicitud
+// pendiente y se envia un codigo al correo; 2) con el codigo correcto se
+// crea la cuenta. Asi el correo de toda cuenta es de quien la creo.
+// El paso 1 devuelve un identificador de la solicitud que el paso 2 debe
+// traer junto con el codigo: sin el, otra persona podria registrarse encima
+// con el mismo correo y su propia contraseña, y esperar a que el dueño del
+// correo escriba el codigo que le llega.
 
 const bcrypt = require('bcryptjs');
 const { buscarPorCorreo, crearCliente, actualizarContrasena, buscarConHashPorId } = require('../models/usuario.model');
 const recuperacionModel = require('../models/recuperacion.model');
+const registroPendienteModel = require('../models/registroPendiente.model');
 const bitacoraModel = require('../models/bitacora.model');
 const correoService = require('../services/correo.service');
 const { generarCodigoRecuperacion, errorContrasena } = require('../utils/contrasena.util');
@@ -15,6 +23,9 @@ const { normalizarCorreo, errorCorreo, errorNombre, errorTelefono } = require('.
 const RONDAS_SAL = 10;
 const MINUTOS_VIGENCIA_CODIGO = 15;
 const MAXIMO_INTENTOS_CODIGO = 5;
+const SEGUNDOS_ENTRE_CODIGOS = 60;
+// Una solicitud de registro sin confirmar se borra pasado este plazo.
+const HORAS_VIGENCIA_REGISTRO_PENDIENTE = 24;
 // Una cuenta de personal creada por el sistema debe entrar y poner su propia
 // contraseña dentro de este plazo; despues la clave temporal deja de servir.
 const HORAS_VIGENCIA_CLAVE_TEMPORAL = 72;
@@ -25,6 +36,11 @@ const MENSAJE_CLAVE_TEMPORAL_VENCIDA =
   'La contraseña temporal que recibiste por correo ya venció. Usa "¿Olvidaste tu contraseña?" para crear la tuya.';
 const MENSAJE_OLVIDE_CLAVE = 'Si el correo está registrado, se envió un código de recuperación.';
 const MENSAJE_CODIGO_INVALIDO = 'Código inválido o expirado.';
+const MENSAJE_CORREO_YA_REGISTRADO = 'Ya existe una cuenta registrada con este correo.';
+const MENSAJE_CODIGO_NO_ENVIADO =
+  'No pudimos enviar el código a ese correo. Revisa que esté bien escrito e inténtalo de nuevo.';
+const MENSAJE_REENVIO_REGISTRO = 'Si tienes un registro pendiente con ese correo, te enviamos un código nuevo.';
+const MENSAJE_CODIGO_RECIEN_ENVIADO = 'Acabamos de enviar un código a ese correo. Espera un minuto para pedir otro.';
 // Hash de relleno: cuando el correo no existe se compara igual contra el,
 // para que la respuesta tarde lo mismo que con un correo real (si no, medir
 // el tiempo dejaria averiguar que correos tienen cuenta).
@@ -50,7 +66,33 @@ function anotarSeguridad(accion, detalle, usuario) {
     .catch((error) => console.error('No se pudo escribir en la bitácora:', error.message));
 }
 
-// POST /api/auth/registro
+// Genera un codigo, lo guarda hasheado con la solicitud y lo envia.
+// Devuelve lo que devuelva guardarCodigo, o false si el correo no se pudo enviar.
+async function enviarCodigoDeRegistro({ correo, nombreCompleto }, guardarCodigo) {
+  const codigo = generarCodigoRecuperacion();
+  const codigoHash = await bcrypt.hash(codigo, RONDAS_SAL);
+  const expiraEn = new Date(Date.now() + MINUTOS_VIGENCIA_CODIGO * 60 * 1000);
+  const guardado = await guardarCodigo(codigoHash, expiraEn);
+  try {
+    await correoService.enviarCodigoRegistro({ correo, nombreCompleto, codigo });
+    return guardado ?? true;
+  } catch (error) {
+    console.error('No se pudo enviar el código de registro:', error.message);
+    return false;
+  }
+}
+
+// La solicitud pendiente es la de quien hace la peticion.
+function esSuSolicitud(pendiente, solicitudId) {
+  return Boolean(pendiente) && typeof solicitudId === 'string' && solicitudId === pendiente.id;
+}
+
+function enviadoHaceMenosDeUnMinuto(pendiente) {
+  return Boolean(pendiente) && Date.now() - new Date(pendiente.codigo_enviado_en).getTime() < SEGUNDOS_ENTRE_CODIGOS * 1000;
+}
+
+// POST /api/auth/registro — paso 1: valida los datos y envia el codigo al
+// correo. Todavia no crea la cuenta.
 async function registrar(req, res, next) {
   try {
     const { contrasena, sitioWeb, autorizaTratamiento } = req.body;
@@ -77,11 +119,85 @@ async function registrar(req, res, next) {
 
     const existente = await buscarPorCorreo(correo);
     if (existente) {
-      return res.status(409).json({ mensaje: 'Ya existe una cuenta registrada con este correo.' });
+      return res.status(409).json({ mensaje: MENSAJE_CORREO_YA_REGISTRADO });
     }
 
+    await registroPendienteModel.eliminarAntiguos(HORAS_VIGENCIA_REGISTRO_PENDIENTE);
     const contrasenaHash = await bcrypt.hash(contrasena, RONDAS_SAL);
-    const nuevoUsuario = await crearCliente({ nombreCompleto, correo, contrasenaHash, telefono, autorizaTratamiento: true });
+    const pendiente = await registroPendienteModel.buscarPorCorreo(correo);
+
+    // Si ya se le envio un codigo hace menos de un minuto no se manda otro,
+    // para no llenar el buzon. Si es la misma persona (volvio atras a
+    // corregir un dato) se guardan los datos nuevos y sigue sirviendo el
+    // mismo codigo; si no, debe esperar.
+    let solicitudId;
+    if (enviadoHaceMenosDeUnMinuto(pendiente)) {
+      if (!esSuSolicitud(pendiente, req.body.solicitudId)) {
+        return res.status(429).json({ mensaje: MENSAJE_CODIGO_RECIEN_ENVIADO });
+      }
+      await registroPendienteModel.actualizarDatos(correo, { nombreCompleto, contrasenaHash, telefono });
+      solicitudId = pendiente.id;
+    } else {
+      solicitudId = await enviarCodigoDeRegistro({ correo, nombreCompleto }, (codigoHash, expiraEn) =>
+        registroPendienteModel.guardar({ correo, nombreCompleto, contrasenaHash, telefono, codigoHash, expiraEn })
+      );
+      if (!solicitudId) {
+        // Sin codigo no hay como terminar: se descarta la solicitud para
+        // que pueda intentarlo de nuevo de inmediato.
+        await registroPendienteModel.eliminarPorCorreo(correo);
+        return res.status(502).json({ mensaje: MENSAJE_CODIGO_NO_ENVIADO });
+      }
+    }
+
+    return res.status(202).json({
+      verificacionPendiente: true,
+      solicitudId,
+      correo,
+      mensaje: `Te enviamos un código de 6 dígitos a ${correo}. Escríbelo para terminar de crear tu cuenta.`,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// POST /api/auth/registro/verificar — paso 2: { correo, solicitudId, codigo }.
+// Con el codigo correcto crea la cuenta y devuelve la sesion iniciada.
+async function verificarRegistro(req, res, next) {
+  try {
+    const correo = normalizarCorreo(req.body.correo);
+    const codigo = String(req.body.codigo ?? '').trim();
+    if (!correo || !codigo) {
+      return res.status(400).json({ mensaje: 'Correo y código son obligatorios.' });
+    }
+
+    const pendiente = await registroPendienteModel.buscarPorCorreo(correo);
+    if (
+      !esSuSolicitud(pendiente, req.body.solicitudId) ||
+      pendiente.intentos >= MAXIMO_INTENTOS_CODIGO ||
+      new Date(pendiente.expira_en) < new Date()
+    ) {
+      return res.status(400).json({ mensaje: MENSAJE_CODIGO_INVALIDO });
+    }
+    const coincide = await bcrypt.compare(codigo, pendiente.codigo_hash);
+    if (!coincide) {
+      await registroPendienteModel.incrementarIntentos(correo);
+      return res.status(400).json({ mensaje: MENSAJE_CODIGO_INVALIDO });
+    }
+
+    // Alguien pudo crear la cuenta con este correo mientras tanto.
+    if (await buscarPorCorreo(correo)) {
+      await registroPendienteModel.eliminarPorCorreo(correo);
+      return res.status(409).json({ mensaje: MENSAJE_CORREO_YA_REGISTRADO });
+    }
+
+    const nuevoUsuario = await crearCliente({
+      nombreCompleto: pendiente.nombre_completo,
+      correo,
+      contrasenaHash: pendiente.contrasena_hash,
+      telefono: pendiente.telefono,
+      autorizaTratamiento: true,
+    });
+    await registroPendienteModel.eliminarPorCorreo(correo);
 
     const usuarioCompleto = { ...nuevoUsuario, sede_id: null };
     const token = generarToken(usuarioCompleto);
@@ -90,7 +206,7 @@ async function registrar(req, res, next) {
     // creacion de la cuenta, nunca lleva credenciales. Es best-effort: si
     // falla el envio no se bloquea el registro (ya se creo la cuenta).
     try {
-      await correoService.enviarBienvenidaCliente({ correo, nombreCompleto });
+      await correoService.enviarBienvenidaCliente({ correo, nombreCompleto: pendiente.nombre_completo });
     } catch (error) {
       console.error('No se pudo enviar el correo de bienvenida:', error.message);
     }
@@ -98,8 +214,29 @@ async function registrar(req, res, next) {
     return res.status(201).json({ usuario: datosPublicos(usuarioCompleto), token });
   } catch (error) {
     if (error.code === '23505') {
-      return res.status(409).json({ mensaje: 'Ya existe una cuenta registrada con este correo.' });
+      return res.status(409).json({ mensaje: MENSAJE_CORREO_YA_REGISTRADO });
     }
+    next(error);
+  }
+}
+
+// POST /api/auth/registro/reenviar — { correo, solicitudId }. Codigo nuevo
+// para un registro pendiente, como mucho uno por minuto. Responde siempre lo
+// mismo, haya o no una solicitud con ese correo.
+async function reenviarCodigoRegistro(req, res, next) {
+  try {
+    const correo = normalizarCorreo(req.body.correo);
+    if (!correo) {
+      return res.status(400).json({ mensaje: 'El correo es obligatorio.' });
+    }
+    const pendiente = await registroPendienteModel.buscarPorCorreo(correo);
+    if (esSuSolicitud(pendiente, req.body.solicitudId) && !enviadoHaceMenosDeUnMinuto(pendiente)) {
+      await enviarCodigoDeRegistro({ correo, nombreCompleto: pendiente.nombre_completo }, (codigoHash, expiraEn) =>
+        registroPendienteModel.renovarCodigo(correo, codigoHash, expiraEn)
+      );
+    }
+    return res.status(200).json({ mensaje: MENSAJE_REENVIO_REGISTRO });
+  } catch (error) {
     next(error);
   }
 }
@@ -259,4 +396,4 @@ async function establecerPrimeraClave(req, res, next) {
   }
 }
 
-module.exports = { registrar, iniciarSesion, olvideClave, restablecerClave, establecerPrimeraClave };
+module.exports = { registrar, verificarRegistro, reenviarCodigoRegistro, iniciarSesion, olvideClave, restablecerClave, establecerPrimeraClave };
