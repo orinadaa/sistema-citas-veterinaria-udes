@@ -111,6 +111,13 @@ async function recordatorioDelMedico({ clienteId, nombreMascota, nombreMedico, t
   ]);
 }
 
+// El administrador de la sede cambio el horario o los bloqueos del medico
+// (el medico ya no los edita: se entera por aqui).
+async function horarioDelMedicoCambio(medicoId, titulo, mensaje) {
+  if (!activo()) return;
+  await enviar([{ usuarioId: medicoId, tipo: 'horario', titulo, mensaje, enlace: '/medico/perfil?tab=disponibilidad' }]);
+}
+
 // RF-18: recordatorio automatico de las citas que empiezan en las proximas
 // 24 horas. Aviso en la campana del cliente y correo (si su correo es real).
 // Devuelve cuantas citas se recordaron.
@@ -145,4 +152,4 @@ function iniciarRecordatorios(minutos = 10) {
   return setInterval(revisar, minutos * 60 * 1000);
 }
 
-module.exports = { citaAgendada, citaReprogramada, citaCancelada, mascotaRegistrada, recordatorioDelMedico, recordarCitasProximas, iniciarRecordatorios };
+module.exports = { citaAgendada, citaReprogramada, citaCancelada, mascotaRegistrada, recordatorioDelMedico, horarioDelMedicoCambio, recordarCitasProximas, iniciarRecordatorios };

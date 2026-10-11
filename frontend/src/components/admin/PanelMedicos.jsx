@@ -1,6 +1,6 @@
 // components/admin/PanelMedicos.jsx
 // RF-10/RF-11: CRUD de medicos de la sede del administrador (perfil,
-// especialidades y que servicio presta cada uno).
+// especialidades, que servicio presta cada uno y su horario de trabajo).
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -26,6 +26,7 @@ import { EstadoError } from '../ui/EstadoError';
 import { IconoMedicos } from '../icons';
 import { Desplegable } from '../form/Desplegable';
 import { CampoBusqueda } from '../form/CampoBusqueda';
+import { HorarioMedicoPanel } from './HorarioMedicoPanel';
 
 const FORM_VACIO = {
   nombreCompleto: '',
@@ -64,6 +65,8 @@ export function PanelMedicos({ busquedaInicial }) {
 
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [medicoEditando, setMedicoEditando] = useState(null);
+  // Medico cuyo horario de trabajo se esta definiendo (HorarioMedicoPanel).
+  const [medicoHorario, setMedicoHorario] = useState(null);
   const [form, setForm] = useState(FORM_VACIO);
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -230,7 +233,7 @@ export function PanelMedicos({ busquedaInicial }) {
 
   return (
     <>
-    <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
+    <div className="flex flex-col gap-6" inert={panelAbierto || Boolean(medicoHorario)} aria-hidden={panelAbierto || Boolean(medicoHorario)}>
       <PageHeader
         title="Médicos Veterinarios"
         subtitle="Gestiona el personal médico de tu sede."
@@ -351,13 +354,22 @@ export function PanelMedicos({ busquedaInicial }) {
           ]}
           rows={medicosFiltrados}
           actions={(m) => (
-            <button
-              type="button"
-              onClick={() => abrirEditar(m)}
-              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
-            >
-              Editar
-            </button>
+            <div className="flex items-center justify-end gap-1">
+              <button
+                type="button"
+                onClick={() => setMedicoHorario(m)}
+                className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+              >
+                Horario
+              </button>
+              <button
+                type="button"
+                onClick={() => abrirEditar(m)}
+                className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+              >
+                Editar
+              </button>
+            </div>
           )}
         />
       )}
@@ -501,6 +513,8 @@ export function PanelMedicos({ busquedaInicial }) {
           {error && <p className="text-sm text-red-600">{error}</p>}
         </form>
     </SidePanel>
+
+    <HorarioMedicoPanel medico={medicoHorario} onClose={() => setMedicoHorario(null)} />
 
     {/* En <body> (portal): mismo editor de foto que mascotas y "Mi perfil"
         del medico; entrega la foto ya recortada. */}

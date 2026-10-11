@@ -17,12 +17,7 @@ const {
   solicitarCambioCorreo,
   confirmarCambioCorreo,
 } = require('../controllers/perfilMedico.controller');
-const {
-  obtenerDisponibilidad,
-  guardarHorario,
-  crearBloqueo,
-  eliminarBloqueo,
-} = require('../controllers/disponibilidadMedico.controller');
+const { obtenerDisponibilidad } = require('../controllers/disponibilidadMedico.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 
@@ -57,10 +52,8 @@ router.put('/perfil/contrasena', cambiarContrasena);
 router.post('/perfil/correo', solicitarCambioCorreo);
 router.post('/perfil/correo/confirmar', confirmarCambioCorreo);
 
-// Disponibilidad propia (horario por sede + bloqueos)
+// Horario de trabajo y bloqueos: solo consulta. Los define el administrador
+// de la sede (ver administracion.routes.js).
 router.get('/disponibilidad', obtenerDisponibilidad);
-router.put('/disponibilidad/horario', guardarHorario);
-router.post('/disponibilidad/bloqueos', crearBloqueo);
-router.delete('/disponibilidad/bloqueos/:id', eliminarBloqueo);
 
 module.exports = router;

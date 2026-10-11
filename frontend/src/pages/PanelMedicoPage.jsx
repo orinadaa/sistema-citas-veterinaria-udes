@@ -60,7 +60,7 @@ export function PanelMedicoPage({ seccion = 'inicio' }) {
         titulo={enPerfil ? usuario?.nombreCompleto ?? '' : `Hola, ${nombre}`}
         descripcion={
           enPerfil
-            ? 'Consulta y actualiza tu información personal, profesional y tu disponibilidad.'
+            ? 'Actualiza tu información personal y profesional, y consulta tu horario de trabajo.'
             : 'Aquí tienes tu agenda y tus pacientes para atender el día de forma rápida y sencilla.'
         }
         className="py-6"

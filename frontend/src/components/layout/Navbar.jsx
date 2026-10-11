@@ -378,7 +378,7 @@ export function Navbar({ onAgendar } = {}) {
                   </Link>
                   <Link to="/medico/perfil?tab=disponibilidad" className="hover-texto-ilumina inline-flex items-center gap-2 transition hover:text-white">
                     <IconoReloj className="h-4 w-4" />
-                    Disponibilidad
+                    Mi horario
                   </Link>
                 </>
               ) : (
