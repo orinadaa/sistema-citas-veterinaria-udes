@@ -140,6 +140,15 @@ export function actualizarInfoClinica(datos, token) {
   return solicitar('/clinica', { metodo: 'PUT', cuerpo: datos, token });
 }
 
+// Logotipos de la clinica: { logos: { clave: ruta del archivo subido o null } }.
+export function obtenerLogos() {
+  return solicitar('/logos');
+}
+
+export function restaurarLogo(clave, token) {
+  return solicitar(`/logos/${clave}`, { metodo: 'DELETE', token });
+}
+
 export function solicitarCodigoRecuperacion(datos) {
   return solicitar('/auth/olvide-clave', { metodo: 'POST', cuerpo: datos });
 }
@@ -443,6 +452,11 @@ async function subirArchivo(ruta, archivo, token, campos = {}) {
   const cuerpo = await respuesta.json().catch(() => ({}));
   if (!respuesta.ok) throw new Error(cuerpo.mensaje || `Error inesperado (${respuesta.status})`);
   return cuerpo;
+}
+
+// Reemplaza un logotipo de la clinica (PNG, WebP o JPG, tal como se eligio).
+export function subirLogo(clave, archivo, token) {
+  return subirArchivo(`/logos/${clave}`, archivo, token);
 }
 
 // Fotos que el administrador sube como archivo (antes eran un enlace).

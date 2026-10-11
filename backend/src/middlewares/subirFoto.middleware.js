@@ -6,7 +6,9 @@
 // mismo patron que un sistema real con almacenamiento de archivos,
 // adaptado a una entrega local. Se usa para fotos de mascotas, la foto
 // de perfil del medico (la sube el o el administrador), la foto de cada
-// sede, la galeria del inicio y la foto de cada servicio.
+// sede, la galeria del inicio, la foto de cada servicio y los logotipos de
+// la clinica (estos ultimos admiten ademas WebP, que conserva la
+// transparencia y pesa menos).
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs/promises');
@@ -15,17 +17,20 @@ const multer = require('multer');
 const CARPETA_UPLOADS = path.join(__dirname, '..', '..', 'uploads');
 const TAMANO_MAXIMO_BYTES = 5 * 1024 * 1024; // 5 MB
 const TIPOS_PERMITIDOS = { 'image/jpeg': '.jpg', 'image/png': '.png' };
+const TIPOS_CON_WEBP = { ...TIPOS_PERMITIDOS, 'image/webp': '.webp' };
 
-// Firma del archivo: JPG empieza por FF D8 FF; PNG por 89 50 4E 47 0D 0A 1A 0A.
+// Firma del archivo: JPG empieza por FF D8 FF; PNG por 89 50 4E 47 0D 0A 1A 0A;
+// WebP por "RIFF", cuatro bytes de tamaño y "WEBP".
 const FIRMA_PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-async function esImagenReal(ruta) {
+async function esImagenReal(ruta, conWebp = false) {
   let archivo;
   try {
     archivo = await fs.open(ruta, 'r');
-    const { buffer, bytesRead } = await archivo.read(Buffer.alloc(8), 0, 8, 0);
-    if (bytesRead < 8) return false;
+    const { buffer, bytesRead } = await archivo.read(Buffer.alloc(12), 0, 12, 0);
+    if (bytesRead < 12) return false;
     const esJpg = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
-    return esJpg || buffer.equals(FIRMA_PNG);
+    const esWebp = conWebp && buffer.toString('latin1', 0, 4) === 'RIFF' && buffer.toString('latin1', 8, 12) === 'WEBP';
+    return esJpg || esWebp || buffer.subarray(0, 8).equals(FIRMA_PNG);
   } catch {
     return false;
   } finally {
@@ -33,19 +38,22 @@ async function esImagenReal(ruta) {
   }
 }
 
-function crearReceptorFoto(subcarpeta) {
+// conWebp: acepta tambien WebP (solo los logotipos).
+function crearReceptorFoto(subcarpeta, { conWebp = false } = {}) {
+  const tipos = conWebp ? TIPOS_CON_WEBP : TIPOS_PERMITIDOS;
+  const formatos = conWebp ? 'PNG, WebP o JPG' : 'JPG o PNG';
   const carpeta = path.join(CARPETA_UPLOADS, subcarpeta);
   const rutaPublica = `/uploads/${subcarpeta}`;
 
   const receptor = multer({
     storage: multer.diskStorage({
       destination: carpeta,
-      filename: (req, archivo, cb) => cb(null, `${crypto.randomUUID()}${TIPOS_PERMITIDOS[archivo.mimetype]}`),
+      filename: (req, archivo, cb) => cb(null, `${crypto.randomUUID()}${tipos[archivo.mimetype]}`),
     }),
     limits: { fileSize: TAMANO_MAXIMO_BYTES, files: 1 },
     fileFilter: (req, archivo, cb) => {
-      if (!TIPOS_PERMITIDOS[archivo.mimetype]) {
-        return cb(Object.assign(new Error('La foto debe ser JPG o PNG.'), { status: 400 }));
+      if (!tipos[archivo.mimetype]) {
+        return cb(Object.assign(new Error(`La imagen debe ser ${formatos}.`), { status: 400 }));
       }
       return cb(null, true);
     },
@@ -57,10 +65,10 @@ function crearReceptorFoto(subcarpeta) {
     receptor(req, res, async (error) => {
       if (!error) {
         // El tipo que declara el navegador se puede falsear: se leen los
-        // primeros bytes y, si no son de un JPG o PNG real, se descarta.
-        if (req.file && !(await esImagenReal(req.file.path))) {
+        // primeros bytes y, si no son de una imagen real, se descarta.
+        if (req.file && !(await esImagenReal(req.file.path, conWebp))) {
           await fs.unlink(req.file.path).catch(() => {});
-          return res.status(400).json({ mensaje: 'El archivo no es una imagen JPG o PNG válida.' });
+          return res.status(400).json({ mensaje: `El archivo no es una imagen ${formatos} válida.` });
         }
         return next();
       }
@@ -89,6 +97,7 @@ const fotosUsuarios = crearReceptorFoto('usuarios');
 const fotosSedes = crearReceptorFoto('sedes');
 const fotosGaleria = crearReceptorFoto('galeria');
 const fotosServicios = crearReceptorFoto('servicios');
+const archivosLogos = crearReceptorFoto('logos', { conWebp: true });
 
 module.exports = {
   subirFotoMascota: fotosMascotas.middleware,
@@ -98,4 +107,5 @@ module.exports = {
   fotosSedes,
   fotosGaleria,
   fotosServicios,
+  archivosLogos,
 };

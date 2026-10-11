@@ -4,6 +4,8 @@
 // configuraba el propio medico en "Mi perfil > Disponibilidad", que ahora
 // es solo de consulta).
 // - Horario semanal: por dia, si atiende, desde/hasta y una pausa opcional.
+//   Se edita con EditorHorarioMedico: los mismos botones por dia y el mismo
+//   reloj del horario de atencion de la sede.
 //   Siempre en la sede del administrador y dentro de su horario de atencion
 //   (el backend lo valida). Sin horario propio, el medico atiende con el
 //   horario de la sede.
@@ -23,6 +25,8 @@ import { EstadoError } from '../ui/EstadoError';
 import { CampoFecha } from '../form/CampoFecha';
 import { CampoHora } from '../form/CampoHora';
 import { IconoPapelera, IconoReloj } from '../icons';
+import { EditorHorarioMedico } from './EditorHorarioMedico';
+import { problemaDelDia } from '../../utils/horarioMedico';
 
 // Lunes primero (la BD guarda 0 = domingo).
 const DIAS = [
@@ -130,8 +134,15 @@ export function HorarioMedicoPanel({ medico, onClose }) {
   const sede = datos?.sedes.find((s) => s.id === datos.sedePrincipalId);
   const atencionDe = (dia) => sede?.horario.find((h) => h.dia_semana === dia);
 
+  // Los siete dias con el horario de atencion de la sede en cada uno.
+  const diasEditor = DIAS.map(({ dia, nombre }) => {
+    const h = atencionDe(dia);
+    return { dia, nombre, atencion: h ? { inicio: hhmm(h.hora_inicio), fin: hhmm(h.hora_fin) } : null };
+  });
+
   function cambiarDia(dia, cambios) {
     setSemana((s) => ({ ...s, [dia]: { ...s[dia], ...cambios } }));
+    setEstadoHorario(null);
   }
 
   // Al personalizar se parte del horario de atencion de la sede.
@@ -163,7 +174,15 @@ export function HorarioMedicoPanel({ medico, onClose }) {
   }
 
   function guardarSemana() {
-    const dias = DIAS.filter(({ dia }) => semana[dia]?.activo).map(({ dia }) => {
+    // Un dia en que la sede no abre no cuenta aunque hubiera quedado marcado.
+    const conProblema = diasEditor.find((d) => problemaDelDia(semana[d.dia], d.atencion));
+    if (conProblema) {
+      setEstadoHorario({ tipo: 'error', texto: `Revisa el ${conProblema.nombre.toLowerCase()}: ${problemaDelDia(semana[conProblema.dia], conProblema.atencion)}` });
+      return;
+    }
+    const dias = diasEditor
+      .filter(({ dia, atencion }) => atencion && semana[dia]?.activo)
+      .map(({ dia }) => {
       const d = semana[dia];
       return {
         diaSemana: dia,
@@ -172,7 +191,7 @@ export function HorarioMedicoPanel({ medico, onClose }) {
         pausaInicio: d.conPausa ? d.pausaInicio : null,
         pausaFin: d.conPausa ? d.pausaFin : null,
       };
-    });
+      });
     if (dias.length === 0) {
       setEstadoHorario({ tipo: 'error', texto: 'Marca al menos un día, o vuelve al horario de la sede.' });
       return;
@@ -302,85 +321,10 @@ export function HorarioMedicoPanel({ medico, onClose }) {
               </>
             ) : (
               <>
-                {DIAS.map(({ dia, nombre }) => {
-                  const d = semana[dia];
-                  const atencion = atencionDe(dia);
-                  return (
-                    <div key={dia} className={`rounded-xl p-3 ring-1 ${d.activo ? 'bg-white ring-slate-200' : 'bg-slate-50 ring-slate-200'}`}>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                        <label className="flex w-28 items-center gap-2 text-sm font-medium text-slate-800">
-                          <input
-                            type="checkbox"
-                            checked={d.activo}
-                            disabled={!atencion}
-                            onChange={(e) =>
-                              cambiarDia(dia, {
-                                activo: e.target.checked,
-                                horaInicio: d.horaInicio || (atencion ? hhmm(atencion.hora_inicio) : ''),
-                                horaFin: d.horaFin || (atencion ? hhmm(atencion.hora_fin) : ''),
-                              })
-                            }
-                            className="casilla"
-                          />
-                          {nombre}
-                        </label>
-                        {!atencion ? (
-                          <span className="text-xs text-slate-600">La sede no atiende este día</span>
-                        ) : (
-                          <>
-                            <CampoHora
-                              aria-label={`Hora de inicio del ${nombre}`}
-                              value={d.horaInicio}
-                              disabled={!d.activo}
-                              onChange={(e) => cambiarDia(dia, { horaInicio: e.target.value })}
-                              className={CLASE_CAMPO}
-                            />
-                            <span className="text-sm text-slate-600">a</span>
-                            <CampoHora
-                              aria-label={`Hora de fin del ${nombre}`}
-                              value={d.horaFin}
-                              disabled={!d.activo}
-                              onChange={(e) => cambiarDia(dia, { horaFin: e.target.value })}
-                              className={CLASE_CAMPO}
-                            />
-                          </>
-                        )}
-                      </div>
-                      {d.activo && d.conPausa && (
-                        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-700">
-                          <span className="w-28">Pausa</span>
-                          <CampoHora
-                            aria-label={`Inicio de la pausa del ${nombre}`}
-                            value={d.pausaInicio}
-                            onChange={(e) => cambiarDia(dia, { pausaInicio: e.target.value })}
-                            className={CLASE_CAMPO}
-                          />
-                          <span className="text-slate-600">a</span>
-                          <CampoHora
-                            aria-label={`Fin de la pausa del ${nombre}`}
-                            value={d.pausaFin}
-                            onChange={(e) => cambiarDia(dia, { pausaFin: e.target.value })}
-                            className={CLASE_CAMPO}
-                          />
-                        </div>
-                      )}
-                      {d.activo && atencion && (
-                        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                          <p className="text-xs text-slate-600">
-                            La sede atiende de {hhmm(atencion.hora_inicio)} a {hhmm(atencion.hora_fin)}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => cambiarDia(dia, d.conPausa ? { conPausa: false, pausaInicio: '', pausaFin: '' } : { conPausa: true })}
-                            className="boton-texto text-xs font-semibold text-brand-blue-700"
-                          >
-                            {d.conPausa ? 'Quitar pausa' : 'Agregar pausa'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                <p className="text-xs text-slate-700">
+                  Elige un día y ajusta sus horas en el reloj. Los cambios de toda la semana se guardan juntos con «Guardar horario».
+                </p>
+                <EditorHorarioMedico key={medicoId} dias={diasEditor} semana={semana} onCambiar={cambiarDia} />
                 <Mensaje estado={estadoHorario} />
               </>
             )}

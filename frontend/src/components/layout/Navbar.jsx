@@ -31,9 +31,7 @@
 // listener de scroll.
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logoCorto from '../../assets/logocorto.webp';
-import logoGrande from '../../assets/logoblanco.webp';
-import logoCortoBlanco from '../../assets/logocortoblanco.webp';
+import { useLogos } from '../../hooks/useLogos';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { rutaAgendarCita, rutaPanelPorRol } from '../../utils/rutas';
 import { salirConPermiso } from '../../utils/guardiaSalida';
@@ -136,6 +134,7 @@ const CLASE_ICONO_OPCION = 'absolute left-[calc(var(--sangria,2.5rem)-1.5rem)] t
 // onAgendar (opcional, solo medico): lo que hace su boton "Agendar cita"
 // (abrir su panel de agendar). Sin el, lleva a /medico con el panel abierto.
 export function Navbar({ onAgendar } = {}) {
+  const logos = useLogos();
   const { estaAutenticado, usuario } = useAuth();
   const navegar = useNavigate();
   const ubicacion = useLocation();
@@ -435,7 +434,7 @@ export function Navbar({ onAgendar } = {}) {
                        aparece el logo corto a color; como esta alineado al
                        pixel con el blanco, la luna se pinta de ambar. */}
                 <img
-                  src={logoGrande}
+                  src={logos.principal_blanco}
                   alt=""
                   className="absolute left-1/2 top-1/2 h-[84px] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
                   style={{
@@ -460,13 +459,13 @@ export function Navbar({ onAgendar } = {}) {
                   }}
                 >
                   <img
-                    src={logoCortoBlanco}
+                    src={logos.corto_blanco}
                     alt=""
                     className="h-10 w-auto max-w-none object-contain"
                     style={{ opacity: 'clamp(0, (var(--flow, 0) - 0.1) / 0.25, 1)' }}
                   />
                   <img
-                    src={logoCorto}
+                    src={logos.corto_color}
                     alt=""
                     className="absolute inset-0 h-10 w-auto max-w-none object-contain"
                     style={{ opacity: 'clamp(0, (var(--flow, 0) - 0.75) / 0.25, 1)' }}

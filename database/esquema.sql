@@ -229,6 +229,19 @@ CREATE TABLE public.informacion_clinica (
 
 
 --
+-- Name: logo_clinica; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.logo_clinica (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    clave character varying(30) NOT NULL,
+    archivo_url character varying(255) NOT NULL,
+    actualizado_en timestamp without time zone DEFAULT now(),
+    creado_en timestamp without time zone DEFAULT now()
+);
+
+
+--
 -- Name: mascota; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -563,6 +576,22 @@ ALTER TABLE ONLY public.horario_medico
 
 ALTER TABLE ONLY public.informacion_clinica
     ADD CONSTRAINT informacion_clinica_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: logo_clinica logo_clinica_clave_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.logo_clinica
+    ADD CONSTRAINT logo_clinica_clave_key UNIQUE (clave);
+
+
+--
+-- Name: logo_clinica logo_clinica_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.logo_clinica
+    ADD CONSTRAINT logo_clinica_pkey PRIMARY KEY (id);
 
 
 --
