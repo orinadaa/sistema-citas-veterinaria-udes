@@ -123,7 +123,7 @@ export function AdminSidebar({ activo, onCambiar }) {
   // limpia la sesion y se recarga, sin render intermedio sobre /admin.
   function salir() {
     localStorage.removeItem(CLAVE_ALMACENAMIENTO);
-    window.location.href = '/';
+    window.location.href = import.meta.env.BASE_URL;
   }
 
   return (

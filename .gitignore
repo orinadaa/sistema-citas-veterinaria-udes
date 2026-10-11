@@ -19,3 +19,7 @@ npm-debug.log*
 # Fotos subidas por los usuarios (se generan en uso, no van al repo)
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+# Demostracion sin servidor (se genera con frontend/demo/publicar.mjs)
+frontend/dist-demo/
+frontend/demo/uploads/

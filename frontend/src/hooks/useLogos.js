@@ -23,7 +23,7 @@ export const LOGOS_ORIGINALES = {
   principal_color: logoColor,
   corto_color: logoCorto,
   corto_blanco: logoCortoBlanco,
-  icono: '/favicon.png',
+  icono: `${import.meta.env.BASE_URL}favicon.png`,
 };
 const CLAVES = Object.keys(LOGOS_ORIGINALES);
 const CLAVE_GUARDADO = 'udes_veterinaria_logos';

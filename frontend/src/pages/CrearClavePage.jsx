@@ -50,7 +50,7 @@ export function CrearClavePage() {
 
   function salir() {
     localStorage.removeItem(CLAVE_ALMACENAMIENTO);
-    window.location.href = '/iniciar-sesion';
+    window.location.href = `${import.meta.env.BASE_URL}iniciar-sesion`;
   }
 
   return (
