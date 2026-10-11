@@ -13,7 +13,6 @@ import { AdminSidebar } from '../components/layout/AdminSidebar';
 import { AdminHeader } from '../components/layout/AdminHeader';
 import { useAuth } from '../context/AuthContext';
 import { FondoVetui } from '../components/vetui';
-import { PageHeader } from '../components/ui/PageHeader';
 import { PanelInicioSede } from '../components/admin/PanelInicioSede';
 import { PanelInicioSistema } from '../components/admin/PanelInicioSistema';
 import { PanelServicios } from '../components/admin/PanelServicios';
@@ -22,8 +21,7 @@ import { PanelHorarios } from '../components/admin/PanelHorarios';
 import { PanelCitasSeguimiento } from '../components/admin/PanelCitasSeguimiento';
 import { PanelPacientes } from '../components/admin/PanelPacientes';
 import { PanelConfiguracion } from '../components/admin/PanelConfiguracion';
-import { PanelGaleria } from '../components/admin/PanelGaleria';
-import { PanelInfoClinica } from '../components/admin/PanelInfoClinica';
+import { PanelPaginaWeb } from '../components/admin/PanelPaginaWeb';
 import { PanelMiCuenta } from '../components/admin/PanelMiCuenta';
 import { PanelCatalogos } from '../components/admin/PanelCatalogos';
 import { PanelDatos } from '../components/admin/PanelDatos';
@@ -75,13 +73,7 @@ export function PanelAdminPage() {
             {esSuper && pestana === 'sedes' && <PanelHorarios />}
             {esSuper && pestana === 'usuarios' && <PanelConfiguracion key={busquedaPorPestana.usuarios} busquedaInicial={busquedaPorPestana.usuarios} />}
             {esSuper && pestana === 'servicios' && <PanelServicios busquedaInicial={busquedaPorPestana.servicios} />}
-            {esSuper && pestana === 'web' && (
-              <div className="flex flex-col gap-6">
-                <PageHeader title="Página web" subtitle="Lo que ve cualquier visitante en la página pública de la clínica." />
-                <PanelInfoClinica />
-                <PanelGaleria />
-              </div>
-            )}
+            {esSuper && pestana === 'web' && <PanelPaginaWeb />}
             {esSuper && pestana === 'catalogos' && <PanelCatalogos />}
             {esSuper && pestana === 'datos' && <PanelDatos />}
             {esSuper && pestana === 'reportes' && <PanelReportes />}
