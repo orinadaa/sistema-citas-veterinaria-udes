@@ -77,3 +77,16 @@ Referrer-Policy: strict-origin-when-cross-origin
 ## Dependencias
 
 `npm audit` queda con avisos solo en herramientas de desarrollo del servidor (jest, nodemon) y dos moderados en el frontend por `exceljs` → `uuid`, que se corrigen cuando `exceljs` publique una versión nueva. Ninguno afecta el uso actual.
+
+## Demostración sin servidor (GitHub Pages)
+
+Para mostrar la plataforma sin instalar nada existe una compilación de demostración: no usa servidor ni base de datos, responde con lecturas grabadas de las cuentas de ejemplo (`@demo.udes.co`) y no guarda ningún cambio. Sirve para enseñar las pantallas, no para usar el sistema.
+
+Desde `frontend/`, con el frontend y el backend encendidos y los datos de ejemplo cargados:
+
+```
+node demo/grabar.mjs                    # graba las lecturas (solo mira) y sustituye los datos de las cuentas que no son de ejemplo
+node demo/publicar.mjs nombre-del-repo  # compila en frontend/dist-demo (agregar --servir para probarla en http://localhost:4173)
+```
+
+El contenido de `frontend/dist-demo` se publica en la rama `gh-pages` del repositorio. Entran las tres cuentas de ejemplo con cualquier contraseña; el superadministrador no está incluido. El reloj de la demostración queda fijo en el momento de la grabación. Para retirarla basta borrar la rama `gh-pages`.
