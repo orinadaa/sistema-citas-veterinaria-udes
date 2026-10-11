@@ -19,10 +19,16 @@ const {
   cancelarCita,
 } = require('../controllers/cita.controller');
 const { verificarToken, verificarRol } = require('../middlewares/auth.middleware');
+const { limitarIntentos } = require('../middlewares/seguridad.middleware');
 
 const router = express.Router();
 
 router.use(verificarToken);
+
+// Topes por cuenta: frenan reservar en masa y abusar del reenvio de correos.
+const porCuenta = (req) => `cuenta:${req.usuario.id}`;
+const limiteAgendar = limitarIntentos({ ventanaMinutos: 15, maximo: 30, clave: porCuenta, mensaje: 'Estás agendando demasiado rápido. Espera unos minutos.' });
+const limiteReenvio = limitarIntentos({ ventanaMinutos: 15, maximo: 5, clave: porCuenta, mensaje: 'Ya reenviamos la confirmación varias veces. Revisa tu correo o inténtalo más tarde.' });
 
 // GET /api/citas/disponibilidad?sedeId=...&servicioId=...&fecha=YYYY-MM-DD
 router.get('/disponibilidad', verificarRol('cliente', 'administrador', 'veterinario'), consultarDisponibilidad);
@@ -34,15 +40,16 @@ router.get('/medicos-disponibles', verificarRol('cliente', 'administrador'), con
 router.get('/mias', verificarRol('cliente'), misCitas);
 
 // POST /api/citas
-router.post('/', verificarRol('cliente', 'administrador', 'veterinario'), crear);
+router.post('/', verificarRol('cliente', 'administrador', 'veterinario'), limiteAgendar, crear);
 
 // POST /api/citas/:id/reenviar-confirmacion — exclusivo del cliente dueño
-router.post('/:id/reenviar-confirmacion', verificarRol('cliente'), reenviarConfirmacion);
+router.post('/:id/reenviar-confirmacion', verificarRol('cliente'), limiteReenvio, reenviarConfirmacion);
 
-// PATCH /api/citas/:id/reprogramar — exclusivo del cliente dueño de la cita
-router.patch('/:id/reprogramar', verificarRol('cliente'), reprogramarCita);
-
-// PATCH /api/citas/:id/cancelar — exclusivo del cliente dueño de la cita
-router.patch('/:id/cancelar', verificarRol('cliente'), cancelarCita);
+// PATCH /api/citas/:id/reprogramar y /cancelar — el cliente dueño, el
+// administrador de la sede de la cita o el medico que la atiende (el
+// controlador comprueba cual de los tres; ver puedeGestionarCita).
+const quienGestiona = verificarRol('cliente', 'administrador', 'veterinario');
+router.patch('/:id/reprogramar', quienGestiona, reprogramarCita);
+router.patch('/:id/cancelar', quienGestiona, cancelarCita);
 
 module.exports = router;

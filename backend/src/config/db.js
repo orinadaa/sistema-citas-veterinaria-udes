@@ -14,6 +14,11 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+  // Produccion: DB_SSL=true cifra la conexion con la base (en local no hace falta).
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: process.env.DB_SSL_VERIFICAR !== 'false' } : undefined,
+  // Las fechas del sistema son hora de Colombia: la sesion de la base usa
+  // la misma zona que el servidor (ver server.js), este donde este alojado.
+  options: `-c timezone=${process.env.TZ || 'America/Bogota'}`,
 });
 
 // Escucha errores inesperados en clientes inactivos del pool.

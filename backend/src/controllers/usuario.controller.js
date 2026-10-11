@@ -11,9 +11,11 @@ const {
   listarTodos,
   actualizarRol,
   actualizarPerfil,
+  contarCitasFuturasDeCuenta,
 } = require('../models/usuario.model');
 const correoService = require('../services/correo.service');
 const { generarContrasenaTemporal } = require('../utils/contrasena.util');
+const { normalizarCorreo, errorCorreo, errorNombre, errorTelefono } = require('../utils/validacion');
 
 const ROLES_VALIDOS = ['superadministrador', 'administrador', 'veterinario', 'cliente'];
 // Roles que se pueden asignar desde el sistema. El superadministrador no:
@@ -59,7 +61,9 @@ async function listar(req, res, next) {
 // POST /api/usuarios (solo administrador) — alta de personal administrativo/veterinario
 async function crearStaff(req, res, next) {
   try {
-    const { nombreCompleto, correo, rol, sedeId, telefono } = req.body;
+    const { rol, sedeId, telefono } = req.body;
+    const nombreCompleto = String(req.body.nombreCompleto ?? '').trim();
+    const correo = normalizarCorreo(req.body.correo);
 
     if (!nombreCompleto || !correo || !rol || !sedeId) {
       return res.status(400).json({
@@ -70,6 +74,11 @@ async function crearStaff(req, res, next) {
       return res.status(400).json({
         mensaje: 'Este endpoint solo crea cuentas de administrador o veterinario. Para clientes use /api/auth/registro.',
       });
+    }
+
+    const problema = errorNombre(nombreCompleto) || errorCorreo(correo) || errorTelefono(telefono);
+    if (problema) {
+      return res.status(400).json({ mensaje: problema });
     }
 
     // La contraseña nunca la escribe el admin: se autogenera y se envia
@@ -127,6 +136,17 @@ async function cambiarRol(req, res, next) {
       return res.status(403).json({ mensaje: 'El rol del superadministrador no se puede cambiar desde el sistema.' });
     }
 
+    // Un medico con citas por atender no puede dejar de ser medico: esas
+    // citas quedarian a nombre de alguien que ya no atiende.
+    if (objetivo && objetivo.rol === 'veterinario' && rol !== 'veterinario') {
+      const pendientes = await contarCitasFuturasDeCuenta(id);
+      if (pendientes > 0) {
+        return res.status(409).json({
+          mensaje: `Esta cuenta tiene ${pendientes} ${pendientes === 1 ? 'cita agendada' : 'citas agendadas'} como médico. Reasígnalas o cancélalas antes de cambiarle el rol.`,
+        });
+      }
+    }
+
     const usuarioActualizado = await actualizarRol(id, { rol, sedeId: rol === 'cliente' ? null : sedeId });
     if (!usuarioActualizado) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
@@ -150,13 +170,23 @@ async function actualizarPerfilUsuario(req, res, next) {
     if (activo === false && id === req.usuario.id) {
       return res.status(400).json({ mensaje: 'No puedes desactivar tu propia cuenta.' });
     }
+    if (activo !== undefined && typeof activo !== 'boolean') {
+      return res.status(400).json({ mensaje: 'El estado de la cuenta debe ser verdadero o falso.' });
+    }
+    const problema = (nombreCompleto !== undefined && errorNombre(nombreCompleto)) || errorTelefono(telefono);
+    if (problema) {
+      return res.status(400).json({ mensaje: problema });
+    }
 
     const usuarioActualizado = await actualizarPerfil(id, { nombreCompleto, telefono, activo });
     if (!usuarioActualizado) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
     }
 
-    return res.status(200).json({ usuario: usuarioActualizado });
+    // Al desactivar: cuantas citas futuras quedan a nombre de esa cuenta
+    // (como medico o como cliente). No se cancelan solas: se avisa.
+    const citasFuturas = activo === false ? await contarCitasFuturasDeCuenta(id) : 0;
+    return res.status(200).json({ usuario: usuarioActualizado, citasFuturas });
   } catch (error) {
     next(error);
   }

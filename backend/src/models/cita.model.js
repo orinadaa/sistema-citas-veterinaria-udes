@@ -4,12 +4,31 @@ const { pool } = require('../config/db');
 // True si ese medico ya tiene una cita activa exactamente en esa fecha_hora.
 // Ademas de esta validacion en la API, el indice unico parcial de la BD
 // (medico_id, fecha_hora) actua como respaldo ante condiciones de carrera.
-async function existeConflicto(medicoId, fechaHora) {
-  const resultado = await pool.query(
-    `SELECT 1 FROM cita WHERE medico_id = $1 AND fecha_hora = $2 AND estado = 'agendada' LIMIT 1`,
-    [medicoId, fechaHora]
-  );
+// Se cruzan dos citas si una empieza antes de que la otra termine. La
+// duracion sale del servicio de cada una (minimo una franja de 30 minutos).
+// exceptoCitaId: al reprogramar, la propia cita no cuenta.
+const CRUCE_CON_OTRA_CITA = `
+  FROM cita c JOIN servicio sv ON sv.id = c.servicio_id
+  WHERE c.estado = 'agendada'
+    AND c.fecha_hora < $2::timestamp + GREATEST($3::int, 30) * INTERVAL '1 minute'
+    AND c.fecha_hora + GREATEST(sv.duracion_minutos, 30) * INTERVAL '1 minute' > $2::timestamp
+    AND ($4::uuid IS NULL OR c.id <> $4::uuid)`;
+
+async function existeConflicto(medicoId, fechaHora, duracionMinutos = 30, exceptoCitaId = null) {
+  const resultado = await pool.query(`SELECT 1 ${CRUCE_CON_OTRA_CITA} AND c.medico_id = $1 LIMIT 1`, [medicoId, fechaHora, duracionMinutos, exceptoCitaId]);
   return resultado.rowCount > 0;
+}
+
+// La misma mascota no puede estar en dos citas a la vez.
+async function mascotaOcupada(mascotaId, fechaHora, duracionMinutos = 30, exceptoCitaId = null) {
+  const resultado = await pool.query(`SELECT 1 ${CRUCE_CON_OTRA_CITA} AND c.mascota_id = $1 LIMIT 1`, [mascotaId, fechaHora, duracionMinutos, exceptoCitaId]);
+  return resultado.rowCount > 0;
+}
+
+// Citas agendadas que aun no ocurren de un cliente (tope al agendar).
+async function contarFuturasDeCliente(clienteId) {
+  const resultado = await pool.query("SELECT COUNT(*)::int AS total FROM cita WHERE cliente_id = $1 AND estado = 'agendada' AND fecha_hora > NOW()", [clienteId]);
+  return resultado.rows[0].total;
 }
 
 // Crea la cita y le asigna su codigo visible CV-{sede}-{año}-{00000}
@@ -19,10 +38,19 @@ async function existeConflicto(medicoId, fechaHora) {
 // citas simultaneas nunca reciben el mismo numero. Si el INSERT de la
 // cita falla (ej. 23505, el medico se ocupo en ese instante), el
 // ROLLBACK deshace tambien el incremento: no quedan huecos.
-async function crear({ clienteId, sedeId, sedeCodigo, servicioId, medicoId, fechaHora, mascotaId, motivo }) {
+// duracionMinutos: la del servicio. Dentro de la transaccion se toma un
+// candado por medico y se vuelve a comprobar el cruce: el indice unico solo
+// cubre dos citas a la MISMA hora, no una larga que pisa a otra.
+async function crear({ clienteId, sedeId, sedeCodigo, servicioId, medicoId, fechaHora, mascotaId, motivo, duracionMinutos = 30 }) {
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
+    await cliente.query('SELECT pg_advisory_xact_lock(hashtext($1::text))', [medicoId]);
+    const cruce = await cliente.query(`SELECT 1 ${CRUCE_CON_OTRA_CITA} AND c.medico_id = $1 LIMIT 1`, [medicoId, fechaHora, duracionMinutos, null]);
+    if (cruce.rowCount > 0) {
+      // Mismo codigo que el indice unico: quien llama prueba con otro medico.
+      throw Object.assign(new Error('El médico ya tiene una cita en ese horario.'), { code: '23505' });
+    }
     const anio = new Date().getFullYear();
     const consecutivo = await cliente.query(
       `INSERT INTO consecutivo_cita (sede_id, anio, ultimo) VALUES ($1, $2, 1)
@@ -170,6 +198,8 @@ async function cancelar(id) {
 
 module.exports = {
   existeConflicto,
+  mascotaOcupada,
+  contarFuturasDeCliente,
   crear,
   formatearCodigoCita,
   buscarDetallePorId,

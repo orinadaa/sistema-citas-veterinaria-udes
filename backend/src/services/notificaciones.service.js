@@ -42,12 +42,21 @@ async function avisarCita(citaId, actorId, textos) {
   try {
     const cita = await notificacionModel.detalleCita(citaId);
     if (!cita) return;
-    const t = textos(cita, actorId === cita.cliente_id);
+    const porElCliente = actorId === cita.cliente_id;
+    const t = textos(cita, porElCliente);
     const avisos = [{ usuarioId: cita.cliente_id, tipo: t.tipo, titulo: t.titulo, mensaje: t.cliente, enlace: '/panel?tab=citas' }];
     if (cita.medico_id !== actorId) {
       avisos.push({ usuarioId: cita.medico_id, tipo: t.tipo, titulo: t.tituloPersonal, mensaje: t.personal, enlace: '/medico' });
     }
     await enviar(avisos);
+    // Si el cambio lo hizo la clinica, el cliente tambien recibe un correo:
+    // puede que no abra el sistema antes de la fecha.
+    const dominio = String(cita.cliente_correo).split('@')[1];
+    if (!porElCliente && t.correoAsunto && !DOMINIOS_SIN_CORREO.includes(dominio)) {
+      await correoService
+        .enviarAvisoDeCita({ correo: cita.cliente_correo, nombreCliente: cita.cliente_nombre, asunto: `${t.correoAsunto} ${cita.codigo}`, mensaje: t.cliente })
+        .catch((error) => console.error(`No se pudo enviar el aviso de la cita ${cita.codigo}:`, error.message));
+    }
   } catch (error) {
     console.error('No se pudieron crear las notificaciones de la cita:', error.message);
   }
@@ -64,22 +73,26 @@ function citaAgendada(citaId, actorId) {
 }
 
 function citaReprogramada(citaId, actorId, fechaAnterior) {
-  return avisarCita(citaId, actorId, (c) => ({
+  return avisarCita(citaId, actorId, (c, porElCliente) => ({
     tipo: 'cita_reprogramada',
     titulo: 'Cita reprogramada',
-    cliente: `La cita de ${c.mascota_nombre} (${c.servicio_nombre}) pasó del ${cuando(fechaAnterior)} al ${cuando(c.fecha_hora)}.`,
+    cliente: `${porElCliente ? 'La' : 'La clínica movió la'} cita de ${c.mascota_nombre} (${c.servicio_nombre})${porElCliente ? ' pasó' : ''} del ${cuando(fechaAnterior)} al ${cuando(c.fecha_hora)}.`,
     tituloPersonal: 'Cita reprogramada',
-    personal: `${c.cliente_nombre} movió la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(fechaAnterior)} al ${cuando(c.fecha_hora)}.`,
+    personal: `${porElCliente ? c.cliente_nombre : 'La sede'} movió la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(fechaAnterior)} al ${cuando(c.fecha_hora)}.`,
+    correoAsunto: 'Tu cita cambió de fecha',
   }));
 }
 
 function citaCancelada(citaId, actorId) {
-  return avisarCita(citaId, actorId, (c) => ({
+  return avisarCita(citaId, actorId, (c, porElCliente) => ({
     tipo: 'cita_cancelada',
     titulo: 'Cita cancelada',
-    cliente: `Se canceló la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)}.`,
+    cliente: porElCliente
+      ? `Se canceló la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)}.`
+      : `La clínica canceló la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)}. Puedes agendar otra cuando quieras.`,
     tituloPersonal: 'Cita cancelada',
-    personal: `${c.cliente_nombre} canceló la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)}.`,
+    personal: `${porElCliente ? c.cliente_nombre : 'La sede'} canceló la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)}.`,
+    correoAsunto: 'Tu cita fue cancelada',
   }));
 }
 

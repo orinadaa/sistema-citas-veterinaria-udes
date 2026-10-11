@@ -10,7 +10,29 @@ const fs = require('fs/promises');
 const path = require('path');
 const { CARPETA_FOTOS_MASCOTAS, RUTA_PUBLICA_FOTOS_MASCOTAS } = require('../middlewares/subirFoto.middleware');
 
+const { errorLongitud, esFechaReal } = require('../utils/validacion');
+
 const SEXOS_VALIDOS = ['macho', 'hembra'];
+
+// Limites de las columnas de texto (database/incremento_3f, 4 y 4d) y la
+// fecha de nacimiento: se revisan aqui para responder un mensaje claro.
+const LIMITES_TEXTO = { nombre: 100, especie: 50, raza: 80, color: 50, caracteristicas: 1000, alergias: 1000, medicamentos: 1000, condicionesMedicas: 1000, observaciones: 1000 };
+const ETIQUETAS_TEXTO = { nombre: 'El nombre', especie: 'La especie', raza: 'La raza', color: 'El color', caracteristicas: 'Las características', alergias: 'Las alergias', medicamentos: 'Los medicamentos', condicionesMedicas: 'Las condiciones médicas', observaciones: 'Las observaciones' };
+function errorDatosMascota(datos) {
+  const largo = errorLongitud(datos, LIMITES_TEXTO, ETIQUETAS_TEXTO);
+  if (largo) return largo;
+  const { fechaNacimiento, pesoKg } = datos;
+  if (fechaNacimiento !== undefined && fechaNacimiento !== null && fechaNacimiento !== '') {
+    const texto = String(fechaNacimiento).slice(0, 10);
+    if (!esFechaReal(texto)) return 'La fecha de nacimiento no es válida.';
+    const hoy = new Date();
+    const hoyTexto = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+    if (texto > hoyTexto) return 'La fecha de nacimiento no puede ser futura.';
+    if (texto < '1980-01-01') return 'Revisa la fecha de nacimiento.';
+  }
+  if (pesoKg !== undefined && pesoKg !== null && pesoKg !== '' && Number(pesoKg) > 999) return 'Revisa el peso: no puede superar los 999 kg.';
+  return null;
+}
 
 function pesoValido(peso) {
   const numero = Number(peso);
@@ -74,6 +96,11 @@ async function listarDeCliente(req, res, next) {
       return res.status(400).json({ mensaje: 'clienteId es obligatorio.' });
     }
 
+    // El medico solo consulta las mascotas de sus pacientes (antes podia
+    // ver las de cualquier cliente, con su informacion medica).
+    if (!(await puedeGestionarMascotasDe(req.usuario, clienteId))) {
+      return res.status(403).json({ mensaje: 'Este cliente no es paciente tuyo.' });
+    }
     const mascotas = await mascotaModel.listarPorCliente(clienteId);
     return res.status(200).json({ mascotas });
   } catch (error) {
@@ -103,8 +130,12 @@ async function crear(req, res, next) {
       clienteId: clienteIdBody,
     } = req.body;
 
-    if (!nombre) {
+    if (!nombre || String(nombre).trim() === '') {
       return res.status(400).json({ mensaje: 'El nombre de la mascota es obligatorio.' });
+    }
+    const problemaDatos = errorDatosMascota(req.body);
+    if (problemaDatos) {
+      return res.status(400).json({ mensaje: problemaDatos });
     }
     const errorEspecie = errorEspecieRaza({ especie, raza }, { alCrear: true });
     if (errorEspecie) {
@@ -137,7 +168,8 @@ async function crear(req, res, next) {
       nombre,
       especie,
       raza,
-      fotoUrl,
+      // La foto solo entra por la subida de archivo (POST /:id/foto).
+      fotoUrl: null,
       fechaNacimiento,
       sexo,
       color,
@@ -179,6 +211,10 @@ async function actualizar(req, res, next) {
     if (nombre !== undefined && textoVacio(nombre)) {
       return res.status(400).json({ mensaje: 'El nombre de la mascota es obligatorio.' });
     }
+    const problemaDatos = errorDatosMascota(req.body);
+    if (problemaDatos) {
+      return res.status(400).json({ mensaje: problemaDatos });
+    }
     const errorEspecie = errorEspecieRaza({ especie, raza }, { alCrear: false });
     if (errorEspecie) {
       return res.status(400).json({ mensaje: errorEspecie });
@@ -203,7 +239,8 @@ async function actualizar(req, res, next) {
       nombre,
       especie,
       raza,
-      fotoUrl,
+      // undefined: la foto guardada no se toca (solo cambia al subir un archivo).
+      fotoUrl: undefined,
       fechaNacimiento,
       sexo,
       color,

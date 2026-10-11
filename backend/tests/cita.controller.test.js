@@ -414,7 +414,7 @@ describe('POST /api/citas sin medicoId (asignacion automatica, flujo del cliente
       { id: 'med-c', nombre_completo: 'Carla' },
     ]);
     // med-a esta ocupado justo en esa franja; med-b tiene 3 citas ese dia, med-c 1
-    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: 'med-a' }]);
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: 'med-a', fecha_hora: proximaFranjaValida(), duracion_minutos: 30 }]);
     medicoModel.contarCitasPorMedico.mockResolvedValue([
       { medico_id: 'med-b', total: 3 },
       { medico_id: 'med-c', total: 1 },
@@ -431,7 +431,7 @@ describe('POST /api/citas sin medicoId (asignacion automatica, flujo del cliente
 
   test('responde 409 si ningun medico esta libre en esa franja', async () => {
     medicoModel.listarPorSedeYServicio.mockResolvedValue([{ id: 'med-a', nombre_completo: 'Ana' }]);
-    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: 'med-a' }]);
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: 'med-a', fecha_hora: proximaFranjaValida(), duracion_minutos: 30 }]);
     medicoModel.contarCitasPorMedico.mockResolvedValue([]);
 
     const respuesta = await agendarSinMedico(proximaFranjaValida());
@@ -704,7 +704,8 @@ describe('PATCH /api/citas/:id/reprogramar', () => {
       .send({ nuevaFechaHora: nuevaFranja.toISOString() });
 
     expect(respuesta.status).toBe(200);
-    expect(citaModel.existeConflicto).toHaveBeenCalledWith(ID_MEDICO, nuevaFranja);
+    // Con la duracion del servicio y sin contar la propia cita.
+    expect(citaModel.existeConflicto).toHaveBeenCalledWith(ID_MEDICO, nuevaFranja, 30, 'cita-1');
     expect(citaModel.reprogramar).toHaveBeenCalledWith('cita-1', nuevaFranja);
   });
 });
@@ -735,6 +736,75 @@ describe('PATCH /api/citas/:id/cancelar', () => {
   });
 });
 
+describe('Reglas de agendamiento de la auditoria', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockearEntidadesBasicas();
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([]);
+    medicoModel.contarCitasPorMedico.mockResolvedValue([]);
+    citaModel.mascotaOcupada.mockResolvedValue(false);
+    citaModel.contarFuturasDeCliente.mockResolvedValue(0);
+    citaModel.existeConflicto.mockResolvedValue(false);
+  });
+
+  const agendar = (extra = {}) =>
+    request(app)
+      .post('/api/citas')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, fechaHora: proximaFranjaValida().toISOString(), mascotaId: ID_MASCOTA, ...extra });
+
+  test('un servicio largo ocupa varias franjas: no se ofrece al medico que tiene cita en medio', async () => {
+    // Cirugia de 90 minutos a las 8:00; el unico medico tiene cita a las 8:30.
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO, nombre: 'Cirugía', duracion_minutos: 90 });
+    medicoModel.listarPorSedeYServicio.mockResolvedValue([{ id: 'med-a', nombre_completo: 'Ana' }]);
+    const ochoYMedia = new Date(proximaFranjaValida().getTime() + 30 * 60000);
+    medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: 'med-a', fecha_hora: ochoYMedia, duracion_minutos: 30 }]);
+
+    const respuesta = await agendar();
+
+    expect(respuesta.status).toBe(409);
+    expect(citaModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('un servicio largo no se agenda si no termina antes del cierre', async () => {
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO, nombre: 'Cirugía', duracion_minutos: 90 });
+    const casiAlCierre = proximaFranjaValida();
+    casiAlCierre.setHours(16, 30, 0, 0); // la sede cierra a las 17:00
+    const respuesta = await agendar({ fechaHora: casiAlCierre.toISOString() });
+    expect(respuesta.status).toBe(409);
+    expect(respuesta.body.mensaje).toMatch(/90 minutos/);
+  });
+
+  test('la misma mascota no puede tener dos citas a la vez', async () => {
+    citaModel.mascotaOcupada.mockResolvedValue(true);
+    const respuesta = await agendar();
+    expect(respuesta.status).toBe(409);
+    expect(respuesta.body.mensaje).toMatch(/mascota/);
+  });
+
+  test('un cliente con 10 citas por atender no puede agendar otra', async () => {
+    citaModel.contarFuturasDeCliente.mockResolvedValue(10);
+    expect((await agendar()).status).toBe(409);
+    expect(citaModel.crear).not.toHaveBeenCalled();
+  });
+
+  test('no se agenda en una sede o un servicio desactivados', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE, nombre: 'Sede', activo: false });
+    expect((await agendar()).status).toBe(409);
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE, nombre: 'Sede', activo: true });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO, nombre: 'Consulta', activo: false });
+    expect((await agendar()).status).toBe(409);
+  });
+
+  test('una fecha que no existe se rechaza al consultar disponibilidad', async () => {
+    const respuesta = await request(app)
+      .get('/api/citas/disponibilidad')
+      .query({ sedeId: ID_SEDE, servicioId: ID_SERVICIO, fecha: '2030-02-31' })
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`);
+    expect(respuesta.status).toBe(400);
+  });
+});
+
 describe('Control de acceso del modulo de citas', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -746,21 +816,50 @@ describe('Control de acceso del modulo de citas', () => {
     expect(respuesta.status).toBe(403);
   });
 
-  test('un administrador no puede reprogramar citas (exclusivo del cliente dueño)', async () => {
-    const respuesta = await request(app)
+  // Desde la auditoria del 11 oct 2026 la sede y el medico tambien pueden
+  // cancelar y reprogramar (antes solo el cliente dueño).
+  const CITA_FUTURA = { id: 'cita-1', cliente_id: ID_CLIENTE, medico_id: ID_MEDICO, sede_id: ID_SEDE, servicio_id: ID_SERVICIO, mascota_id: ID_MASCOTA, estado: 'agendada', fecha_hora: proximaFranjaValida(5) };
+  const TOKEN_MEDICO = jwt.sign({ id: ID_MEDICO, rol: 'veterinario', sedeId: ID_SEDE }, process.env.JWT_SECRET);
+  const cancelarCon = (token) => request(app).patch('/api/citas/cita-1/cancelar').set('Authorization', `Bearer ${token}`);
+
+  test('el administrador de OTRA sede no puede cancelar ni reprogramar la cita', async () => {
+    citaModel.buscarPorId.mockResolvedValue({ ...CITA_FUTURA, sede_id: 'otra-sede' });
+    expect((await cancelarCon(TOKEN_ADMIN)).status).toBe(403);
+    const reprogramar = await request(app)
       .patch('/api/citas/cita-1/reprogramar')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
       .send({ nuevaFechaHora: proximaFranjaValida().toISOString() });
-
-    expect(respuesta.status).toBe(403);
+    expect(reprogramar.status).toBe(403);
+    expect(citaModel.cancelar).not.toHaveBeenCalled();
   });
 
-  test('un administrador no puede cancelar citas (exclusivo del cliente dueño)', async () => {
-    const respuesta = await request(app)
-      .patch('/api/citas/cita-1/cancelar')
-      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+  test('el administrador de la sede de la cita si puede cancelarla', async () => {
+    citaModel.buscarPorId.mockResolvedValue(CITA_FUTURA);
+    citaModel.cancelar.mockResolvedValue({ ...CITA_FUTURA, estado: 'cancelada' });
+    const respuesta = await cancelarCon(TOKEN_ADMIN);
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.cita.estado).toBe('cancelada');
+  });
 
-    expect(respuesta.status).toBe(403);
+  test('el medico cancela sus citas, no las de otro medico', async () => {
+    citaModel.buscarPorId.mockResolvedValue(CITA_FUTURA);
+    citaModel.cancelar.mockResolvedValue({ ...CITA_FUTURA, estado: 'cancelada' });
+    expect((await cancelarCon(TOKEN_MEDICO)).status).toBe(200);
+    citaModel.buscarPorId.mockResolvedValue({ ...CITA_FUTURA, medico_id: 'otro-medico' });
+    expect((await cancelarCon(TOKEN_MEDICO)).status).toBe(403);
+  });
+
+  test('una cita que ya paso no se puede cancelar ni reprogramar', async () => {
+    const ayer = new Date(Date.now() - 864e5);
+    citaModel.buscarPorId.mockResolvedValue({ ...CITA_FUTURA, fecha_hora: ayer });
+    expect((await cancelarCon(TOKEN_CLIENTE)).status).toBe(409);
+    const reprogramar = await request(app)
+      .patch('/api/citas/cita-1/reprogramar')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nuevaFechaHora: proximaFranjaValida().toISOString() });
+    expect(reprogramar.status).toBe(409);
+    expect(citaModel.cancelar).not.toHaveBeenCalled();
+    expect(citaModel.reprogramar).not.toHaveBeenCalled();
   });
 
   test('un administrador si puede consultar disponibilidad y medicos-disponibles (calendario del panel)', async () => {

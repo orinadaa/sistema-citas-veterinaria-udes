@@ -61,7 +61,9 @@ function forzarHttps(req, res, next) {
 // Tope por IP. En memoria: alcanza para un solo servidor (el alcance del
 // proyecto); con varios habria que llevarlo a un almacen compartido.
 // En las pruebas automaticas no cuenta, salvo las del propio limite.
-function limitarIntentos({ ventanaMinutos, maximo, mensaje }) {
+// clave (opcional): de que depende el tope. Por defecto la IP; tambien
+// puede ser la cuenta que se intenta abrir o el usuario con sesion.
+function limitarIntentos({ ventanaMinutos, maximo, mensaje, clave: claveDe }) {
   const ventanaMs = ventanaMinutos * 60 * 1000;
   const intentos = new Map(); // ip -> { cuenta, vence }
 
@@ -75,7 +77,7 @@ function limitarIntentos({ ventanaMinutos, maximo, mensaje }) {
   return (req, res, next) => {
     if (process.env.NODE_ENV === 'test' && !process.env.LIMITE_EN_PRUEBAS) return next();
     const ahora = Date.now();
-    const clave = req.ip || 'desconocida';
+    const clave = (claveDe && claveDe(req)) || req.ip || 'desconocida';
     let registro = intentos.get(clave);
     if (!registro || registro.vence <= ahora) {
       registro = { cuenta: 0, vence: ahora + ventanaMs };
