@@ -75,6 +75,40 @@ export function cambiarContrasenaCliente(datos, token) {
   return solicitar('/cuenta/contrasena', { metodo: 'PUT', cuerpo: datos, token });
 }
 
+// "Mi cuenta" del administrador de sede y del superadministrador.
+export function obtenerMiCuenta(token) {
+  return solicitar('/mi-cuenta', { token });
+}
+
+export function solicitarCambioCorreoMiCuenta(correoNuevo, token) {
+  return solicitar('/mi-cuenta/correo', { metodo: 'POST', cuerpo: { correoNuevo }, token });
+}
+
+export function confirmarCambioCorreoMiCuenta(codigo, token) {
+  return solicitar('/mi-cuenta/correo/confirmar', { metodo: 'POST', cuerpo: { codigo }, token });
+}
+
+export function solicitarCodigoContrasenaMiCuenta(contrasenaActual, token) {
+  return solicitar('/mi-cuenta/contrasena/codigo', { metodo: 'POST', cuerpo: { contrasenaActual }, token });
+}
+
+export function cambiarContrasenaMiCuenta(datos, token) {
+  return solicitar('/mi-cuenta/contrasena', { metodo: 'PUT', cuerpo: datos, token });
+}
+
+// Informacion general de la clinica (RF-23): WhatsApp y redes sociales.
+export function obtenerInfoClinica() {
+  return solicitar('/clinica');
+}
+
+export function obtenerInfoClinicaAdmin(token) {
+  return solicitar('/clinica/admin', { token });
+}
+
+export function actualizarInfoClinica(datos, token) {
+  return solicitar('/clinica', { metodo: 'PUT', cuerpo: datos, token });
+}
+
 export function solicitarCodigoRecuperacion(datos) {
   return solicitar('/auth/olvide-clave', { metodo: 'POST', cuerpo: datos });
 }

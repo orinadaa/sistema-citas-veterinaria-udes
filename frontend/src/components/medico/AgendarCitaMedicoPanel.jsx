@@ -30,6 +30,8 @@ import { DatePickerCalendar } from '../agendar/DatePickerCalendar';
 import { TimeSlotPicker } from '../agendar/TimeSlotPicker';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { IconoBuscar, IconoCheck, IconoX } from '../icons';
+import { ETIQUETA_SEXO } from '../../utils/sexo';
+import { EtiquetaSexo } from '../ui/EtiquetaSexo';
 import { iniciales } from '../../utils/texto';
 import { Desplegable } from '../form/Desplegable';
 import { CampoBusqueda } from '../form/CampoBusqueda';
@@ -88,14 +90,17 @@ function TarjetaCliente({ cliente, onQuitar }) {
 }
 
 function TarjetaMascotaResumen({ mascota }) {
-  const sexo = mascota.sexo === 'hembra' ? '♀ Hembra' : mascota.sexo === 'macho' ? '♂ Macho' : null;
   return (
     <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
       <AvatarMascota mascota={mascota} className="h-12 w-12" />
       <div className="min-w-0">
         <p className="truncate font-semibold text-slate-900">{mascota.nombre}</p>
         <p className="truncate text-sm text-slate-500">{especieYRaza(mascota)}</p>
-        <p className="text-xs text-slate-400">{[sexo, edadYPeso(mascota)].filter(Boolean).join(' · ')}</p>
+        <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-slate-400">
+          <EtiquetaSexo sexo={mascota.sexo} />
+          {ETIQUETA_SEXO[mascota.sexo] && edadYPeso(mascota) && <span aria-hidden="true">·</span>}
+          {edadYPeso(mascota)}
+        </p>
       </div>
     </div>
   );

@@ -12,6 +12,8 @@ import { CategoryBadge } from '../ui/CategoryBadge';
 import { estadoDeCita } from '../citas/DetalleCitaPanel';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { IconoCalendario, IconoCorreo, IconoDocumento, IconoEstetoscopio, IconoPersona, IconoUbicacion } from '../icons';
+import { ETIQUETA_SEXO } from '../../utils/sexo';
+import { EtiquetaSexo } from '../ui/EtiquetaSexo';
 
 function Fila({ icono: Icono, etiqueta, valor, detalle }) {
   return (
@@ -53,10 +55,10 @@ export function DetalleCitaMedicoPanel({ cita, onClose, acciones }) {
                 <StatusBadge status={estadoDeCita(cita)} />
               </div>
               <p className="text-sm font-medium text-brand-blue">{[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}</p>
-              <p className="mt-1 text-sm text-slate-500">
-                {[cita.mascota_sexo === 'hembra' ? '♀ Hembra' : cita.mascota_sexo === 'macho' ? '♂ Macho' : null, edadYPeso(mascota)]
-                  .filter(Boolean)
-                  .join(' · ')}
+              <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-slate-500">
+                <EtiquetaSexo sexo={cita.mascota_sexo} />
+                {ETIQUETA_SEXO[cita.mascota_sexo] && edadYPeso(mascota) && <span aria-hidden="true">·</span>}
+                {edadYPeso(mascota)}
               </p>
             </div>
           </div>

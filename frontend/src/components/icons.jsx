@@ -67,6 +67,13 @@ import { UserIcon } from '@phosphor-icons/react/dist/csr/User';
 import { UsersIcon } from '@phosphor-icons/react/dist/csr/Users';
 import { WarningIcon } from '@phosphor-icons/react/dist/csr/Warning';
 import { XIcon } from '@phosphor-icons/react/dist/csr/X';
+import { WhatsappLogoIcon } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
+import { InstagramLogoIcon } from '@phosphor-icons/react/dist/csr/InstagramLogo';
+import { FacebookLogoIcon } from '@phosphor-icons/react/dist/csr/FacebookLogo';
+import { TiktokLogoIcon } from '@phosphor-icons/react/dist/csr/TiktokLogo';
+import { YoutubeLogoIcon } from '@phosphor-icons/react/dist/csr/YoutubeLogo';
+import { GenderFemaleIcon } from '@phosphor-icons/react/dist/csr/GenderFemale';
+import { GenderMaleIcon } from '@phosphor-icons/react/dist/csr/GenderMale';
 
 // Dibuja un icono de Phosphor (`de`) con la interfaz del sistema.
 // aria-hidden: todos son decorativos (el nombre accesible lo pone el boton
@@ -85,6 +92,30 @@ export function IconoUbicacion(props) {
 // Cerrar sesion: puerta con flecha saliendo.
 export function IconoSalir(props) {
   return <Icono de={SignOutIcon} {...props} />;
+}
+// Logos de WhatsApp y de las redes sociales (RF-23).
+export function IconoWhatsapp(props) {
+  return <Icono de={WhatsappLogoIcon} {...props} />;
+}
+export function IconoInstagram(props) {
+  return <Icono de={InstagramLogoIcon} {...props} />;
+}
+export function IconoFacebook(props) {
+  return <Icono de={FacebookLogoIcon} {...props} />;
+}
+export function IconoTiktok(props) {
+  return <Icono de={TiktokLogoIcon} {...props} />;
+}
+export function IconoYoutube(props) {
+  return <Icono de={YoutubeLogoIcon} {...props} />;
+}
+// Sexo de la mascota: iconos, no los caracteres de texto (que algunos
+// equipos dibujan como emoji).
+export function IconoHembra(props) {
+  return <Icono de={GenderFemaleIcon} {...props} />;
+}
+export function IconoMacho(props) {
+  return <Icono de={GenderMaleIcon} {...props} />;
 }
 export function IconoFlechaDerecha(props) {
   return <Icono de={ArrowRightIcon} {...props} />;

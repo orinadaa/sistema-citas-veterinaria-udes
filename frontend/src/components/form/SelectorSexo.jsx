@@ -5,9 +5,11 @@
 // Valores: 'hembra' | 'macho' | '' (sin elegir). Si no es requerido, un
 // clic sobre la opcion elegida la desmarca (equivale al "Selecciona" del
 // <select> que reemplaza).
+import { IconoHembra, IconoMacho } from '../icons';
+
 const OPCIONES = [
-  { valor: 'hembra', etiqueta: 'Hembra', simbolo: '♀', activa: 'bg-pink-50 text-pink-700 ring-pink-300', icono: 'text-pink-500' },
-  { valor: 'macho', etiqueta: 'Macho', simbolo: '♂', activa: 'bg-blue-50 text-brand-blue ring-brand-blue-400', icono: 'text-brand-blue' },
+  { valor: 'hembra', etiqueta: 'Hembra', Icono: IconoHembra, activa: 'bg-pink-50 text-pink-700 ring-pink-300', icono: 'text-pink-500' },
+  { valor: 'macho', etiqueta: 'Macho', Icono: IconoMacho, activa: 'bg-blue-50 text-brand-blue ring-brand-blue-400', icono: 'text-brand-blue' },
 ];
 
 export function SelectorSexo({ id, valor, onChange, requerido = false, etiqueta = 'Sexo' }) {
@@ -35,9 +37,7 @@ export function SelectorSexo({ id, valor, onChange, requerido = false, etiqueta 
                 elegida ? `${opcion.activa} ring-2` : 'bg-white text-slate-600 ring-slate-300 hover:bg-slate-50'
               }`}
             >
-              <span aria-hidden="true" className={`text-base leading-none ${opcion.icono}`}>
-                {opcion.simbolo}
-              </span>
+              <opcion.Icono className={`h-4 w-4 ${opcion.icono}`} peso="bold" />
               {opcion.etiqueta}
             </button>
           );
