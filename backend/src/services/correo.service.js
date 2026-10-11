@@ -133,6 +133,16 @@ async function enviarConfirmacionCita(cita) {
   });
 }
 
+// La clinica (administrador de la sede o medico) cancelo o movio una cita:
+// el cliente se entera tambien por correo.
+async function enviarAvisoDeCita({ correo, nombreCliente, asunto, mensaje }) {
+  await enviarCorreo({
+    para: correo,
+    asunto: `${asunto} — Clínica Veterinaria UDES`,
+    texto: [`Hola ${nombreCliente},`, '', mensaje, '', 'Puedes ver tus citas en "Mis citas", dentro de tu cuenta.', '', 'Clínica Veterinaria UDES'].join('\n'),
+  });
+}
+
 // Codigo para confirmar un cambio de correo: se envia AL CORREO NUEVO,
 // asi se verifica que existe y que la persona tiene acceso a el.
 async function enviarCodigoCambioCorreo({ correo, nombreCompleto, codigo }) {
@@ -208,6 +218,7 @@ async function enviarRecordatorioCita(cita) {
 }
 
 module.exports = {
+  enviarAvisoDeCita,
   enviarRecordatorioCita,
   enviarCredenciales,
   enviarBienvenidaCliente,

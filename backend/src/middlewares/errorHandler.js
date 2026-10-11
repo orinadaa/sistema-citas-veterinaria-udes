@@ -21,6 +21,23 @@ function errorHandler(err, req, res, next) {
     return res.status(404).json({ mensaje: 'El registro indicado no existe.' });
   }
 
+  // Texto mas largo que la columna, fecha u hora imposibles, numero fuera
+  // de rango: red de seguridad por si un controlador no lo valido antes.
+  if (err.code === '22001') {
+    return res.status(400).json({ mensaje: 'Uno de los datos es más largo de lo permitido.' });
+  }
+  if (['22007', '22008', '22003', '22P03'].includes(err.code)) {
+    return res.status(400).json({ mensaje: 'Uno de los datos (fecha, hora o número) no es válido.' });
+  }
+  // Referencia a un registro que no existe (llave foranea) o valor que una
+  // regla de la base no admite.
+  if (err.code === '23503') {
+    return res.status(400).json({ mensaje: 'Uno de los registros indicados no existe.' });
+  }
+  if (err.code === '23514' || err.code === '23502') {
+    return res.status(400).json({ mensaje: 'Uno de los datos no es válido o falta.' });
+  }
+
   const statusCode = err.statusCode || err.status || 500;
   if (statusCode >= 500) {
     console.error('Error no controlado:', err);

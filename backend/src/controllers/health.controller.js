@@ -9,18 +9,11 @@ async function getHealth(req, res, next) {
     const dbStatus = await testConnection();
 
     if (!dbStatus.ok) {
-      return res.status(503).json({
-        servidor: 'ok',
-        baseDeDatos: 'error',
-        detalle: dbStatus.error,
-      });
+      console.error('La base de datos no responde:', dbStatus.error);
+      return res.status(503).json({ servidor: 'ok', baseDeDatos: 'error' });
     }
 
-    return res.status(200).json({
-      servidor: 'ok',
-      baseDeDatos: 'ok',
-      horaServidorBD: dbStatus.horaServidor,
-    });
+    return res.status(200).json({ servidor: 'ok', baseDeDatos: 'ok' });
   } catch (error) {
     next(error);
   }

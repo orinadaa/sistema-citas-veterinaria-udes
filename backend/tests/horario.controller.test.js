@@ -110,7 +110,7 @@ describe('DELETE /api/horarios/:sedeId/:diaSemana', () => {
       .delete(`/api/horarios/${ID_SEDE}/0`)
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
 
-    expect(respuesta.status).toBe(204);
+    expect(respuesta.status).toBe(200);
   });
 });
 

@@ -12,7 +12,8 @@ const bcrypt = require('bcryptjs');
 const usuarioModel = require('../models/usuario.model');
 const perfilModel = require('../models/perfilMedico.model');
 const correoService = require('../services/correo.service');
-const { generarCodigoRecuperacion } = require('../utils/contrasena.util');
+const { generarCodigoRecuperacion, errorContrasena } = require('../utils/contrasena.util');
+const { generarToken } = require('../utils/token');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 
 const CORREO_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -87,8 +88,9 @@ async function cambiarContrasena(req, res, next) {
     if (!actual || !nueva) {
       return res.status(400).json({ mensaje: 'La contraseña actual y la nueva son obligatorias.' });
     }
-    if (String(nueva).length < 8) {
-      return res.status(400).json({ mensaje: 'La nueva contraseña debe tener al menos 8 caracteres.' });
+    const problema = errorContrasena(nueva);
+    if (problema) {
+      return res.status(400).json({ mensaje: problema });
     }
     const hash = await perfilModel.obtenerHashContrasena(req.usuario.id);
     if (!hash || !(await bcrypt.compare(actual, hash))) {
@@ -98,7 +100,10 @@ async function cambiarContrasena(req, res, next) {
       return res.status(400).json({ mensaje: 'La nueva contraseña debe ser distinta a la actual.' });
     }
     await usuarioModel.actualizarContrasena(req.usuario.id, await bcrypt.hash(nueva, RONDAS_SAL));
-    return res.status(200).json({ mensaje: 'Contraseña actualizada.' });
+    // El cambio cierra las demas sesiones de la cuenta; esta sigue con un
+    // token nuevo (el frontend lo toma de tokenRenovado).
+    const cuenta = await usuarioModel.buscarPorId(req.usuario.id);
+    return res.status(200).json({ mensaje: 'Contraseña actualizada.', tokenRenovado: cuenta ? generarToken(cuenta) : undefined });
   } catch (error) {
     next(error);
   }

@@ -4,10 +4,13 @@
 // se enfoque solo en la logica de la peticion HTTP.
 
 const { pool } = require('../config/db');
+const { olvidarCuenta } = require('../utils/estadoCuenta');
 
 async function buscarPorCorreo(correo) {
   const resultado = await pool.query(
-    'SELECT id, nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, activo, debe_cambiar_contrasena FROM usuario WHERE correo = $1',
+    // Sin distinguir mayusculas: el correo se guarda en minusculas, pero asi
+    // tampoco falla una cuenta antigua guardada de otra forma.
+    'SELECT id, nombre_completo, correo, contrasena_hash, rol, sede_id, telefono, activo, debe_cambiar_contrasena, creado_en FROM usuario WHERE LOWER(correo) = LOWER($1)',
     [correo]
   );
   return resultado.rows[0] || null;
@@ -21,12 +24,14 @@ async function buscarPorId(id) {
   return resultado.rows[0] || null;
 }
 
-async function crearCliente({ nombreCompleto, correo, contrasenaHash, telefono }) {
+// autorizaTratamiento: deja la fecha en que autorizo el tratamiento de sus
+// datos personales (Ley 1581 de 2012).
+async function crearCliente({ nombreCompleto, correo, contrasenaHash, telefono, autorizaTratamiento = false }) {
   const resultado = await pool.query(
-    `INSERT INTO usuario (nombre_completo, correo, contrasena_hash, rol, telefono)
-     VALUES ($1, $2, $3, 'cliente', $4)
+    `INSERT INTO usuario (nombre_completo, correo, contrasena_hash, rol, telefono, autorizo_tratamiento_en)
+     VALUES ($1, $2, $3, 'cliente', $4, CASE WHEN $5 THEN NOW() END)
      RETURNING id, nombre_completo, correo, rol, telefono, creado_en`,
-    [nombreCompleto, correo, contrasenaHash, telefono || null]
+    [nombreCompleto, correo, contrasenaHash, telefono || null, Boolean(autorizaTratamiento)]
   );
   return resultado.rows[0];
 }
@@ -76,6 +81,8 @@ async function actualizarRol(id, { rol, sedeId }) {
      RETURNING id, nombre_completo, correo, rol, sede_id, telefono, activo`,
     [id, rol, sedeId ?? null]
   );
+  // El cambio de rol o sede vale desde ya, no cuando venza la sesion.
+  olvidarCuenta(id);
   return resultado.rows[0] || null;
 }
 
@@ -92,13 +99,21 @@ async function actualizarPerfil(id, { nombreCompleto, telefono, activo }) {
      RETURNING id, nombre_completo, correo, rol, sede_id, telefono, activo`,
     [id, nombreCompleto ?? null, telefono ?? null, activo ?? null]
   );
+  olvidarCuenta(id);
   return resultado.rows[0] || null;
 }
 
 // Cualquier cambio de contraseña hecho por la propia persona (primera
-// entrada, perfil, recuperacion por codigo) apaga la marca de clave temporal.
+// entrada, perfil, recuperacion por codigo) apaga la marca de clave temporal
+// y cierra las sesiones abiertas con la clave anterior: los tokens emitidos
+// antes de este momento dejan de servir (ver utils/estadoCuenta.js). Quien
+// la cambia desde su perfil recibe un token nuevo para seguir en su sesion.
 async function actualizarContrasena(id, contrasenaHash) {
-  await pool.query('UPDATE usuario SET contrasena_hash = $2, debe_cambiar_contrasena = false WHERE id = $1', [id, contrasenaHash]);
+  await pool.query(
+    "UPDATE usuario SET contrasena_hash = $2, debe_cambiar_contrasena = false, sesiones_validas_desde = date_trunc('second', NOW()) WHERE id = $1",
+    [id, contrasenaHash]
+  );
+  olvidarCuenta(id);
 }
 
 // Para establecer la contraseña propia: la cuenta completa, con su hash.
@@ -110,7 +125,17 @@ async function buscarConHashPorId(id) {
   return resultado.rows[0] || null;
 }
 
+// Citas agendadas que todavia no ocurren, donde la cuenta es el medico o el cliente.
+async function contarCitasFuturasDeCuenta(id) {
+  const resultado = await pool.query(
+    "SELECT COUNT(*)::int AS total FROM cita WHERE estado = 'agendada' AND fecha_hora > NOW() AND (medico_id = $1 OR cliente_id = $1)",
+    [id]
+  );
+  return resultado.rows[0].total;
+}
+
 module.exports = {
+  contarCitasFuturasDeCuenta,
   buscarClientes,
   buscarPorCorreo,
   buscarPorId,

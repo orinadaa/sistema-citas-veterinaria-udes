@@ -67,11 +67,26 @@ describe('Tope de intentos', () => {
     usuarioModel.buscarPorCorreo.mockResolvedValue(null);
     let ultima;
     for (let i = 0; i < 21; i += 1) {
-      ultima = await request(app).post('/api/auth/login').send({ correo: 'x@x.co', contrasena: 'incorrecta' });
+      // Un correo distinto cada vez: asi cuenta solo el tope por IP.
+      ultima = await request(app).post('/api/auth/login').send({ correo: `x${i}@x.co`, contrasena: 'incorrecta' });
       if (i < 20) expect(ultima.status).toBe(401);
     }
     expect(ultima.status).toBe(429);
     expect(ultima.headers['retry-after']).toBeDefined();
+  });
+
+  test('tambien se bloquea por cuenta: muchos intentos contra el mismo correo', async () => {
+    process.env.LIMITE_EN_PRUEBAS = '1';
+    // Aplicacion nueva: los contadores por IP de la prueba anterior no cuentan aqui.
+    jest.resetModules();
+    require('../src/models/usuario.model').buscarPorCorreo.mockResolvedValue(null);
+    const appNueva = require('../src/app');
+    let ultima;
+    for (let i = 0; i < 11; i += 1) {
+      ultima = await request(appNueva).post('/api/auth/login').send({ correo: 'Victima@Clinica.co', contrasena: 'incorrecta' });
+    }
+    expect(ultima.status).toBe(429);
+    expect(ultima.body.mensaje).toMatch(/esta cuenta/);
   });
 });
 

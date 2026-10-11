@@ -11,6 +11,7 @@ const mascotaModel = require('../models/mascota.model');
 const pacienteModel = require('../models/paciente.model');
 const perfilMedicoModel = require('../models/perfilMedico.model');
 const correoService = require('../services/correo.service');
+const { normalizarCorreo, errorCorreo, errorNombre, errorTelefono, errorLongitud } = require('../utils/validacion');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 const { generarContrasenaTemporal } = require('../utils/contrasena.util');
 
@@ -30,10 +31,17 @@ async function listarMedicos(req, res, next) {
 // en su propia sede (no se puede elegir otra sede desde este panel).
 async function crearMedico(req, res, next) {
   try {
-    const { nombreCompleto, correo, documento, telefono } = req.body;
+    const { documento, telefono } = req.body;
+    const nombreCompleto = String(req.body.nombreCompleto ?? '').trim();
+    const correo = normalizarCorreo(req.body.correo);
 
     if (!nombreCompleto || !correo || !documento) {
       return res.status(400).json({ mensaje: 'Nombre completo, correo y documento de identidad son obligatorios.' });
+    }
+    const problema =
+      errorNombre(nombreCompleto) || errorCorreo(correo) || errorTelefono(telefono) || errorLongitud({ documento }, { documento: 20 }, { documento: 'El documento' });
+    if (problema) {
+      return res.status(400).json({ mensaje: problema });
     }
 
     // La contraseña nunca la escribe el admin: se autogenera y se envia

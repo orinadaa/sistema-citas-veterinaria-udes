@@ -31,8 +31,12 @@ async function listarPorSedeYServicio(sedeId, servicioId, diaSemana = null) {
 async function listarFranjasOcupadas(medicoIds, inicio, fin) {
   if (medicoIds.length === 0) return [];
   const resultado = await pool.query(
-    `SELECT medico_id, fecha_hora FROM cita
-     WHERE medico_id = ANY($1::uuid[]) AND estado = 'agendada' AND fecha_hora >= $2 AND fecha_hora < $3`,
+    // Con la duracion del servicio: una cita larga ocupa varias franjas, y
+    // una que empezo antes de `inicio` puede seguir ocupando al medico.
+    `SELECT c.medico_id, c.fecha_hora, sv.duracion_minutos
+     FROM cita c JOIN servicio sv ON sv.id = c.servicio_id
+     WHERE c.medico_id = ANY($1::uuid[]) AND c.estado = 'agendada'
+       AND c.fecha_hora < $3 AND c.fecha_hora + GREATEST(sv.duracion_minutos, 30) * INTERVAL '1 minute' > $2`,
     [medicoIds, inicio, fin]
   );
   return resultado.rows;

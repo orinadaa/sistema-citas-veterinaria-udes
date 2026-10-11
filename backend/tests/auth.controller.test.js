@@ -27,6 +27,7 @@ describe('POST /api/auth/registro', () => {
       nombreCompleto: 'Juan Perez',
       correo: 'correo-sin-arroba',
       contrasena: 'password123',
+      autorizaTratamiento: true,
     });
 
     expect(respuesta.status).toBe(400);
@@ -49,6 +50,7 @@ describe('POST /api/auth/registro', () => {
       nombreCompleto: 'Juan Perez',
       correo: 'juan@correo.com',
       contrasena: 'password123',
+      autorizaTratamiento: true,
     });
 
     expect(respuesta.status).toBe(409);
@@ -69,6 +71,7 @@ describe('POST /api/auth/registro', () => {
       nombreCompleto: 'Juan Perez',
       correo: 'juan@correo.com',
       contrasena: 'password123',
+      autorizaTratamiento: true,
     });
 
     expect(respuesta.status).toBe(201);
@@ -96,6 +99,7 @@ describe('POST /api/auth/registro', () => {
       nombreCompleto: 'Juan Perez',
       correo: 'juan@correo.com',
       contrasena: 'password123',
+      autorizaTratamiento: true,
     });
 
     expect(respuesta.status).toBe(201);

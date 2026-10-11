@@ -4,6 +4,7 @@
 // exclusiva del administrador.
 const horarioModel = require('../models/horario.model');
 const sedeModel = require('../models/sede.model');
+const { esHora, aMinutos } = require('../utils/validacion');
 
 const DIA_VALIDO = (dia) => Number.isInteger(dia) && dia >= 0 && dia <= 6;
 
@@ -46,8 +47,17 @@ async function actualizarDia(req, res, next) {
     if (!DIA_VALIDO(diaSemana)) {
       return res.status(400).json({ mensaje: 'diaSemana debe ser un número entre 0 (domingo) y 6 (sábado).' });
     }
-    if (horaInicio >= horaFin) {
+    // Formato HH:MM y comparacion en minutos (antes se comparaban como
+    // texto: "9:00" quedaba despues de "17:00").
+    if (!esHora(horaInicio) || !esHora(horaFin)) {
+      return res.status(400).json({ mensaje: 'Las horas deben tener el formato HH:MM, por ejemplo 08:00.' });
+    }
+    if (aMinutos(horaInicio) >= aMinutos(horaFin)) {
       return res.status(400).json({ mensaje: 'La hora de inicio debe ser anterior a la hora de fin.' });
+    }
+    // Las citas van en franjas de 30 minutos: el horario empieza y termina en :00 o :30.
+    if (aMinutos(horaInicio) % 30 !== 0 || aMinutos(horaFin) % 30 !== 0) {
+      return res.status(400).json({ mensaje: 'El horario debe empezar y terminar en punto o a la media hora (por ejemplo 08:00 o 17:30).' });
     }
 
     const sede = await sedeModel.buscarPorId(sedeId);
@@ -56,7 +66,10 @@ async function actualizarDia(req, res, next) {
     }
 
     const dia = await horarioModel.upsertDia(sedeId, diaSemana, horaInicio, horaFin);
-    return res.status(200).json({ dia });
+    // Citas ya agendadas que quedaron fuera del horario nuevo: no se mueven
+    // solas, se avisa para que la sede las reprograme.
+    const citasAfectadas = await horarioModel.contarCitasFueraDeHorario(sedeId, diaSemana, horaInicio, horaFin);
+    return res.status(200).json({ dia, citasAfectadas: citasAfectadas || 0 });
   } catch (error) {
     next(error);
   }
@@ -75,7 +88,8 @@ async function cerrarDia(req, res, next) {
     }
 
     await horarioModel.cerrarDia(sedeId, dia);
-    return res.status(204).send();
+    const citasAfectadas = await horarioModel.contarCitasFueraDeHorario(sedeId, dia);
+    return res.status(200).json({ citasAfectadas: citasAfectadas || 0 });
   } catch (error) {
     next(error);
   }

@@ -29,7 +29,7 @@ router.get('/', listarEntidades);
 router.get('/bitacora', listarBitacora);
 
 // GET /api/datos/respaldo — copia de seguridad (.sql)
-router.get('/respaldo', auditar('Descargar copia de seguridad', 'sistema'), respaldo);
+router.post('/respaldo', auditar('Descargar copia de seguridad', 'sistema'), respaldo);
 
 // Correcciones puntuales
 router.put('/usuarios/:id/corregir', auditar('Corregir datos de una cuenta', 'usuario'), corregirUsuario);

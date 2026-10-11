@@ -23,4 +23,12 @@ function generarFranjasEntreHoras(fecha, horaInicio, horaFin) {
   return franjas;
 }
 
-module.exports = { DURACION_SLOT_MINUTOS, generarFranjasEntreHoras };
+// Franjas (de 30 minutos) que ocupa una cita que empieza en `inicio` y
+// dura `duracionMinutos`: una consulta de 30 ocupa una; una cirugia de 90,
+// tres. Antes toda cita ocupaba una sola franja, durara lo que durara.
+function franjasQueOcupa(inicio, duracionMinutos) {
+  const cantidad = Math.max(1, Math.ceil((Number(duracionMinutos) || DURACION_SLOT_MINUTOS) / DURACION_SLOT_MINUTOS));
+  return Array.from({ length: cantidad }, (_, i) => new Date(new Date(inicio).getTime() + i * DURACION_SLOT_MINUTOS * 60000));
+}
+
+module.exports = { DURACION_SLOT_MINUTOS, generarFranjasEntreHoras, franjasQueOcupa };

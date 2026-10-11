@@ -6,6 +6,8 @@
 // - bitacora de cambios y copia de seguridad.
 // No hay edicion libre de tablas ni eliminacion de registros.
 const { spawn } = require('child_process');
+const bcrypt = require('bcryptjs');
+const usuarioModel = require('../models/usuario.model');
 const datosModel = require('../models/datos.model');
 const bitacoraModel = require('../models/bitacora.model');
 
@@ -126,9 +128,26 @@ async function listarBitacora(req, res, next) {
 }
 
 // --- copia de seguridad ------------------------------------------------
-// GET /api/datos/respaldo — descarga un .sql con toda la base (pg_dump).
+// POST /api/datos/respaldo { contrasena } — descarga un .sql con toda la
+// base (pg_dump). Contiene todos los datos personales y las contraseñas
+// cifradas: por eso se vuelve a pedir la contraseña de quien la descarga
+// (una sesion abierta en un equipo desatendido no basta).
 // Restaurarla no se hace desde el sistema: es una operacion manual.
-function respaldo(req, res) {
+async function respaldo(req, res, next) {
+  try {
+    const contrasena = String(req.body?.contrasena || '');
+    if (!contrasena) return res.status(400).json({ mensaje: 'Escribe tu contraseña para descargar la copia de seguridad.' });
+    const cuenta = await usuarioModel.buscarConHashPorId(req.usuario.id);
+    if (!cuenta || !(await bcrypt.compare(contrasena, cuenta.contrasena_hash))) {
+      return res.status(403).json({ mensaje: 'La contraseña no es correcta.' });
+    }
+  } catch (error) {
+    return next(error);
+  }
+  return generarRespaldo(req, res);
+}
+
+function generarRespaldo(req, res) {
   const ejecutable = process.env.PG_DUMP_PATH || 'pg_dump';
   const argumentos = ['--no-owner', '--no-privileges', '-h', process.env.DB_HOST, '-p', String(process.env.DB_PORT || 5432), '-U', process.env.DB_USER, process.env.DB_NAME];
   const proceso = spawn(ejecutable, argumentos, { env: { ...process.env, PGPASSWORD: process.env.DB_PASSWORD } });
