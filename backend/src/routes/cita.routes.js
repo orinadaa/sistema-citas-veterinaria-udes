@@ -1,13 +1,13 @@
 // routes/cita.routes.js
 // RF-06 a RF-09: agendar, consultar disponibilidad, reprogramar y
-// cancelar citas (HU-05 a HU-08), exclusivo del rol cliente.
+// cancelar citas (HU-05 a HU-08).
 //
 // Ampliacion (calendario del panel administrativo): el administrador
 // tambien puede consultar disponibilidad y crear citas, para agendar en
 // nombre de un cliente desde su calendario (ver cita.controller.js:
 // crear() exige clienteId explicito cuando quien llama es administrador).
-// Reprogramar/cancelar siguen siendo exclusivas del cliente dueno de la
-// cita (RF-08/RF-09) — no se ampliaron.
+// Reprogramar/cancelar: el cliente dueño, el administrador de la sede de
+// la cita o el medico que la atiende (auditoria del 11 oct 2026).
 const express = require('express');
 const {
   consultarDisponibilidad,

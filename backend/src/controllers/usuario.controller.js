@@ -1,8 +1,8 @@
 // controllers/usuario.controller.js
 // RF-04 (gestion de roles), RF-05 (restriccion por rol).
-// Crear personal (administrador/veterinario) y reasignar roles son acciones
-// exclusivas del administrador; se protegen con verificarRol('administrador')
-// en las rutas.
+// Crear personal (administrador/veterinario), reasignar roles y activar o
+// desactivar cuentas son acciones exclusivas del superadministrador (ver
+// usuario.routes.js). El administrador de sede solo lista clientes.
 
 const bcrypt = require('bcryptjs');
 const {
@@ -37,7 +37,7 @@ async function obtenerPerfilPropio(req, res, next) {
   }
 }
 
-// GET /api/usuarios (solo administrador) — ?rol= filtra por rol, usado
+// GET /api/usuarios (superadministrador; el administrador de sede solo con rol=cliente) — ?rol= filtra por rol, usado
 // por ejemplo para listar clientes al agendar una cita desde el panel.
 async function listar(req, res, next) {
   try {
@@ -58,7 +58,7 @@ async function listar(req, res, next) {
   }
 }
 
-// POST /api/usuarios (solo administrador) — alta de personal administrativo/veterinario
+// POST /api/usuarios (solo superadministrador) — alta de personal administrativo/veterinario
 async function crearStaff(req, res, next) {
   try {
     const { rol, sedeId, telefono } = req.body;
@@ -118,7 +118,7 @@ async function crearStaff(req, res, next) {
   }
 }
 
-// PATCH /api/usuarios/:id/rol (solo administrador) — HU-04
+// PATCH /api/usuarios/:id/rol (solo superadministrador) — HU-04
 async function cambiarRol(req, res, next) {
   try {
     const { id } = req.params;

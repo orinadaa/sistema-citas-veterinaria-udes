@@ -1,7 +1,10 @@
 // controllers/cita.controller.js
 // RF-06 (agendar), RF-07 (disponibilidad), RF-08 (reprogramar),
-// RF-09 (cancelar). Todo el modulo es exclusivo del rol cliente
-// (ver cita.routes.js): son las historias de usuario HU-05 a HU-08.
+// RF-09 (cancelar): historias de usuario HU-05 a HU-08.
+// Agendan el cliente (para si mismo), el administrador de sede y el medico
+// (a nombre de un cliente). Reprograman y cancelan el cliente dueño, el
+// administrador de la sede de la cita y el medico que la atiende.
+// Una cita ocupa tantas franjas de 30 minutos como dure su servicio.
 //
 // La disponibilidad de una franja depende de que al menos un medico que
 // preste ese servicio en esa sede este libre. En el flujo de
@@ -190,6 +193,7 @@ async function consultarDisponibilidad(req, res, next) {
       sedeId,
       servicioId,
       duracionMinutos: DURACION_SLOT_MINUTOS,
+      duracionServicioMinutos: duracion,
       medicosEnSede,
       medicosDisponiblesEnSede: medicos.length,
       franjas: disponibilidad,
