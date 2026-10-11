@@ -68,6 +68,7 @@ import { UsersIcon } from '@phosphor-icons/react/dist/csr/Users';
 import { WarningIcon } from '@phosphor-icons/react/dist/csr/Warning';
 import { XIcon } from '@phosphor-icons/react/dist/csr/X';
 import { PhoneIcon } from '@phosphor-icons/react/dist/csr/Phone';
+import { ChatCircleDotsIcon } from '@phosphor-icons/react/dist/csr/ChatCircleDots';
 import { WhatsappLogoIcon } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
 import { InstagramLogoIcon } from '@phosphor-icons/react/dist/csr/InstagramLogo';
 import { FacebookLogoIcon } from '@phosphor-icons/react/dist/csr/FacebookLogo';
@@ -91,6 +92,9 @@ export function IconoUbicacion(props) {
   return <Icono de={MapPinIcon} {...props} />;
 }
 // Cerrar sesion: puerta con flecha saliendo.
+export function IconoContacto(props) {
+  return <Icono de={ChatCircleDotsIcon} {...props} />;
+}
 export function IconoTelefono(props) {
   return <Icono de={PhoneIcon} {...props} />;
 }

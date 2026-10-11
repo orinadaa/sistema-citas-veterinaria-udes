@@ -8,7 +8,7 @@ import { Hero } from '../components/landing/Hero';
 import { Servicios } from '../components/landing/Servicios';
 import { Sedes } from '../components/landing/Sedes';
 import { Horarios } from '../components/landing/Horarios';
-import { BurbujaWhatsapp } from '../components/landing/BurbujaWhatsapp';
+import { BotonContacto } from '../components/landing/BotonContacto';
 import { HuellasFondo } from '../components/landing/HuellasFondo';
 import { usePaginadoPorRueda } from '../hooks/usePaginadoPorRueda';
 
@@ -59,7 +59,7 @@ export function LandingPage() {
         </div>
       </main>
       <Footer />
-      <BurbujaWhatsapp />
+      <BotonContacto />
     </div>
   );
 }
