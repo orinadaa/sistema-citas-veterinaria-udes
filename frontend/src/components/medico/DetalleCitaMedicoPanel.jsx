@@ -54,7 +54,7 @@ export function DetalleCitaMedicoPanel({ cita, onClose, acciones }) {
                 <p className="truncate font-heading text-lg font-bold text-brand-navy">{cita.mascota_nombre}</p>
                 <StatusBadge status={estadoDeCita(cita)} />
               </div>
-              <p className="text-sm font-medium text-brand-blue">{[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}</p>
+              <p className="text-sm font-medium text-brand-blue-600">{[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}</p>
               <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-slate-500">
                 <EtiquetaSexo sexo={cita.mascota_sexo} />
                 {ETIQUETA_SEXO[cita.mascota_sexo] && edadYPeso(mascota) && <span aria-hidden="true">·</span>}

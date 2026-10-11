@@ -9,7 +9,7 @@
 //   pacientes, horario, reportes de su sede; los servicios, solo consulta).
 // Los permisos reales los impone el servidor; aca solo se decide que mostrar.
 import { useState } from 'react';
-import { AdminSidebar } from '../components/layout/AdminSidebar';
+import { AdminSidebar, AdminNavMovil } from '../components/layout/AdminSidebar';
 import { AdminHeader } from '../components/layout/AdminHeader';
 import { useAuth } from '../context/AuthContext';
 import { FondoVetui } from '../components/vetui';
@@ -61,10 +61,11 @@ export function PanelAdminPage() {
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <AdminHeader onNavegar={navegarDesdeBusqueda} onMiCuenta={() => irA('cuenta')} />
+        <AdminNavMovil activo={pestana} onCambiar={irA} />
 
         <div className="relative min-h-0 flex-1">
           <div aria-hidden="true" className="vidrio vidrio-hoja absolute inset-0 rounded-superficie" />
-          <main className="hoja-panel relative h-full overflow-y-auto rounded-superficie px-6 py-8 text-white sm:px-8">
+          <main className="hoja-panel relative h-full overflow-y-auto rounded-superficie px-4 py-6 text-white sm:px-8 sm:py-8">
             {/* Mi cuenta: se abre desde el menu del avatar, no desde el menu lateral. */}
             {pestana === 'cuenta' && <PanelMiCuenta />}
 

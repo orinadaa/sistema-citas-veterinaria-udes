@@ -16,9 +16,6 @@ import {
   Cell,
   ResponsiveContainer,
 } from 'recharts';
-import ExcelJS from 'exceljs';
-import { jsPDF } from 'jspdf';
-import { autoTable } from 'jspdf-autotable';
 import { obtenerReportes, obtenerSedesAdmin } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora, hoyComoFechaLocal } from '../../utils/fecha';
@@ -123,6 +120,8 @@ export function PanelReportes({ sedeFija = null }) {
     if (!datos) return;
     setExportando('excel');
     try {
+      // La libreria de Excel se descarga recien aqui: pesa y solo sirve para exportar.
+      const { default: ExcelJS } = await import('exceljs');
       const libro = new ExcelJS.Workbook();
       const hoja = libro.addWorksheet('Últimas citas');
       hoja.columns = [
@@ -147,10 +146,11 @@ export function PanelReportes({ sedeFija = null }) {
     }
   }
 
-  function exportarPDF() {
+  async function exportarPDF() {
     if (!datos) return;
     setExportando('pdf');
     try {
+      const [{ jsPDF }, { autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
       const doc = new jsPDF();
       doc.setFontSize(14);
       doc.text('Reporte de citas — Clínica Veterinaria UDES', 14, 16);
@@ -325,7 +325,7 @@ export function PanelReportes({ sedeFija = null }) {
                   {
                     header: 'Estado',
                     render: (c) => (
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${c.estado === 'agendada' ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'}`}>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${c.estado === 'agendada' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                         {c.estado === 'agendada' ? 'Agendada' : 'Cancelada'}
                       </span>
                     ),

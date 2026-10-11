@@ -55,12 +55,12 @@ function Stepper({ paso }) {
             )}
             <span
               className={`relative z-10 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-                completado ? 'bg-brand-green text-white' : activo ? 'bg-brand-blue text-white ring-4 ring-blue-100' : 'border-2 border-slate-200 bg-white text-slate-400'
+                completado ? 'bg-emerald-700 text-white' : activo ? 'bg-brand-blue-600 text-white ring-4 ring-blue-100' : 'border-2 border-slate-200 bg-white text-slate-400'
               }`}
             >
               {completado ? <IconoCheck className="h-3.5 w-3.5" /> : numero}
             </span>
-            <span className={`text-[11px] font-medium leading-tight ${activo ? 'text-brand-blue' : completado ? 'text-slate-700' : 'text-slate-400'}`}>
+            <span className={`text-xs font-medium leading-tight ${activo ? 'text-brand-blue-600' : completado ? 'text-slate-700' : 'text-slate-400'}`}>
               {etiqueta}
             </span>
           </li>
@@ -73,7 +73,7 @@ function Stepper({ paso }) {
 function TarjetaCliente({ cliente, onQuitar }) {
   return (
     <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-bold text-white">
         {iniciales(cliente.nombre_completo)}
       </span>
       <div className="min-w-0 flex-1">
@@ -243,7 +243,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
             type="button"
             disabled={!pasoCompleto || enviando}
             onClick={paso === 4 ? confirmar : () => setPaso(paso + 1)}
-            className="flex-1 rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {paso === 4 ? (enviando ? 'Agendando...' : 'Confirmar') : 'Siguiente'}
           </button>
@@ -284,7 +284,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
                             onClick={() => elegirCliente(c)}
                             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-left hover:bg-slate-50"
                           >
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-brand-blue">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-brand-blue-600">
                               {iniciales(c.nombre_completo)}
                             </span>
                             <span className="min-w-0">

@@ -9,7 +9,7 @@ import { IconoMas } from '../icons';
 export function PageHeader({ title, subtitle, actionLabel, onAction, actionColor = 'amber' }) {
   const colorClases =
     actionColor === 'blue'
-      ? 'bg-brand-blue text-white shadow-sm hover:bg-blue-600'
+      ? 'bg-brand-blue-600 text-white shadow-sm hover:bg-brand-blue-700'
       : 'boton-glass-ambar text-brand-navy';
 
   return (

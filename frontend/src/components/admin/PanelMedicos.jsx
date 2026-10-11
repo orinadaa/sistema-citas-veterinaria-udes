@@ -358,14 +358,14 @@ export function PanelMedicos({ busquedaInicial }) {
               <button
                 type="button"
                 onClick={() => setMedicoHorario(m)}
-                className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+                className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue-600 transition"
               >
                 Horario
               </button>
               <button
                 type="button"
                 onClick={() => abrirEditar(m)}
-                className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+                className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue-600 transition"
               >
                 Editar
               </button>
@@ -387,7 +387,7 @@ export function PanelMedicos({ busquedaInicial }) {
             type="submit"
             form="form-medico"
             disabled={guardando}
-            className="rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+            className="rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:opacity-60"
           >
             {guardando ? 'Guardando...' : 'Guardar cambios'}
           </button>
@@ -475,7 +475,7 @@ export function PanelMedicos({ busquedaInicial }) {
                       type="button"
                       onClick={() => alternarServicio(medicoActual, s.id)}
                       className={`rounded-boton px-3 py-1.5 text-xs font-medium transition ${
-                        activo ? 'bg-brand-blue text-white hover:bg-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        activo ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
                       {s.nombre}

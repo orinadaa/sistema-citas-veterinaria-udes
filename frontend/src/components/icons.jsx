@@ -20,6 +20,7 @@
 import { ArrowClockwiseIcon } from '@phosphor-icons/react/dist/csr/ArrowClockwise';
 import { ArrowRightIcon } from '@phosphor-icons/react/dist/csr/ArrowRight';
 import { BellIcon } from '@phosphor-icons/react/dist/csr/Bell';
+import { ListIcon } from '@phosphor-icons/react/dist/csr/List';
 import { BirdIcon } from '@phosphor-icons/react/dist/csr/Bird';
 import { BoneIcon } from '@phosphor-icons/react/dist/csr/Bone';
 import { BugIcon } from '@phosphor-icons/react/dist/csr/Bug';
@@ -39,7 +40,6 @@ import { EyeIcon } from '@phosphor-icons/react/dist/csr/Eye';
 import { EyeSlashIcon } from '@phosphor-icons/react/dist/csr/EyeSlash';
 import { FileTextIcon } from '@phosphor-icons/react/dist/csr/FileText';
 import { FlaskIcon } from '@phosphor-icons/react/dist/csr/Flask';
-import { GearIcon } from '@phosphor-icons/react/dist/csr/Gear';
 import { HeartIcon } from '@phosphor-icons/react/dist/csr/Heart';
 import { HospitalIcon } from '@phosphor-icons/react/dist/csr/Hospital';
 import { ImageIcon } from '@phosphor-icons/react/dist/csr/Image';
@@ -57,7 +57,6 @@ import { PlusIcon } from '@phosphor-icons/react/dist/csr/Plus';
 import { ScalesIcon } from '@phosphor-icons/react/dist/csr/Scales';
 import { ScissorsIcon } from '@phosphor-icons/react/dist/csr/Scissors';
 import { ShieldCheckIcon } from '@phosphor-icons/react/dist/csr/ShieldCheck';
-import { SparkleIcon } from '@phosphor-icons/react/dist/csr/Sparkle';
 import { SignOutIcon } from '@phosphor-icons/react/dist/csr/SignOut';
 import { StethoscopeIcon } from '@phosphor-icons/react/dist/csr/Stethoscope';
 import { SyringeIcon } from '@phosphor-icons/react/dist/csr/Syringe';
@@ -176,8 +175,9 @@ export function IconoPersona(props) {
 export function IconoGrafica(props) {
   return <Icono de={ChartBarIcon} {...props} />;
 }
-export function IconoEngranaje(props) {
-  return <Icono de={GearIcon} {...props} />;
+// Menu en pantallas pequeñas (tres rayas).
+export function IconoMenu(props) {
+  return <Icono de={ListIcon} {...props} />;
 }
 export function IconoX(props) {
   return <Icono de={XIcon} {...props} />;
@@ -196,10 +196,6 @@ export function IconoCamara(props) {
 }
 export function IconoRotar(props) {
   return <Icono de={ArrowClockwiseIcon} {...props} />;
-}
-// Destello decorativo (avisos del landing).
-export function IconoDestello(props) {
-  return <Icono de={SparkleIcon} {...props} />;
 }
 // Menu del panel: inicio, pagina web, catalogos y datos.
 export function IconoInicio(props) {

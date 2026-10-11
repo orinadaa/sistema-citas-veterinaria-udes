@@ -275,7 +275,7 @@ export function PanelHorarios({ sedeFija = null }) {
                     <p className="flex items-center gap-2 font-medium text-slate-900">
                       {sede.nombre}
                       {sede.es_principal && (
-                        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Principal</span>
+                        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">Principal</span>
                       )}
                     </p>
                     <p className="text-xs text-slate-400">{sede.direccion || sede.ciudad}</p>
@@ -291,8 +291,8 @@ export function PanelHorarios({ sedeFija = null }) {
                     <span
                       key={d.numero}
                       title={d.nombre}
-                      className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold ${
-                        d.abierto ? 'bg-brand-green/15 text-brand-green' : 'bg-slate-100 text-slate-400'
+                      className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                        d.abierto ? 'bg-brand-green/15 text-emerald-700' : 'bg-slate-100 text-slate-400'
                       }`}
                     >
                       {d.letra}
@@ -307,7 +307,7 @@ export function PanelHorarios({ sedeFija = null }) {
               render: (sede) => (
                 <span
                   className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    sede.activo ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'
+                    sede.activo ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                   }`}
                 >
                   {sede.activo ? 'Activa' : 'Inactiva'}
@@ -320,7 +320,7 @@ export function PanelHorarios({ sedeFija = null }) {
             <button
               type="button"
               onClick={() => abrirEditar(sede)}
-              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue-600 transition"
             >
               {sedeFija ? 'Cambiar horario' : 'Editar'}
             </button>
@@ -339,7 +339,7 @@ export function PanelHorarios({ sedeFija = null }) {
           type="submit"
           form="form-sede"
           disabled={guardando}
-          className="w-full rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+          className="w-full rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:opacity-60"
         >
           {guardando ? 'Guardando...' : sedeEditando ? 'Guardar cambios' : 'Crear sede'}
         </button>

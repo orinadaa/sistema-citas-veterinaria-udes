@@ -62,7 +62,7 @@ function Mensaje({ estado }) {
   return (
     <p
       className={`rounded-lg px-3 py-2 text-sm ring-1 ${
-        estado.tipo === 'ok' ? 'bg-emerald-50 text-brand-green ring-emerald-200' : 'bg-red-50 text-red-700 ring-red-200'
+        estado.tipo === 'ok' ? 'bg-emerald-50 text-emerald-700 ring-emerald-200' : 'bg-red-50 text-red-700 ring-red-200'
       }`}
     >
       {estado.texto}
@@ -153,7 +153,7 @@ function CambioCorreo({ correoActual, onCambiado }) {
               setPaso('pedir');
               setEstado(null);
             }}
-            className="shrink-0 rounded-boton border border-brand-blue px-3 py-2 text-sm font-semibold text-brand-blue hover:bg-blue-50"
+            className="shrink-0 rounded-boton border border-brand-blue px-3 py-2 text-sm font-semibold text-brand-blue-600 hover:bg-blue-50"
           >
             Cambiar
           </button>
@@ -180,7 +180,7 @@ function CambioCorreo({ correoActual, onCambiado }) {
                 type="button"
                 disabled={enviando || !correoNuevo.trim()}
                 onClick={pedirCodigo}
-                className="shrink-0 rounded-boton bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-50"
+                className="shrink-0 rounded-boton bg-brand-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700 disabled:opacity-50"
               >
                 {enviando ? 'Enviando...' : 'Enviar código'}
               </button>
@@ -204,7 +204,7 @@ function CambioCorreo({ correoActual, onCambiado }) {
                 type="button"
                 disabled={enviando || codigo.length !== 6}
                 onClick={confirmar}
-                className="shrink-0 rounded-boton bg-brand-blue px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-50"
+                className="shrink-0 rounded-boton bg-brand-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700 disabled:opacity-50"
               >
                 {enviando ? 'Verificando...' : 'Confirmar'}
               </button>
@@ -352,7 +352,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                   className="w-32"
                 />
                 <p className="mt-3 font-heading text-lg font-bold text-brand-navy">{perfil.nombre_completo}</p>
-                <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-brand-green">
+                <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                   <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-green" />
                   {perfil.activo ? 'Activo' : 'Inactivo'}
                 </span>
@@ -440,7 +440,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                   <button
                     type="submit"
                     disabled={guardando === 'personal'}
-                    className="self-end rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
+                    className="self-end rounded-boton bg-brand-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700 disabled:opacity-60"
                   >
                     {guardando === 'personal' ? 'Guardando...' : 'Guardar cambios'}
                   </button>
@@ -484,7 +484,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                   <button
                     type="submit"
                     disabled={guardando === 'clave'}
-                    className="self-end rounded-boton border border-brand-blue px-5 py-2 text-sm font-semibold text-brand-blue hover:bg-blue-50 disabled:opacity-60"
+                    className="self-end rounded-boton border border-brand-blue px-5 py-2 text-sm font-semibold text-brand-blue-600 hover:bg-blue-50 disabled:opacity-60"
                   >
                     {guardando === 'clave' ? 'Actualizando...' : 'Actualizar contraseña'}
                   </button>
@@ -502,7 +502,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                         <IconoSede className="h-4 w-4 shrink-0 text-brand-blue" />
                         <span className="flex-1">{s.nombre}</span>
                         {s.principal && (
-                          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Principal</span>
+                          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">Principal</span>
                         )}
                       </li>
                     ))}
@@ -516,10 +516,12 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                     { icono: IconoPata, etiqueta: 'Mascotas', valor: perfil.resumen.mascotas },
                   ].map((dato) => (
                     <div key={dato.etiqueta} className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
-                        <dato.icono className="h-4 w-4" />
-                      </span>
-                      <dt className="flex-1 text-sm text-slate-500">{dato.etiqueta}</dt>
+                      <dt className="flex flex-1 items-center gap-3 text-sm text-slate-500">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-brand-blue">
+                          <dato.icono className="h-4 w-4" />
+                        </span>
+                        {dato.etiqueta}
+                      </dt>
                       <dd className="font-heading text-lg font-bold text-brand-navy">{dato.valor}</dd>
                     </div>
                   ))}
@@ -586,7 +588,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                 <button
                   type="submit"
                   disabled={guardando === 'profesional'}
-                  className="self-end rounded-boton bg-brand-blue px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-600 disabled:opacity-60"
+                  className="self-end rounded-boton bg-brand-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700 disabled:opacity-60"
                 >
                   {guardando === 'profesional' ? 'Guardando...' : 'Guardar cambios'}
                 </button>

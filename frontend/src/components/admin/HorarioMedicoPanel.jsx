@@ -248,7 +248,7 @@ export function HorarioMedicoPanel({ medico, onClose }) {
               type="button"
               disabled={guardando}
               onClick={guardarSemana}
-              className="rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+              className="rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:opacity-60"
             >
               {guardando ? 'Guardando...' : 'Guardar horario'}
             </button>
@@ -295,7 +295,7 @@ export function HorarioMedicoPanel({ medico, onClose }) {
                 <button
                   type="button"
                   onClick={personalizar}
-                  className="self-start rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600"
+                  className="self-start rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
                 >
                   Definir un horario propio
                 </button>

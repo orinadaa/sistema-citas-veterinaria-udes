@@ -16,7 +16,7 @@ export function ReenviarCodigo({ cuenta, onReenviar, disabled = false, className
       type="button"
       onClick={onReenviar}
       disabled={disabled}
-      className={`boton-texto text-sm font-semibold text-brand-blue transition disabled:opacity-50 ${className}`}
+      className={`boton-texto text-sm font-semibold text-brand-blue-600 transition disabled:opacity-50 ${className}`}
     >
       Reenviar código
     </button>

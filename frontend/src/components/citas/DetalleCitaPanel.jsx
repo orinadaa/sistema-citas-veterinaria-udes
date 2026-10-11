@@ -70,7 +70,7 @@ function FilaInfo({ icono: Icono, etiqueta, valor, detalle, accion }) {
 // Boton outline azul de una fila (boton, o enlace externo si trae href).
 function BotonFila({ icono: Icono, onClick, href, children }) {
   const clase =
-    'inline-flex items-center gap-1.5 rounded-boton border border-brand-blue px-3 py-1.5 text-xs font-semibold text-brand-blue transition hover:bg-blue-50';
+    'inline-flex items-center gap-1.5 rounded-boton border border-brand-blue px-3 py-1.5 text-xs font-semibold text-brand-blue-600 transition hover:bg-blue-50';
   if (href) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className={clase}>
@@ -225,7 +225,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
                 <StatusBadge status={estado} />
               </div>
               {(cita.mascota_especie || cita.mascota_raza) && (
-                <p className="text-sm font-medium text-brand-blue">
+                <p className="text-sm font-medium text-brand-blue-600">
                   {[cita.mascota_especie, cita.mascota_raza].filter(Boolean).join(' · ')}
                 </p>
               )}

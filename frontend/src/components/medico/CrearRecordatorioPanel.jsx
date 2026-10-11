@@ -134,7 +134,7 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
             type="submit"
             form="form-recordatorio"
             disabled={guardando}
-            className="flex-1 rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:opacity-60"
+            className="flex-1 rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:opacity-60"
           >
             {guardando ? 'Guardando...' : 'Guardar recordatorio'}
           </button>
@@ -151,7 +151,7 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
               <p className="truncate text-xs text-slate-400">Dueño: {nombreDueno}</p>
             </div>
             {onVerPerfil && (
-              <button type="button" onClick={onVerPerfil} className="shrink-0 text-sm font-semibold text-brand-blue hover:underline">
+              <button type="button" onClick={onVerPerfil} className="shrink-0 text-sm font-semibold text-brand-blue-600 hover:underline">
                 Ver perfil
               </button>
             )}
@@ -239,7 +239,7 @@ export function CrearRecordatorioPanel({ mascota, nombreDueno, onClose, onVerPer
           </div>
 
           {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">{error}</p>}
-          {aviso && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-brand-green ring-1 ring-emerald-200">{aviso}</p>}
+          {aviso && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 ring-1 ring-emerald-200">{aviso}</p>}
 
           <div className="border-t border-slate-100 pt-5">
             <p className="text-sm font-semibold text-slate-700">Recordatorios de {mascota.nombre}</p>

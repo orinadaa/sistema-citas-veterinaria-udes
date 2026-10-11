@@ -43,16 +43,18 @@ export function MiniCalendario({ diaSeleccionado, onSeleccionarDia, clase = 'rou
           <button
             type="button"
             onClick={() => setMesMostrado((m) => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-            className="boton-texto rounded-boton p-1 text-slate-400 transition hover:text-slate-600"
+            aria-label="Mes anterior"
+            className="boton-texto rounded-boton p-1.5 text-slate-600 transition hover:text-slate-900"
           >
-            <IconoFlechaDerecha className="h-3.5 w-3.5 rotate-180" />
+            <IconoFlechaDerecha className="h-4 w-4 rotate-180" />
           </button>
           <button
             type="button"
             onClick={() => setMesMostrado((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-            className="boton-texto rounded-boton p-1 text-slate-400 transition hover:text-slate-600"
+            aria-label="Mes siguiente"
+            className="boton-texto rounded-boton p-1.5 text-slate-600 transition hover:text-slate-900"
           >
-            <IconoFlechaDerecha className="h-3.5 w-3.5" />
+            <IconoFlechaDerecha className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -74,9 +76,9 @@ export function MiniCalendario({ diaSeleccionado, onSeleccionarDia, clase = 'rou
               onClick={() => onSeleccionarDia(celda)}
               className={`mx-auto flex h-7 w-7 items-center justify-center rounded-boton transition ${
                 esSeleccionado
-                  ? 'bg-brand-blue text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : esHoy
-                    ? 'font-semibold text-brand-blue'
+                    ? 'font-semibold text-brand-blue-600'
                     : esDelMes
                       ? 'text-slate-700 hover:bg-slate-100'
                       : 'text-slate-300 hover:bg-slate-50'

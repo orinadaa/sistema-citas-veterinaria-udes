@@ -270,7 +270,7 @@ export function PanelCitasSeguimiento() {
               <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Estado</p>
               <span
                 className={`mt-1 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${
-                  citaDetalle.estado === 'agendada' ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'
+                  citaDetalle.estado === 'agendada' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                 }`}
               >
                 {citaDetalle.estado === 'agendada' ? 'Agendada' : 'Cancelada'}

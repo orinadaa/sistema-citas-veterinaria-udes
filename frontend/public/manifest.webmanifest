@@ -1,0 +1,13 @@
+{
+  "name": "Clínica Veterinaria UDES",
+  "short_name": "Veterinaria UDES",
+  "lang": "es",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#06338a",
+  "theme_color": "#06338a",
+  "icons": [
+    { "src": "/icono-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icono-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

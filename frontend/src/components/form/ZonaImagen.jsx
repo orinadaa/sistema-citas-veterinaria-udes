@@ -103,7 +103,7 @@ export function ZonaImagen({
         <button
           type="button"
           onClick={() => entrada.current?.click()}
-          className="self-start text-xs font-medium text-brand-blue hover:underline"
+          className="self-start text-xs font-medium text-brand-blue-600 hover:underline"
         >
           {procesando ? 'Preparando la foto...' : 'Cambiar foto'}
         </button>

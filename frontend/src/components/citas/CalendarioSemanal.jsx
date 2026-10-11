@@ -28,7 +28,7 @@ function TarjetaCita({ cita, mostrarMedico, onClick }) {
       type="button"
       onClick={onClick}
       style={{ backgroundColor: tono.bg, color: tono.text }}
-      className={`mb-1 flex w-full flex-col rounded-lg px-1.5 py-1 text-left text-[11px] leading-tight transition hover:brightness-95 ${
+      className={`mb-1 flex w-full flex-col rounded-lg px-1.5 py-1 text-left text-xs leading-tight transition hover:brightness-95 ${
         cancelada ? 'opacity-50 line-through' : ''
       }`}
     >
@@ -79,7 +79,7 @@ export function CalendarioSemanal({ dias, citas, mostrarMedico = false, onSelecc
 
       {slots.map((indiceSlot) => (
         <Fragment key={indiceSlot}>
-          <div className="border-t border-slate-100 pr-2 pt-1 text-right text-[11px] text-slate-400">
+          <div className="border-t border-slate-100 pr-2 pt-1 text-right text-xs text-slate-400">
             {indiceSlot % 2 === 0 ? etiquetaHora(indiceSlot) : ''}
           </div>
           {dias.map((dia, indiceDia) => {

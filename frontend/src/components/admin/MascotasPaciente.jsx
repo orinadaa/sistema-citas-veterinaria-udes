@@ -241,7 +241,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
         </div>
       )}
 
-      {aviso && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-brand-green ring-1 ring-emerald-200">{aviso}</p>}
+      {aviso && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 ring-1 ring-emerald-200">{aviso}</p>}
 
       {!formularioAbierto && (
         <button
@@ -250,7 +250,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
             setAviso('');
             setFormularioAbierto(true);
           }}
-          className="inline-flex items-center justify-center gap-2 rounded-boton border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-brand-blue hover:text-brand-blue"
+          className="inline-flex items-center justify-center gap-2 rounded-boton border-2 border-dashed border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-brand-blue hover:text-brand-blue-600"
         >
           <IconoMas className="h-4 w-4" />
           Agregar mascota
@@ -365,7 +365,7 @@ export function MascotasPaciente({ clienteId, mascotas, onCambio, formularioCola
           <button
             type="submit"
             disabled={guardando}
-            className="inline-flex items-center gap-2 rounded-boton bg-brand-blue px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-boton bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <IconoPata className="h-4 w-4" />
             {guardando ? 'Guardando...' : mascotaEditando ? 'Guardar cambios' : 'Agregar mascota'}

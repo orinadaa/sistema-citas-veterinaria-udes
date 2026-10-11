@@ -107,7 +107,7 @@ export function PanelDisponibilidadMedico() {
               >
                 <span className="flex w-32 items-center gap-2 text-sm font-semibold text-brand-navy">
                   {nombre}
-                  {dia === hoy && <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-brand-blue-700">Hoy</span>}
+                  {dia === hoy && <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-brand-blue-700">Hoy</span>}
                 </span>
                 {turno ? (
                   <span className="flex flex-1 flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-700">

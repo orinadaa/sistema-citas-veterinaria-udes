@@ -207,7 +207,7 @@ export function PanelPacientes({ busquedaInicial }) {
             <button
               type="button"
               onClick={() => abrirDetalle(p)}
-              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue transition"
+              className="boton-texto rounded-boton px-3 py-1.5 text-sm font-medium text-brand-blue-600 transition"
             >
               Ver
             </button>
@@ -228,7 +228,7 @@ export function PanelPacientes({ busquedaInicial }) {
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-bold text-white">
                 {detalle.cliente.nombre_completo
                   .split(' ')
                   .slice(0, 2)
@@ -240,7 +240,7 @@ export function PanelPacientes({ busquedaInicial }) {
                 <p className="font-heading text-base font-semibold text-brand-navy">{detalle.cliente.nombre_completo}</p>
                 <span
                   className={`mt-0.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                    detalle.cliente.activo ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'
+                    detalle.cliente.activo ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                   }`}
                 >
                   <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${detalle.cliente.activo ? 'bg-brand-green' : 'bg-slate-400'}`} />
@@ -292,7 +292,7 @@ export function PanelPacientes({ busquedaInicial }) {
                       </p>
                       <span
                         className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
-                          c.estado === 'agendada' ? 'bg-emerald-50 text-brand-green' : 'bg-slate-100 text-slate-500'
+                          c.estado === 'agendada' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                         }`}
                       >
                         {c.estado === 'agendada' ? 'Agendada' : 'Cancelada'}

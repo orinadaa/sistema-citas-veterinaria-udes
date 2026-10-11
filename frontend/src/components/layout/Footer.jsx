@@ -2,7 +2,8 @@
 // WhatsApp y las redes sociales los configura el superadministrador (RF-23,
 // Pagina web > Informacion de la clinica): solo sale el icono de los canales
 // que tienen numero o enlace.
-import logoBlanco from '../../assets/logoblanco.png';
+import { Link } from 'react-router-dom';
+import logoBlanco from '../../assets/logoblanco.webp';
 import { useInfoClinica } from '../../hooks/useInfoClinica';
 import { canalesDe } from '../landing/canales';
 
@@ -23,7 +24,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-7 sm:px-6 md:grid-cols-3 md:gap-10">
         <div>
           {/* Mismo archivo que el logo grande de la topbar (logoblanco.png). */}
-          <img src={logoBlanco} alt="Clínica Veterinaria UDES" className="h-20 w-auto" />
+          <img src={logoBlanco} alt="Clínica Veterinaria UDES" width="120" height="80" loading="lazy" className="h-20 w-auto" />
           <p className="mt-2 max-w-sm text-sm text-slate-400">
             Servicio de extensión de la Universidad de Santander para el
             cuidado de tu mascota, en Bucaramanga y Valledupar.
@@ -35,7 +36,7 @@ export function Footer() {
           <ul className="mt-2 space-y-1 text-sm text-slate-400">
             {ENLACES_RAPIDOS.map((enlace) => (
               <li key={enlace.href}>
-                <a href={enlace.href} className="hover-texto-ilumina transition hover:text-white">
+                <a href={enlace.href} className="hover-texto-ilumina inline-block py-1 transition hover:text-white">
                   {enlace.etiqueta}
                 </a>
               </li>
@@ -69,8 +70,15 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 px-4 py-3 text-center text-xs text-slate-500 sm:px-6">
-        © {new Date().getFullYear()} Clínica Veterinaria UDES. Todos los derechos reservados.
+      {/* slate-400: el slate-500 anterior no llegaba a 4,5:1 sobre este fondo. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 border-t border-white/10 px-4 py-3 text-center text-xs text-slate-400 sm:px-6">
+        <span>© {new Date().getFullYear()} Clínica Veterinaria UDES. Todos los derechos reservados.</span>
+        <Link to="/privacidad" className="hover-texto-ilumina py-1.5 underline underline-offset-2 hover:text-white">
+          Política de privacidad
+        </Link>
+        <Link to="/aviso-legal" className="hover-texto-ilumina py-1.5 underline underline-offset-2 hover:text-white">
+          Aviso legal
+        </Link>
       </div>
     </footer>
   );

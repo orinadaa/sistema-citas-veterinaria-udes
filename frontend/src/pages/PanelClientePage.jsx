@@ -16,7 +16,7 @@ import { estadoDeCita } from '../components/citas/DetalleCitaPanel';
 import { obtenerMisCitas, obtenerMisMascotas } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { formatearFechaLarga, formatearHora } from '../utils/fecha';
-import fotoMain from '../assets/foto-main.png';
+import fotoMain from '../assets/foto-main.webp';
 import { IconoCalendario, IconoFlechaDerecha, IconoPata, IconoCorazon, IconoMas } from '../components/icons';
 
 const TABS = [

@@ -1,0 +1,17 @@
+# Solo la pagina de inicio y las paginas legales son publicas. Lo demas
+# exige sesion o es la API: no debe aparecer en buscadores.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /panel
+Disallow: /medico
+Disallow: /agendar
+Disallow: /iniciar-sesion
+Disallow: /registrarse
+Disallow: /olvide-clave
+Disallow: /crear-clave
+Disallow: /api/
+Disallow: /uploads/
+
+# Al publicar el sitio, agregar aqui la direccion del mapa del sitio:
+# Sitemap: https://DOMINIO/sitemap.xml
