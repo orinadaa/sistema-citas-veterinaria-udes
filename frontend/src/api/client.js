@@ -379,21 +379,26 @@ export function confirmarCambioCorreoMedico(codigo, token) {
   return solicitar('/medico/perfil/correo/confirmar', { metodo: 'POST', cuerpo: { codigo }, token });
 }
 
-// Disponibilidad propia del medico
+// Horario de trabajo del medico: el medico solo lo consulta...
 export function obtenerDisponibilidadMedico(token) {
   return solicitar('/medico/disponibilidad', { token });
 }
 
-export function guardarHorarioMedico(dias, token) {
-  return solicitar('/medico/disponibilidad/horario', { metodo: 'PUT', cuerpo: { dias }, token });
+// ...y lo define el administrador de su sede (Medicos > Horario).
+export function obtenerDisponibilidadDeMedico(medicoId, token) {
+  return solicitar(`/administracion/medicos/${medicoId}/disponibilidad`, { token });
 }
 
-export function crearBloqueoMedico(datos, token) {
-  return solicitar('/medico/disponibilidad/bloqueos', { metodo: 'POST', cuerpo: datos, token });
+export function guardarHorarioDeMedico(medicoId, dias, token) {
+  return solicitar(`/administracion/medicos/${medicoId}/disponibilidad/horario`, { metodo: 'PUT', cuerpo: { dias }, token });
 }
 
-export function eliminarBloqueoMedico(id, token) {
-  return solicitar(`/medico/disponibilidad/bloqueos/${id}`, { metodo: 'DELETE', token });
+export function crearBloqueoDeMedico(medicoId, datos, token) {
+  return solicitar(`/administracion/medicos/${medicoId}/disponibilidad/bloqueos`, { metodo: 'POST', cuerpo: datos, token });
+}
+
+export function eliminarBloqueoDeMedico(medicoId, bloqueoId, token) {
+  return solicitar(`/administracion/medicos/${medicoId}/disponibilidad/bloqueos/${bloqueoId}`, { metodo: 'DELETE', token });
 }
 
 // Subida de archivos (multipart). No usa solicitar(): el navegador debe

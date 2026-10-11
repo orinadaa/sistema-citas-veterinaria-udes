@@ -10,7 +10,7 @@
 //   biografia editables; especialidades y servicios de SOLO LECTURA
 //   (los asigna el administrador). Sin formacion academica,
 //   certificaciones ni documentos (fuera de este incremento).
-// - Disponibilidad: ver PanelDisponibilidadMedico.
+// - Mi horario (solo consulta): ver PanelDisponibilidadMedico.
 import { useEffect, useState } from 'react';
 import {
   actualizarPerfilMedico,
@@ -36,7 +36,7 @@ import { Desplegable } from '../form/Desplegable';
 const TABS = [
   { id: 'personal', etiqueta: 'Información personal', icono: IconoPersona },
   { id: 'profesional', etiqueta: 'Información profesional', icono: IconoEstetoscopio },
-  { id: 'disponibilidad', etiqueta: 'Disponibilidad', icono: IconoReloj },
+  { id: 'disponibilidad', etiqueta: 'Mi horario', icono: IconoReloj },
 ];
 const ANIOS_EXPERIENCIA = [
   { valor: '0-1', etiqueta: 'Menos de 1 año' },

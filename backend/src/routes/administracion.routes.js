@@ -12,6 +12,12 @@ const {
   listarPacientes,
   obtenerDetallePaciente,
 } = require('../controllers/administracion.controller');
+const {
+  obtenerDisponibilidadDeMedico,
+  guardarHorarioDeMedico,
+  crearBloqueoDeMedico,
+  eliminarBloqueoDeMedico,
+} = require('../controllers/disponibilidadMedico.controller');
 const { obtenerReporte } = require('../controllers/reportes.controller');
 const { obtenerTableroSede, obtenerResumenSistema } = require('../controllers/tablero.controller');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
@@ -45,6 +51,13 @@ router.put('/medicos/:id/servicios', verificarRol('administrador'), auditar('Cam
 
 // PUT /api/administracion/medicos/:id/especialidades — solo administrador
 router.put('/medicos/:id/especialidades', verificarRol('administrador'), auditar('Cambiar especialidades de un médico', 'usuario'), actualizarEspecialidadesDeMedico);
+
+// Horario de trabajo y bloqueos de un medico de la sede — solo administrador.
+// El medico los consulta en /api/medico/disponibilidad, no los edita.
+router.get('/medicos/:id/disponibilidad', verificarRol('administrador'), obtenerDisponibilidadDeMedico);
+router.put('/medicos/:id/disponibilidad/horario', verificarRol('administrador'), auditar('Cambiar horario de un médico', 'usuario'), guardarHorarioDeMedico);
+router.post('/medicos/:id/disponibilidad/bloqueos', verificarRol('administrador'), auditar('Agregar bloqueo a un médico', 'usuario'), crearBloqueoDeMedico);
+router.delete('/medicos/:id/disponibilidad/bloqueos/:bloqueoId', verificarRol('administrador'), auditar('Quitar bloqueo de un médico', 'usuario'), eliminarBloqueoDeMedico);
 
 // GET /api/administracion/citas — administrador o veterinario
 router.get('/citas', verificarRol('administrador', 'veterinario'), listarCitas);
