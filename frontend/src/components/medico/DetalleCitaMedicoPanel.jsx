@@ -7,6 +7,7 @@
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { edadYPeso } from '../../utils/mascota';
 import { SidePanel } from '../ui/SidePanel';
+import { PieCancelarCita } from '../citas/PieCancelarCita';
 import { StatusBadge } from '../ui/StatusBadge';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { estadoDeCita } from '../citas/DetalleCitaPanel';
@@ -30,7 +31,8 @@ function Fila({ icono: Icono, etiqueta, valor, detalle }) {
   );
 }
 
-export function DetalleCitaMedicoPanel({ cita, onClose, acciones }) {
+// onCancelada: la cita se cancelo desde este panel (recargar la agenda).
+export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada }) {
   const infoMedica = cita
     ? [
         ['Alergias', cita.mascota_alergias],
@@ -44,7 +46,14 @@ export function DetalleCitaMedicoPanel({ cita, onClose, acciones }) {
     : null;
 
   return (
-    <SidePanel isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={cita && acciones ? acciones(cita) : undefined}>
+    <SidePanel isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={
+        cita ? (
+          <PieCancelarCita cita={cita} onCancelada={onCancelada}>
+            {acciones ? acciones(cita) : null}
+          </PieCancelarCita>
+        ) : undefined
+      }
+    >
       {cita && (
         <div className="flex flex-col gap-6">
           <div className="flex items-start gap-4">

@@ -523,10 +523,17 @@ export function corregirCitaDatos(id, datos, token) {
 
 // Descarga un archivo (CSV o copia de seguridad) con la sesion del usuario:
 // un enlace normal no enviaria el token. Devuelve el nombre del archivo.
-export async function descargarDatos(ruta, parametros, token, nombrePorDefecto) {
-  const respuesta = await fetch(`/api${ruta}${consultaDe(parametros)}`, { headers: { Authorization: `Bearer ${token}` } });
+// cuerpo (opcional): si viene, la peticion es POST con ese JSON (la copia de
+// seguridad envia asi la contraseña, que no debe viajar en la direccion).
+export async function descargarDatos(ruta, parametros, token, nombrePorDefecto, cuerpo) {
+  const respuesta = await fetch(`/api${ruta}${consultaDe(parametros)}`, {
+    method: cuerpo ? 'POST' : 'GET',
+    headers: { Authorization: `Bearer ${token}`, ...(cuerpo ? { 'Content-Type': 'application/json' } : {}) },
+    body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+  });
   if (!respuesta.ok) {
     const datos = await respuesta.json().catch(() => ({}));
+    avisarSiLaSesionTermino(respuesta, datos, token);
     throw new Error(datos.mensaje || `No se pudo descargar (${respuesta.status})`);
   }
   const nombre = /filename="([^"]+)"/.exec(respuesta.headers.get('Content-Disposition') || '')?.[1] || nombrePorDefecto;

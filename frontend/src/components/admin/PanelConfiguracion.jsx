@@ -109,7 +109,8 @@ export function PanelConfiguracion({ busquedaInicial }) {
     try {
       if (usuarioEditando) {
         await cambiarRolUsuario(usuarioEditando.id, { rol: form.rol, sedeId: form.sedeId }, token);
-        await actualizarUsuario(usuarioEditando.id, { nombreCompleto: form.nombreCompleto, telefono: form.telefono, activo: form.activo }, token);
+        const { citasFuturas } = await actualizarUsuario(usuarioEditando.id, { nombreCompleto: form.nombreCompleto, telefono: form.telefono, activo: form.activo }, token);
+        avisarCitasPendientes(usuarioEditando.nombre_completo, citasFuturas);
       } else {
         if (!form.correo) {
           setError('El correo es obligatorio para crear un usuario.');
@@ -141,9 +142,20 @@ export function PanelConfiguracion({ busquedaInicial }) {
     }
   }
 
+  // Al desactivar una cuenta con citas por atender: no se cancelan solas.
+  function avisarCitasPendientes(nombre, cantidad) {
+    if (cantidad > 0) {
+      setAviso({
+        tipo: 'advertencia',
+        texto: `La cuenta de ${nombre} quedó inactiva, pero tiene ${cantidad} ${cantidad === 1 ? 'cita agendada' : 'citas agendadas'} por atender. No se cancelan solas: revísalas en Datos.`,
+      });
+    }
+  }
+
   async function alternarActivo(u) {
     if (u.id === usuario.id) return;
-    await actualizarUsuario(u.id, { activo: !u.activo }, token);
+    const { citasFuturas } = await actualizarUsuario(u.id, { activo: !u.activo }, token);
+    avisarCitasPendientes(u.nombre_completo, citasFuturas);
     cargar();
   }
 
