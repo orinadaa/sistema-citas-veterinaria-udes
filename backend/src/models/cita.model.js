@@ -121,14 +121,21 @@ async function listarPorCliente(clienteId) {
 
 // RF-12: seguimiento de citas por parte de administrativo/veterinario.
 // Incluye la categoria del servicio (color) para el calendario del
-// panel administrativo y los datos de la mascota.
+// panel administrativo y los datos de la mascota y del dueño que muestra
+// el detalle de la cita. La informacion medica de la mascota no va aqui:
+// esa la ve solo el medico (listarPorMedico).
 async function listarPorSede(sedeId) {
   const resultado = await pool.query(
-    `SELECT c.*, sv.nombre AS servicio_nombre, cat.nombre AS categoria_nombre, cat.color AS categoria_color,
+    `SELECT c.*, sv.nombre AS servicio_nombre, sv.duracion_minutos AS servicio_duracion_minutos,
+            cat.nombre AS categoria_nombre, cat.color AS categoria_color,
+            s.nombre AS sede_nombre,
             m.nombre_completo AS medico_nombre,
-            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono,
-            mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza
+            cl.nombre_completo AS cliente_nombre, cl.telefono AS cliente_telefono, cl.correo AS cliente_correo,
+            mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza,
+            mc.foto_url AS mascota_foto_url, mc.sexo AS mascota_sexo, mc.peso_kg AS mascota_peso_kg,
+            mc.fecha_nacimiento AS mascota_fecha_nacimiento
      FROM cita c
+     JOIN sede s ON s.id = c.sede_id
      JOIN servicio sv ON sv.id = c.servicio_id
      JOIN categoria_servicio cat ON cat.id = sv.categoria_id
      JOIN usuario m ON m.id = c.medico_id
