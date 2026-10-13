@@ -708,6 +708,32 @@ describe('PATCH /api/citas/:id/reprogramar', () => {
     expect(citaModel.existeConflicto).toHaveBeenCalledWith(ID_MEDICO, nuevaFranja, 30, 'cita-1');
     expect(citaModel.reprogramar).toHaveBeenCalledWith('cita-1', nuevaFranja);
   });
+
+  // La sede y el medico reprograman desde el detalle de la cita de su panel.
+  test.each([
+    ['el administrador de la sede de la cita', TOKEN_ADMIN],
+    ['el medico que atiende la cita', jwt.sign({ id: ID_MEDICO, rol: 'veterinario', sedeId: ID_SEDE }, process.env.JWT_SECRET)],
+  ])('%s puede reprogramarla', async (_quien, token) => {
+    const nuevaFranja = proximaFranjaValida(15);
+    citaModel.buscarPorId.mockResolvedValue({
+      id: 'cita-1',
+      cliente_id: ID_CLIENTE,
+      medico_id: ID_MEDICO,
+      sede_id: ID_SEDE,
+      fecha_hora: proximaFranjaValida(5),
+      estado: 'agendada',
+    });
+    citaModel.existeConflicto.mockResolvedValue(false);
+    citaModel.reprogramar.mockResolvedValue({ id: 'cita-1', cliente_id: ID_CLIENTE, medico_id: ID_MEDICO, fecha_hora: nuevaFranja, estado: 'agendada' });
+
+    const respuesta = await request(app)
+      .patch('/api/citas/cita-1/reprogramar')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ nuevaFechaHora: nuevaFranja.toISOString() });
+
+    expect(respuesta.status).toBe(200);
+    expect(citaModel.reprogramar).toHaveBeenCalledWith('cita-1', nuevaFranja);
+  });
 });
 
 describe('PATCH /api/citas/:id/cancelar', () => {

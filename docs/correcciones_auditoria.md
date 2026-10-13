@@ -30,6 +30,7 @@ Las pantallas del administrador de sede y del superadministrador se revisaron de
 | LOG-04 | Una cita que ya pasó no se cancela ni se reprograma. |
 | LOG-05 | La misma mascota no puede tener dos citas a la vez; máximo 10 citas por atender por cliente cuando agenda él mismo. |
 | LOG-06 | No se agenda en una sede o servicio inactivos, ni a un cliente o con un médico inactivos. |
+| LOG-07 | El administrador de la sede y el médico pueden cancelar y reprogramar citas desde el detalle (`citas/PieCancelarCita.jsx`, con la misma ventana que usa el cliente; se agregó el 13 de octubre de 2026). El cliente recibe el aviso, y al cancelar también un correo. |
 | LOG-09 | El horario de atención valida `HH:MM`, compara en minutos y exige horas en punto o y media. |
 | LOG-11 | La consulta de disponibilidad rechaza fechas que no existen. |
 | BD-01 | `database/esquema.sql`, `database/datos_iniciales.sql` y `docs/instalacion.md`. |
@@ -60,7 +61,6 @@ Las pantallas del administrador de sede y del superadministrador se revisaron de
 | SEG-10 | Opción `DB_SSL` y pasos para crear un usuario propio de base de datos. | Aplicarlo al desplegar. |
 | SEG-13 | La bitácora registra inicios de sesión fallidos, accesos denegados y contraseñas restablecidas. | Guardar los registros del servidor con retención (despliegue). |
 | SEG-17 | `npm audit fix`: quedan 0 avisos altos en el frontend. | 2 moderados por `exceljs` y los de herramientas de desarrollo dependen de sus autores. |
-| LOG-07 | El administrador de la sede y el médico pueden cancelar citas desde el detalle; el cliente recibe aviso y correo. El servidor también les permite reprogramar. | Pantalla para reprogramar desde la sede o el médico. |
 | LOG-08 | Cambiar o cerrar un horario y desactivar una cuenta avisan cuántas citas quedan afectadas; no se puede quitar el rol de médico a quien tiene citas por atender. | Avisar al quitarle un servicio a un médico. |
 | COD-04 | README del frontend, documento de contexto y comentarios al día. | `infoproyecto/` (requerimientos) sigue sin versionar. |
 | ACC-03 | (ver arriba) | Revisar a ojo los textos sobre vidrio o degradado, que ninguna herramienta mide. |

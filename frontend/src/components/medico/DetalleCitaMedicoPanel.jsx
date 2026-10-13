@@ -1,8 +1,8 @@
 // components/medico/DetalleCitaMedicoPanel.jsx
-// Detalle de una cita en el panel del medico (solo lectura): mascota con
-// su perfil e informacion medica que escribio el dueño, datos de la cita
-// y contacto del dueño. El medico no reprograma ni cancela citas (eso
-// es del cliente, RF-08/RF-09). `acciones` (opcional) agrega botones al
+// Detalle de una cita en el panel del medico: mascota con su perfil e
+// informacion medica que escribio el dueño, datos de la cita y contacto
+// del dueño. Desde el pie el medico puede cancelar o reprogramar la cita
+// (RF-08/RF-09, PieCancelarCita). `acciones` (opcional) agrega botones al
 // pie (ej. "Crear recordatorio").
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { edadYPeso } from '../../utils/mascota';
@@ -31,8 +31,9 @@ function Fila({ icono: Icono, etiqueta, valor, detalle }) {
   );
 }
 
-// onCancelada: la cita se cancelo desde este panel (recargar la agenda).
-export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada }) {
+// onCancelada / onReprogramada: la cita se cancelo o cambio de fecha desde
+// este panel (recargar la agenda).
+export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada, onReprogramada }) {
   const infoMedica = cita
     ? [
         ['Alergias', cita.mascota_alergias],
@@ -48,7 +49,7 @@ export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada })
   return (
     <SidePanel isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={
         cita ? (
-          <PieCancelarCita cita={cita} onCancelada={onCancelada}>
+          <PieCancelarCita cita={cita} onCancelada={onCancelada} onReprogramada={onReprogramada}>
             {acciones ? acciones(cita) : null}
           </PieCancelarCita>
         ) : undefined
