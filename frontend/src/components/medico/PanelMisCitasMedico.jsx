@@ -271,6 +271,10 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
           setCitaDetalle(null);
           cargar();
         }}
+        onReprogramada={() => {
+          setCitaDetalle(null);
+          cargar();
+        }}
         acciones={(cita) => (
           <button
             type="button"
