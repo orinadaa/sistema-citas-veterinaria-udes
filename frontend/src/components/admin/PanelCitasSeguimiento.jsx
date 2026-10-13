@@ -2,10 +2,9 @@
 // RF-12: seguimiento de citas programadas, como vista de calendario
 // semanal (reemplaza la tabla anterior). El administrador ademas puede
 // agendar citas en nombre de un cliente ("+ Nueva cita", en una ventana
-// centrada: NuevaCitaModal). Al hacer clic en una cita se abre un
-// SidePanel con el detalle (mismo patron que Servicios/Médicos); desde su
-// pie la sede y el medico pueden cancelarla o reprogramarla (RF-08/RF-09,
-// PieCancelarCita).
+// centrada: NuevaCitaModal). Al hacer clic en una cita se abre su detalle
+// (DetalleCitaMedicoPanel, el mismo del medico); desde su pie la sede y el
+// medico pueden cancelarla o reprogramarla (RF-08/RF-09, PieCancelarCita).
 import { useEffect, useMemo, useState } from 'react';
 import {
   obtenerCitasAdministracion,
@@ -16,10 +15,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { formatearFechaLarga, formatearHora, esMismoDia, sumarDias, inicioDeSemana, formatearMesAnio, formatearRangoSemana } from '../../utils/fecha';
 import { PageHeader } from '../ui/PageHeader';
-import { SidePanel } from '../ui/SidePanel';
-import { PieCancelarCita } from '../citas/PieCancelarCita';
-import { sePuedeCancelar } from '../../utils/citaCancelable';
-import { CategoryBadge, COLORES_CATEGORIA } from '../ui/CategoryBadge';
+import { COLORES_CATEGORIA } from '../ui/CategoryBadge';
+import { DetalleCitaMedicoPanel } from '../medico/DetalleCitaMedicoPanel';
 import { MiniCalendario } from '../citas/MiniCalendario';
 import { CalendarioSemanal } from '../citas/CalendarioSemanal';
 import { NuevaCitaModal } from './NuevaCitaModal';
@@ -230,76 +227,22 @@ export function PanelCitasSeguimiento() {
 
     </div>
 
-    <SidePanel
-      isOpen={Boolean(citaDetalle)}
-      onClose={() => setCitaDetalle(null)}
-      title="Detalle de la cita"
-      footer={
-        sePuedeCancelar(citaDetalle) ? (
-          <PieCancelarCita
-            cita={citaDetalle}
-            onCancelada={() => {
-              setCitaDetalle(null);
-              cargarCitas();
-            }}
-            onReprogramada={() => {
-              setCitaDetalle(null);
-              cargarCitas();
-            }}
-          />
-        ) : undefined
-      }
-    >
-        {citaDetalle && (
-          <div className="flex flex-col gap-4">
-            <CategoryBadge nombre={citaDetalle.categoria_nombre} color={citaDetalle.categoria_color} />
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Fecha y hora</p>
-              <p className="text-sm text-slate-800">
-                {formatearFechaLarga(citaDetalle.fecha_hora)} · {formatearHora(citaDetalle.fecha_hora)}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Servicio</p>
-              <p className="text-sm text-slate-800">{citaDetalle.servicio_nombre}</p>
-            </div>
-            {esAdmin && (
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Médico</p>
-                <p className="text-sm text-slate-800">{citaDetalle.medico_nombre}</p>
-              </div>
-            )}
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Cliente</p>
-              <p className="text-sm text-slate-800">{citaDetalle.cliente_nombre}</p>
-              {citaDetalle.cliente_telefono && <p className="text-xs text-slate-600">{citaDetalle.cliente_telefono}</p>}
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Mascota</p>
-              <p className="text-sm text-slate-800">
-                {citaDetalle.mascota_nombre}
-                {citaDetalle.mascota_especie ? ` (${citaDetalle.mascota_especie})` : ''}
-              </p>
-            </div>
-            {citaDetalle.motivo && (
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Motivo</p>
-                <p className="text-sm text-slate-800">{citaDetalle.motivo}</p>
-              </div>
-            )}
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-600">Estado</p>
-              <span
-                className={`mt-1 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${
-                  citaDetalle.estado === 'agendada' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                }`}
-              >
-                {citaDetalle.estado === 'agendada' ? 'Agendada' : 'Cancelada'}
-              </span>
-            </div>
-          </div>
-        )}
-      </SidePanel>
+      {/* Mismo detalle con iconos que ve el medico. La sede ve ademas el medico de la cita;
+          la informacion medica de la mascota es solo para el medico. */}
+      <DetalleCitaMedicoPanel
+        cita={citaDetalle}
+        onClose={() => setCitaDetalle(null)}
+        mostrarMedico={esAdmin}
+        mostrarInfoMedica={!esAdmin}
+        onCancelada={() => {
+          setCitaDetalle(null);
+          cargarCitas();
+        }}
+        onReprogramada={() => {
+          setCitaDetalle(null);
+          cargarCitas();
+        }}
+      />
 
       {/* "Nueva cita" abre una ventana centrada (NuevaCitaModal). */}
       {esAdmin && (

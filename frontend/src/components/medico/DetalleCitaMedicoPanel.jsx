@@ -4,6 +4,9 @@
 // del dueño. Desde el pie el medico puede cancelar o reprogramar la cita
 // (RF-08/RF-09, PieCancelarCita). `acciones` (opcional) agrega botones al
 // pie (ej. "Crear recordatorio").
+// Tambien lo usa el calendario del administrador de sede, con
+// `mostrarMedico` (la sede ve citas de varios medicos) y sin la informacion
+// medica (`mostrarInfoMedica={false}`), que es solo para el medico.
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { edadYPeso } from '../../utils/mascota';
 import { SidePanel } from '../ui/SidePanel';
@@ -12,7 +15,7 @@ import { StatusBadge } from '../ui/StatusBadge';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { estadoDeCita } from '../citas/DetalleCitaPanel';
 import { AvatarMascota } from '../cliente/AvatarMascota';
-import { IconoCalendario, IconoCorreo, IconoDocumento, IconoEstetoscopio, IconoPersona, IconoUbicacion } from '../icons';
+import { IconoCalendario, IconoCorreo, IconoDocumento, IconoEstetoscopio, IconoMedicos, IconoPersona, IconoUbicacion } from '../icons';
 import { ETIQUETA_SEXO } from '../../utils/sexo';
 import { EtiquetaSexo } from '../ui/EtiquetaSexo';
 
@@ -33,7 +36,7 @@ function Fila({ icono: Icono, etiqueta, valor, detalle }) {
 
 // onCancelada / onReprogramada: la cita se cancelo o cambio de fecha desde
 // este panel (recargar la agenda).
-export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada, onReprogramada }) {
+export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada, onReprogramada, mostrarMedico = false, mostrarInfoMedica = true }) {
   const infoMedica = cita
     ? [
         ['Alergias', cita.mascota_alergias],
@@ -86,6 +89,7 @@ export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada, o
               valor={cita.servicio_nombre}
               detalle={cita.servicio_duracion_minutos ? `Duración estimada: ${cita.servicio_duracion_minutos} min` : undefined}
             />
+            {mostrarMedico && <Fila icono={IconoMedicos} etiqueta="Médico" valor={cita.medico_nombre} />}
             <Fila icono={IconoUbicacion} etiqueta="Sede" valor={cita.sede_nombre} />
             <Fila
               icono={IconoPersona}
@@ -115,21 +119,23 @@ export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada, o
             </div>
           )}
 
-          <div className="rounded-2xl bg-[#EEF6FD] p-4">
-            <p className="font-heading text-sm font-semibold text-brand-navy">Información médica (según el dueño)</p>
-            {infoMedica.length === 0 ? (
-              <p className="mt-1 text-sm text-slate-500">El dueño no registró alergias, medicamentos ni condiciones.</p>
-            ) : (
-              <dl className="mt-2 flex flex-col gap-2">
-                {infoMedica.map(([etiqueta, valor]) => (
-                  <div key={etiqueta}>
-                    <dt className="text-xs font-medium text-slate-500">{etiqueta}</dt>
-                    <dd className="text-sm text-slate-800">{valor}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-          </div>
+          {mostrarInfoMedica && (
+            <div className="rounded-2xl bg-[#EEF6FD] p-4">
+              <p className="font-heading text-sm font-semibold text-brand-navy">Información médica (según el dueño)</p>
+              {infoMedica.length === 0 ? (
+                <p className="mt-1 text-sm text-slate-500">El dueño no registró alergias, medicamentos ni condiciones.</p>
+              ) : (
+                <dl className="mt-2 flex flex-col gap-2">
+                  {infoMedica.map(([etiqueta, valor]) => (
+                    <div key={etiqueta}>
+                      <dt className="text-xs font-medium text-slate-500">{etiqueta}</dt>
+                      <dd className="text-sm text-slate-800">{valor}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          )}
         </div>
       )}
     </SidePanel>
