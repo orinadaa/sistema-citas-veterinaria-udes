@@ -1,6 +1,6 @@
 # Textos de la página pública (superadministrador)
 
-Amplía RF-23 (información de la clínica en la página pública). Pedido de Oriana del 14 de octubre de 2026: que el superadministrador cambie el texto del hero y los demás textos de marca sin programar.
+Amplía RF-37 (contenido de la página pública: galería, logotipos y, desde ahora, textos de marca). Pedido de Oriana del 14 de octubre de 2026: que el superadministrador cambie el texto del hero y los demás textos de marca sin programar.
 
 ## Qué se puede cambiar
 
