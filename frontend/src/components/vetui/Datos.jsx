@@ -4,7 +4,7 @@
 import { IconoFlechaDerecha } from '../icons';
 
 const TONOS_ICONO = {
-  azul: 'bg-blue-100 text-brand-blue-700',
+  azul: 'bg-blue-200 text-brand-blue-800',
   ambar: 'bg-amber-100 text-amber-700',
   rosa: 'bg-pink-100 text-pink-700',
   verde: 'bg-emerald-100 text-emerald-700',

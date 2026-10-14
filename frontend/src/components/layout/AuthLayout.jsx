@@ -13,7 +13,7 @@ export function AuthLayout({ titulo, subtitulo, children, pieDePagina }) {
       <HuellasFondo denso />
       <header className="mb-8">
       <Link to="/">
-        <img src={logos.principal_blanco} alt="Clínica Veterinaria UDES, ir al inicio" width="93" height="62" className="h-[62px] w-auto" />
+        <img src={logos.principal_blanco} alt="Clínica Veterinaria UDES, ir al inicio" width="126" height="84" className="h-[84px] w-auto" />
       </Link>
       </header>
 

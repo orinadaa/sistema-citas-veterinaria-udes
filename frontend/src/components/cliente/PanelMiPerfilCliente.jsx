@@ -18,7 +18,7 @@ import { CambioContrasena, CambioCorreo, MensajeCuenta as Mensaje, TarjetaCuenta
 import { IconoCalendario, IconoCorazon, IconoEscudo, IconoPata, IconoPersona } from '../icons';
 
 const TABS = [
-  { id: 'personal', etiqueta: 'Información personal', icono: IconoPersona },
+  { id: 'personal', etiqueta: 'Información personal', etiquetaCorta: 'Mis datos', icono: IconoPersona },
   { id: 'seguridad', etiqueta: 'Seguridad', icono: IconoEscudo },
 ];
 

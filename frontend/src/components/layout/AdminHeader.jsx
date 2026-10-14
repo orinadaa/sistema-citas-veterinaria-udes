@@ -6,6 +6,7 @@ import { IconoBuscar, IconoChevronAbajo, IconoMedicos, IconoPersona, IconoSalir,
 import { iconoDeServicio } from '../../utils/iconoServicio';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerSedesAdmin, obtenerUsuarios } from '../../api/client';
+import { useCoincideMedio } from '../../hooks/useCoincideMedio';
 
 // 'veterinario' se usa para rotular resultados de busqueda de usuarios.
 const ETIQUETA_ROL = { superadministrador: 'Superadministrador', administrador: 'Administrador de sede', veterinario: 'Médico Veterinario' };
@@ -15,6 +16,7 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
   const { usuario, token } = useAuth();
   const esAdmin = usuario?.rol === 'administrador';
   const esSuper = usuario?.rol === 'superadministrador';
+  const pantallaChica = useCoincideMedio('(max-width: 639px)');
   const buscadorActivo = esAdmin || esSuper;
 
   function salir() {
@@ -157,7 +159,8 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
               setMenuAbierto(false);
             }}
             disabled={!buscadorActivo}
-            placeholder={esSuper ? 'Buscar usuario, sede o servicio...' : 'Buscar paciente, médico o servicio...'}
+            // En el telefono el texto completo se cortaba a la mitad.
+            placeholder={pantallaChica ? 'Buscar...' : esSuper ? 'Buscar usuario, sede o servicio...' : 'Buscar paciente, médico o servicio...'}
             className="h-full w-full min-w-0 bg-transparent text-sm font-medium text-white placeholder:text-white/80 focus:outline-none disabled:cursor-not-allowed"
           />
         </label>

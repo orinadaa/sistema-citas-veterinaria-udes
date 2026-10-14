@@ -3,12 +3,12 @@
 import { IconoFlechaDerecha } from '../icons';
 
 const COLORES = {
-  blue: 'bg-blue-50 text-brand-blue',
-  green: 'bg-emerald-50 text-emerald-700',
-  red: 'bg-red-50 text-brand-red',
-  amber: 'bg-amber-50 text-brand-amber',
+  blue: 'bg-blue-200 text-brand-blue-800',
+  green: 'bg-emerald-100 text-emerald-700',
+  red: 'bg-red-100 text-brand-red',
+  amber: 'bg-amber-100 text-amber-700',
   pink: 'bg-[#FDE6F0] text-[#C23E80]',
-  purple: 'bg-violet-50 text-violet-600',
+  purple: 'bg-violet-100 text-violet-700',
 };
 
 export function KPICard({ icon: Icono, color = 'blue', value, detalle, label, onClick }) {

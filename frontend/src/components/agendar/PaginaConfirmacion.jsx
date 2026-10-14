@@ -89,16 +89,14 @@ export function PaginaConfirmacion({ cita, correoEnviado: correoEnviadoInicial, 
         </p>
 
         <div className="mt-4 flex flex-col items-center gap-2 text-sm">
+          {/* Texto centrado sin icono: en el telefono el mensaje ocupa varias
+              lineas y un icono de 16px al lado quedaba suelto y lo descentraba. */}
           {correoEnviado ? (
-            <p className="flex items-center gap-2 text-slate-700">
-              <IconoCorreo className="h-4 w-4 text-brand-blue-700" />
-              Te hemos enviado un correo de confirmación a <span className="font-medium">{cita.cliente_correo}</span>
+            <p className="max-w-xl text-balance text-slate-700">
+              Te hemos enviado un correo de confirmación a <span className="break-all font-medium">{cita.cliente_correo}</span>
             </p>
           ) : (
-            <p className="flex items-center gap-2 text-amber-800">
-              <IconoCorreo className="h-4 w-4" />
-              No pudimos enviar el correo de confirmación. Tu cita sí quedó agendada.
-            </p>
+            <p className="max-w-xl text-balance text-amber-800">No pudimos enviar el correo de confirmación. Tu cita sí quedó agendada.</p>
           )}
           <button
             type="button"

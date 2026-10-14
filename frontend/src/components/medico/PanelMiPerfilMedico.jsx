@@ -23,9 +23,9 @@ import { IconoCalendario, IconoCamara, IconoCorreo, IconoEstetoscopio, IconoPata
 import { Desplegable } from '../form/Desplegable';
 
 const TABS = [
-  { id: 'personal', etiqueta: 'Información personal', icono: IconoPersona },
-  { id: 'profesional', etiqueta: 'Información profesional', icono: IconoEstetoscopio },
-  { id: 'disponibilidad', etiqueta: 'Mi horario', icono: IconoReloj },
+  { id: 'personal', etiqueta: 'Información personal', etiquetaCorta: 'Mis datos', icono: IconoPersona },
+  { id: 'profesional', etiqueta: 'Información profesional', etiquetaCorta: 'Profesional', icono: IconoEstetoscopio },
+  { id: 'disponibilidad', etiqueta: 'Mi horario', etiquetaCorta: 'Horario', icono: IconoReloj },
 ];
 const ANIOS_EXPERIENCIA = [
   { valor: '0-1', etiqueta: 'Menos de 1 año' },

@@ -29,6 +29,9 @@ function haceCuanto(iso) {
   return new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
 }
 
+// Distancia minima entre el panel y los bordes de la pantalla.
+const MARGEN_PANTALLA_PX = 16;
+
 const BOTON = {
   pildora: 'boton-texto relative inline-flex rounded-boton p-2 text-white/90 transition',
 };
@@ -74,14 +77,18 @@ export function Notificaciones({ variante = 'pildora', onIr }) {
     };
   }, [abierto]);
 
-  // Ubica el panel bajo la campana, alineado a su borde derecho.
+  // Ubica el panel bajo la campana, alineado a su borde derecho, sin salirse
+  // de la pantalla por ningun lado: en el telefono la campana no esta en la
+  // esquina y, alineado solo a la derecha, el panel se cortaba a la izquierda.
   useLayoutEffect(() => {
     if (!abierto) return undefined;
     function ubicar() {
       const boton = contenedor.current?.getBoundingClientRect();
       if (!boton || !panel.current) return;
+      const ancho = panel.current.offsetWidth;
+      const izquierda = Math.min(Math.max(MARGEN_PANTALLA_PX, boton.right - ancho), window.innerWidth - ancho - MARGEN_PANTALLA_PX);
       panel.current.style.top = `${boton.bottom + 14}px`;
-      panel.current.style.right = `${Math.max(16, window.innerWidth - boton.right)}px`;
+      panel.current.style.left = `${Math.max(MARGEN_PANTALLA_PX, izquierda)}px`;
     }
     ubicar();
     window.addEventListener('scroll', ubicar, { passive: true });

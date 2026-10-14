@@ -13,12 +13,22 @@ export function Pestanas({ items, activo, onCambiar, etiqueta = 'Secciones' }) {
             role="tab"
             aria-selected={seleccionada}
             onClick={() => onCambiar(item.id)}
-            className={`inline-flex items-center gap-2 rounded-boton px-4 py-2 text-sm font-semibold transition ${
+            // Una sola linea y el icono de tamaño fijo: si el texto se partia,
+            // el icono se encogia hasta quedar como un punto suelto.
+            // etiquetaCorta (opcional): la que se muestra en el telefono.
+            className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-boton px-3 py-2 text-sm font-semibold transition sm:gap-2 sm:px-4 ${
               seleccionada ? 'bg-white text-brand-blue-800 shadow-sm' : 'text-blue-50 hover:bg-white/10 hover:text-white'
             }`}
           >
-            {item.icono && <item.icono className="h-4 w-4" />}
-            {item.etiqueta}
+            {item.icono && <item.icono className="h-4 w-4 shrink-0" />}
+            {item.etiquetaCorta ? (
+              <>
+                <span className="sm:hidden">{item.etiquetaCorta}</span>
+                <span className="hidden sm:inline">{item.etiqueta}</span>
+              </>
+            ) : (
+              item.etiqueta
+            )}
           </button>
         );
       })}
