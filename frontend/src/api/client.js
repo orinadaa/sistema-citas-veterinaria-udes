@@ -148,6 +148,21 @@ export function actualizarInfoClinica(datos, token) {
   return solicitar('/clinica', { metodo: 'PUT', cuerpo: datos, token });
 }
 
+// Textos de marca de la pagina publica: { textos: { clave: texto } }.
+export function obtenerTextosSitio() {
+  return solicitar('/textos');
+}
+
+// Lista de edicion: [{ clave, seccion, etiqueta, maximo, original, valor, personalizado }].
+export function obtenerTextosSitioAdmin(token) {
+  return solicitar('/textos/admin', { token });
+}
+
+// textos: { clave: texto } (null o el texto original = volver al original).
+export function actualizarTextosSitio(textos, token) {
+  return solicitar('/textos', { metodo: 'PUT', cuerpo: { textos }, token });
+}
+
 // Logotipos de la clinica: { logos: { clave: ruta del archivo subido o null } }.
 export function obtenerLogos() {
   return solicitar('/logos');

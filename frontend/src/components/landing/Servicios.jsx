@@ -10,6 +10,7 @@ import { SectionHeading } from './SectionHeading';
 import { FondoAmbientalServicios } from './FondoAmbientalServicios';
 import { TarjetaSlide } from './TarjetaSlide';
 import { ServicioSlider } from './ServicioSlider';
+import { useTextosSitio } from '../../hooks/useTextosSitio';
 
 // "Profilaxis dental" se muestra en el landing con el nombre comercial
 // "Odontología" — es solo una etiqueta de presentacion publica, el
@@ -20,6 +21,7 @@ const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
 
 export function Servicios() {
   const { estaAutenticado } = useAuth();
+  const textos = useTextosSitio();
   const [estado, setEstado] = useState(ESTADOS.CARGANDO);
   const [servicios, setServicios] = useState([]);
   const [intento, setIntento] = useState(0);
@@ -73,8 +75,8 @@ export function Servicios() {
         <TarjetaSlide>
           <Revelar>
             <SectionHeading
-              titulo="Servicios veterinarios"
-              subtitulo="Contamos con una amplia gama de servicios para el cuidado integral de tu mascota."
+              titulo={textos.servicios_titulo}
+              subtitulo={textos.servicios_subtitulo}
               sobreFondoOscuro
             />
           </Revelar>

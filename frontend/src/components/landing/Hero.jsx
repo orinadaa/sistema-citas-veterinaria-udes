@@ -7,15 +7,17 @@ import { FondoAmbientalHero } from './FondoAmbientalHero';
 import { IconoFlechaDerecha, IconoPata, IconoEscudo } from '../icons';
 import { useAuth } from '../../context/AuthContext';
 import { rutaAgendarCita } from '../../utils/rutas';
-
-const BULLETS = [
-  { icono: IconoPata, texto: '2 sedes en Bucaramanga y Valledupar' },
-  { icono: IconoEscudo, texto: 'Atención veterinaria integral' },
-];
+import { useTextosSitio } from '../../hooks/useTextosSitio';
 
 export function Hero() {
   const navegar = useNavigate();
   const { estaAutenticado } = useAuth();
+  // Textos editables por el superadministrador (Pagina web > Textos).
+  const textos = useTextosSitio();
+  const vinetas = [
+    { icono: IconoPata, texto: textos.hero_vineta_1 },
+    { icono: IconoEscudo, texto: textos.hero_vineta_2 },
+  ].filter((v) => v.texto);
 
   function irAAgendar() {
     navegar(rutaAgendarCita(estaAutenticado));
@@ -29,11 +31,12 @@ export function Hero() {
       <div className="slide-sale relative mx-auto grid grid-cols-[minmax(0,1fr)] w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-10">
         <div className="max-w-xl">
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
-            Cuidamos de quienes hacen parte de <span className="text-brand-amber">tu familia</span>
+            {textos.hero_titulo}
+            {textos.hero_destacado && <> <span className="text-brand-amber">{textos.hero_destacado}</span></>}
           </h1>
 
           <p className="mt-5 max-w-[46ch] text-lg leading-relaxed text-blue-50">
-            Atención veterinaria integral, con profesionales comprometidos y tecnología al servicio de la salud de tu mascota.
+            {textos.hero_descripcion}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -54,7 +57,7 @@ export function Hero() {
           </div>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-3">
-            {BULLETS.map(({ icono: Icono, texto }) => (
+            {vinetas.map(({ icono: Icono, texto }) => (
               <div key={texto} className="flex items-center gap-2 text-sm font-medium text-white/90">
                 <Icono className="h-4 w-4 shrink-0" />
                 {texto}

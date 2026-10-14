@@ -1069,6 +1069,25 @@ ALTER TABLE ONLY public.verificacion_correo
 
 
 --
+-- incremento_16a_textos_sitio.sql: textos de marca de la pagina publica (solo los cambiados).
+--
+
+CREATE TABLE public.texto_sitio (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    clave character varying(40) NOT NULL,
+    valor character varying(400) NOT NULL,
+    actualizado_por uuid,
+    actualizado_en timestamp without time zone DEFAULT now(),
+    creado_en timestamp without time zone DEFAULT now(),
+    CONSTRAINT texto_sitio_pkey PRIMARY KEY (id),
+    CONSTRAINT texto_sitio_clave_key UNIQUE (clave),
+    CONSTRAINT texto_sitio_actualizado_por_fkey FOREIGN KEY (actualizado_por) REFERENCES public.usuario(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_texto_sitio_actualizado_por ON public.texto_sitio USING btree (actualizado_por);
+
+
+--
 -- PostgreSQL database dump complete
 --
 

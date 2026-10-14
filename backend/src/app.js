@@ -25,6 +25,7 @@ const notificacionRoutes = require('./routes/notificacion.routes');
 const clinicaRoutes = require('./routes/clinica.routes');
 const logoRoutes = require('./routes/logo.routes');
 const miCuentaRoutes = require('./routes/miCuenta.routes');
+const textoSitioRoutes = require('./routes/textoSitio.routes');
 const errorHandler = require('./middlewares/errorHandler');
 const { cabecerasSeguridad, origenesPermitidos, forzarHttps } = require('./middlewares/seguridad.middleware');
 
@@ -69,6 +70,7 @@ app.use('/api/notificaciones', notificacionRoutes);
 app.use('/api/clinica', clinicaRoutes);
 app.use('/api/logos', logoRoutes);
 app.use('/api/mi-cuenta', miCuentaRoutes);
+app.use('/api/textos', textoSitioRoutes);
 
 app.get('/', (req, res) => {
   res.send('API del sistema de citas - Clinica Veterinaria UDES');

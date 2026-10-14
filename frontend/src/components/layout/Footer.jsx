@@ -5,6 +5,7 @@
 import { Link } from 'react-router-dom';
 import { useLogos } from '../../hooks/useLogos';
 import { useInfoClinica } from '../../hooks/useInfoClinica';
+import { useTextosSitio } from '../../hooks/useTextosSitio';
 import { canalesDe } from '../landing/canales';
 
 const ENLACES_RAPIDOS = [
@@ -19,16 +20,15 @@ const ENLACES_RAPIDOS = [
 export function Footer() {
   const logos = useLogos();
   const canales = canalesDe(useInfoClinica());
+  // Textos editables por el superadministrador (Pagina web > Textos).
+  const textos = useTextosSitio();
   return (
     <footer data-slide className="text-slate-300 lg:snap-start lg:snap-always" style={{ backgroundColor: '#0E172C' }}>
       <div className="mx-auto grid grid-cols-[minmax(0,1fr)] max-w-7xl gap-6 px-4 py-7 sm:px-6 md:grid-cols-3 md:gap-10">
         <div>
           {/* Mismo logotipo que el grande de la topbar (completo, blanco). */}
           <img src={logos.principal_blanco} alt="Clínica Veterinaria UDES" width="120" height="80" loading="lazy" className="h-20 w-auto" />
-          <p className="mt-2 max-w-sm text-sm text-slate-400">
-            Servicio de extensión de la Universidad de Santander para el
-            cuidado de tu mascota, en Bucaramanga y Valledupar.
-          </p>
+          <p className="mt-2 max-w-sm text-sm text-slate-400">{textos.pie_descripcion}</p>
         </div>
 
         <div>
@@ -46,9 +46,7 @@ export function Footer() {
 
         <div>
           <h3 className="text-sm font-semibold text-white">Universidad de Santander</h3>
-          <p className="mt-2 text-sm text-slate-400">
-            Clínica Veterinaria UDES, un servicio de la Vicerrectoría de Extensión.
-          </p>
+          <p className="mt-2 text-sm text-slate-400">{textos.pie_institucional}</p>
           {canales.length > 0 && (
             <ul className="mt-3 flex flex-wrap gap-2" aria-label="Contacto y redes sociales">
               {canales.map(({ clave, nombre, href, Icono }) => (

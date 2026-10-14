@@ -9,6 +9,7 @@ import { rutaAgendarCita } from '../../utils/rutas';
 import { detalleHorarioPorDia } from '../../utils/horarioTexto';
 import { IconoAlerta, IconoCalendario, IconoReloj, IconoSede, IconoUbicacion } from '../icons';
 import { SectionHeading } from './SectionHeading';
+import { useTextosSitio } from '../../hooks/useTextosSitio';
 import { HalosAmbientales } from './HalosAmbientales';
 import { TarjetaSlide } from './TarjetaSlide';
 
@@ -129,6 +130,7 @@ function Decoracion() {
 }
 
 export function Horarios() {
+  const textos = useTextosSitio();
   const [estado, setEstado] = useState(ESTADOS.CARGANDO);
   const [sedes, setSedes] = useState([]);
   const [horariosPorSede, setHorariosPorSede] = useState({});
@@ -155,8 +157,8 @@ export function Horarios() {
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:flex lg:flex-1 lg:flex-col">
         <TarjetaSlide ultima>
           <SectionHeading
-            titulo="Horarios de atención"
-            subtitulo="Conoce nuestros horarios en cada sede y agenda tu cita fácilmente."
+            titulo={textos.horarios_titulo}
+            subtitulo={textos.horarios_subtitulo}
             sobreFondoOscuro
           />
 

@@ -9,10 +9,12 @@ import { Revelar } from './Revelar';
 import { SectionHeading } from './SectionHeading';
 import { HalosAmbientales } from './HalosAmbientales';
 import { TarjetaSlide } from './TarjetaSlide';
+import { useTextosSitio } from '../../hooks/useTextosSitio';
 
 const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
 
 export function Sedes() {
+  const textos = useTextosSitio();
   const [estado, setEstado] = useState(ESTADOS.CARGANDO);
   const [sedes, setSedes] = useState([]);
   const [intento, setIntento] = useState(0);
@@ -34,8 +36,8 @@ export function Sedes() {
         <TarjetaSlide>
           <Revelar>
             <SectionHeading
-              titulo="Nuestras sedes"
-              subtitulo="Atendemos en dos ciudades. Elige la que te quede más cerca al agendar tu cita."
+              titulo={textos.sedes_titulo}
+              subtitulo={textos.sedes_subtitulo}
               sobreFondoOscuro
             />
           </Revelar>
