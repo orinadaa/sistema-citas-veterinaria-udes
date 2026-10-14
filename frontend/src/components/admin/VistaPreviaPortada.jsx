@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { useLogos } from '../../hooks/useLogos';
 import {
+  IconoCalendario,
   IconoCandado,
   IconoCelular,
   IconoCuadro,
@@ -19,6 +20,15 @@ import {
 } from '../icons';
 
 const DOMINIO = 'citas-veterinaria-udes.duckdns.org';
+// Mismo material que la pildora de la barra superior del landing ya formada
+// (MATERIALES.claro en layout/Navbar.jsx) y que los botones de vidrio; se
+// copian aqui porque dentro del panel (.vidrio) las utilidades cambian de color.
+const PILDORA =
+  'rounded-full bg-white/[0.12] bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),rgb(255_255_255/0)_60%)] shadow-[0_10px_26px_-10px_rgb(0_0_0/0.35),inset_0_0_0_1px_rgb(203_213_225/0.25),inset_0_1px_0_rgb(226_232_240/0.3)] backdrop-blur-md';
+const BOTON_AMBAR =
+  'bg-brand-amber bg-[linear-gradient(to_bottom,rgb(255_255_255/0.3),rgb(255_255_255/0)_55%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.65),inset_0_0_0_1px_rgb(255_255_255/0.3)] text-slate-900';
+const BOTON_CLARO =
+  'bg-white/[0.12] bg-[linear-gradient(to_bottom,rgb(255_255_255/0.18),rgb(255_255_255/0)_60%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),inset_0_0_0_1px_rgb(255_255_255/0.35)] text-white';
 
 function TextosHero({ valores, movil }) {
   const vinetas = [
@@ -33,11 +43,11 @@ function TextosHero({ valores, movil }) {
       </p>
       <p className={`mt-3 leading-relaxed text-blue-50 ${movil ? 'text-sm' : 'text-[0.95rem]'}`}>{valores.hero_descripcion}</p>
       <div className={`mt-5 flex gap-2.5 ${movil ? 'flex-col' : 'flex-wrap'}`}>
-        <span className="inline-flex items-center justify-center gap-1.5 rounded-boton bg-brand-amber px-4 py-2 text-xs font-semibold text-slate-900">
+        <span className={`inline-flex items-center justify-center gap-1.5 rounded-boton px-4 py-2 text-xs font-semibold ${BOTON_AMBAR}`}>
           Agendar cita
           <IconoFlechaDerecha className="h-3.5 w-3.5" />
         </span>
-        <span className="inline-flex items-center justify-center rounded-boton bg-white/15 px-4 py-2 text-xs font-semibold text-white ring-1 ring-white/30">
+        <span className={`inline-flex items-center justify-center rounded-boton px-4 py-2 text-xs font-semibold ${BOTON_CLARO}`}>
           Conoce nuestros servicios
         </span>
       </div>
@@ -89,17 +99,26 @@ function VentanaEscritorio({ valores, logos }) {
         </div>
       </div>
       {/* Pagina */}
-      <div className="aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-blue-500 to-brand-blue-800">
-        <div className="flex items-center justify-between px-6 py-3">
-          <img src={logos.principal_blanco} alt="" className="h-8 w-auto" />
-          <div className="flex items-center gap-5 text-xs font-medium text-white/85">
-            <span>Servicios</span>
-            <span>Sedes</span>
-            <span>Horarios</span>
-            <span className="rounded-boton bg-white/15 px-3 py-1.5 ring-1 ring-white/30">Iniciar sesión</span>
+      <div className="flex aspect-[16/10] flex-col overflow-hidden bg-gradient-to-br from-brand-blue-500 to-brand-blue-800">
+        <div className="px-4 pt-2.5">
+          <div className={`grid h-11 grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 ${PILDORA}`}>
+            <div className="flex justify-center gap-4 text-xs font-medium text-white/90">
+              <span>Servicios</span>
+              <span>Sedes</span>
+              <span>Horarios</span>
+            </div>
+            <img src={logos.corto_color} alt="" className="h-6 w-auto" />
+            <div className="flex items-center justify-center gap-3 text-xs font-medium text-white">
+              <span>Iniciar sesión</span>
+              <span>Registrarse</span>
+              <span className={`inline-flex items-center gap-1.5 rounded-boton px-2.5 py-1.5 font-semibold ${BOTON_AMBAR}`}>
+                <IconoCalendario className="h-3.5 w-3.5" />
+                Agendar cita
+              </span>
+            </div>
           </div>
         </div>
-        <div className="grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-center gap-6 px-6 pt-6">
+        <div className="grid flex-1 grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-center gap-6 px-6 pb-4">
           <TextosHero valores={valores} />
           <div className="grid aspect-[4/3] place-items-center rounded-2xl bg-white/10 text-white/70 ring-1 ring-white/20">
             <span className="flex flex-col items-center gap-2 text-xs">
@@ -127,9 +146,14 @@ function MarcoCelular({ valores, logos }) {
           </span>
         </div>
         <div className="h-[calc(100%-2rem)] overflow-y-auto">
-          <div className="flex items-center justify-between px-5 py-3">
-            <img src={logos.corto_blanco} alt="" className="h-8 w-auto" />
-            <IconoMenu className="h-6 w-6 text-white" />
+          <div className="px-3 pt-2">
+            <div className={`grid h-12 grid-cols-[1fr_auto_1fr] items-center px-3 ${PILDORA}`}>
+              <IconoMenu className="h-5 w-5 text-white" />
+              <img src={logos.corto_color} alt="" className="h-7 w-auto" />
+              <span className={`grid h-8 w-8 place-items-center justify-self-end rounded-boton ${BOTON_AMBAR}`}>
+                <IconoCalendario className="h-4 w-4" />
+              </span>
+            </div>
           </div>
           <div className="px-5 pb-8 pt-6">
             <TextosHero valores={valores} movil />
