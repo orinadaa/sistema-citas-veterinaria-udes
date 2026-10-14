@@ -1,22 +1,6 @@
 // components/layout/AdminSidebar.jsx
-// Sidebar fijo del panel administrativo, con la identidad de marca real
-// de la clinica (ver identidadmarca/): mismo degradado de marca que el
-// Hero del landing y las pantallas de login/registro (bg-gradient-to-b
-// from-brand-blue-500 to-brand-blue-800, ver Hero.jsx/AuthLayout.jsx),
-// logo completo a color (logocolor.png) expandido y el isotipo corto
-// (logocorto.png) colapsado. El rol veterinario usa el mismo sidebar
-// (sin "variante navy": decision de la usuaria) con su propio set de
-// items (ITEMS_MEDICO).
-//
-// Material: vidrio que desenfoca el fondo. Contraido queda como una pildora
-// flotante (igual que la pildora de la topbar del cliente, en vertical),
-// mas corta que la ventana y centrada en el eje vertical; "Cerrar sesión"
-// queda abajo del todo dentro de la pildora.
-//
-// Se puede expandir/contraer (solo iconos); el estado se recuerda entre
-// sesiones. El ancho es fijo dentro de cada estado (no cambia con el
-// contenido de la pagina): lo controla PanelAdminPage con un layout de
-// alto completo (h-screen) donde solo el <main> hace scroll.
+// Sidebar fijo del panel administrativo, con la identidad de marca real de la
+// clinica (ver identidadmarca/)
 import { useState } from 'react';
 import {
   IconoCalendario,

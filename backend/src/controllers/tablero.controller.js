@@ -1,10 +1,5 @@
 // controllers/tablero.controller.js
-// Paneles de inicio. Cada rol ve el suyo:
-// - GET /api/administracion/tablero  (administrador): el dia de SU sede.
-// - GET /api/administracion/sistema  (superadministrador): el estado de
-//   todo el sistema.
-// Los avisos ("requiere atencion") se arman aca para que la interfaz solo
-// los muestre: cada uno dice que pasa y a que modulo ir para resolverlo.
+// Paneles de inicio. Cada rol ve el suyo.
 const tableroModel = require('../models/tablero.model');
 const sedeModel = require('../models/sede.model');
 

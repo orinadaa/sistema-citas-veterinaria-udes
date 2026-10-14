@@ -1,11 +1,7 @@
 // components/agendar/SedeListCard.jsx
 // Tarjeta de sede en formato lista (no grid) para el paso "Selecciona la
 // sede": foto, badge "Sede principal", direccion, horario real
-// (horario_atencion, RF-13) y amenidades. Las amenidades salen de datos
-// reales: parqueadero y sala pet friendly las marca el administrador en
-// Sedes; "especialidades" es el conteo de servicios que prestan los
-// medicos de la sede (sede.model.js#listarTodas).
-// Material: Tarjeta de cristal de vetUI (interactiva, seleccionable).
+// (horario_atencion, RF-13) y amenidades.
 import { agruparHorario } from '../../utils/horarioTexto';
 import { Insignia, Tarjeta } from '../vetui';
 import { IconoCarro, IconoEstetoscopio, IconoPata, IconoReloj, IconoSede, IconoUbicacion } from '../icons';

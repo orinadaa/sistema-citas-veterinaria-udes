@@ -1,31 +1,7 @@
 // components/layout/BarraPagina.jsx
-// Barra de desplazamiento de la PAGINA, flotante (pedido de Oriana): una
-// pildora ambar con brillo, como los botones "Agendar cita", que flota
-// sobre el contenido sin canal ni franja de fondo.
-//
-// Por que es un componente y no solo CSS: la barra nativa de la pagina
-// siempre reserva una franja con fondo propio (no puede ser transparente
-// sobre el contenido). Entonces se oculta la nativa (clase barra-flotante
-// en <html>, ver vetui.css) y se dibuja esta encima, atada al scroll real:
-// rueda, teclado, trackpad y los saltos del sistema (landing paginado,
-// useAnclaTopbar) siguen siendo el scroll nativo; esto solo lo muestra y
-// permite arrastrarlo.
-//
-// - Solo con mouse (hover + puntero fino). En pantallas tactiles se deja la
-//   barra del sistema, que ya es flotante.
-// - Se oculta sola si la pagina no tiene scroll (ej. panel administrativo,
-//   que se desplaza por dentro: ahi aplica la barra CSS de vetui.css).
-// - En los topes no se ve (pedido de Oriana): arriba de todo o al final la
-//   pagina no puede seguir en ese sentido, asi que la barra se apaga un
-//   momento despues de llegar y vuelve apenas se desplaza otra vez. Sigue
-//   ahi: pasar el mouse por el borde derecho la muestra para arrastrarla.
-// - La misma regla vale para las barras de ADENTRO (paneles laterales,
-//   contenido del panel administrativo, tablas, areas de texto), que son
-//   nativas y se pintan por CSS: este componente escucha el scroll de
-//   cualquier elemento y le pone data-barra-activa solo mientras no esta
-//   en un tope; vetui.css muestra la barra unicamente con ese atributo.
-// - aria-hidden: es un adorno del scroll; el teclado mueve la pagina igual.
-// - z-45: sobre la topbar (z-40), debajo de paneles y dialogos (z-50).
+// Barra de desplazamiento de la PAGINA, flotante: una pildora ambar con
+// brillo, como los botones "Agendar cita", que flota sobre el contenido sin
+// canal ni franja de fondo.
 import { useEffect, useRef } from 'react';
 
 const MARGEN_PX = 6;

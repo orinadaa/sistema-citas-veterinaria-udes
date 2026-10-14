@@ -22,13 +22,10 @@ const { auditar } = require('../middlewares/bitacora.middleware');
 const router = express.Router();
 router.use(verificarToken, verificarRol('superadministrador'));
 
-// GET /api/datos — entidades que se pueden explorar
 router.get('/', listarEntidades);
 
-// GET /api/datos/bitacora
 router.get('/bitacora', listarBitacora);
 
-// GET /api/datos/respaldo — copia de seguridad (.sql)
 router.post('/respaldo', auditar('Descargar copia de seguridad', 'sistema'), respaldo);
 
 // Correcciones puntuales

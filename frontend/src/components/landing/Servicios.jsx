@@ -1,10 +1,5 @@
 // components/landing/Servicios.jsx
 // RF-11/RF-16: catalogo real de servicios, obtenido de GET /api/servicios.
-// Se muestra como slider fotografico (ServicioSlider.jsx) con el nombre,
-// la descripcion y la FOTO de cada servicio, todo de la base de datos: la
-// foto la sube el administrador en Servicios > Editar (un servicio sin
-// foto no aparece aca). El boton "Agendar cita" de cada slide lleva a
-// agendar con ese servicio preseleccionado.
 import { useEffect, useState } from 'react';
 import { obtenerServicios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -27,6 +22,7 @@ export function Servicios() {
   const { estaAutenticado } = useAuth();
   const [estado, setEstado] = useState(ESTADOS.CARGANDO);
   const [servicios, setServicios] = useState([]);
+  const [intento, setIntento] = useState(0);
 
   useEffect(() => {
     obtenerServicios()
@@ -35,7 +31,7 @@ export function Servicios() {
         setEstado(ESTADOS.LISTO);
       })
       .catch(() => setEstado(ESTADOS.ERROR));
-  }, []);
+  }, [intento]);
 
   // Por foto: `enfoque` = object-position (el encuadre que eligio el
   // administrador) para que el recorte no corte al paciente; `oscuridad` =
@@ -88,9 +84,15 @@ export function Servicios() {
           )}
 
           {estado === ESTADOS.ERROR && (
-            <div className="mt-10 flex items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
+            <div role="alert" className="mt-10 flex flex-wrap items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
               <IconoAlerta className="h-5 w-5 shrink-0" />
               <p className="text-sm">No pudimos cargar los servicios en este momento.</p>
+              <button type="button" onClick={() => {
+                  setEstado(ESTADOS.CARGANDO);
+                  setIntento((v) => v + 1);
+                }} className="ml-auto shrink-0 rounded-boton border border-amber-400 px-3 py-1.5 text-sm font-semibold text-amber-900 transition hover:bg-amber-100">
+                Reintentar
+              </button>
             </div>
           )}
 

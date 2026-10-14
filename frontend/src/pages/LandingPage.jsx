@@ -35,7 +35,7 @@ export function LandingPage() {
   }, [hash]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="area-segura min-h-screen bg-white">
       <Navbar />
       <main>
         {/* Hero, Servicios, Sedes y Horarios comparten un

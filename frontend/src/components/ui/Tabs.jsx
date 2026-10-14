@@ -1,8 +1,7 @@
 // components/ui/Tabs.jsx
 // items: [{ id, label, icon? }] -- icon opcional (componente de icons.jsx).
 // sobreVidrio: las pestañas van directo sobre la hoja translucida del panel
-// (texto blanco, activa con linea ambar). Sin el, van sobre una superficie
-// clara (panel lateral, tarjeta blanca): texto oscuro, activa en azul.
+// (texto blanco, activa con linea ambar).
 export function Tabs({ items, activeItem, onChange, sobreVidrio = false }) {
   const activa = sobreVidrio ? 'border-brand-amber text-white' : 'border-brand-blue-700 text-brand-blue-700';
   const inactiva = sobreVidrio

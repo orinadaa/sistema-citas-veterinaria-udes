@@ -11,7 +11,7 @@ jest.mock('../src/models/medico.model');
 jest.mock('../src/models/usuario.model');
 jest.mock('../src/models/horario.model');
 jest.mock('../src/models/mascota.model');
-// Disponibilidad propia del medico (opcion A): por defecto ningun medico
+// Disponibilidad propia del medico: por defecto ningun medico
 // tiene horario propio ni bloqueos -> mismo comportamiento de antes.
 jest.mock('../src/models/disponibilidadMedico.model', () => ({
   cargarContexto: jest.fn(async (ids, sedeId) => ({
@@ -22,7 +22,7 @@ jest.mock('../src/models/disponibilidadMedico.model', () => ({
   })),
   atiendeEnSede: jest.fn(async () => true),
 }));
-// El correo de confirmacion (incremento 4) nunca debe salir por SMTP real en pruebas.
+// El correo de confirmacion nunca debe salir por SMTP real en pruebas.
 jest.mock('../src/services/correo.service');
 
 const request = require('supertest');
@@ -709,6 +709,40 @@ describe('PATCH /api/citas/:id/reprogramar', () => {
     expect(citaModel.reprogramar).toHaveBeenCalledWith('cita-1', nuevaFranja);
   });
 
+  test('usa la duracion guardada en la cita, no la actual del servicio', async () => {
+    const nuevaFranja = proximaFranjaValida(15);
+    citaModel.buscarPorId.mockResolvedValue({ id: 'cita-1', cliente_id: ID_CLIENTE, medico_id: ID_MEDICO, sede_id: ID_SEDE, mascota_id: ID_MASCOTA, fecha_hora: proximaFranjaValida(5), estado: 'agendada', duracion_minutos: 60 });
+    servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO, duracion_minutos: 30 });
+    citaModel.existeConflicto.mockResolvedValue(false);
+    citaModel.mascotaOcupada.mockResolvedValue(false);
+    citaModel.reprogramar.mockResolvedValue({ id: 'cita-1', fecha_hora: nuevaFranja, estado: 'agendada' });
+
+    const respuesta = await request(app)
+      .patch('/api/citas/cita-1/reprogramar')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nuevaFechaHora: nuevaFranja.toISOString() });
+
+    expect(respuesta.status).toBe(200);
+    expect(citaModel.existeConflicto).toHaveBeenCalledWith(ID_MEDICO, nuevaFranja, 60, 'cita-1');
+    expect(citaModel.mascotaOcupada).toHaveBeenCalledWith(ID_MASCOTA, nuevaFranja, 60, 'cita-1');
+  });
+
+  test('responde 409 si al guardar la mascota ya quedo ocupada por otra reprogramacion simultanea', async () => {
+    const nuevaFranja = proximaFranjaValida(15);
+    citaModel.buscarPorId.mockResolvedValue({ id: 'cita-1', cliente_id: ID_CLIENTE, medico_id: ID_MEDICO, sede_id: ID_SEDE, mascota_id: ID_MASCOTA, fecha_hora: proximaFranjaValida(5), estado: 'agendada' });
+    citaModel.existeConflicto.mockResolvedValue(false);
+    citaModel.mascotaOcupada.mockResolvedValue(false);
+    citaModel.reprogramar.mockRejectedValue(Object.assign(new Error('ocupada'), { code: 'MASCOTA_OCUPADA' }));
+
+    const respuesta = await request(app)
+      .patch('/api/citas/cita-1/reprogramar')
+      .set('Authorization', `Bearer ${TOKEN_CLIENTE}`)
+      .send({ nuevaFechaHora: nuevaFranja.toISOString() });
+
+    expect(respuesta.status).toBe(409);
+    expect(respuesta.body.mensaje).toMatch(/mascota/i);
+  });
+
   // La sede y el medico reprograman desde el detalle de la cita de su panel.
   test.each([
     ['el administrador de la sede de la cita', TOKEN_ADMIN],
@@ -842,8 +876,7 @@ describe('Control de acceso del modulo de citas', () => {
     expect(respuesta.status).toBe(403);
   });
 
-  // Desde la auditoria del 11 oct 2026 la sede y el medico tambien pueden
-  // cancelar y reprogramar (antes solo el cliente dueño).
+  // La sede y el medico tambien pueden cancelar y reprogramar.
   const CITA_FUTURA = { id: 'cita-1', cliente_id: ID_CLIENTE, medico_id: ID_MEDICO, sede_id: ID_SEDE, servicio_id: ID_SERVICIO, mascota_id: ID_MASCOTA, estado: 'agendada', fecha_hora: proximaFranjaValida(5) };
   const TOKEN_MEDICO = jwt.sign({ id: ID_MEDICO, rol: 'veterinario', sedeId: ID_SEDE }, process.env.JWT_SECRET);
   const cancelarCon = (token) => request(app).patch('/api/citas/cita-1/cancelar').set('Authorization', `Bearer ${token}`);

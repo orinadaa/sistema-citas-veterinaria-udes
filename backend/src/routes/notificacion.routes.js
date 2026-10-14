@@ -8,7 +8,6 @@ const { verificarToken, verificarRol } = require('../middlewares/auth.middleware
 const router = express.Router();
 router.use(verificarToken, verificarRol('cliente', 'veterinario'));
 
-// GET /api/notificaciones — las ultimas 30 y cuantas hay sin leer
 router.get('/', async (req, res, next) => {
   try {
     return res.status(200).json(await notificacionModel.listarDeUsuario(req.usuario.id));
@@ -17,7 +16,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// PATCH /api/notificaciones/leidas — marcar todas como leidas
 router.patch('/leidas', async (req, res, next) => {
   try {
     await notificacionModel.marcarTodasLeidas(req.usuario.id);
@@ -27,7 +25,6 @@ router.patch('/leidas', async (req, res, next) => {
   }
 });
 
-// PATCH /api/notificaciones/:id/leida
 router.patch('/:id/leida', async (req, res, next) => {
   try {
     const marcada = await notificacionModel.marcarLeida(req.usuario.id, req.params.id);

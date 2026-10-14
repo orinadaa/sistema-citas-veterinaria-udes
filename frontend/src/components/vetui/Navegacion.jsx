@@ -1,10 +1,6 @@
 // components/vetui/Navegacion.jsx
-// Controles de navegación entre vistas, sobre fondo oscuro:
-//   Pestanas  control segmentado de vidrio (vistas hermanas: Mis citas /
-//             Mis mascotas). La activa es una píldora blanca.
-//   Chips     filtros con conteo (Todas, Próximas...). Activo blanco,
-//             inactivos vidrio claro.
-// items: [{ id, etiqueta, icono?, conteo? }]
+// Controles de navegación entre vistas, sobre fondo oscuro: Pestanas control
+// segmentado de vidrio (vistas hermanas: Mis citas / Mis mascotas).
 export function Pestanas({ items, activo, onCambiar, etiqueta = 'Secciones' }) {
   return (
     <div role="tablist" aria-label={etiqueta} className="vidrio inline-flex w-fit max-w-full gap-1 overflow-x-auto rounded-boton p-1">

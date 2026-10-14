@@ -1,17 +1,6 @@
 // components/form/RelojHora.jsx
-// Selector de hora con reloj de manecillas (pedido de Oriana, parecido al de
-// Google): se elige la hora tocando o arrastrando sobre el reloj y, al
-// soltar, el reloj pasa a los minutos.
-// Al lado van la hora y los minutos con flechas (o escritos) y a. m. / p. m.
-// Esos dos numeros son tambien la lectura de la hora y el selector de lo que
-// marca el reloj: el que esta en azul es el que se elige en la esfera. El reloj marca los minutos de 5 en 5; con las flechas se
-// llega a cualquier minuto. Los controles exactos son ademas la via de
-// teclado: el reloj es solo para el puntero.
-// value: "HH:MM" en 24 horas. onChange recibe el nuevo "HH:MM".
-// reinicio (opcional): al cambiar, el reloj vuelve a las horas.
-// Movimiento: la manecilla gira por el camino corto, los numeros entran con
-// un fundido al pasar de horas a minutos; con "reducir movimiento" no hay
-// animaciones.
+// Selector de hora con reloj de manecillas: se elige la hora tocando o
+// arrastrando sobre el reloj y, al soltar, el reloj pasa a los minutos.
 import { useRef, useState } from 'react';
 import { IconoChevronAbajo } from '../icons';
 

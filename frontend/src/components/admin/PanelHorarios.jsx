@@ -1,7 +1,7 @@
 // components/admin/PanelHorarios.jsx
 // RF-13: gestion de sedes (perfil, activa/inactiva) y su horario de
 // atencion por dia. Cualquier administrador puede gestionar cualquier
-// sede (ver database/incremento_3d_sedes_perfil.sql).
+// sede.
 import { useEffect, useMemo, useState } from 'react';
 import {
   obtenerSedesAdmin,
@@ -35,7 +35,7 @@ const DIAS = [
 
 // codigo: 2-5 letras, va dentro del consecutivo de cada cita
 // (CV-BGA-2026-00045). esPrincipal/amenidades: tarjeta de sede del
-// flujo de agendamiento del cliente (incremento 4).
+// flujo de agendamiento del cliente.
 const FORM_VACIO = {
   nombre: '',
   ciudad: '',

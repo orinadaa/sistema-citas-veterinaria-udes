@@ -1,25 +1,6 @@
 // scripts/datosDemo.js
 // Carga datos de EJEMPLO para mostrar el sistema como si estuviera en
-// funcionamiento (sustentacion, demostraciones), y permite quitarlos.
-//
-//   npm run demo:cargar    crea los datos de ejemplo
-//   npm run demo:quitar    los borra (solo los de ejemplo)
-//
-// Reglas:
-// - Solo INSERTA. No modifica ni borra ninguna cuenta, mascota o cita que
-//   ya exista. Lo unico existente que cambia es el contador de codigos de
-//   cita (consecutivo_cita), para que las proximas citas reales no repitan
-//   un codigo.
-// - Todo lo de ejemplo cuelga de cuentas con correo "@demo.udes.co": asi se
-//   reconoce y se quita sin tocar lo real. "quitar" borra esas cuentas, sus
-//   mascotas y sus citas (tambien las que se hayan agendado despues a su
-//   nombre) y los servicios de la medica de ejemplo.
-// - Las citas respetan el sistema real: caen en dias y horas en que la sede
-//   atiende, con un medico de esa sede que presta ese servicio y que no
-//   tiene otra cita a esa hora.
-// - Es repetible: siempre genera lo mismo (sorteo con semilla fija). Si ya
-//   hay datos de ejemplo, "cargar" avisa y no hace nada.
-// - Todas las cuentas de ejemplo entran con la contraseña CONTRASENA_DEMO.
+// funcionamiento (sustentacion, demostraciones)
 
 require('dotenv').config();
 const bcrypt = require('bcryptjs');

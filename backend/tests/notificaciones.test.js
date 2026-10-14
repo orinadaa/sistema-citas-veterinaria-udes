@@ -157,6 +157,31 @@ describe('Recordatorio automatico previo a la cita (RF-18)', () => {
     console.error.mockRestore();
   });
 
+  test('el correo se reintenta antes de darlo por fallido', async () => {
+    notificacionModel.tomarCitasParaRecordar.mockResolvedValue(['ci1']);
+    correoService.enviarRecordatorioCita.mockRejectedValueOnce(new Error('smtp')).mockRejectedValueOnce(new Error('smtp')).mockResolvedValue();
+    expect(await servicio.recordarCitasProximas()).toBe(1);
+    expect(correoService.enviarRecordatorioCita).toHaveBeenCalledTimes(3);
+    // El aviso de la campana no se repite por los reintentos del correo.
+    expect(creadas()).toHaveLength(1);
+    expect(notificacionModel.liberarRecordatorio).not.toHaveBeenCalled();
+  });
+
+  test('si no se pudo avisar, la cita vuelve a la cola para el siguiente intento', async () => {
+    notificacionModel.tomarCitasParaRecordar.mockResolvedValue(['ci1', 'ci2']);
+    notificacionModel.crear.mockRejectedValueOnce(new Error('sin conexion')).mockResolvedValue();
+    correoService.enviarRecordatorioCita.mockResolvedValue();
+    notificacionModel.liberarRecordatorio.mockResolvedValue();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    expect(await servicio.recordarCitasProximas()).toBe(1);
+    expect(notificacionModel.liberarRecordatorio).toHaveBeenCalledTimes(1);
+    expect(notificacionModel.liberarRecordatorio).toHaveBeenCalledWith('ci1');
+    // A la que fallo no se le envia correo: se reintentara completa.
+    expect(correoService.enviarRecordatorioCita).toHaveBeenCalledTimes(1);
+    console.error.mockRestore();
+  });
+
   test('sin citas proximas no hace nada', async () => {
     notificacionModel.tomarCitasParaRecordar.mockResolvedValue([]);
     expect(await servicio.recordarCitasProximas()).toBe(0);

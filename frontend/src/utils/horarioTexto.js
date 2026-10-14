@@ -1,8 +1,6 @@
 // utils/horarioTexto.js
-// Convierte el horario real de una sede (horario_atencion, RF-13) en
-// lineas de texto legibles, agrupando dias consecutivos con el mismo
-// rango (ej. "Lunes a viernes: 08:00 - 17:00"). Usado por el landing
-// publico (Sedes y Horarios) para no mostrar un horario escrito a mano.
+// Convierte el horario real de una sede (horario_atencion, RF-13) en lineas de
+// texto legibles, agrupando dias consecutivos con el mismo rango.
 
 // Orden de despliegue Lunes..Domingo (la BD guarda 0=domingo..6=sabado).
 const ORDEN_DIAS = [1, 2, 3, 4, 5, 6, 0];

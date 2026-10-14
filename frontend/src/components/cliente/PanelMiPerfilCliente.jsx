@@ -1,16 +1,6 @@
 // components/cliente/PanelMiPerfilCliente.jsx
 // "Mi perfil" del cliente (/panel/perfil), inspirado en el del medico y
-// adaptado a lo que un cliente necesita ver o cambiar. Dos secciones:
-// - Informacion personal: resumen de la cuenta, datos personales editables
-//   (nombre, telefono, documento, direccion) y resumen de actividad
-//   (mascotas, citas proximas y realizadas).
-// - Seguridad:
-//   * correo: se cambia confirmando un codigo enviado AL CORREO NUEVO (asi
-//     se comprueba que existe y que es suyo);
-//   * contraseña: se cambia confirmando un codigo enviado a SU CORREO ACTUAL
-//     (asi se comprueba que quien la cambia es el dueño de la cuenta).
-// Las dos tarjetas de seguridad son las compartidas con "Mi cuenta" del
-// administrador (components/cuenta/SeguridadCuenta).
+// adaptado a lo que un cliente necesita ver o cambiar.
 import { useEffect, useState } from 'react';
 import {
   actualizarPerfilCliente,
@@ -71,7 +61,7 @@ function DatosPersonales({ perfil, token, onGuardado }) {
     <Tarjeta titulo="Datos personales" descripcion="Son los datos con los que la clínica te identifica y te contacta.">
       <form onSubmit={guardar} className="flex flex-col gap-4" noValidate>
         <Campo id="perfil-nombre" label="Nombre completo" value={form.nombreCompleto} maxLength={150} onChange={cambiar('nombreCompleto')} required />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
           <Campo id="perfil-telefono" label="Teléfono (opcional)" inputMode="tel" value={form.telefono} maxLength={20} onChange={cambiar('telefono')} />
           <Campo id="perfil-documento" label="Documento de identidad (opcional)" value={form.documento} maxLength={20} onChange={cambiar('documento')} />
         </div>
@@ -136,7 +126,7 @@ export function PanelMiPerfilCliente() {
       <Pestanas items={TABS} activo={pestana} onCambiar={setPestana} etiqueta="Secciones de mi perfil" />
 
       {pestana === 'personal' ? (
-        <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_260px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[260px_minmax(0,1fr)_260px]">
           <Tarjeta>
             <div className="flex flex-col items-center text-center">
               <span className="flex h-24 w-24 items-center justify-center rounded-full bg-brand-blue-700 text-2xl font-bold text-white ring-4 ring-white">
@@ -174,7 +164,7 @@ export function PanelMiPerfilCliente() {
           </Tarjeta>
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
           <CambioCorreo
             correoActual={perfil.correo}
             api={{ solicitar: (correoNuevo) => solicitarCambioCorreoCliente(correoNuevo, token), confirmar: (codigo) => confirmarCambioCorreoCliente(codigo, token) }}

@@ -1,13 +1,6 @@
 // controllers/perfilMedico.controller.js
-// "Mi perfil" del medico veterinario (/api/medico/perfil). Decisiones de
-// la usuaria:
-// - Edita nombre, telefono, direccion, foto y su informacion profesional
-//   (titulos, registro, años de experiencia, biografia).
-// - Especialidades, servicios y sede son de SOLO LECTURA (los asigna el
-//   administrador).
-// - El correo se puede cambiar, pero solo despues de confirmar un codigo
-//   de 6 digitos enviado AL CORREO NUEVO (asi se verifica que existe y
-//   que es suyo).
+// "Mi perfil" del medico veterinario (/api/medico/perfil). Decisiones de la
+// usuaria.
 const bcrypt = require('bcryptjs');
 const usuarioModel = require('../models/usuario.model');
 const perfilModel = require('../models/perfilMedico.model');

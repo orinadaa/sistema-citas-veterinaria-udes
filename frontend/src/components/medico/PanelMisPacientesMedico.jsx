@@ -1,17 +1,6 @@
 // components/medico/PanelMisPacientesMedico.jsx
-// Presentacion vetUI, igual que la vista del cliente: va directo sobre el fondo
-// de marca, con indicadores en TarjetaDato, el filtro de estado en Chips con
-// conteo real y una tarjeta de vidrio blanco por mascota (como "Mis citas" del
-// cliente) en vez de una tabla.
-// "Mis pacientes" del medico: dueños y mascotas que ha atendido o que
-// tienen cita con el (una fila por mascota). Sin "+ Agregar paciente":
-// el medico no crea cuentas de cliente (decision de la usuaria); solo
-// agrega mascotas a un paciente existente desde su detalle.
-// - KPIs reales (sobre todos sus pacientes, no dependen de filtros).
-// - Filtros: busqueda (dueño o mascota), sede de las citas, estado del
-//   dueño y "Limpiar filtros".
-// - "Agendar" en la columna de proxima cita abre el panel de agendar con
-//   ese dueño ya elegido.
+// Presentacion vetUI, igual que la vista del cliente: va directo sobre el
+// fondo de marca, con indicadores en TarjetaDato.
 import { useEffect, useState } from 'react';
 import { obtenerPacientesMedico, obtenerSedes } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';

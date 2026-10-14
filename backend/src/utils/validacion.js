@@ -1,8 +1,6 @@
 // utils/validacion.js
 // Validaciones compartidas de datos que escribe una persona. Devuelven el
-// mensaje del problema (para responder 400) o null si el dato sirve. Antes
-// varios de estos datos llegaban sin revisar hasta la base, que respondia
-// con un error 500.
+// mensaje del problema (para responder 400) o null si el dato sirve.
 
 const CORREO_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TELEFONO_REGEX = /^[0-9+\s()-]{7,20}$/;

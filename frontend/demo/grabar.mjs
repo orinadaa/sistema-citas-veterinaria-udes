@@ -1,11 +1,6 @@
 // frontend/demo/grabar.mjs
 // Graba las respuestas de lectura de la API que usa cada pantalla, para la
-// demostracion sin servidor (GitHub Pages). Recorre la plataforma SOLO MIRANDO
-// con las cuentas de ejemplo (@demo.udes.co): no guarda, cancela ni borra.
-// Antes de escribir el archivo reemplaza los datos de las cuentas que NO son
-// de ejemplo (nombre, correo, telefono, documento, foto) por datos ficticios.
-// Requiere el frontend (5173) y el backend encendidos.
-// uso: node demo/grabar.mjs      (desde frontend/)
+// demostracion sin servidor (GitHub Pages).
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';

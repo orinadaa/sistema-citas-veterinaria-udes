@@ -1,40 +1,6 @@
 // components/landing/ServicioSlider.jsx
 // Slider fotografico de servicios del landing (sin grilla, thumbnails ni
-// flechas). Desde md muestra DOS servicios a la vez, lado a lado, y en
-// cada cambio pasa a otros dos distintos; en movil, uno a la vez. Dos por
-// vista deja cada foto en un marco casi cuadrado: asi no hay que ampliarla
-// tanto como cuando una sola ocupaba todo el ancho con poca altura (se
-// veia pixelada y muy recortada).
-//
-// Cada servicio: foto (object-cover) -> overlay oscuro general ->
-// degradado inferior -> nombre, descripcion y boton abajo a la izquierda.
-// La foto y sus overlays llevan una mascara (MASCARA) que los desvanece
-// hacia las orillas, como la galeria del Hero: la foto se funde con la
-// tarjeta de vidrio de la seccion en vez de verse como un rectangulo
-// dentro de otro. El texto queda fuera de la mascara. La intensidad del
-// overlay se ajusta por foto (`oscuridad`): las fotos con fondo claro
-// (paredes blancas, batas) necesitan mas oscuridad para que el texto
-// blanco cumpla WCAG AA.
-//
-// Como se arma: hay un "puesto" por servicio visible (1 o 2). El puesto k
-// muestra el servicio (inicio + k) y cada puesto hace su propio fundido
-// cruzado. Avanzar suma `porVista` a `inicio` (circular): con una cantidad
-// impar de servicios las parejas se van corriendo y todos rotan.
-//
-// Comportamiento:
-// - Autoplay cada 3000ms con UN solo setTimeout, recreado en cada cambio
-//   (el cleanup del efecto elimina el anterior, nunca hay dos corriendo).
-//   Toda interaccion manual incrementa `reinicio`, lo que reinicia el
-//   conteo aunque el inicio no cambie.
-// - Desktop: click en mitad izquierda = anteriores, mitad derecha =
-//   siguientes; hover pausa el autoplay.
-// - Movil: swipe horizontal con pointer events + `touch-pan-y`, asi el
-//   navegador sigue manejando el scroll vertical de la pagina (si el
-//   gesto es vertical llega `pointercancel` y no se navega).
-// - Teclado: flechas izquierda/derecha con el foco en el slider; el foco
-//   dentro del slider tambien pausa el autoplay.
-// - Lazy loading: solo se montan las <img> de los servicios visibles, los
-//   de la vista siguiente y los ya visitados.
+// flechas).
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -269,7 +235,7 @@ export function ServicioSlider({ slides }) {
               onClick={() => navegar(i)}
               aria-label={`Ver ${slide.titulo}`}
               aria-current={activa ? 'true' : undefined}
-              className="group rounded-full px-1.5 py-[9px] outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="punto-carrusel group rounded-full px-[9px] py-[9px] outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <span
                 className={`block h-1.5 rounded-full transition-all duration-300 motion-reduce:transition-none ${

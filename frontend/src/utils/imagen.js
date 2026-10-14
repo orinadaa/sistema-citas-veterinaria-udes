@@ -1,10 +1,7 @@
 // utils/imagen.js
-// Prepara una foto rectangular antes de subirla (galeria del inicio, foto
-// de sede): valida formato y peso, y la reduce en el navegador a un JPEG
-// de maximo `ladoMaximo` px por lado. Asi una foto de camara de 10 MB
-// llega al backend pesando unos cientos de KB y el sitio la carga rapido.
-// Las fotos circulares (mascota, medico) no pasan por aca: las recorta
-// FotoMascotaModal.
+// Prepara una foto rectangular antes de subirla (galeria del inicio, foto de
+// sede): valida formato y peso, y la reduce en el navegador a un JPEG de
+// maximo `ladoMaximo` px por lado.
 
 export const PESO_MAXIMO_ORIGINAL_MB = 15;
 const TIPOS_PERMITIDOS = ['image/jpeg', 'image/png'];

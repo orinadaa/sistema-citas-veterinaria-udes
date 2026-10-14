@@ -1,11 +1,6 @@
 // controllers/disponibilidadMedico.controller.js
 // Horario de trabajo del medico: horario semanal (con pausa opcional) y
 // bloqueos (vacaciones, permisos, excepciones por horas).
-// Decision de la usuaria (11 oct 2026): lo define el administrador de la
-// sede del medico, desde Medicos; el medico solo lo consulta en "Mi perfil".
-// Sin horario propio, el medico atiende con el horario de la sede. El
-// horario propio siempre debe caber dentro del horario de atencion de la
-// sede ese dia, y el administrador solo asigna dias en su propia sede.
 const disponibilidadModel = require('../models/disponibilidadMedico.model');
 const sedeModel = require('../models/sede.model');
 const horarioModel = require('../models/horario.model');

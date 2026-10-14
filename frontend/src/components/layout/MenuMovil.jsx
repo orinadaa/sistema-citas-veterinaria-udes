@@ -1,14 +1,10 @@
 // components/layout/MenuMovil.jsx
-// Menu de la barra superior en celular y tableta (por debajo de md). Antes,
-// en pantallas pequeñas la barra solo dejaba el logo y el boton de agendar:
-// no habia como llegar a Servicios/Sedes/Horarios ni a "Iniciar sesion", y
-// con la sesion abierta no habia perfil ni "Cerrar sesion".
-// El boton vive en la barra; la hoja se dibuja en <body> (portal) para no
-// quedar dentro del backdrop-filter de la pildora, encima de todo (z-[70]).
+// Menu de la barra superior en celular y tableta (por debajo de md).
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { rutaPanelPorRol } from '../../utils/rutas';
+import { useFocoDialogo } from '../../hooks/useFocoDialogo';
 import { IconoCalendario, IconoInicio, IconoMenu, IconoPata, IconoPersona, IconoReloj, IconoSalir, IconoX } from '../icons';
 
 const CLASE_ENLACE =
@@ -19,6 +15,7 @@ export function MenuMovil({ estaAutenticado, usuario, onSalir }) {
   const ubicacion = useLocation();
   const botonRef = useRef(null);
   const cerrarRef = useRef(null);
+  const panelRef = useRef(null);
   const rol = usuario?.rol;
   const esMedico = rol === 'veterinario';
   const esCliente = rol === 'cliente';
@@ -49,6 +46,9 @@ export function MenuMovil({ estaAutenticado, usuario, onSalir }) {
     };
   }, [abierto]);
 
+  // El foco inicial y el regreso al boton ya los maneja el efecto de arriba.
+  useFocoDialogo(abierto, panelRef, { enfocarAlAbrir: false });
+
   const cerrar = () => setAbierto(false);
   const nombre = usuario?.nombreCompleto?.split(' ')[0];
 
@@ -69,12 +69,13 @@ export function MenuMovil({ estaAutenticado, usuario, onSalir }) {
       {abierto &&
         createPortal(
           <div className="fixed inset-0 z-[70] md:hidden">
-            <div aria-hidden="true" onClick={cerrar} className="absolute inset-0 bg-slate-950/60" />
+            <div aria-hidden="true" onClick={cerrar} className="absolute inset-0 bg-brand-blue-800/55 backdrop-blur-md" />
             <div
+              ref={panelRef}
               role="dialog"
               aria-modal="true"
               aria-label="Menú"
-              className="absolute inset-x-3 top-3 max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-[28px] border border-white/15 bg-brand-blue-800 p-3 shadow-2xl"
+              className="absolute inset-x-3 top-3 max-h-[calc(100dvh-1.5rem)] overflow-y-auto vidrio vidrio-hoja rounded-[28px] p-3"
             >
               <div className="flex items-center justify-between pl-3">
                 <p className="text-base font-semibold text-white">{estaAutenticado && nombre ? `Hola, ${nombre}` : 'Menú'}</p>

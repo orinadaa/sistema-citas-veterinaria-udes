@@ -1,14 +1,5 @@
 // middlewares/subirFoto.middleware.js
 // Recepcion de fotos (multipart/form-data, campo "foto") con multer.
-// El archivo se guarda en disco, en backend/uploads/<subcarpeta>/, con
-// un nombre aleatorio (nunca el nombre original que manda el
-// navegador), y la base de datos solo guarda la ruta publica -- el
-// mismo patron que un sistema real con almacenamiento de archivos,
-// adaptado a una entrega local. Se usa para fotos de mascotas, la foto
-// de perfil del medico (la sube el o el administrador), la foto de cada
-// sede, la galeria del inicio, la foto de cada servicio y los logotipos de
-// la clinica (estos ultimos admiten ademas WebP, que conserva la
-// transparencia y pesa menos).
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs/promises');

@@ -1,8 +1,6 @@
 // frontend/demo/publicar.mjs
 // Compila la demostracion sin servidor y la deja lista en frontend/dist-demo
-// para GitHub Pages. Antes hay que grabar los datos: node demo/grabar.mjs
-// uso: node demo/publicar.mjs nombre-del-repositorio     (desde frontend/)
-//      node demo/publicar.mjs nombre-del-repositorio --servir   (ademas la sirve en http://localhost:4173 para probarla)
+// para GitHub Pages. mjs uso: node demo/publicar.mjs nombre-del-repositorio.
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import http from 'node:http';

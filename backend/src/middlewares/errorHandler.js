@@ -1,11 +1,6 @@
 // middlewares/errorHandler.js
-// Middleware centralizado de manejo de errores.
-// Debe registrarse SIEMPRE al final de la cadena en app.js.
-//
-// Los errores inesperados (500) se anotan completos en el registro del
-// servidor, pero a quien hizo la peticion solo se le dice que algo fallo: el
-// detalle (nombres de tablas, consultas, rutas del disco) le serviria a un
-// atacante para conocer el sistema por dentro.
+// Middleware centralizado de manejo de errores. Debe registrarse SIEMPRE al
+// final de la cadena en app.js.
 
 function errorHandler(err, req, res, next) {
   // Cuerpo que no es JSON valido o que pesa demasiado: es un error de quien llama.

@@ -1,10 +1,6 @@
 // components/ui/CategoryBadge.jsx
-// Pill de categoria/especialidad: fondo pastel + texto/punto del tono
-// saturado de la paleta `category` (ver seccion 1.1 del sistema de diseno).
-// Los 7 colores tienen 2 variantes precalculadas (fondo ~90% blanco,
-// texto/punto en el tono saturado); el ejemplo "Preventiva" del
-// documento (bg #D6F5EA / text #2E7A6B) corresponde a `teal`.
-// El texto de cada color cumple contraste 4,5:1 sobre su fondo (WCAG AA).
+// Pill de categoria/especialidad: fondo pastel + texto/punto del tono saturado
+// de la paleta `category` (ver seccion 1.1 del sistema de diseno).
 export const COLORES_CATEGORIA = {
   blue: { bg: '#E5F0FE', text: '#1E5FBF', dot: '#4897F6' },
   amber: { bg: '#FEF3D6', text: '#92650B', dot: '#FDD369' },

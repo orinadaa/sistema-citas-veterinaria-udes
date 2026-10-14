@@ -1,11 +1,5 @@
 // scripts/seedAdmin.js
-// Crea la primera cuenta de administrador. Es un paso de arranque manual:
-// una vez existe un administrador, el resto de cuentas de personal se crean
-// desde POST /api/usuarios (protegido por rol), no desde este script.
-//
-// Uso: node src/scripts/seedAdmin.js
-// Variables opcionales (con valores por defecto para entorno local):
-//   ADMIN_NOMBRE, ADMIN_CORREO, ADMIN_CONTRASENA, ADMIN_SEDE_CIUDAD
+// Crea la primera cuenta de administrador.
 
 require('dotenv').config();
 const bcrypt = require('bcryptjs');

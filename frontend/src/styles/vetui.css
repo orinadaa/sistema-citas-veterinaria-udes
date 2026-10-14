@@ -981,3 +981,82 @@ html:has([aria-modal="true"]:not([aria-hidden="true"]):not([aria-hidden="true"] 
     }
   }
 }
+
+/* Telefono y pantallas tactiles. La version web no cambia.
+   - Campos de escritura en 16 px: con menos, Safari de iPhone acerca la
+     pagina al enfocarlos.
+   - Areas tactiles de 44 px. Quedan fuera los botones con alto fijo o
+     posicion absoluta (dias del calendario, citas de la agenda, interruptor,
+     puntos del carrusel), que tienen su propia medida. */
+@media (max-width: 40rem), (pointer: coarse) {
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file']),
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+  .campo,
+  .campo-vetui {
+    min-height: 2.75rem;
+  }
+  button:not(.absolute, [role='switch'], [class*=' h-'], [class^='h-'], [style*='height'], .punto-carrusel),
+  a:is([class*='flex'], [class*='grid']):not(.absolute, [class*=' h-'], [class^='h-']),
+  [role='tab'] {
+    min-height: 2.75rem;
+  }
+  /* Botones de solo icono: cuadrados de 44 px con el icono centrado. */
+  :is(button, a):is(.h-8.w-8, .h-9.w-9),
+  button:is(.p-1\.5, .p-2):not([class*=' h-'], [class^='h-']) {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+  button:is(.p-1\.5, .p-2) > svg:only-child {
+    margin-inline: auto;
+  }
+  /* Enlaces de texto: el relleno vertical de un elemento en linea amplia
+     el area que responde al toque sin mover el texto de alrededor. */
+  a:not([class*='flex'], [class*='block'], [class*='grid'], [class*=' h-'], [class^='h-']) {
+    padding-block: 0.75rem;
+  }
+  a.inline-block:is(.py-1, .py-1\.5) {
+    padding-block: 0.75rem;
+    margin-block: -0.5rem;
+  }
+  .casilla {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+/* En un telefono con muesca puesto en horizontal, el navegador deja franjas
+   a los lados de la pagina: toman el azul de marca en vez de quedar blancas. */
+html {
+  background-color: var(--color-brand-blue-800);
+}
+
+/* Areas seguras (muesca, esquinas redondeadas, barra de inicio). La pagina
+   ocupa toda la pantalla (viewport-fit=cover) y el contenido se aparta con
+   bordes transparentes: el fondo se pinta tambien debajo del borde, asi que
+   llega hasta el filo sin dejar franjas. En un equipo sin muesca valen 0. */
+@supports (padding: env(safe-area-inset-left)) {
+  .area-segura {
+    border-style: solid;
+    border-color: transparent;
+    border-width: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  /* Lo que flota pegado a un borde de la pantalla. */
+  .fixed.right-3 {
+    right: max(0.75rem, env(safe-area-inset-right));
+  }
+  .fixed.inset-y-3 {
+    top: max(0.75rem, env(safe-area-inset-top));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .fixed.inset-x-3 {
+    left: max(0.75rem, env(safe-area-inset-left));
+    right: max(0.75rem, env(safe-area-inset-right));
+  }
+  .fixed.right-7 {
+    right: max(1.75rem, env(safe-area-inset-right));
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+}

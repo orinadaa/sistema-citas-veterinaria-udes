@@ -63,4 +63,9 @@ async function tomarCitasParaRecordar(horas) {
   return resultado.rows.map((fila) => fila.id);
 }
 
-module.exports = { crear, listarDeUsuario, marcarLeida, marcarTodasLeidas, detalleCita, tomarCitasParaRecordar };
+// Devuelve la cita a la cola de recordatorios cuando no se pudo avisar.
+async function liberarRecordatorio(citaId) {
+  await pool.query('UPDATE cita SET recordatorio_enviado_en = NULL WHERE id = $1', [citaId]);
+}
+
+module.exports = { crear, listarDeUsuario, marcarLeida, marcarTodasLeidas, detalleCita, tomarCitasParaRecordar, liberarRecordatorio };

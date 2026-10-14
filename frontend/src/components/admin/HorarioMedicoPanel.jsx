@@ -1,16 +1,6 @@
 // components/admin/HorarioMedicoPanel.jsx
-// Medicos > Horario: el administrador de la sede define el horario de
-// trabajo de cada medico (decision de la usuaria, 11 oct 2026; antes lo
-// configuraba el propio medico en "Mi perfil > Disponibilidad", que ahora
-// es solo de consulta).
-// - Horario semanal: por dia, si atiende, desde/hasta y una pausa opcional.
-//   Se edita con EditorHorarioMedico: los mismos botones por dia y el mismo
-//   reloj del horario de atencion de la sede.
-//   Siempre en la sede del administrador y dentro de su horario de atencion
-//   (el backend lo valida). Sin horario propio, el medico atiende con el
-//   horario de la sede.
-// - Bloqueos: rango de fechas, opcionalmente solo unas horas, con motivo.
-//   Las citas ya agendadas dentro no se cancelan solas: se avisa cuantas hay.
+// Medicos > Horario: el administrador de la sede define el horario de trabajo
+// de cada medico.
 import { useEffect, useState } from 'react';
 import {
   crearBloqueoDeMedico,
@@ -299,7 +289,7 @@ export function HorarioMedicoPanel({ medico, onClose }) {
               <>
                 <div className="rounded-xl bg-[#EEF6FD] p-4">
                   <p className="text-sm font-semibold text-brand-navy">Atiende con el horario de la sede</p>
-                  <ul className="mt-2 grid gap-1 text-sm text-slate-700 sm:grid-cols-2">
+                  <ul className="mt-2 grid grid-cols-[minmax(0,1fr)] gap-1 text-sm text-slate-700 sm:grid-cols-2">
                     {DIAS.map(({ dia, nombre }) => {
                       const h = atencionDe(dia);
                       return (
@@ -337,7 +327,7 @@ export function HorarioMedicoPanel({ medico, onClose }) {
             </div>
 
             <form onSubmit={agregarBloqueo} className="flex flex-col gap-3">
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
                 {/* Cambiar "Desde" a un dia posterior al "Hasta" elegido lo borra. */}
                 <CampoFecha
                   id="bloqueo-medico-desde"

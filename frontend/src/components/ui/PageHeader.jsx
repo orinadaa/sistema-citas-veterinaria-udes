@@ -1,9 +1,6 @@
 // components/ui/PageHeader.jsx
-// Encabezado estandar de pantalla: titulo + subtitulo a la izquierda,
-// boton de accion primaria (amber) a la derecha. `actionLabel` es
-// opcional (algunas pantallas, como Configuracion, no tienen accion
-// primaria); `actionColor` permite el caso especial de Reportes, donde
-// el boton principal es azul en vez de amber.
+// Encabezado estandar de pantalla: titulo + subtitulo a la izquierda, boton de
+// accion primaria (amber) a la derecha.
 import { IconoMas } from '../icons';
 
 export function PageHeader({ title, subtitle, actionLabel, onAction, actionColor = 'amber' }) {

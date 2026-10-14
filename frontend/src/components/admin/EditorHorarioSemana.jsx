@@ -1,13 +1,5 @@
 // components/admin/EditorHorarioSemana.jsx
-// Horario de atencion de una sede, dia por dia (pedido de Oriana):
-// - arriba, los siete dias como botones; cada uno dice si abre y a que horas;
-// - al tocar un dia se edita ESE dia: se elige si se cambia la hora de
-//   apertura o la de cierre y se ajusta en el reloj (RelojHora);
-// - "Guardar" guarda solo ese dia; "Cerrar este día" lo deja sin atencion.
-// dias: [{ numero, letra, nombre, abierto, horaInicio, horaFin }] (abierto =
-// lo que esta guardado). onCambiar(numero, cambios) actualiza el borrador;
-// onGuardar(dia) / onCerrar(dia) hablan con el servidor y devuelven true si
-// salio bien.
+// Horario de atencion de una sede, dia por dia.
 import { useState } from 'react';
 import { RelojHora } from '../form/RelojHora';
 import { Insignia } from '../vetui';

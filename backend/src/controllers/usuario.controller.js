@@ -1,8 +1,5 @@
 // controllers/usuario.controller.js
 // RF-04 (gestion de roles), RF-05 (restriccion por rol).
-// Crear personal (administrador/veterinario), reasignar roles y activar o
-// desactivar cuentas son acciones exclusivas del superadministrador (ver
-// usuario.routes.js). El administrador de sede solo lista clientes.
 
 const bcrypt = require('bcryptjs');
 const {

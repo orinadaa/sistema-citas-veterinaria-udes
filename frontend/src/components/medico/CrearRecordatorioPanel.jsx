@@ -1,14 +1,6 @@
 // components/medico/CrearRecordatorioPanel.jsx
-// SidePanel "Crear recordatorio" del medico, siempre para una mascota
-// concreta (contexto arriba: foto, nombre, especie · raza y dueño).
-// - 5 tipos seleccionables (medicacion, control, vacunacion,
-//   desparasitacion, otro); el titulo se sugiere segun el tipo mientras
-//   el medico no lo haya escrito a mano.
-// - Fecha y hora futuras; descripcion opcional (max. 300).
-// - Al guardar, el backend avisa al dueño por correo (decision de la
-//   usuaria). Debajo se listan los recordatorios de esa mascota.
-// onVerPerfil (opcional): enlace "Ver perfil" para volver al detalle
-// del paciente.
+// SidePanel "Crear recordatorio" del medico, siempre para una mascota concreta
+// (contexto arriba: foto, nombre, especie · raza y dueño)
 import { useEffect, useState } from 'react';
 import { crearRecordatorioMedico, obtenerRecordatoriosMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';

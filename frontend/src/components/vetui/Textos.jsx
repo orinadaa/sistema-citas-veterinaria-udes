@@ -1,14 +1,6 @@
 // components/vetui/Textos.jsx
-// Encabezados de vetUI (escala tipográfica, Raleway):
-//   EncabezadoPagina  antetítulo + h1 + descripción, sobre el fondo.
-//                     `acciones` a la derecha, `imagen` decorativa.
-//                     `agrupado`: texto e imagen forman un solo bloque
-//                     centrado en la pagina (en vez de texto a la
-//                     izquierda e imagen contra el borde derecho).
-//   TituloSeccion     h2 de una Superficie (vidrio), con número de paso
-//                     opcional.
-// Sobre fondo oscuro el texto es blanco (títulos) y blue-50/blue-100
-// (cuerpo): ambos en AA sobre vidrio y fondo.
+// Encabezados de vetUI (escala tipográfica, Raleway): EncabezadoPagina
+// antetítulo + h1 + descripción, sobre el fondo.
 export function EncabezadoPagina({ antetitulo, titulo, descripcion, acciones, imagen, agrupado = false, className = '' }) {
   return (
     // lg:min-h-[17.25rem] (276px): con los 96px de la topbar, el contenido

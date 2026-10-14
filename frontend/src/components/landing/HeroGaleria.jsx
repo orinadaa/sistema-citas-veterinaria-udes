@@ -1,22 +1,6 @@
 // components/landing/HeroGaleria.jsx
-// Galeria de fotos reales de la clinica en el Hero. Reemplaza a la
-// ilustracion de la veterinaria con la perrita.
-//
-// - Las fotos son las de la "Galeria" que el administrador configura en
-//   Configuracion > Galeria (GET /api/galeria: archivo, descripcion,
-//   encuadre y orden). Si no hay ninguna visible o el backend no
-//   responde, se usan las de ejemplo que vienen con el sistema
-//   (FOTOS_RESPALDO: identidadmarca/galeria -> assets/galeria, max.
-//   1400px de ancho), asi el Hero nunca queda vacio.
-// - Una foto a la vez, con fundido cruzado; cambia sola cada 3s y tambien
-//   al hacer clic sobre ella (el clic reinicia el conteo).
-// - Sin borde ni rectangulo: una mascara lleva la foto de opaca a
-//   transparente en las orillas, asi se funde con el fondo azul del Hero
-//   (ver MASCARA). Todas las fotos se recortan al mismo marco
-//   (object-cover); `foco` es el punto de la foto que queda al centro.
-// - Desde lg la foto es mas ancha que su columna (130%) y se extiende
-//   hacia la derecha, hasta el borde de la pantalla en monitores comunes.
-// - Con prefers-reduced-motion no hay fundido (cambia de golpe).
+// Galeria de fotos reales de la clinica en el Hero. Reemplaza a la ilustracion
+// de la veterinaria con la perrita.
 import { useEffect, useState } from 'react';
 import { obtenerGaleria } from '../../api/client';
 import fotoLaboratorio from '../../assets/galeria/laboratorio.jpg';
@@ -27,7 +11,7 @@ import fotoEquipo from '../../assets/galeria/equipo.jpg';
 
 const INTERVALO_MS = 3000;
 
-// Mascara = interseccion de dos degradados (pedido de Oriana: el lado
+// Mascara = interseccion de dos degradados (: el lado
 // derecho con menos desvanecido que el resto):
 // - radial, con el centro corrido a la derecha (60%): desvanece arriba,
 //   abajo y, largo, hacia la izquierda (donde esta el texto del Hero);

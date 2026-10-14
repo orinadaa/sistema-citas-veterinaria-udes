@@ -1,17 +1,6 @@
 // components/admin/EditorHorarioMedico.jsx
 // Horario propio de un medico, dia por dia, con los mismos componentes del
-// horario de atencion de la sede (EditorHorarioSemana; pedido de Oriana):
-// - arriba, los siete dias como botones; el punto dice si el medico atiende;
-// - al tocar un dia se edita ESE dia: un interruptor para decir si atiende,
-//   y la hora que se cambia (entrada, salida o los dos extremos de la pausa)
-//   se ajusta en el reloj (RelojHora).
-// A diferencia de la sede, aqui no se guarda dia por dia: la semana completa
-// se guarda con el boton "Guardar horario" del panel (el servidor recibe los
-// siete dias juntos y los valida contra el horario de la sede).
-// dias: [{ dia, nombre, atencion }] (atencion = { inicio, fin } "HH:MM" de la
-// sede ese dia, o null si la sede no abre). semana: { [dia]: { activo,
-// horaInicio, horaFin, conPausa, pausaInicio, pausaFin } }.
-// onCambiar(dia, cambios) actualiza el borrador.
+// horario de atencion de la sede.
 import { useState } from "react";
 import { RelojHora } from "../form/RelojHora";
 import { StatusToggle } from "../ui/StatusToggle";

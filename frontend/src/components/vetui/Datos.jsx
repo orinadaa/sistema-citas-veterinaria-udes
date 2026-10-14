@@ -1,13 +1,6 @@
 // components/vetui/Datos.jsx
-// Piezas para mostrar datos:
-//   TarjetaDato  indicador (KPI) en vidrio blanco (como las tarjetas de
-//                contenido de la app): icono, valor, etiqueta.
-//                Si recibe onClick, toda la tarjeta es un botón.
-//   Insignia     etiqueta de estado de solo lectura. Para citas:
-//                estado="proxima" | "completada" | "cancelada"; o un
-//                `tono` genérico con `children`.
-// Insignia: pildora clara con texto oscuro (-800), legible tanto sobre
-// vidrio como sobre cristal.
+// Piezas para mostrar datos: TarjetaDato indicador (KPI) en vidrio blanco
+// (como las tarjetas de contenido de la app): icono, valor, etiqueta.
 import { IconoFlechaDerecha } from '../icons';
 
 const TONOS_ICONO = {

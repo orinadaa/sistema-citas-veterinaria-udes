@@ -1,6 +1,6 @@
 // models/logo.model.js
 // Logotipos de la clinica que el superadministrador reemplazo por un archivo
-// propio (ver database/incremento_14a_logos.sql). Un logotipo sin fila usa
+// propio. Un logotipo sin fila usa
 // el original que viene con el sistema.
 const { pool } = require('../config/db');
 

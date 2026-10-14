@@ -1,7 +1,6 @@
 // utils/franjas.js
 // Logica pura de calculo de franjas horarias, separada del origen de
-// los datos (antes era una constante fija, ahora viene de la tabla
-// horario_atencion via horario.model.js).
+// los datos (la tabla horario_atencion, via horario.model.js).
 
 const DURACION_SLOT_MINUTOS = 30;
 
@@ -25,7 +24,7 @@ function generarFranjasEntreHoras(fecha, horaInicio, horaFin) {
 
 // Franjas (de 30 minutos) que ocupa una cita que empieza en `inicio` y
 // dura `duracionMinutos`: una consulta de 30 ocupa una; una cirugia de 90,
-// tres. Antes toda cita ocupaba una sola franja, durara lo que durara.
+// tres.
 function franjasQueOcupa(inicio, duracionMinutos) {
   const cantidad = Math.max(1, Math.ceil((Number(duracionMinutos) || DURACION_SLOT_MINUTOS) / DURACION_SLOT_MINUTOS));
   return Array.from({ length: cantidad }, (_, i) => new Date(new Date(inicio).getTime() + i * DURACION_SLOT_MINUTOS * 60000));

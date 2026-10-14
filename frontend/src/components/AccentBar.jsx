@@ -1,8 +1,6 @@
 // components/AccentBar.jsx
-// Detalle de marca: azul + amarillo, los dos colores institucionales de
-// la clinica. Se usa siempre igual, bajo los titulos de seccion.
-// `sobreFondoAzul` cambia la mitad azul por blanco para que se distinga
-// sobre un fondo ya azul (ej. el banner de cierre).
+// Detalle de marca: azul + amarillo, los dos colores institucionales de la
+// clinica.
 export function AccentBar({ sobreFondoAzul = false, centrado = false }) {
   return (
     <span

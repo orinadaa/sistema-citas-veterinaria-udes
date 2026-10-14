@@ -1,12 +1,6 @@
 // pages/AgendarCitaPage.jsx
-// Flujo de agendamiento del cliente (RF-06 agendar indicando sede,
-// RF-07 disponibilidad por sede). 5 hitos agrupados en 3 paginas:
-//   1. Mascota + Servicio
-//   2. Sede + Fecha y hora
-//   3. Confirmacion
-// Todo el estado de las selecciones vive aqui (no en cada pagina) para
-// que "Cambiar" en el resumen lateral regrese a una pagina sin perder
-// lo ya elegido en las demas.
+// Flujo de agendamiento del cliente (RF-06 agendar indicando sede, RF-07
+// disponibilidad por sede). 5 hitos agrupados en 3 paginas.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBlocker, useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
@@ -89,8 +83,8 @@ export function AgendarCitaPage() {
           setServicioId((actual) => actual || servicioInicial);
         }
 
-        // Sede por defecto = la de la ultima cita del cliente (decision
-        // registrada: no existe "sede de preferencia" en el perfil). Las
+        // Sede por defecto = la de la ultima cita del cliente (no existe "sede de
+        // preferencia" en el perfil). Las
         // citas vienen ordenadas por fecha_hora DESC; solo si esa sede
         // sigue activa.
         // ?sedeId=... (tarjetas de Horarios del landing) manda sobre esa
@@ -327,8 +321,8 @@ export function AgendarCitaPage() {
             // pildora ya formada y este contenido justo debajo (scroll-mt-28,
             // igual que cada Seccion). lg:min-h: con un paso corto la pagina
             // igual alcanza a bajar hasta el ancla (si no, el salto se apaga).
-            <div data-ancla-topbar className="mt-8 grid scroll-mt-28 gap-6 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
-              <div className="flex flex-col gap-6">
+            <div data-ancla-topbar className="mt-8 grid scroll-mt-28 grid-cols-[minmax(0,1fr)] gap-6 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+              <div className="flex min-w-0 flex-col gap-6">
                 {pagina === 1 && (
                   <PaginaMascotaServicio
                     mascotas={mascotas}

@@ -1,15 +1,5 @@
 // components/landing/BotonContacto.jsx
-// Boton flotante de contacto de la pagina publica (RF-23, pedido de Oriana;
-// reemplaza a la burbuja que solo abria WhatsApp). Fijo abajo a la derecha.
-// Al pasar el cursor o al pulsarlo se despliegan hacia arriba los accesos
-// directos: WhatsApp y las redes que tengan enlace en el panel del
-// superadministrador. Sin ningun canal configurado no se dibuja nada.
-// - Con raton: se abre al pasar el cursor y se cierra al salir; un clic lo
-//   deja fijo. En pantallas tactiles solo cuenta el toque.
-// - Teclado: el boton abre y cierra (aria-expanded); Escape cierra. Cerrado,
-//   los accesos quedan fuera del orden de tabulacion (inert).
-// - 56 px el boton y 48 px cada acceso: comodos para tocar. Deja libre el
-//   borde derecho, donde va la barra de desplazamiento.
+// Boton flotante de contacto de la pagina publica. Fijo abajo a la derecha.
 import { useEffect, useRef, useState } from 'react';
 import { useInfoClinica } from '../../hooks/useInfoClinica';
 import { IconoContacto, IconoX } from '../icons';

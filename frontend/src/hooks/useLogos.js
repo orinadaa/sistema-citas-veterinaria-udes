@@ -1,16 +1,6 @@
 // hooks/useLogos.js
 // Logotipos de la clinica en toda la pagina (barra superior y su animacion,
 // pantallas de sesion, pie de pagina, menu del panel e icono de la pestaña).
-// El superadministrador puede reemplazar cada uno desde Pagina web >
-// Logotipos; el que no se ha reemplazado usa el archivo original que viene
-// con el sistema (assets/).
-//
-// useLogos() devuelve { principal_blanco, principal_color, corto_color,
-// corto_blanco, icono } con la direccion de la imagen que toca mostrar.
-// Se piden al servidor una vez por visita y se comparten entre todos los
-// componentes. Lo ultimo que respondio el servidor se guarda en el
-// navegador: asi, al volver, el logotipo propio sale desde el primer
-// instante y no se ve primero el original.
 import { useEffect, useSyncExternalStore } from 'react';
 import { obtenerLogos } from '../api/client';
 import logoBlanco from '../assets/logoblanco.webp';

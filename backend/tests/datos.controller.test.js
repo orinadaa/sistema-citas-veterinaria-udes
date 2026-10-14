@@ -106,6 +106,20 @@ describe('Explorador de solo lectura', () => {
     expect(encabezado).toBe('Nombre;Categoría;Precio;Duración (min);Activo');
     expect(fila).toBe(`'=CMD();"Consulta; general";60000;30;Sí`);
   });
+
+  test('neutraliza formulas escondidas tras espacios o caracteres de control, sin tocar los numeros', async () => {
+    datosModel.listar.mockResolvedValue({
+      filas: [
+        { id: 's1', nombre: '  =HYPERLINK(1)', categoria: '\t@SUM(A1)', precio: -5, duracion: 30, activo: true },
+        { id: 's2', nombre: '\u0000+1+1', categoria: '-2+3', precio: 10, duracion: 30, activo: false },
+      ],
+      total: 2,
+    });
+    const respuesta = await con(request(app).get('/api/datos/servicios/exportar'));
+    const [, fila1, fila2] = respuesta.text.replace('\ufeff', '').trim().split('\r\n');
+    expect(fila1).toBe("'=HYPERLINK(1);'@SUM(A1);-5;30;Sí");
+    expect(fila2).toBe("'+1+1;'-2+3;10;30;No");
+  });
 });
 
 describe('Bitacora', () => {

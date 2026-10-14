@@ -1,8 +1,6 @@
 // utils/iconoServicio.js
 // Icono de linea para cada servicio del catalogo (tarjetas del flujo de
-// agendamiento). Los servicios los crea el administrador con nombre
-// libre, asi que se busca por palabra clave; si ninguna coincide, se usa
-// el estetoscopio generico.
+// agendamiento).
 import {
   IconoCintaOncologia,
   IconoCirugia,

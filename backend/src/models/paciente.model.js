@@ -4,8 +4,7 @@
 // sobre usuario/mascota/cita ya existentes.
 const { pool } = require('../config/db');
 
-// sedeId es opcional (vista multisede, ver decisiones del incremento
-// 3): si se indica, solo se cuentan las citas de esa sede y se excluye
+// sedeId es opcional: si se indica, solo se cuentan las citas de esa sede y se excluye
 // a los clientes que no tengan ninguna cita ahi.
 async function listarClientes({ sedeId, busqueda }) {
   const resultado = await pool.query(

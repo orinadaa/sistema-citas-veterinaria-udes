@@ -1,15 +1,7 @@
 // components/form/SelectorEncuadre.jsx
-// Encuadre de una foto que el sitio va a recortar (galeria del inicio,
-// foto de un servicio): la foto completa con un punto que marca lo que
-// debe quedar siempre a la vista, y debajo una vista previa del recorte.
-// El punto se mueve con un clic sobre la foto o con los dos deslizadores
-// (para teclado). Entrega porcentajes 0-100 por onCambiar({ focoX, focoY }),
-// que el sitio aplica como object-position.
-//
-// proporcionVista: proporcion del marco donde se mostrara (clase de
-// Tailwind), para que la vista previa recorte igual que el sitio.
-// mostrarVista={false}: sin la vista previa (EncuadreModal la dibuja
-// aparte, mas grande).
+// Encuadre de una foto que el sitio va a recortar (galeria del inicio, foto de
+// un servicio): la foto completa con un punto que marca lo que debe quedar
+// siempre a la vista.
 export function SelectorEncuadre({
   src,
   focoX,

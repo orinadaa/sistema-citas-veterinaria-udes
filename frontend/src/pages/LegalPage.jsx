@@ -1,9 +1,5 @@
 // pages/LegalPage.jsx
 // Politica de privacidad (/privacidad) y aviso legal (/aviso-legal).
-// BORRADOR redactado a partir de lo que el sistema realmente guarda y hace
-// (Ley 1581 de 2012 y Decreto 1377 de 2013, Colombia). Antes de publicar el
-// sitio debe revisarlo la Universidad de Santander y alinearse con su
-// politica institucional de tratamiento de datos personales.
 import { Link } from 'react-router-dom';
 import { FondoVetui } from '../components/vetui';
 import { useLogos } from '../hooks/useLogos';

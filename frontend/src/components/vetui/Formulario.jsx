@@ -1,9 +1,7 @@
 // components/vetui/Formulario.jsx
-// Campos de vetUI para superficies de vidrio (sobre fondo oscuro): el
-// campo es casi blanco con texto oscuro (los datos siempre se leen oscuro
-// sobre claro) y la etiqueta es blanca. Foco: anillo ámbar.
-// Dentro de paneles laterales (cristal fuerte) se usan los campos de
-// form/Campo.jsx, que ya son oscuros sobre claro.
+// Campos de vetUI para superficies de vidrio (sobre fondo oscuro): el campo es
+// casi blanco con texto oscuro (los datos siempre se leen oscuro sobre claro)
+// y la etiqueta es blanca.
 export function Etiqueta({ htmlFor, children, requerido }) {
   return (
     <label htmlFor={htmlFor} className="vt-etiqueta text-sm font-semibold text-white">

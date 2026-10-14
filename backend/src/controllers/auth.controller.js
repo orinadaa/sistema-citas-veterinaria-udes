@@ -1,14 +1,5 @@
 // controllers/auth.controller.js
 // RF-01 (registro de clientes), RF-02 (inicio de sesion).
-// El registro publico solo crea usuarios con rol "cliente": las cuentas de
-// administrador/veterinario las crea un administrador (ver usuario.controller.js).
-// El registro va en dos pasos: 1) se guardan los datos como solicitud
-// pendiente y se envia un codigo al correo; 2) con el codigo correcto se
-// crea la cuenta. Asi el correo de toda cuenta es de quien la creo.
-// El paso 1 devuelve un identificador de la solicitud que el paso 2 debe
-// traer junto con el codigo: sin el, otra persona podria registrarse encima
-// con el mismo correo y su propia contraseña, y esperar a que el dueño del
-// correo escriba el codigo que le llega.
 
 const bcrypt = require('bcryptjs');
 const { buscarPorCorreo, crearCliente, actualizarContrasena, buscarConHashPorId } = require('../models/usuario.model');
@@ -262,8 +253,8 @@ async function iniciarSesion(req, res, next) {
     }
 
     // "Cuenta inactiva" solo se dice a quien YA demostro ser el dueño (la
-    // contraseña es correcta), asi no revela nada a un tercero. Decision de
-    // Oriana (frente 5): es el unico mensaje especifico del inicio de sesion.
+    // contraseña es correcta), asi no revela nada a un tercero. Es el
+    // unico mensaje especifico del inicio de sesion.
     if (!usuario.activo) {
       return res.status(403).json({ mensaje: MENSAJE_CUENTA_INACTIVA, codigo: 'CUENTA_INACTIVA' });
     }

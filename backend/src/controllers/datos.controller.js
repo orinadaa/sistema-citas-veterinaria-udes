@@ -1,10 +1,5 @@
 // controllers/datos.controller.js
-// Modulo "Datos" del superadministrador (/api/datos):
-// - explorar cualquier entidad en solo lectura, con busqueda, filtros,
-//   orden y paginas, y exportarla a CSV;
-// - correcciones puntuales, cada una con sus reglas;
-// - bitacora de cambios y copia de seguridad.
-// No hay edicion libre de tablas ni eliminacion de registros.
+// Modulo "Datos" del superadministrador (/api/datos)
 const { spawn } = require('child_process');
 const bcrypt = require('bcryptjs');
 const usuarioModel = require('../models/usuario.model');
@@ -87,8 +82,12 @@ function celdaCsv(valor, tipo) {
   if (tipo === 'booleano') texto = valor ? 'Sí' : 'No';
   else if (valor instanceof Date) texto = tipo === 'fecha' ? valor.toLocaleDateString('es-CO') : valor.toLocaleString('es-CO');
   else texto = String(valor);
-  // Una celda que empieza con = + - @ se abriria como formula en Excel.
-  if (/^[=+\-@]/.test(texto)) texto = `'${texto}`;
+  // Una celda que empieza con = + - @ (o con tabulacion o retorno) se abriria
+  // como formula en una hoja de calculo, tambien si antes lleva espacios o
+  // caracteres de control. Los numeros de la base no pasan por aqui.
+  if (typeof valor !== 'number' && /^[\s\u0000-\u001f\u00a0\ufeff]*[=+\-@]|^[\t\r\n]/.test(texto)) {
+    texto = `'${texto.replace(/^[\s\u0000-\u001f\u00a0\ufeff]+/, '')}`;
+  }
   return /[";\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
 }
 

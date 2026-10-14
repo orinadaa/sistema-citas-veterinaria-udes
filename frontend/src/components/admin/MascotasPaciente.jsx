@@ -1,15 +1,5 @@
 // components/admin/MascotasPaciente.jsx
-// Tab "Mascota(s)" del SidePanel "Detalle del paciente" (rol
-// administrador). Distinto a proposito del lado del cliente:
-// - Tarjeta por mascota (foto, especie · raza, sexo | edad · peso) con
-//   menu de tres puntos: solo Editar (carga la mascota en el mismo
-//   formulario de abajo). El administrador NO puede eliminar mascotas:
-//   eso lo hace unicamente su dueño (decision de la usuaria).
-// - Formulario "Agregar mascota" embebido en el tab (no es otro panel),
-//   con la zona de foto estandar (ZonaFoto) que abre el mismo editor de
-//   foto del cliente (FotoMascotaModal), Sexo como segmented control
-//   obligatorio en este formulario, y sin "Informacion medica" (no
-//   aparece en la referencia de este modulo).
+// Tab "Mascota(s)" del SidePanel "Detalle del paciente" (rol administrador).
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { crearMascota, actualizarMascota, subirFotoMascota } from '../../api/client';

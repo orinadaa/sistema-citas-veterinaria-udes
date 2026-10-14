@@ -1,9 +1,6 @@
 // components/admin/PanelServicios.jsx
 // RF-11: catalogo de servicios veterinarios (categoria, precio, duracion
-// estimada, estado). La duracion se muestra al cliente en el resumen del
-// flujo de agendamiento; es informativa (la agenda sigue en franjas de 30 min).
-// Cada servicio puede llevar una foto: es la que se ve en la seccion
-// "Servicios" de la pagina publica (un servicio sin foto no aparece ahi).
+// estimada, estado).
 import { useEffect, useMemo, useState } from 'react';
 import {
   obtenerServiciosAdmin,
@@ -26,7 +23,7 @@ import { StatusToggle } from '../ui/StatusToggle';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
-import { IconoEncuadre, IconoJeringa, IconoPapelera } from '../icons';
+import { IconoCatalogo, IconoCheck, IconoEncuadre, IconoEstetoscopio, IconoOjoTachado, IconoPapelera } from '../icons';
 import { iconoDeServicio } from '../../utils/iconoServicio';
 import { formatearCOP } from '../../utils/moneda';
 import { Desplegable } from '../form/Desplegable';
@@ -248,10 +245,10 @@ export function PanelServicios({ busquedaInicial, soloLectura = false }) {
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <KPICard icon={IconoJeringa} color="blue" value={kpis.total} label="Servicios totales" />
-        <KPICard icon={IconoJeringa} color="green" value={kpis.activos} label="Activos" />
-        <KPICard icon={IconoJeringa} color="red" value={kpis.inactivos} label="Inactivos" />
-        <KPICard icon={IconoJeringa} color="blue" value={kpis.categorias} label="Categorías" />
+        <KPICard icon={IconoEstetoscopio} color="blue" value={kpis.total} label="Servicios totales" />
+        <KPICard icon={IconoCheck} color="green" value={kpis.activos} label="Activos" />
+        <KPICard icon={IconoOjoTachado} color="red" value={kpis.inactivos} label="Inactivos" />
+        <KPICard icon={IconoCatalogo} color="blue" value={kpis.categorias} label="Categorías" />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">

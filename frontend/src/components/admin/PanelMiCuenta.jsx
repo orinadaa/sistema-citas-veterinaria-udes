@@ -1,10 +1,6 @@
 // components/admin/PanelMiCuenta.jsx
 // "Mi cuenta" del administrador de sede y del superadministrador (menu del
 // avatar del panel): sus datos y la seguridad de su cuenta.
-// - Correo: se cambia confirmando un codigo enviado al correo NUEVO. Sirve
-//   para pasar una cuenta con un correo que no existe a uno real.
-// - Contraseña (decision de Oriana): contraseña actual + codigo de 6 digitos
-//   enviado a su correo.
 import { useEffect, useState } from 'react';
 import {
   cambiarContrasenaMiCuenta,
@@ -46,7 +42,7 @@ export function PanelMiCuenta() {
       ) : !cuenta ? (
         <div className="h-40 animate-pulse rounded-2xl bg-white/20" />
       ) : (
-        <div className="grid items-start gap-6 xl:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 xl:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)]">
           <TarjetaCuenta className="self-start">
             <div className="flex flex-col items-center text-center">
               <span className="flex h-24 w-24 items-center justify-center rounded-full bg-brand-blue-700 text-2xl font-bold text-white ring-4 ring-white">

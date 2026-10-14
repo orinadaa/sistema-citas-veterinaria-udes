@@ -1,8 +1,6 @@
 // components/admin/AvisosAtencion.jsx
 // "Requiere tu atención": lista de cosas por resolver que arma el servidor
-// (tablero.controller.js). Cada aviso dice que pasa y lleva al modulo donde
-// se arregla (onIr). Sin avisos, lo dice en positivo. Lo usan el inicio del
-// administrador de sede y el del superadministrador.
+// (tablero.controller.js).
 import { IconoAlerta, IconoCheck, IconoFlechaDerecha } from '../icons';
 
 export function AvisosAtencion({ avisos, onIr, etiquetaModulo = {} }) {

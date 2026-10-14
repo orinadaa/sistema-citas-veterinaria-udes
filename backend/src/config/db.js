@@ -1,8 +1,5 @@
 // config/db.js
 // Configura el pool de conexiones a PostgreSQL usando la libreria "pg".
-// Un pool reutiliza conexiones en vez de abrir una nueva por cada consulta,
-// lo cual es la practica recomendada para una API que atendera muchas
-// peticiones concurrentes (agendamiento de citas, consultas, etc.).
 
 const { Pool } = require('pg');
 

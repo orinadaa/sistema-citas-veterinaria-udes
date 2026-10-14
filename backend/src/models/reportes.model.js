@@ -1,10 +1,5 @@
 // models/reportes.model.js
-// Agregaciones de solo lectura para el panel de Reportes. Vista
-// multisede (ver decisiones del incremento 3): el filtro de sede
-// aplica a los KPIs, el ranking de servicios, el estado de citas y las
-// ultimas citas; "citas por semana" y "citas por sede" se muestran
-// siempre comparando todas las sedes (el filtro no aplicaria, son
-// graficos comparativos).
+// Agregaciones de solo lectura para el panel de Reportes.
 const { pool } = require('../config/db');
 
 async function obtenerKpis(sedeId) {

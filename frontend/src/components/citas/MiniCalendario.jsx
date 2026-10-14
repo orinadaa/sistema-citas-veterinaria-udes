@@ -74,7 +74,7 @@ export function MiniCalendario({ diaSeleccionado, onSeleccionarDia, clase = 'rou
               key={celda.toISOString()}
               type="button"
               onClick={() => onSeleccionarDia(celda)}
-              className={`mx-auto flex h-7 w-7 items-center justify-center rounded-boton transition ${
+              className={`mx-auto flex h-9 w-9 items-center justify-center rounded-boton transition sm:h-7 sm:w-7 ${
                 esSeleccionado
                   ? 'bg-brand-blue-600 text-white'
                   : esHoy

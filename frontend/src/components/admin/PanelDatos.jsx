@@ -1,13 +1,6 @@
 // components/admin/PanelDatos.jsx
 // Datos (superadministrador): ver y cuidar la informacion del sistema sin
-// abrir la base de datos. Tres pestañas:
-// - Explorar: cualquier entidad en SOLO LECTURA, con busqueda, filtros,
-//   orden, paginas y exportacion a CSV. Al abrir una fila se ve el registro
-//   completo, lo relacionado y, si aplica, las correcciones disponibles.
-// - Bitacora: quien cambio que y cuando.
-// - Copia de seguridad: descarga un archivo .sql con toda la base.
-// No hay edicion libre de tablas ni eliminacion: las correcciones son pocas
-// y cada una tiene sus reglas (el servidor las impone).
+// abrir la base de datos.
 import { useEffect, useState } from 'react';
 import {
   corregirCitaDatos,
@@ -96,7 +89,7 @@ function CorregirUsuario({ registro, token, alTerminar }) {
       <p className="text-xs text-slate-700">Para un nombre, teléfono o correo mal escritos. El rol, la sede y el estado se cambian en Usuarios.</p>
       <Campo id="dato-nombre" label="Nombre completo" value={form.nombreCompleto} onChange={(e) => setForm({ ...form, nombreCompleto: e.target.value })} required />
       <Campo id="dato-correo" label="Correo" type="email" value={form.correo} onChange={(e) => setForm({ ...form, correo: e.target.value })} required />
-      <Campo id="dato-telefono" label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
+      <Campo id="dato-telefono" inputMode="tel" label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
       <Mensaje estado={estado} />
       <button type="submit" disabled={guardando} className={`self-end ${CLASE_BOTON}`}>
         {guardando ? 'Guardando...' : 'Guardar corrección'}
@@ -449,7 +442,7 @@ function Explorar({ token }) {
                       const ordenada = consulta.orden === c.clave;
                       return (
                         <th key={c.clave} scope="col" aria-sort={ordenada ? (consulta.direccion === 'asc' ? 'ascending' : 'descending') : undefined} className="px-4 py-3">
-                          <button type="button" onClick={() => ordenarPor(c.clave)} className="boton-texto inline-flex items-center gap-1 uppercase tracking-wide transition">
+                          <button type="button" onClick={() => ordenarPor(c.clave)} className="boton-texto -my-2 inline-flex min-h-9 items-center gap-1 uppercase tracking-wide transition">
                             {c.etiqueta}
                             <IconoChevronAbajo className={`h-3 w-3 ${ordenada ? '' : 'opacity-0'} ${ordenada && consulta.direccion === 'asc' ? 'rotate-180' : ''}`} />
                           </button>

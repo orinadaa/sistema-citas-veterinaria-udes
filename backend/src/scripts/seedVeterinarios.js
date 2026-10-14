@@ -1,11 +1,7 @@
 // scripts/seedVeterinarios.js
-// Siembra medicos de ejemplo y sus especialidades (que servicio presta
-// cada uno), para poder probar el flujo de agendamiento de citas de
-// principio a fin. La administracion real de medicos/especialidades
-// (crear, editar, reasignar) es del panel administrativo, incremento 3;
-// este script es solo el punto de partida, igual que seedAdmin.js.
-//
-// Uso: node src/scripts/seedVeterinarios.js
+// Siembra medicos de ejemplo y sus especialidades (que servicio presta cada
+// uno), para poder probar el flujo de agendamiento de citas de principio a
+// fin.
 
 require('dotenv').config();
 const bcrypt = require('bcryptjs');

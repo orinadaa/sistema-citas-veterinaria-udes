@@ -243,7 +243,7 @@ export function PanelReportes({ sedeFija = null }) {
             <KPICard icon={IconoPersona} color="amber" value={datos.kpis.pacientesRegistrados} label="Pacientes registrados" />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
             <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
               <p className="font-heading text-sm font-semibold text-brand-navy">Citas por semana, por sede</p>
               <div className="mt-4 h-72">
@@ -312,7 +312,7 @@ export function PanelReportes({ sedeFija = null }) {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[2fr_1fr]">
             <div>
               <p className="mb-3 font-heading text-sm font-semibold text-white">Últimas citas registradas</p>
               <DataTable

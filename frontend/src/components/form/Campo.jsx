@@ -1,10 +1,5 @@
 // components/form/Campo.jsx
 // Bloque de formulario consistente: label arriba, input, error debajo.
-// El input usa `campo`, el campo unico de vetUI (styles/vetui.css): mismo
-// borde, radio y foco que el Desplegable, el buscador, la hora y la fecha.
-// Con `error`, aria-invalid lo pinta en rojo.
-// Si type="password", agrega un boton de mostrar/ocultar clave dentro
-// del input (icono de ojo).
 import { useState } from 'react';
 import { IconoOjo, IconoOjoTachado } from '../icons';
 

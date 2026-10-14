@@ -1,15 +1,6 @@
 // utils/razas.js
-// RESPALDO: desde el incremento 8b las especies y razas viven en la base de
-// datos y las gestiona el superadministrador (Catalogos). Esta lista es la
-// semilla de esas tablas y lo que se muestra si el servidor no responde
-// (ver hooks/useCatalogoEspecies.js). Lo que sigue describe el origen:
-// Catalogo de especies y razas para el perfil de mascota (decision de
-// la usuaria: especie y raza obligatorias, raza como lista desplegable
-// que depende de la especie). Es un catalogo estatico del frontend, no
-// una tabla: se guarda el mismo texto de siempre en mascota.especie /
-// mascota.raza, asi las mascotas ya registradas no se rompen.
-// Cada lista incluye "Criollo / mestizo" y "No sé la raza". "Otro"
-// (conejo, hamster...) no tiene lista: se escribe a mano.
+// RESPALDO: las especies y razas viven en la base de datos y las gestiona
+// el superadministrador (Catalogos).
 
 export const RAZA_CRIOLLA = 'Criollo / mestizo';
 export const RAZA_DESCONOCIDA = 'No sé la raza';

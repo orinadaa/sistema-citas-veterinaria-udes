@@ -7,8 +7,7 @@ const CAMPOS =
   'id, cliente_id, nombre, especie, raza, foto_url, fecha_nacimiento, sexo, color, peso_kg, caracteristicas, ' +
   'alergias, medicamentos, condiciones_medicas, observaciones, creado_en';
 
-// Solo mascotas activas: las eliminadas (baja logica, ver
-// database/incremento_4c_mascota_baja.sql) ya no se listan.
+// Solo mascotas activas: las eliminadas (baja logica) no se listan.
 async function listarPorCliente(clienteId) {
   const resultado = await pool.query(`SELECT ${CAMPOS} FROM mascota WHERE cliente_id = $1 AND activo ORDER BY nombre`, [
     clienteId,

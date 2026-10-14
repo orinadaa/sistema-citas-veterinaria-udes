@@ -1,10 +1,6 @@
 // components/admin/PanelConfiguracion.jsx
-// Configuracion, acotada a lo que tiene respaldo real: gestion de
-// cuentas de personal (Usuarios), Sedes (reutiliza PanelHorarios tal
-// cual). Desde la separacion de roles es el modulo "Usuarios" del
-// superadministrador. El resto de pestanas del mockup (Notificaciones, Seguridad,
-// Respaldo, Preferencias, Apariencia) no se construyen: sin RF/RNF ni
-// backend detras, ver docs/incremento_3_pruebas.md.
+// Configuracion, acotada a lo que tiene respaldo real: gestion de cuentas de
+// personal (Usuarios), Sedes (reutiliza PanelHorarios tal cual).
 import { useEffect, useMemo, useState } from 'react';
 import {
   obtenerUsuarios,
@@ -17,6 +13,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Campo } from '../form/Campo';
 import { PageHeader } from '../ui/PageHeader';
 import { StatusToggle } from '../ui/StatusToggle';
+import { Dialogo } from '../vetui/Superpuestos';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
@@ -152,8 +149,33 @@ export function PanelConfiguracion({ busquedaInicial }) {
     }
   }
 
+  // Desactivar deja a la persona sin acceso: se confirma antes.
+  const [porDesactivar, setPorDesactivar] = useState(null);
+  const [desactivando, setDesactivando] = useState(false);
+
   async function alternarActivo(u) {
     if (u.id === usuario.id) return;
+    if (u.activo) {
+      setPorDesactivar(u);
+      return;
+    }
+    await cambiarActivo(u);
+  }
+
+  async function confirmarDesactivacion() {
+    setDesactivando(true);
+    try {
+      await cambiarActivo(porDesactivar);
+      setPorDesactivar(null);
+    } catch (err) {
+      setPorDesactivar(null);
+      setAviso({ tipo: 'advertencia', texto: err.message });
+    } finally {
+      setDesactivando(false);
+    }
+  }
+
+  async function cambiarActivo(u) {
     const { citasFuturas } = await actualizarUsuario(u.id, { activo: !u.activo }, token);
     avisarCitasPendientes(u.nombre_completo, citasFuturas);
     cargar();
@@ -161,11 +183,25 @@ export function PanelConfiguracion({ busquedaInicial }) {
 
   return (
     <>
+    <Dialogo
+      abierto={Boolean(porDesactivar)}
+      onCerrar={() => setPorDesactivar(null)}
+      titulo={`¿Desactivar la cuenta de ${porDesactivar?.nombre_completo ?? ''}?`}
+      descripcion="No podrá iniciar sesión hasta que la actives de nuevo. Sus datos y sus citas se conservan."
+    >
+      <button type="button" onClick={() => setPorDesactivar(null)} className="rounded-boton border border-slate-400 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-white/60">
+        No, mantenerla activa
+      </button>
+      <button type="button" onClick={confirmarDesactivacion} disabled={desactivando} className="rounded-boton bg-red-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-800 disabled:opacity-60">
+        {desactivando ? 'Desactivando...' : 'Sí, desactivar'}
+      </button>
+    </Dialogo>
     <div className="flex flex-col gap-6" inert={panelAbierto} aria-hidden={panelAbierto}>
       <PageHeader title="Usuarios" subtitle="Todas las cuentas del sistema. Solo desde aquí se activan o desactivan." />
 
       {aviso && (
         <p
+          role="status"
           className={`rounded-lg px-3 py-2 text-sm ring-1 ${
             aviso.tipo === 'exito'
               ? 'bg-green-50 text-green-700 ring-green-200'
@@ -340,7 +376,7 @@ export function PanelConfiguracion({ busquedaInicial }) {
             </Desplegable>
           </div>
 
-          <Campo id="telefono-usuario-config" label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
+          <Campo id="telefono-usuario-config" inputMode="tel" label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
 
           {usuarioEditando && (
             <StatusToggle

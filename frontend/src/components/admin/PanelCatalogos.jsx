@@ -1,14 +1,6 @@
 // components/admin/PanelCatalogos.jsx
-// Catalogos (superadministrador): las listas de opciones del sistema, que
-// se cambian sin programar. Dos pestañas:
-// - Categorias y especialidades: es un solo catalogo. Clasifica los
-//   servicios y es la lista de especialidades de los medicos.
-// - Especies y razas: lo que ofrecen los formularios de mascota. Una
-//   especie sin razas activas pide la raza como texto libre.
-// Regla comun (decision de Oriana): nada se elimina, se desactiva. Lo
-// desactivado deja de ofrecerse en registros nuevos; lo que ya lo usa lo
-// conserva. Por eso cada fila dice cuantos registros la usan.
-// Renombrar corrige el nombre tambien en las mascotas que ya lo tienen.
+// Catalogos (superadministrador): las listas de opciones del sistema, que se
+// cambian sin programar.
 import { useEffect, useState } from 'react';
 import {
   actualizarCategoriaCatalogo,
@@ -317,7 +309,7 @@ function Especies({ token }) {
         />
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
         {/* Especies */}
         <ul role="tablist" aria-label="Especies" className="flex flex-col gap-2">
           {especies.map((especie) => {

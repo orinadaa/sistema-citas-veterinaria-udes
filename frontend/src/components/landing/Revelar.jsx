@@ -1,11 +1,6 @@
 // components/landing/Revelar.jsx
-// Scroll-reveal del landing con IntersectionObserver nativo (sin
-// libreria nueva, ver el alcance del proyecto): el contenido entra con fade + 24px de
-// desplazamiento vertical la primera vez que aparece en el viewport y
-// luego deja de observarse (no se vuelve a ocultar al subir).
-// `retraso` (ms) permite escalonar elementos de una misma seccion.
-// Con prefers-reduced-motion el contenido se muestra siempre, sin
-// transicion.
+// Scroll-reveal del landing con IntersectionObserver nativo (sin libreria
+// nueva, ver el alcance del proyecto)
 import { useEffect, useRef, useState } from 'react';
 
 const OPCIONES_OBSERVADOR = { threshold: 0.15, rootMargin: '0px 0px -10% 0px' };

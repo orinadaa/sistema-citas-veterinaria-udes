@@ -1,17 +1,6 @@
 // components/citas/DetalleCitaPanel.jsx
-// Detalle de una cita en "Mis citas" del panel del cliente, con
-// reprogramar (RF-08) y cancelar (RF-09) cuando esta activa y es
-// futura. Sigue la especificacion final de la usuaria, en orden:
-// resumen de la mascota, numero de cita, informacion de la cita (filas
-// con chip azul; "Reprogramar" en la fila de Fecha y hora, "Ver en
-// mapa" en la de Sede), motivo, recomendaciones y pie con solo
-// "Cancelar cita". Decisiones de la usuaria: sin "Editar cita", sin
-// "Notas adicionales" (no existen en el sistema) y sin "Ver perfil" del
-// medico (no hay vista de perfil).
-// Reprogramar abre una ventana centrada (ReprogramarCitaModal), no un
-// calendario dentro del panel. Usa el mismo calendario de mes y selector de horas del
-// flujo de agendar (DatePickerCalendar + TimeSlotPicker), filtrado al
-// medico de la cita: reprogramar no cambia de medico.
+// Detalle de una cita en "Mis citas" del panel del cliente, con reprogramar
+// (RF-08) y cancelar (RF-09) cuando esta activa y es futura.
 import { useCallback, useEffect, useState } from 'react';
 import { reprogramarCita, cancelarCita, obtenerHorarios } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -36,7 +25,7 @@ import {
 import { ETIQUETA_SEXO } from '../../utils/sexo';
 import { IconoSexo } from '../ui/EtiquetaSexo';
 
-// Texto fijo definido por la usuaria (especificacion final del panel).
+// Recomendaciones fijas que se muestran en el detalle de la cita.
 const RECOMENDACIONES = [
   'Llega 10 minutos antes de la hora programada.',
   'Trae el carnet de vacunas de tu mascota.',
@@ -138,7 +127,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     setError('');
     try {
       await reprogramarCita(cita.id, nuevaFranja, token);
-      onActualizada();
+      onActualizada('Tu cita quedó reprogramada.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -151,7 +140,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     setError('');
     try {
       await cancelarCita(cita.id, token);
-      onActualizada();
+      onActualizada('Tu cita fue cancelada. La encuentras en Canceladas.');
     } catch (err) {
       setError(err.message);
       setEnviando(false);
@@ -342,7 +331,11 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
           {modo === 'confirmarCancelar' && (
             <div className="rounded-xl bg-red-50 p-4 ring-1 ring-red-200">
               <p className="text-sm font-medium text-red-800">¿Seguro que quieres cancelar esta cita?</p>
-              {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+              {error && (
+                <p role="alert" className="mt-2 text-sm text-red-700">
+                  {error}
+                </p>
+              )}
             </div>
           )}
         </div>

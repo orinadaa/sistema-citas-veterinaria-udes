@@ -38,8 +38,7 @@ export function AuthProvider({ children }) {
 
   // El servidor rechazo el token (vencio a las 8 horas, la cuenta se
   // desactivo o cambio la contraseña en otro equipo): se cierra la sesion
-  // local y ProtectedRoute lleva a iniciar sesion. Antes el panel seguia
-  // abierto y cada accion fallaba con "token invalido".
+  // local y ProtectedRoute lleva a iniciar sesion.
   useEffect(() => {
     function alTerminar(evento) {
       setSesion((actual) => {

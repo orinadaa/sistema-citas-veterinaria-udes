@@ -218,12 +218,13 @@ async function listarCitas(req, res, next) {
   }
 }
 
-// GET /api/administracion/pacientes?sedeId=&busqueda= — solo administrador.
-// "Paciente" es un cliente (dueño); vista multisede (sedeId opcional),
-// ver decisiones del incremento 3.
+// GET /api/administracion/pacientes?busqueda= — solo administrador.
+// "Paciente" es un cliente (dueño) con al menos una cita en la sede del administrador.
 async function listarPacientes(req, res, next) {
   try {
-    const { sedeId, busqueda } = req.query;
+    // La sede sale de la sesion, nunca de la peticion: cada administrador ve solo la suya.
+    const { sedeId } = req.usuario;
+    const { busqueda } = req.query;
     const [pacientes, citasDelMes] = await Promise.all([
       pacienteModel.listarClientes({ sedeId, busqueda }),
       pacienteModel.contarCitasDelMes(sedeId),
@@ -244,10 +245,12 @@ async function obtenerDetallePaciente(req, res, next) {
       return res.status(404).json({ mensaje: 'Paciente no encontrado.' });
     }
 
-    const [mascotas, citas] = await Promise.all([
-      mascotaModel.listarPorCliente(id),
-      citaModel.listarPorCliente(id),
-    ]);
+    // Solo los pacientes de la sede del administrador (al menos una cita en ella), y solo sus citas en esa sede.
+    const citas = await citaModel.listarPorClienteEnSede(id, req.usuario.sedeId);
+    if (citas.length === 0) {
+      return res.status(404).json({ mensaje: 'Paciente no encontrado.' });
+    }
+    const mascotas = await mascotaModel.listarPorCliente(id);
 
     return res.status(200).json({ cliente, mascotas, citas });
   } catch (error) {

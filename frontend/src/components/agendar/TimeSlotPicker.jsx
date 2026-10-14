@@ -1,11 +1,6 @@
 // components/agendar/TimeSlotPicker.jsx
-// RF-07: horarios del dia elegido, en tabs Mañana / Tarde / Noche (solo
-// los turnos que el horario de atencion de la sede cubre ese dia). La
-// disponibilidad la calcula el backend (GET /api/citas/disponibilidad):
-// franjas del horario de atencion de la sede, menos las ya ocupadas por
-// todos los medicos que prestan el servicio en esa sede, menos las que
-// ya pasaron. Aqui solo se pinta lo que responde -- nunca se deshabilita
-// un horario "a mano" en el frontend.
+// RF-07: horarios del dia elegido, en tabs Mañana / Tarde / Noche (solo los
+// turnos que el horario de atencion de la sede cubre ese dia).
 import { useEffect, useState } from 'react';
 import { obtenerDisponibilidad } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';

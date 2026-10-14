@@ -2,12 +2,6 @@
 // Demostracion sin servidor (GitHub Pages). Solo entra en la compilacion de
 // demostracion (VITE_DEMO=1, ver vite.config.js y main.demo.jsx): la
 // plataforma normal no carga este archivo.
-// - Responde las peticiones a /api con las lecturas grabadas en datos.json
-//   (frontend/demo/grabar.mjs). Nada se guarda: toda escritura responde con
-//   un aviso.
-// - Fija el reloj en el momento de la grabacion, para que las citas de
-//   ejemplo sigan cayendo en "esta semana".
-// - Muestra un aviso con las cuentas de ejemplo.
 import grabado from './datos.json';
 
 const BASE = import.meta.env.BASE_URL;

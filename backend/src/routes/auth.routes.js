@@ -28,29 +28,27 @@ const limiteLoginPorCuenta = limitarIntentos({
 });
 const limiteRegistro = limitarIntentos({ ventanaMinutos: 60, maximo: 10, mensaje: 'Se crearon demasiadas cuentas desde esta conexión. Inténtalo más tarde.' });
 const limiteCodigos = limitarIntentos({ ventanaMinutos: 15, maximo: 10 });
+// Por destinatario y por dia, venga de la IP que venga: nadie puede usar el
+// sistema para llenar de correos el buzon de otra persona.
+const porDestinatario = (prefijo) => (req) => (req.body?.correo ? `${prefijo}:${String(req.body.correo).trim().toLowerCase().slice(0, 150)}` : null);
+const MENSAJE_TOPE_CORREOS = 'Ya se enviaron varios correos a esa dirección hoy. Revisa tu bandeja y el correo no deseado, o inténtalo mañana.';
+const limiteCorreosDeRegistro = limitarIntentos({ ventanaMinutos: 24 * 60, maximo: 6, clave: porDestinatario('registro'), mensaje: MENSAJE_TOPE_CORREOS });
+const limiteCorreosDeRecuperacion = limitarIntentos({ ventanaMinutos: 24 * 60, maximo: 5, clave: porDestinatario('recuperacion'), mensaje: MENSAJE_TOPE_CORREOS });
 
-// POST /api/auth/registro — paso 1: envia el codigo al correo
-router.post('/registro', limiteRegistro, registrar);
+router.post('/registro', limiteRegistro, limiteCorreosDeRegistro, registrar);
 
-// POST /api/auth/registro/verificar — paso 2: con el codigo crea la cuenta
 router.post('/registro/verificar', limiteCodigos, verificarRegistro);
 
-// POST /api/auth/registro/reenviar — codigo nuevo para un registro pendiente
-router.post('/registro/reenviar', limiteCodigos, reenviarCodigoRegistro);
+router.post('/registro/reenviar', limiteCodigos, limiteCorreosDeRegistro, reenviarCodigoRegistro);
 
-// POST /api/auth/login
 router.post('/login', limiteLogin, limiteLoginPorCuenta, iniciarSesion);
 
-// POST /api/auth/olvide-clave — cualquier rol
-router.post('/olvide-clave', limiteCodigos, olvideClave);
+router.post('/olvide-clave', limiteCodigos, limiteCorreosDeRecuperacion, olvideClave);
 
-// POST /api/auth/restablecer-clave — cualquier rol
 router.post('/restablecer-clave', limiteCodigos, restablecerClave);
 
-// GET /api/auth/perfil — cualquier usuario autenticado consulta su propia sesion
 router.get('/perfil', verificarToken, obtenerPerfilPropio);
 
-// POST /api/auth/primera-clave — la cuenta con clave temporal establece la suya
 router.post('/primera-clave', verificarTokenClaveTemporal, establecerPrimeraClave);
 
 module.exports = router;

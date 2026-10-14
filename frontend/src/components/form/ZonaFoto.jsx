@@ -1,14 +1,7 @@
 // components/form/ZonaFoto.jsx
-// Zona de foto estandar del sistema: circulo punteado con icono de camara
-// y "Subir foto" cuando esta vacio, o la foto recortada al circulo cuando
-// ya hay una; debajo va la ayuda (que subir y formato) o "Cambiar foto".
-// La usan todos los campos donde se sube una foto: mascota (cliente,
-// admin y medico) y foto de perfil del medico. Circular (pedido de
-// Oriana): asi la foto se ve como en el resto del sistema.
-//
-// Es solo la zona: el clic abre el editor de foto (FotoMascotaModal:
-// elegir archivo, encuadrar, vista previa), que es quien valida formato
-// y tamaño y entrega la imagen final.
+// Zona de foto estandar del sistema: circulo punteado con icono de camara y
+// "Subir foto" cuando esta vacio, o la foto recortada al circulo cuando ya hay
+// una; debajo va la ayuda.
 import { IconoCamara } from '../icons';
 
 export function ZonaFoto({

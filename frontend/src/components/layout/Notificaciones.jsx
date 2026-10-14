@@ -1,22 +1,6 @@
 // components/layout/Notificaciones.jsx
 // La campana: boton con el numero de avisos sin leer y, al pulsarlo, el panel
-// con las ultimas notificaciones de quien inicio sesion (cita agendada,
-// reprogramada o cancelada, mascota registrada, recordatorio del medico y
-// recordatorio previo a la cita). Es del cliente y del medico (Navbar); el
-// administrador y el superadministrador no tienen notificaciones.
-//
-// - Se actualiza sola cada minuto y al abrir el panel.
-// - Pulsar un aviso lo marca como leido y lleva a donde corresponde (onIr
-//   recibe el enlace, una ruta).
-// - "Marcar todas como leídas" limpia el contador.
-// - Se cierra con Escape o con un clic afuera.
-// - Lo no leido no se distingue solo por color: lleva un punto y negrita, y
-//   el boton anuncia el numero a los lectores de pantalla.
-// El panel es el mismo vidrio azul translucido del menu del perfil de la
-// pildora (pedido de Oriana). Se dibuja en <body> (portal), no dentro de la
-// pildora: ahi quedaria anidado en otro vidrio y el navegador solo
-// desenfocaria la pildora, no la pagina de atras. Por eso se ubica a mano,
-// debajo de la campana, y se reubica al desplazar o cambiar el tamaño.
+// con las ultimas notificaciones de quien inicio sesion.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { marcarNotificacionLeida, marcarNotificacionesLeidas, obtenerNotificaciones } from '../../api/client';
@@ -163,7 +147,7 @@ export function Notificaciones({ variante = 'pildora', onIr }) {
           aria-label="Notificaciones"
           // Mismo material del menu del perfil (Navbar): brand-blue-800 al
           // 50% con el fondo desenfocado y oscurecido.
-          className="fixed z-50 flex max-h-[min(32rem,calc(100vh-7rem))] w-[23rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden whitespace-normal rounded-superficie bg-brand-blue-800/50 text-left text-white shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5),inset_0_0_0_1px_rgb(203_213_225/0.2),inset_0_1px_0_rgb(226_232_240/0.3)] backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]"
+          className="fixed z-50 flex max-h-[min(32rem,calc(100dvh-7rem))] w-[23rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden whitespace-normal rounded-superficie bg-brand-blue-800/50 text-left text-white shadow-[0_12px_32px_-12px_rgb(6_51_138/0.5),inset_0_0_0_1px_rgb(203_213_225/0.2),inset_0_1px_0_rgb(226_232_240/0.3)] backdrop-blur-[24px] backdrop-saturate-150 backdrop-brightness-[.65]"
         >
           <div className="flex items-center justify-between gap-3 border-b border-white/15 px-5 py-3.5">
             <p className="font-heading text-base font-semibold">Notificaciones</p>

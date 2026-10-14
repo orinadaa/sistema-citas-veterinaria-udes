@@ -6,6 +6,8 @@
 export const EVENTO_SESION_TERMINADA = 'udes:sesion-terminada';
 export const EVENTO_TOKEN_RENOVADO = 'udes:token-renovado';
 
+export const ERROR_SIN_CONEXION = 'No hay conexión con el servidor. Revisa tu internet e inténtalo de nuevo.';
+
 // 401 en una peticion hecha CON token = el token ya no sirve (vencio, la
 // cuenta se desactivo o cambio la contraseña). El de la clave temporal
 // (CAMBIO_CLAVE_OBLIGATORIO) es un 403 y no pasa por aqui.
@@ -21,11 +23,17 @@ async function solicitar(ruta, { metodo = 'GET', cuerpo, token } = {}) {
     encabezados.Authorization = `Bearer ${token}`;
   }
 
-  const respuesta = await fetch(`/api${ruta}`, {
-    method: metodo,
-    headers: encabezados,
-    body: cuerpo ? JSON.stringify(cuerpo) : undefined,
-  });
+  let respuesta;
+  try {
+    respuesta = await fetch(`/api${ruta}`, {
+      method: metodo,
+      headers: encabezados,
+      body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+    });
+  } catch {
+    // fetch solo falla asi cuando no hay red o el servidor no responde.
+    throw new Error(ERROR_SIN_CONEXION);
+  }
 
   const datos = await respuesta.json().catch(() => ({}));
 
@@ -459,7 +467,7 @@ export function subirLogo(clave, archivo, token) {
   return subirArchivo(`/logos/${clave}`, archivo, token);
 }
 
-// Fotos que el administrador sube como archivo (antes eran un enlace).
+// Fotos que el administrador sube como archivo.
 export function subirFotoSede(id, archivo, token) {
   return subirArchivo(`/sedes/${id}/foto`, archivo, token);
 }

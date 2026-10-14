@@ -1,15 +1,6 @@
 // components/form/SelectorCategoria.jsx
-// Categoria de un servicio como botones (pedido de Oriana; reemplaza al
-// <select>): una pildora por categoria con su punto de color, el mismo
-// lenguaje de CategoryBadge que se ve en las tablas. Son pocas opciones
-// fijas, asi que se ven todas y se elige con un clic.
-//
-// Accesibilidad (igual que SelectorEspecieRaza):
-// - grupo de opciones (radiogroup): Tab entra a la elegida y las flechas
-//   cambian de categoria;
-// - la elegida no se distingue solo por el color: suma un check, borde
-//   mas grueso y texto en negrita;
-// - cada boton mide al menos 40px de alto.
+// Categoria de un servicio como botones: una pildora por categoria con su
+// punto de color, el mismo lenguaje de CategoryBadge que se ve en las tablas.
 import { useRef } from 'react';
 import { COLORES_CATEGORIA } from '../ui/CategoryBadge';
 import { IconoCheck } from '../icons';

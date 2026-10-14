@@ -1,19 +1,6 @@
 // components/medico/PanelMisCitasMedico.jsx
 // "Mis citas": pestaña de inicio de la vista del medico (/medico). Solo sus
 // citas (GET /api/administracion/citas ya las filtra por medico).
-// Presentacion vetUI, igual que la vista del cliente: va directo sobre el
-// fondo de marca, con los indicadores, el calendario y las tarjetas de la
-// derecha en vidrio blanco (TarjetaDato / Tarjeta) y los controles en
-// vidrio (Pestanas, boton-glass-claro). El titulo y "Agendar nueva cita" los
-// pone la pagina (PanelMedicoPage), junto a las pestañas.
-// - 4 KPIs reales: citas esta semana, citas hoy, proximas citas y
-//   pacientes (mascotas) atendidos este mes.
-// - Vistas Semana / Dia (mismo grid del admin, CalendarioSemanal) y
-//   Agenda (lista agrupada por dia de la semana visible).
-// - Columna derecha: mini calendario, citas de hoy y conteo real por
-//   categoria de servicio de la semana visible (colores de la BD).
-// "Agendar nueva cita" abre AgendarCitaMedicoPanel (cita con el mismo
-// medico, en su sede).
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { obtenerCitasAdministracion } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -290,9 +277,9 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
                 dueno: cita.cliente_nombre,
               })
             }
-            className="inline-flex w-full items-center justify-center gap-2 rounded-boton border border-brand-blue px-4 py-2.5 text-sm font-semibold text-brand-blue-600 transition hover:bg-blue-50"
+            className="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-boton border border-brand-blue px-4 py-2.5 text-sm font-semibold text-brand-blue-600 transition hover:bg-blue-50"
           >
-            <IconoCampana className="h-4 w-4" />
+            <IconoCampana className="h-4 w-4 shrink-0" />
             Crear recordatorio
           </button>
         )}

@@ -1,27 +1,5 @@
 // components/admin/NuevaCitaModal.jsx
-// "Nueva cita" del administrador en una ventana centrada (antes era un
-// panel lateral). Decisiones de Oriana: la base es el flujo de agendar del
-// CLIENTE (/agendar), no un formulario aparte, organizado en 3 pasos con
-// un stepper horizontal.
-//
-// Que se reutiliza del flujo del cliente, sin duplicarlo:
-// - PaginaMascotaServicio: las tarjetas de mascota y de servicio;
-// - DatePickerCalendar + TimeSlotPicker: calendario y horas disponibles;
-// - el patron de pasos (stepper, Atras / Continuar) y la confirmacion al
-//   salir con datos sin guardar (DialogoSalirAgendar).
-//
-// Que cambia frente al cliente, porque quien agenda es el administrador:
-// - Paso 1 empieza eligiendo el CLIENTE (el cliente agenda para si mismo);
-//   la mascota nueva se crea a nombre de ese cliente (NuevaMascotaRapida);
-// - no se elige sede: es la del administrador;
-// - el MEDICO lo elige el administrador entre los libres a esa hora
-//   (SelectorMedico); al cliente se le asigna solo.
-//
-// Pasos: 1. Cliente, mascota y servicio  2. Fecha, hora y medico
-//        3. Revisar y confirmar.
-//
-// Ventana: cristal de vetUI sobre el velo, z-[60], en <body> (portal).
-// Escape, la X o un clic afuera piden confirmar si ya hay algo elegido.
+// "Nueva cita" del administrador, en una ventana centrada.
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { agendarCita, obtenerMascotasDeCliente } from '../../api/client';
@@ -225,7 +203,7 @@ export function NuevaCitaModal({ abierto, onCerrar, onAgendada, clientes, servic
               <div className="flex flex-col gap-6">
                 <Superficie tono="blanco">
                   <TituloSeccion numero={1} titulo="Selecciona el cliente" descripcion="¿A nombre de quién es la cita?" />
-                  <div className="mt-5 grid gap-3 md:grid-cols-2">
+                  <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
                     <CampoBusqueda placeholder="Buscar cliente por nombre..." value={busquedaCliente} onChange={(e) => setBusquedaCliente(e.target.value)} />
                     <Desplegable
                       id="cliente-nueva-cita"
@@ -288,7 +266,7 @@ export function NuevaCitaModal({ abierto, onCerrar, onAgendada, clientes, servic
             )}
 
             {paso === 2 && (
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
                 <Superficie tono="blanco">
                   <TituloSeccion numero={1} titulo="Elige el día" />
                   <div className="mt-5">

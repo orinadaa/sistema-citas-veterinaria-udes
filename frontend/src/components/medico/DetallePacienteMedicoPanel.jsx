@@ -1,13 +1,5 @@
 // components/medico/DetallePacienteMedicoPanel.jsx
-// "Detalle del paciente" en el panel del medico. Misma estructura que la
-// version del admin (avatar de iniciales, estado, tabs Informacion /
-// Mascota(s) / Citas) con dos diferencias decididas por la usuaria:
-// - Los datos del dueño son de SOLO LECTURA (sin editar ni activar).
-// - "+ Agregar mascota" abre el mismo formulario embebido del admin
-//   (MascotasPaciente), para la mascota que llega en plena consulta.
-//   El medico edita datos de mascotas pero no las elimina.
-// `accionesMascota` pasa acciones extra al menu ⋮ de cada mascota
-// (ej. "Crear recordatorio").
+// "Detalle del paciente" en el panel del medico.
 import { useEffect, useState } from 'react';
 import { obtenerDetallePacienteMedico } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';

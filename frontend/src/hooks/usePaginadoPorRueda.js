@@ -1,18 +1,6 @@
 // hooks/usePaginadoPorRueda.js
-// Landing paginado: cada gesto de rueda del mouse (o del trackpad) lleva a
-// la seccion siguiente o anterior, como slides. Solo desde lg (pantallas
-// de computadora); en movil la pagina tiene scroll normal.
-//
-// El scroll snap de CSS (index.css, html.snap-landing) ya engancha cada
-// seccion para teclado, barra de scroll y enlaces, pero con la rueda un
-// gesto corto puede volver a la seccion actual en vez de avanzar, segun
-// el navegador y el dispositivo. Por eso la rueda se maneja aca:
-// - cada gesto mueve exactamente una seccion (scroll suave nativo);
-// - mientras la pagina se mueve, y hasta que el gesto termina (la inercia
-//   del trackpad sigue mandando eventos ~1s), los eventos se ignoran, asi
-//   un solo gesto nunca saltea secciones;
-// - Ctrl + rueda (zoom del navegador) no se toca.
-// Las secciones se marcan con el atributo data-slide.
+// Landing paginado: cada gesto de rueda del mouse (o del trackpad) lleva a la
+// seccion siguiente o anterior, como slides.
 import { useEffect } from 'react';
 
 const SILENCIO_FIN_GESTO_MS = 200;

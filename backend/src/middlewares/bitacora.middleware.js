@@ -2,13 +2,6 @@
 // Deja registro en la bitacora de las acciones que cambian la configuracion
 // del sistema o corrigen datos: quien (req.usuario), que accion, sobre que
 // registro y un resumen de lo que envio.
-//
-// Uso en una ruta, despues de verificar el rol:
-//   router.put('/:id', soloSuper, auditar('Editar sede', 'sede'), actualizar)
-//
-// Se escribe solo si la respuesta fue exitosa (2xx), y nunca hace fallar la
-// peticion: si la bitacora no se puede guardar, se avisa en la consola y la
-// accion sigue su curso.
 const bitacoraModel = require('../models/bitacora.model');
 
 // Nunca se guardan: contraseñas, codigos y tokens.

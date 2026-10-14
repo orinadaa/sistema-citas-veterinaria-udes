@@ -1,10 +1,7 @@
 // components/form/SelectorSexo.jsx
-// Segmented control Hembra / Macho (reemplaza al <select> de sexo). Lo
-// usan los formularios de mascota del admin (Detalle del paciente) y del
-// cliente (FormularioMascotaPanel).
-// Valores: 'hembra' | 'macho' | '' (sin elegir). Si no es requerido, un
-// clic sobre la opcion elegida la desmarca (equivale al "Selecciona" del
-// <select> que reemplaza).
+// Segmented control Hembra / Macho (reemplaza al <select> de sexo). Lo usan
+// los formularios de mascota del admin (Detalle del paciente) y del cliente
+// (FormularioMascotaPanel).
 import { IconoHembra, IconoMacho } from '../icons';
 
 const OPCIONES = [

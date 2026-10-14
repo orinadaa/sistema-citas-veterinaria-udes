@@ -50,17 +50,19 @@ async function crearPersonal({ nombreCompleto, correo, contrasenaHash, rol, sede
   return resultado.rows[0];
 }
 
-// Busqueda de clientes activos por nombre, correo o telefono (el medico
-// busca al dueño al agendar una cita). Maximo 10 resultados.
-async function buscarClientes(termino) {
+// Busqueda de clientes activos por nombre, correo o telefono, limitada a
+// los pacientes del medico (quienes tienen o tuvieron una cita con el).
+// Maximo 10 resultados.
+async function buscarClientes(termino, medicoId) {
   const resultado = await pool.query(
-    `SELECT id, nombre_completo, correo, telefono
-     FROM usuario
-     WHERE rol = 'cliente' AND activo
-       AND (nombre_completo ILIKE '%' || $1 || '%' OR correo ILIKE '%' || $1 || '%' OR telefono ILIKE '%' || $1 || '%')
-     ORDER BY nombre_completo
+    `SELECT u.id, u.nombre_completo, u.correo, u.telefono
+     FROM usuario u
+     WHERE u.rol = 'cliente' AND u.activo
+       AND (u.nombre_completo ILIKE '%' || $1 || '%' OR u.correo ILIKE '%' || $1 || '%' OR u.telefono ILIKE '%' || $1 || '%')
+       AND EXISTS (SELECT 1 FROM cita c WHERE c.cliente_id = u.id AND c.medico_id = $2)
+     ORDER BY u.nombre_completo
      LIMIT 10`,
-    [termino]
+    [termino, medicoId]
   );
   return resultado.rows;
 }

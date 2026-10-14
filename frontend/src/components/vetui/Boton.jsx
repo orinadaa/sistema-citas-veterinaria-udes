@@ -1,15 +1,6 @@
 // components/vetui/Boton.jsx
-// Botón de vetUI. La jerarquía va por variante, no por tamaño:
-//   primario      ámbar glass. La acción principal de la pantalla (una
-//                 sola por vista: Agendar cita, Continuar, Guardar).
-//   secundario    vidrio claro. Acciones secundarias sobre fondo oscuro.
-//   inverso       blanco glass. La principal sobre una banda azul.
-//   contorno      borde azul. Secundaria sobre cristal (superficie clara).
-//   peligro       rojo translúcido. Salir/cancelar sobre fondo oscuro.
-//   peligro-claro borde rojo. Salir/cancelar sobre cristal.
-//   fantasma      solo texto, para acciones terciarias.
-// `as` permite usarlo como Link o <a> sin perder el estilo. `icono` va
-// antes del texto e `iconoFinal` después (ej. flecha de "Continuar").
+// Botón de vetUI. La jerarquía va por variante, no por tamaño: primario ámbar
+// glass.
 const VARIANTES = {
   primario: 'boton-glass-ambar text-slate-900',
   secundario: 'boton-glass-claro text-white',

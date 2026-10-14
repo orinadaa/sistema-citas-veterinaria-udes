@@ -1,8 +1,5 @@
 // components/agendar/PaginaMascotaServicio.jsx
 // Pagina 1 del flujo de agendamiento (hitos 1 y 2): mascota + servicio.
-// La tarjeta "+ Agregar mascota" abre el mismo SidePanel de "Mis
-// mascotas" (FormularioMascotaPanel), que AgendarCitaPage renderiza
-// fuera del contenido `inert`; la mascota nueva queda seleccionada.
 import { SelectableCard } from './SelectableCard';
 import { Seccion } from './Seccion';
 import { EstadoError, EstadoVacio, Esqueleto as Bloque } from '../vetui';
@@ -13,7 +10,7 @@ import { AvatarMascota } from '../cliente/AvatarMascota';
 
 function Esqueleto({ cantidad = 3 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: cantidad }, (_, i) => (
         <Bloque key={i} />
       ))}
@@ -47,7 +44,7 @@ export function PaginaMascotaServicio({
         {cargando ? (
           <Esqueleto />
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {mascotas.map((mascota) => (
               <SelectableCard
                 key={mascota.id}
@@ -85,7 +82,7 @@ export function PaginaMascotaServicio({
         ) : servicios.length === 0 ? (
           <EstadoVacio>No hay servicios disponibles en este momento.</EstadoVacio>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {servicios.map((servicio) => {
               const Icono = iconoDeServicio(servicio.nombre);
               return (

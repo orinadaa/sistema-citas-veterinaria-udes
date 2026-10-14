@@ -1,18 +1,30 @@
 // components/ui/StatusToggle.jsx
-// Toggle estandar de "activo/inactivo" en todo el sistema: verde
-// encendido, gris apagado (decision de diseno, ver el alcance del proyecto/mockups:
-// se estandariza en verde para evitar el azul, que queda solo para
-// elementos interactivos/de navegacion).
-export function StatusToggle({ checked, onChange, label, helpText, disabled = false }) {
+// Toggle estandar de "activo/inactivo" en todo el sistema: verde encendido,
+// gris apagado.
+import { useState } from 'react';
+
+export function StatusToggle({ checked, onChange, label, helpText, disabled = false, ariaLabel = 'Activo' }) {
+  // Si el cambio se guarda en el servidor y falla, se dice aqui mismo.
+  const [fallo, setFallo] = useState('');
+  async function cambiar() {
+    setFallo('');
+    try {
+      await onChange(!checked);
+    } catch (err) {
+      setFallo(err?.message || 'No se pudo guardar el cambio.');
+    }
+  }
+
   return (
     <label className={`flex items-center gap-3 ${disabled ? 'opacity-60' : 'cursor-pointer'}`}>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-label={label ? undefined : ariaLabel}
         disabled={disabled}
-        onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+        onClick={cambiar}
+        className={`relative h-6 w-11 shrink-0 rounded-full transition before:absolute before:-inset-2.5 before:content-[''] ${
           checked ? 'bg-brand-green' : 'bg-slate-300'
         }`}
       >
@@ -22,10 +34,15 @@ export function StatusToggle({ checked, onChange, label, helpText, disabled = fa
           }`}
         />
       </button>
-      {(label || helpText) && (
+      {(label || helpText || fallo) && (
         <span className="flex flex-col">
           {label && <span className="text-sm font-medium text-slate-700">{label}</span>}
           {helpText && <span className="text-xs text-slate-400">{helpText}</span>}
+          {fallo && (
+            <span role="alert" className="text-xs font-medium text-red-700">
+              {fallo}
+            </span>
+          )}
         </span>
       )}
     </label>

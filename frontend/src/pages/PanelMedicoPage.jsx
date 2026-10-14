@@ -1,17 +1,5 @@
 // pages/PanelMedicoPage.jsx
-// Vista del medico veterinario (/medico y /medico/perfil). Decisiones de
-// Oriana: el medico deja el panel tipo dashboard de /admin (que queda solo
-// para el administrador de sede y el superadministrador) y pasa a una
-// pagina con la MISMA estructura que la del cliente (PanelClientePage):
-// fondo de marca a pagina completa, barra flotante en pildora (Navbar),
-// encabezado con saludo y pestañas de vidrio.
-// - Dos pestañas: "Mis citas" y "Mis pacientes" (?tab=pacientes).
-// - "Mi perfil" NO es una pestaña: se abre desde el menu del avatar de la
-//   pildora y vive en /medico/perfil (seccion="perfil"), con sus tres
-//   secciones de siempre.
-// - Los indicadores son los de cada pestaña (no hay una fila fija arriba).
-// Es un cambio de presentacion: lo que el medico puede hacer y el servidor
-// no cambian.
+// Vista del medico veterinario (/medico y /medico/perfil).
 import { useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';

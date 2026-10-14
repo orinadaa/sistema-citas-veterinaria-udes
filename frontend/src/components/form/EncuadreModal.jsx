@@ -1,20 +1,6 @@
 // components/form/EncuadreModal.jsx
 // Ventana "Ajustar foto" para las fotos rectangulares que el sitio recorta
-// (hoy: la foto de un servicio). Saca del formulario lo que la mayoria no
-// necesita tocar: el encuadre (que parte debe verse siempre) y la
-// descripcion de la foto. En el panel solo queda la foto y un boton
-// "Ajustar foto"; quien quiera afinar abre esta ventana (divulgacion
-// progresiva: lo opcional y avanzado no ocupa el formulario).
-//
-// Misma forma que el editor de fotos circulares (FotoMascotaModal):
-// ventana centrada sobre un velo, titulo con X, cuerpo y pie con
-// Cancelar / accion principal. Trabaja sobre un borrador: nada cambia en
-// el formulario hasta "Aplicar"; Cancelar, la X, Escape o un clic afuera
-// lo descartan.
-//
-// z-[60]: por encima del SidePanel (z-50) desde el que se abre. Se monta
-// en <body> (portal) porque el panel usa transform, y un ancestro con
-// transform encerraria el position:fixed de la ventana dentro de el.
+// (hoy: la foto de un servicio).
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Campo } from './Campo';
@@ -87,7 +73,7 @@ export function EncuadreModal({
         </div>
 
         {src && (
-          <div className="grid flex-1 gap-6 overflow-y-auto p-6 md:grid-cols-[minmax(0,1fr)_240px]">
+          <div className="grid grid-cols-[minmax(0,1fr)] flex-1 gap-6 overflow-y-auto p-6 md:grid-cols-[minmax(0,1fr)_240px]">
             <SelectorEncuadre
               src={src}
               focoX={borrador.focoX}

@@ -13,15 +13,15 @@ const notificaciones = require('../services/notificaciones.service');
 // Mismo umbral que "frecuente" en Pacientes del administrador.
 const UMBRAL_FRECUENTE = 3;
 
-// GET /api/medico/clientes?busqueda=... — buscar al dueño al agendar.
-// Minimo 2 caracteres para no listar todos los clientes.
+// GET /api/medico/clientes?busqueda=... — buscar al dueño al agendar, solo
+// entre los pacientes del medico. Minimo 2 caracteres.
 async function buscarClientes(req, res, next) {
   try {
     const termino = String(req.query.busqueda || '').trim();
     if (termino.length < 2) {
       return res.status(200).json({ clientes: [] });
     }
-    const clientes = await usuarioModel.buscarClientes(termino);
+    const clientes = await usuarioModel.buscarClientes(termino, req.usuario.id);
     return res.status(200).json({ clientes });
   } catch (error) {
     next(error);

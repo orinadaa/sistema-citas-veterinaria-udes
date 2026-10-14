@@ -1,11 +1,6 @@
 // components/landing/HalosAmbientales.jsx
 // Halos de Sedes y Horarios, mismo lenguaje que
-// FondoAmbientalHero/FondoAmbientalServicios. La base es el degradado
-// continuo del landing (LandingPage.jsx); aca solo van los halos.
-// La capa se extiende un 15% por encima y por debajo de la seccion para
-// mezclarse con las vecinas, con mask-image en esos tramos (sin bordes
-// rectos). Los halos van lejos de la esquina superior izquierda, donde
-// esta el encabezado de cada seccion.
+// FondoAmbientalHero/FondoAmbientalServicios.
 const color = (token, porcentaje) => `color-mix(in oklab, var(--color-${token}) ${porcentaje}%, transparent)`;
 
 const VARIANTES = {

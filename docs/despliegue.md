@@ -24,7 +24,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO citas_udes;
 
 En `backend/.env`: `DB_USER=citas_udes` y, si la base está en otro servidor, `DB_SSL=true`.
 
-La copia de seguridad desde el panel (Datos) usa `pg_dump` con ese mismo usuario. Además conviene programar copias automáticas en el servidor de base de datos y guardarlas cifradas.
+La copia de seguridad desde el panel (Datos) usa `pg_dump` con ese mismo usuario. El archivo que entrega no va cifrado y contiene datos personales y las contraseñas cifradas: debe guardarse cifrado, fuera de equipos de uso común, y eliminarse cuando deje de hacer falta. Además conviene programar copias automáticas en el servidor de base de datos y guardarlas cifradas.
 
 ## Servidor (backend)
 

@@ -1,14 +1,9 @@
 // components/layout/AdminHeader.jsx
-// Barra superior del panel administrativo: buscador global +
-// notificaciones + avatar/nombre/rol. Las notificaciones siguen siendo
-// un placeholder visual (no hay backend de notificaciones en este
-// incremento). El buscador si es funcional: busca en Servicios,
-// Médicos y Pacientes (las 3 listas administrables con filtro de
-// nombre); al elegir un resultado cambia a esa pestaña del sidebar y
-// precarga el filtro de esa pantalla con el termino buscado. (El medico
-// veterinario ya no usa este panel: su vista es /medico.)
+// Barra superior del panel administrativo: buscador global + notificaciones +
+// avatar/nombre/rol.
 import { useEffect, useRef, useState } from 'react';
-import { IconoBuscar, IconoChevronAbajo, IconoJeringa, IconoMedicos, IconoPersona, IconoSalir, IconoSede } from '../icons';
+import { IconoBuscar, IconoChevronAbajo, IconoMedicos, IconoPersona, IconoSalir, IconoSede } from '../icons';
+import { iconoDeServicio } from '../../utils/iconoServicio';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../../context/AuthContext';
 import { obtenerServiciosAdmin, obtenerMedicosAdmin, obtenerPacientes, obtenerSedesAdmin, obtenerUsuarios } from '../../api/client';
 
@@ -146,10 +141,11 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
       )}
 
       <div ref={contenedorRef} className={`relative max-w-md flex-1 ${vistaPreviaAbierta ? 'z-50' : ''}`}>
-        <div className="vidrio flex h-[52px] items-center gap-2.5 rounded-boton px-5 text-white">
+        <label className="vidrio flex h-[52px] cursor-text items-center gap-2.5 rounded-boton px-5 text-white">
           <IconoBuscar className="h-4 w-4 shrink-0" />
           <input
             type="search"
+            aria-label={esSuper ? 'Buscar usuario, sede o servicio' : 'Buscar paciente, médico o servicio'}
             value={termino}
             onChange={(evento) => {
               setTermino(evento.target.value);
@@ -162,9 +158,9 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
             }}
             disabled={!buscadorActivo}
             placeholder={esSuper ? 'Buscar usuario, sede o servicio...' : 'Buscar paciente, médico o servicio...'}
-            className="w-full bg-transparent text-sm font-medium text-white placeholder:text-white/80 focus:outline-none disabled:cursor-not-allowed"
+            className="h-full w-full min-w-0 bg-transparent text-sm font-medium text-white placeholder:text-white/80 focus:outline-none disabled:cursor-not-allowed"
           />
-        </div>
+        </label>
 
         {vistaPreviaAbierta && (
           <div className="vidrio vidrio-hoja absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-superficie p-2">
@@ -246,17 +242,20 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
             {!buscando && resultados.servicios.length > 0 && (
               <div>
                 <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-white/75">Servicios</p>
-                {resultados.servicios.map((s) => (
+                {resultados.servicios.map((s) => {
+                  const IconoServicio = iconoDeServicio(s.nombre);
+                  return (
                   <button
                     key={s.id}
                     type="button"
                     onClick={() => seleccionarResultado('servicios', s.nombre)}
                     className="flex w-full items-center gap-2.5 rounded-boton px-4 py-2 text-left text-sm font-medium text-white transition hover:bg-white/15"
                   >
-                    <IconoJeringa className="h-4 w-4 shrink-0 text-brand-amber-400" />
+                    <IconoServicio className="h-4 w-4 shrink-0 text-brand-amber-400" />
                     {s.nombre}
                   </button>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -274,6 +273,9 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
               setDropdownAbierto(false);
               setMenuAbierto((v) => !v);
             }}
+            aria-haspopup="menu"
+            aria-expanded={menuAbierto}
+            aria-label={`Cuenta de ${usuario?.nombreCompleto ?? 'usuario'}`}
             className={`relative z-10 flex h-[52px] items-center gap-2.5 rounded-boton pl-2 pr-4 transition ${menuAbierto ? '' : 'vidrio'}`}
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/25 text-xs font-semibold text-white">
@@ -292,15 +294,20 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
               la misma pieza: texto blanco, icono rojo bajo el avatar y fondo
               rojizo al pasar el cursor. */}
           {menuAbierto && (
-            <div className="vidrio vidrio-hoja absolute inset-x-0 top-0 overflow-hidden rounded-[26px]">
-              <div aria-hidden="true" className="h-[52px]" />
+            <div className="vidrio vidrio-hoja absolute right-0 top-0 w-[min(17rem,calc(100vw-1.5rem))] overflow-hidden rounded-[26px] sm:inset-x-0 sm:w-auto">
+              {/* En telefono el boton solo muestra el avatar: el nombre y el rol van aqui. */}
+              <div className="flex h-[52px] flex-col justify-center pl-[1.125rem] pr-24 sm:hidden">
+                <span className="truncate text-sm font-semibold text-white">{usuario?.nombreCompleto}</span>
+                <span className="truncate text-xs text-white/85">{ETIQUETA_ROL[usuario?.rol] ?? usuario?.rol}</span>
+              </div>
+              <div aria-hidden="true" className="hidden h-[52px] sm:block" />
               <button
                 type="button"
                 onClick={() => {
                   setMenuAbierto(false);
                   onMiCuenta?.();
                 }}
-                className="hover-texto-ilumina relative block w-full border-t border-white/10 py-2.5 pl-[3.375rem] pr-4 text-left text-sm font-medium text-white transition hover:bg-white/10"
+                className="hover-texto-ilumina relative block min-h-11 w-full whitespace-nowrap border-t border-white/10 py-2.5 pl-[3.375rem] pr-4 text-left text-sm font-medium text-white transition hover:bg-white/10"
               >
                 <IconoPersona className="absolute left-[1.125rem] top-1/2 h-4 w-4 -translate-y-1/2" />
                 Mi cuenta
@@ -308,7 +315,7 @@ export function AdminHeader({ onNavegar, onMiCuenta }) {
               <button
                 type="button"
                 onClick={salir}
-                className="hover-texto-ilumina relative block w-full border-t border-white/10 py-2.5 pl-[3.375rem] pr-4 text-left text-sm font-medium text-white transition hover:bg-red-500/25"
+                className="hover-texto-ilumina relative block min-h-11 w-full whitespace-nowrap border-t border-white/10 py-2.5 pl-[3.375rem] pr-4 text-left text-sm font-medium text-white transition hover:bg-red-500/25"
               >
                 <IconoSalir className="absolute left-[1.125rem] top-1/2 h-4 w-4 -translate-y-1/2 text-red-300" />
                 Cerrar sesión

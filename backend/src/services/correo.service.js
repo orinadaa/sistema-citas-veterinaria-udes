@@ -1,10 +1,6 @@
 // services/correo.service.js
-// Envio de correos transaccionales (credenciales, bienvenida, recuperacion
-// de clave) via SMTP real (Gmail + contraseña de aplicacion). Es una
-// excepcion consciente a "sin integraciones con sistemas externos"
-// (alcance del proyecto), acordada explicitamente con la directora del proyecto para
-// que las credenciales y los codigos de recuperacion lleguen de verdad al
-// correo del usuario.
+// Envio de correos transaccionales (credenciales, bienvenida, recuperacion de
+// clave) via SMTP real (Gmail + contraseña de aplicacion).
 const nodemailer = require('nodemailer');
 
 let transportador = null;
@@ -119,10 +115,8 @@ const formatoFechaCita = new Intl.DateTimeFormat('es-CO', {
   hour12: true,
 });
 
-// Confirmacion de una cita recien agendada (parte de confirmacion de
-// RF-17, adelantada al flujo de agendamiento del incremento 4; el
-// recordatorio de 24 horas antes, RF-18, sigue pendiente para el
-// incremento 5). `cita` es la fila de cita.model.js#buscarDetallePorId.
+// Confirmacion de una cita recien agendada (RF-17). `cita` es la fila de
+// cita.model.js#buscarDetallePorId.
 async function enviarConfirmacionCita(cita) {
   const lineas = [
     `Hola ${cita.cliente_nombre},`,
@@ -190,8 +184,7 @@ const ETIQUETA_TIPO_RECORDATORIO = {
 };
 
 // Recordatorio creado por el medico para una mascota: se avisa al
-// dueño en el momento de crearlo (el envio automatico el mismo dia es
-// del modulo de notificaciones, incremento 5).
+// dueño en el momento de crearlo.
 async function enviarRecordatorioCreado({ correo, nombreCliente, nombreMascota, nombreMedico, tipo, titulo, descripcion, fechaTexto, hora }) {
   const lineas = [
     `Hola ${nombreCliente},`,

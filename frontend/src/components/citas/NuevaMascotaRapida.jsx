@@ -1,9 +1,6 @@
 // components/citas/NuevaMascotaRapida.jsx
-// Alta rapida de una mascota mientras el administrador agenda una cita
-// para un cliente (NuevaCitaModal): nombre, especie y raza; el resto del
-// perfil se completa despues en la ficha del paciente. Crea la mascota a nombre del cliente indicado y
-// avisa con onCreada(mascota) para dejarla elegida.
-// (Reemplaza al alta que traia el antiguo MascotaSelector.)
+// Alta rapida de una mascota mientras el administrador agenda una cita para un
+// cliente (NuevaCitaModal): nombre, especie y raza.
 import { useState } from 'react';
 import { crearMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';

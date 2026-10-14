@@ -1,19 +1,11 @@
 // scripts/crearSuperadmin.js
-// Crea la cuenta del superadministrador. Es un paso manual y deliberado: el
-// rol no se puede asignar desde el sistema (ver usuario.controller.js), asi
-// nadie se lo otorga por error desde una pantalla.
-//
-// Uso (desde backend/):
-//   SUPERADMIN_CORREO=correo@udes.edu.co SUPERADMIN_CONTRASENA=Temporal123 npm run crear:superadmin
-// Opcional: SUPERADMIN_NOMBRE (por defecto "Superadministrador UDES").
-//
-// No toca ninguna cuenta existente: si el correo ya esta registrado, avisa
-// y no hace nada. El superadministrador no pertenece a una sede.
+// Crea la cuenta del superadministrador.
 
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const { pool } = require('../config/db');
 const { buscarPorCorreo, crearPersonal } = require('../models/usuario.model');
+const { errorContrasena } = require('../utils/contrasena.util');
 
 const RONDAS_SAL = 10;
 
@@ -26,8 +18,10 @@ async function crearSuperadmin() {
     if (!correo || !contrasena) {
       throw new Error('Faltan SUPERADMIN_CORREO y SUPERADMIN_CONTRASENA.');
     }
-    if (contrasena.length < 8) {
-      throw new Error('La contraseña debe tener al menos 8 caracteres.');
+    // La misma regla que el registro y el cambio de contraseña.
+    const problema = errorContrasena(contrasena, correo);
+    if (problema) {
+      throw new Error(problema);
     }
 
     const existente = await buscarPorCorreo(correo);

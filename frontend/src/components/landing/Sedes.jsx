@@ -1,11 +1,6 @@
 // components/landing/Sedes.jsx
-// RF-03: informacion publica de sedes, obtenida del endpoint real
-// GET /api/sedes. La foto de cada sede es la que el admin configuro
-// (sede.foto_url, ver panel de Sedes) — no existe un banco de fotos
-// reales de los edificios en identidad de marca, asi que se usa un
-// placeholder con el icono de ubicacion mientras el admin no cargue una.
-// La tarjeta muestra solo nombre y ciudad/direccion (el horario completo
-// esta en la seccion Horarios, justo despues): la foto ocupa casi todo.
+// RF-03: informacion publica de sedes, obtenida del endpoint real GET
+// /api/sedes.
 import { useEffect, useState } from 'react';
 import { obtenerSedes } from '../../api/client';
 import { IconoUbicacion, IconoAlerta, IconoSede, IconoFlechaDerecha } from '../icons';
@@ -20,6 +15,7 @@ const ESTADOS = { CARGANDO: 'cargando', LISTO: 'listo', ERROR: 'error' };
 export function Sedes() {
   const [estado, setEstado] = useState(ESTADOS.CARGANDO);
   const [sedes, setSedes] = useState([]);
+  const [intento, setIntento] = useState(0);
 
   useEffect(() => {
     obtenerSedes()
@@ -28,7 +24,7 @@ export function Sedes() {
         setEstado(ESTADOS.LISTO);
       })
       .catch(() => setEstado(ESTADOS.ERROR));
-  }, []);
+  }, [intento]);
 
   return (
     // Sin fondo propio: va sobre el degradado continuo del landing.
@@ -45,7 +41,7 @@ export function Sedes() {
           </Revelar>
 
           {estado === ESTADOS.CARGANDO && (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2">
+            <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-6 sm:grid-cols-2">
               {[0, 1].map((clave) => (
                 <div key={clave} className="h-[26rem] animate-pulse rounded-2xl bg-white/10" />
               ))}
@@ -53,16 +49,20 @@ export function Sedes() {
           )}
 
           {estado === ESTADOS.ERROR && (
-            <div className="mt-10 flex items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
+            <div role="alert" className="mt-10 flex flex-wrap items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
               <IconoAlerta className="h-5 w-5 shrink-0" />
-              <p className="text-sm">
-                No pudimos cargar la información de las sedes en este momento. Intenta recargar la página.
-              </p>
+              <p className="text-sm">No pudimos cargar la información de las sedes en este momento.</p>
+              <button type="button" onClick={() => {
+                  setEstado(ESTADOS.CARGANDO);
+                  setIntento((v) => v + 1);
+                }} className="ml-auto shrink-0 rounded-boton border border-amber-400 px-3 py-1.5 text-sm font-semibold text-amber-900 transition hover:bg-amber-100">
+                Reintentar
+              </button>
             </div>
           )}
 
           {estado === ESTADOS.LISTO && (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2">
+            <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-6 sm:grid-cols-2">
               {sedes.map((sede, posicion) => {
                 return (
                   <Revelar key={sede.id} retraso={120 + posicion * 120}>

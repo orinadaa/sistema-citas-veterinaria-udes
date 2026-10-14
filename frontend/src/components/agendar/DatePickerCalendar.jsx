@@ -1,27 +1,7 @@
 // components/agendar/DatePickerCalendar.jsx
-// Calendario de mes, el unico del sistema para elegir una fecha: se usa
-// tal cual para la cita (agendar, reprogramar) y dentro de CampoFecha
-// para cualquier otro campo de fecha. Por defecto los dias pasados y los
-// dias en que la sede no atiende (sin fila en horario_atencion) quedan
-// deshabilitados; hoy se marca sutilmente; el dia elegido en azul
-// solido. Trabaja con fechas "YYYY-MM-DD" en hora local, el mismo
-// formato que espera GET /api/citas/disponibilidad.
-//
-// minimo / maximo ("YYYY-MM-DD"): limites elegibles. minimo sin pasar =
-// hoy (no se agenda en el pasado); minimo={null} = sin limite inferior
-// (fecha de nacimiento, reportes).
-//
-// marcas (opcional): { "YYYY-MM-DD": ['proxima', 'completada', ...] }. Dibuja
-// un punto de color por estado debajo del numero del dia (vista "Mis citas"
-// del cliente: que dias tienen cita). El color nunca va solo: el nombre
-// accesible del dia dice cuantas citas hay y de que estado.
-// permiteQuitar: un clic sobre el dia ya elegido lo desmarca (onChange('')).
-//
-// En todos los calendarios del sistema (pedido de Oriana) el mes y el año
-// del encabezado se pueden pulsar: el mes abre la grilla de los 12 meses
-// y el año una lista de años para recorrer, ademas de las flechas de mes.
-// No son <select>: se eligen dentro del mismo calendario, y lo que queda
-// fuera de los limites sale deshabilitado.
+// Calendario de mes, el unico del sistema para elegir una fecha: se usa tal
+// cual para la cita (agendar, reprogramar) y dentro de CampoFecha para
+// cualquier otro campo de fecha.
 import { useState } from 'react';
 import { aFechaLocal, desdeFechaLocal, esMismoDia, sumarDias } from '../../utils/fecha';
 import { IconoFlechaDerecha } from '../icons';
@@ -151,7 +131,7 @@ export function DatePickerCalendar({
     setMes(new Date(anio, indice, 1));
     setVista('dias');
   }
-  // Texto suelto, sin forma de boton (pedido de Oriana): el hover y el
+  // Texto suelto, sin forma de boton: el hover y el
   // estado abierto se marcan sobre el propio texto (color + subrayado).
   const claseEncabezado = (activa) =>
     `cursor-pointer rounded-sm font-heading text-base font-semibold underline-offset-4 transition-colors hover:[filter:none] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${activa ? t.encabezadoActivo : t.encabezado}`;

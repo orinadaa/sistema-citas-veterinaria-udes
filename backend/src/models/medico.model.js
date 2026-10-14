@@ -1,8 +1,5 @@
 // models/medico.model.js
-// "Medico" aqui es un usuario con rol 'veterinario'. RF-10/RF-11: el
-// administrador ve los medicos de su sede y administra su perfil
-// (documento, telefono, foto, biografia, especialidades, activo) y que
-// servicio presta cada uno (servicio_medico).
+// "Medico" aqui es un usuario con rol 'veterinario'.
 const { pool } = require('../config/db');
 
 // Medicos activos que prestan el servicio y atienden en esa sede (opcion
@@ -31,12 +28,12 @@ async function listarPorSedeYServicio(sedeId, servicioId, diaSemana = null) {
 async function listarFranjasOcupadas(medicoIds, inicio, fin) {
   if (medicoIds.length === 0) return [];
   const resultado = await pool.query(
-    // Con la duracion del servicio: una cita larga ocupa varias franjas, y
-    // una que empezo antes de `inicio` puede seguir ocupando al medico.
-    `SELECT c.medico_id, c.fecha_hora, sv.duracion_minutos
-     FROM cita c JOIN servicio sv ON sv.id = c.servicio_id
+    // Con la duracion guardada en la cita: una cita larga ocupa varias franjas,
+    // y una que empezo antes de `inicio` puede seguir ocupando al medico.
+    `SELECT c.medico_id, c.fecha_hora, c.duracion_minutos
+     FROM cita c
      WHERE c.medico_id = ANY($1::uuid[]) AND c.estado = 'agendada'
-       AND c.fecha_hora < $3 AND c.fecha_hora + GREATEST(sv.duracion_minutos, 30) * INTERVAL '1 minute' > $2`,
+       AND c.fecha_hora < $3 AND c.fecha_hora + GREATEST(c.duracion_minutos, 30) * INTERVAL '1 minute' > $2`,
     [medicoIds, inicio, fin]
   );
   return resultado.rows;

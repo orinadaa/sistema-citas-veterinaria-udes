@@ -1,11 +1,5 @@
 // pages/CrearClavePage.jsx
-// Primera entrada con clave temporal (/crear-clave). Las cuentas que crea
-// otra persona (el superadministrador crea administradores y medicos; el
-// administrador de sede crea medicos) nacen con una contraseña generada por
-// el sistema y enviada por correo. Por seguridad, antes de usar el sistema
-// la persona debe establecer aca su propia contraseña.
-// No es solo una pantalla: mientras no lo haga, el servidor rechaza todo lo
-// demas con ese inicio de sesion (ver backend, auth.middleware.js).
+// Primera entrada con clave temporal (/crear-clave).
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';

@@ -434,6 +434,7 @@ export function PanelMedicos({ busquedaInicial }) {
           )}
           <Campo
             id="telefono-medico"
+            inputMode="tel"
             label="Teléfono"
             value={form.telefono}
             onChange={(e) => setForm({ ...form, telefono: e.target.value })}

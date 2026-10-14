@@ -13,7 +13,7 @@ Pasos para dejar el sistema funcionando desde cero en un computador (entorno loc
 # Crear la base vacía
 psql -U postgres -c "CREATE DATABASE clinica_veterinaria_udes"
 
-# Estructura completa (21 tablas, índices y reglas)
+# Estructura completa (23 tablas, índices y reglas)
 psql -U postgres -d clinica_veterinaria_udes -f database/esquema.sql
 
 # Catálogos iniciales: sedes, horarios, categorías, servicios, especies y razas
@@ -22,7 +22,7 @@ psql -U postgres -d clinica_veterinaria_udes -f database/datos_iniciales.sql
 
 `database/esquema.sql` equivale a ejecutar en orden todos los `incremento_*.sql`, que se conservan solo como historial de cómo creció la base. No hace falta ejecutarlos.
 
-Si la base ya existía de antes, no uses `esquema.sql`: ejecuta solo los `incremento_*.sql` que falten. Los más recientes son `incremento_13a_seguridad_auditoria.sql`, `incremento_13b_verificacion_correo.sql` e `incremento_14a_logos.sql`.
+Si la base ya existía de antes, no uses `esquema.sql`: ejecuta solo los `incremento_*.sql` que falten. Los más recientes son `incremento_13a_seguridad_auditoria.sql`, `incremento_13b_verificacion_correo.sql`, `incremento_14a_logos.sql` e `incremento_15a_duracion_cita.sql`. Este último completa la duración de las citas que ya existían y es necesario en cualquier base creada antes del 13 de octubre de 2026.
 
 ## 2. Servidor (backend)
 

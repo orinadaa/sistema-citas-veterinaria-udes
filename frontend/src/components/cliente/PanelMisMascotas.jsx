@@ -1,10 +1,5 @@
 // components/cliente/PanelMisMascotas.jsx
-// Pestaña "Mis mascotas" del panel del cliente (cierra RF-14): antes
-// solo se podia agregar una mascota de forma inline al agendar una
-// cita (MascotaSelector.jsx); aqui se pueden ver todas y editarlas.
-// El formulario (SidePanel) vive en FormularioMascotaPanel.jsx, compartido
-// con el flujo de agendamiento. vetUI: cada mascota en una Tarjeta de
-// vidrio blanco (corta el azul del fondo); "Agregar mascota" es la accion primaria (ambar).
+// Pestaña "Mis mascotas" del panel del cliente (RF-14).
 import { useEffect, useState } from 'react';
 import { obtenerMisMascotas } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -65,7 +60,7 @@ export function PanelMisMascotas() {
       {aviso.texto && <Aviso tono={aviso.tipo === 'ok' ? 'ok' : 'alerta'}>{aviso.texto}</Aviso>}
 
       {cargando ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[0, 1].map((clave) => (
             <Esqueleto key={clave} className="h-64" />
           ))}
@@ -76,7 +71,7 @@ export function PanelMisMascotas() {
         <EstadoVacio>Aún no has registrado mascotas.</EstadoVacio>
       ) : (
         // Tarjetas verticales: foto grande arriba y datos centrados debajo.
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {mascotas.map((mascota) => (
             <Tarjeta key={mascota.id} material="blanco" className="flex flex-col items-center gap-4 p-6 text-center">
               <div className="flex w-full min-w-0 flex-col items-center gap-3">

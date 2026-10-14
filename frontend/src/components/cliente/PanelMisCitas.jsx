@@ -1,20 +1,6 @@
 // components/cliente/PanelMisCitas.jsx
-// Pestaña "Mis citas" del panel del cliente (RF-15, con reprogramar
-// RF-08 y cancelar RF-09 vía DetalleCitaPanel). Filtros por estado
-// como pills con conteo real -- nunca un numero inventado. Cada fila:
-// foto, mascota, fecha/hora, servicio/sede/medico, estado y "Ver
-// detalles" (especificacion final de la usuaria). vetUI: chips de vidrio
-// para filtrar, cada cita en una Tarjeta de vidrio blanco (corta el azul del
-// fondo; la proxima mas cercana con anillo ambar). La foto de la mascota va
-// grande, arriba del nombre y la raza.
-//
-// Lista + calendario (diseño elegido por Oriana): a la derecha un
-// calendario de mes con un punto de color en cada dia que tiene cita
-// (azul proxima, verde completada, rojo cancelada); tocar un dia deja en
-// la lista solo las citas de ese dia, y tocarlo otra vez (o "Ver todas
-// las fechas") quita el filtro. El filtro de dia se combina con el de
-// estado. La lista sigue siendo lo principal: ahi se abre el detalle. En
-// celular el calendario va arriba de la lista.
+// Pestaña "Mis citas" del panel del cliente (RF-15, con reprogramar RF-08 y
+// cancelar RF-09 vía DetalleCitaPanel).
 import { useMemo, useState } from 'react';
 import { aFechaLocal, desdeFechaLocal, formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { Boton, Chips, EstadoVacio, Esqueleto, Insignia, Superficie, Tarjeta } from '../vetui';
@@ -48,6 +34,8 @@ function idProximaMasCercana(citas) {
 export function PanelMisCitas({ citas, cargando, onActualizada }) {
   const [filtro, setFiltro] = useState('todas');
   const [citaDetalle, setCitaDetalle] = useState(null);
+  // Confirmacion de lo ultimo que se hizo desde el detalle (cancelar, reprogramar).
+  const [aviso, setAviso] = useState('');
   // Dia elegido en el calendario ("YYYY-MM-DD"), o '' = todas las fechas.
   const [dia, setDia] = useState('');
 
@@ -97,7 +85,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
         onCambiar={setFiltro}
       />
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         {/* Calendario: a la derecha de las citas (pedido de Oriana) y a la
             vista mientras se recorre la lista. En el codigo va primero para
             que en celular quede arriba; lg:order-2 lo pasa a la derecha. */}
@@ -115,6 +103,11 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
         </Superficie>
 
         <div className="flex min-w-0 flex-col gap-3">
+          {aviso && (
+            <p role="status" className="vidrio rounded-tarjeta px-4 py-2.5 text-sm font-medium text-white">
+              {aviso}
+            </p>
+          )}
           {dia && (
             <div className="vidrio flex flex-wrap items-center justify-between gap-2 rounded-tarjeta px-4 py-2.5">
               <p role="status" className="text-sm font-medium text-white">
@@ -208,8 +201,9 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
     <DetalleCitaPanel
       cita={citaDetalle}
       onClose={() => setCitaDetalle(null)}
-      onActualizada={() => {
+      onActualizada={(mensaje) => {
         onActualizada();
+        setAviso(typeof mensaje === 'string' ? mensaje : '');
         setCitaDetalle(null);
       }}
     />

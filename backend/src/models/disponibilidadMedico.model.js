@@ -1,7 +1,6 @@
 // models/disponibilidadMedico.model.js
-// Horario propio por medico y sede + bloqueos (opcion A, ver
-// database/incremento_5c_disponibilidad_medico.sql y
-// utils/disponibilidadMedico.js para la regla).
+// Horario propio por medico y sede, y sus bloqueos. La regla esta en
+// utils/disponibilidadMedico.js.
 const { pool } = require('../config/db');
 const { fechaLocalISO } = require('../utils/disponibilidadMedico');
 

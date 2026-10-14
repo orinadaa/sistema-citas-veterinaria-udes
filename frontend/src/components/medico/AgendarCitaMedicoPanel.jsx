@@ -1,18 +1,6 @@
 // components/medico/AgendarCitaMedicoPanel.jsx
 // SidePanel "Agendar nueva cita" del medico veterinario, a nombre de un
-// cliente. La cita queda SIEMPRE con este medico y en su sede (el
-// backend lo fuerza). 4 pasos dentro del panel:
-//   1. Paciente y mascota (buscador de dueño + mascota de ese dueño)
-//   2. Servicio (solo los que presta este medico)
-//   3. Fecha y hora: el mismo calendario + horas libres de /agendar,
-//      con la disponibilidad de ESTE medico (GET /api/citas/disponibilidad
-//      con medicoId) -- no un input libre, asi no se agenda en una hora
-//      ocupada (decision de la usuaria).
-//   4. Confirmar
-// "Notas adicionales" se guarda como el motivo de la cita (lo que el
-// cliente ve como "Motivo de la consulta").
-// pacienteInicial (opcional): abre con ese dueño ya elegido (boton
-// "Agendar" de Mis pacientes).
+// cliente.
 import { useEffect, useState } from 'react';
 import {
   agendarCita,
@@ -275,7 +263,7 @@ export function AgendarCitaMedicoPanel({ isOpen, onClose, onAgendada, pacienteIn
                       {buscando ? (
                         <p className="px-3 py-2 text-sm text-slate-400">Buscando...</p>
                       ) : clientesEncontrados.length === 0 ? (
-                        <p className="px-3 py-2 text-sm text-slate-400">No hay pacientes con &quot;{termino}&quot;.</p>
+                        <p className="px-3 py-2 text-sm text-slate-400">No hay pacientes tuyos con &quot;{termino}&quot;. A un cliente nuevo lo agenda la sede.</p>
                       ) : (
                         clientesEncontrados.map((c) => (
                           <button

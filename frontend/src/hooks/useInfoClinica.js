@@ -1,8 +1,6 @@
 // hooks/useInfoClinica.js
 // Informacion general de la clinica (RF-23) para la pagina publica: el
-// WhatsApp de la burbuja y las redes del pie de pagina. Se pide una vez por
-// visita y se comparte (cache en memoria). Mientras carga, o si el servidor
-// no responde, devuelve null: la burbuja y las redes simplemente no salen.
+// WhatsApp de la burbuja y las redes del pie de pagina.
 import { useEffect, useState } from 'react';
 import { obtenerInfoClinica } from '../api/client';
 
