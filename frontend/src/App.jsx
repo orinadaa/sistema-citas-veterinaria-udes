@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
 import { ROLES_DEL_PANEL } from './utils/rutas';
 import { BarraPagina } from './components/layout/BarraPagina';
+import { AvisoAmbientePruebas } from './components/layout/AvisoAmbientePruebas';
 
 // Cada pantalla se descarga cuando se visita (antes todo iba en un solo
 // archivo de 2,7 MB que tambien cargaba quien solo veia el inicio). El
@@ -91,6 +92,7 @@ function Rutas() {
   return (
     <>
     {state?.aviso && <AvisoDeRuta key={key} texto={state.aviso} />}
+    <AvisoAmbientePruebas />
     <div role="region" aria-label="Atajo de teclado">
       <button
         type="button"

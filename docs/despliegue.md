@@ -67,6 +67,14 @@ Referrer-Policy: strict-origin-when-cross-origin
 
 `img-src https:` hace falta mientras las fotos de las sedes vengan de otros sitios. Con fotos propias se puede quitar.
 
+## Ambiente de pruebas
+
+Un ambiente de pruebas es una copia publicada que sirve para revisar la plataforma sin afectar la de producción. Se diferencia en tres cosas:
+
+- **Aviso visible:** compilar con `VITE_AMBIENTE=pruebas` (por ejemplo, con un archivo `frontend/.env.production.local` que tenga esa línea). Aparece una marca fija abajo a la izquierda que dice "Ambiente de pruebas". Sin la variable no aparece.
+- **Fuera de los buscadores:** Nginx responde `/robots.txt` con `Disallow: /` y envía la cabecera `X-Robots-Tag: noindex, nofollow` en todas las respuestas.
+- **Datos que se pueden perder:** antes de una ronda de pruebas se saca una copia de la base (`pg_dump -Fc`) para poder volver al estado anterior.
+
 ## Buscadores
 
 - `frontend/public/robots.txt` ya bloquea las rutas privadas. Al tener dominio, agregar la línea `Sitemap:` y crear `sitemap.xml` con la dirección de la página de inicio.
