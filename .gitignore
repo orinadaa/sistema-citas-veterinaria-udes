@@ -20,6 +20,4 @@ npm-debug.log*
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# Demostracion sin servidor (se genera con frontend/demo/publicar.mjs)
-frontend/dist-demo/
 frontend/demo/uploads/

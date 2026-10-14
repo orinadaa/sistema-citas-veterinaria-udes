@@ -74,7 +74,7 @@ Las pruebas del servidor usan modelos simulados, así que no necesitan la base d
 | Documento | Contenido |
 |---|---|
 | [docs/instalacion.md](docs/instalacion.md) | Instalación desde cero en un equipo |
-| [docs/despliegue.md](docs/despliegue.md) | Qué hacer para publicar el sistema y demostración sin servidor |
+| [docs/despliegue.md](docs/despliegue.md) | Qué hacer para publicar el sistema |
 | [docs/roles_superadministrador.md](docs/roles_superadministrador.md) | Perfiles administrativos, catálogos y módulo de datos |
 | [docs/notas_de_implementacion.md](docs/notas_de_implementacion.md) | Explicación ampliada de cada archivo y de sus decisiones de diseño |
 | [docs/vetui.md](docs/vetui.md) | Guía de componentes de la interfaz |

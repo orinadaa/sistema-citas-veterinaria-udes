@@ -219,16 +219,6 @@ Estado vigente de una cuenta, leido de la base en cada peticion con sesion (auth
 
 Validaciones compartidas de datos que escribe una persona. Devuelven el mensaje del problema (para responder 400) o null si el dato sirve. Antes varios de estos datos llegaban sin revisar hasta la base, que respondia con un error 500.
 
-## frontend/demo
-
-### `grabar.mjs`
-
-Graba las respuestas de lectura de la API que usa cada pantalla, para la demostracion sin servidor (GitHub Pages). Recorre la plataforma SOLO MIRANDO con las cuentas de ejemplo (@demo.udes.co): no guarda, cancela ni borra. Antes de escribir el archivo reemplaza los datos de las cuentas que NO son de ejemplo (nombre, correo, telefono, documento, foto) por datos ficticios. Requiere el frontend (5173) y el backend encendidos. uso: node demo/grabar.mjs (desde frontend/)
-
-### `publicar.mjs`
-
-Compila la demostracion sin servidor y la deja lista en frontend/dist-demo para GitHub Pages. Antes hay que grabar los datos: node demo/grabar.mjs uso: node demo/publicar.mjs nombre-del-repositorio (desde frontend/) node demo/publicar.mjs nombre-del-repositorio --servir (ademas la sirve en http://localhost:4173 para probarla)
-
 ## frontend/src/components
 
 ### `AccentBar.jsx`
@@ -889,15 +879,6 @@ Lo que se abre encima de la página, en cristal fuerte sobre un velo azul difumi
 ### `Textos.jsx`
 
 Encabezados de vetUI (escala tipográfica, Raleway): EncabezadoPagina antetítulo + h1 + descripción, sobre el fondo. `acciones` a la derecha, `imagen` decorativa. `agrupado`: texto e imagen forman un solo bloque centrado en la pagina (en vez de texto a la izquierda e imagen contra el borde derecho). TituloSeccion h2 de una Superficie (vidrio), con número de paso opcional. Sobre fondo oscuro el texto es blanco (títulos) y blue-50/blue-100 (cuerpo): ambos en AA sobre vidrio y fondo.
-
-## frontend/src/demo
-
-### `activar.js`
-
-Demostracion sin servidor (GitHub Pages). Solo entra en la compilacion de demostracion (VITE_DEMO=1, ver vite.config.js y main.demo.jsx): la plataforma normal no carga este archivo.
-- Responde las peticiones a /api con las lecturas grabadas en datos.json (frontend/demo/grabar.mjs). Nada se guarda: toda escritura responde con un aviso.
-- Fija el reloj en el momento de la grabacion, para que las citas de ejemplo sigan cayendo en "esta semana".
-- Muestra un aviso con las cuentas de ejemplo.
 
 ## frontend/src/hooks
 

@@ -174,7 +174,7 @@ function Rutas() {
 // Router "de datos" con una sola ruta comodin que contiene las <Routes> de
 // siempre: es lo que permite frenar una navegacion con useBlocker (ver
 // AgendarCitaPage: confirmar antes de abandonar una cita a medio agendar).
-// basename: carpeta desde la que se sirve la pagina ("/" salvo en la demostracion de GitHub Pages).
+// basename: carpeta desde la que se sirve la pagina ("/" por defecto).
 const router = createBrowserRouter([{ path: '*', element: <Rutas /> }], { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/' });
 
 function App() {
