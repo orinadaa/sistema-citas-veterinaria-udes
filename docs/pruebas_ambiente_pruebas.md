@@ -4,7 +4,27 @@ Pruebas funcionales, de seguridad, de rendimiento y de interfaz ejecutadas el 14
 
 Resultado: **289 de 290 casos aprobados**. El único caso no aprobado (LH-08) depende de las fotos cargadas en la plataforma, no del código.
 
-**Alcance de la versión:** los 290 casos de este informe se ejecutaron sobre el commit `a364595`; sus resultados no se deben atribuir a revisiones posteriores. El 14 de octubre de 2026 se consultó por SSH y en modo de solo lectura el archivo `/srv/citas-udes/VERSION`; el valor fue `f5ac5f8`, igual al `HEAD` local. Las huellas SHA-256 de dos archivos del backend coincidieron exactamente y las de tres archivos del frontend coincidieron tras normalizar los finales de línea. Así se confirmó que AWS ya ejecuta la versión local `f5ac5f8`. Entre ambas revisiones se modificó el permiso de cancelación y reprogramación del médico; por tanto, el caso ME-16 de este informe es histórico y no describe el comportamiento final. La batería de 290 casos no se repitió completa sobre `f5ac5f8`.
+**Alcance de la versión:** los 290 casos de este informe se ejecutaron sobre el commit `a364595`; sus resultados no se deben atribuir a revisiones posteriores. El 14 de octubre de 2026 se consultó por SSH y en modo de solo lectura el archivo `/srv/citas-udes/VERSION`; el valor fue `f5ac5f8`, que corresponde a la última revisión de código de la copia local. Después se creó el commit `ea9d641`, que solo actualiza documentación. Las huellas SHA-256 de dos archivos del backend coincidieron exactamente y las de tres archivos del frontend coincidieron tras normalizar los finales de línea. Así se confirmó que AWS ejecuta el código de `f5ac5f8`. Entre ambas revisiones se modificó el permiso de cancelación y reprogramación del médico; por tanto, el caso ME-16 de este informe es histórico y no describe el comportamiento final. La batería completa de 290 casos no se repitió sobre `f5ac5f8`.
+
+## Revisión de la versión final (14 de octubre de 2026)
+
+Se repitieron comprobaciones de acceso, permisos, interfaz y disponibilidad sobre el servicio AWS, y se ejecutaron las pruebas automatizadas en la copia local correspondiente al código `f5ac5f8`. Esta revisión complementa el informe de 290 casos; no lo reemplaza ni se presenta como una repetición íntegra.
+
+| Comprobación | Resultado observado |
+|---|---|
+| Versión y salud | `/srv/citas-udes/VERSION` indica `f5ac5f8`; `GET /api/health` responde HTTP 200. |
+| Acceso por perfiles | Las cuatro cuentas sintéticas inician sesión por interfaz y API; se abren los paneles de cliente, médico, administrador de sede y superadministrador. |
+| Permisos de API | 13 consultas autorizadas responden HTTP 200; cuatro intentos entre perfiles responden HTTP 403; una ruta administrativa sin sesión responde HTTP 401. |
+| Regla del médico | Los intentos de cancelar o reprogramar una cita responden HTTP 403. |
+| Interfaz administrativa | Se revisaron Citas, Médicos, Pacientes, Servicios, Horario y Reportes del administrador; y Sedes, Usuarios, Servicios, Página web, Catálogos, Datos y Bitácora del superadministrador. La vista previa de textos alternó entre computador y celular sin guardar cambios. |
+| HTTPS y rutas | HTTPS responde HTTP 200, con certificado válido, HTTP/2, HSTS y cabeceras de seguridad; HTTP redirige a HTTPS; una ruta API inexistente responde HTTP 404 en JSON. |
+| Puertos | Los puertos 4000 y 5432 no aceptaron conexiones desde internet. PostgreSQL escucha solo en `127.0.0.1:5432`. |
+| Carga de solo lectura | 5.065 solicitudes concurrentes a `GET /api/sedes` durante 20 segundos; 0 fallos. Percentil 50: 93 ms; percentil 95: 120 ms; percentil 97,5: 146 ms; máximo: 584 ms. |
+| Pruebas automatizadas | 502 de 502 aprobadas en 32 conjuntos, ejecutadas localmente sobre el código que se verificó en AWS. |
+| Compilación web | `npm run build` terminó correctamente. Vite avisó que los paquetes de ExcelJS y del panel administrativo superan 500 KB minificados. |
+| Integridad | Las cantidades antes y después fueron 314 citas y 32 mascotas; la sede PRB continúa inactiva. No se modificaron citas ni mascotas. |
+
+La medición de carga de esta revisión consultó el catálogo de sedes y no es directamente comparable con la medición anterior sobre disponibilidad de citas. Lighthouse, SSL Labs y la entrega de correos a buzones externos no se repitieron en esta revisión; las cuentas `example.test` no reciben correo. Tampoco se repitió la batería completa de pantallas móviles en un emulador de dispositivo.
 
 ## Cómo se probó
 
