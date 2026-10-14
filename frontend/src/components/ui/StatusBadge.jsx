@@ -1,11 +1,7 @@
 // components/ui/StatusBadge.jsx
-// Pill de solo lectura para el estado de una cita en "Mis citas" del
-// panel del cliente: 3 estados (proxima/completada/cancelada), a
-// diferencia de StatusToggle.jsx (que es un interruptor on/off de
-// activo/inactivo). Reutiliza brand.blue/green/red, no colores nuevos.
-// Proxima = azul, Completada = verde, Cancelada = rojo: version final
-// de la usuaria, verificada por muestreo de pixeles (reemplaza la
-// inversion temporal a verde/azul).
+// Pill de solo lectura para el estado de una cita en "Mis citas" del panel del
+// cliente: 3 estados (proxima/completada/cancelada), a diferencia de
+// StatusToggle.jsx.
 const CONFIG = {
   proxima: { texto: 'Próxima', className: 'bg-blue-50 text-brand-blue' },
   completada: { texto: 'Completada', className: 'bg-emerald-50 text-emerald-700' },

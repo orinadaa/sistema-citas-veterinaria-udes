@@ -1,11 +1,5 @@
 // models/tablero.model.js
-// Consultas de los paneles de inicio:
-// - resumenSede: lo que el administrador de una sede necesita ver al entrar
-//   (las citas de hoy, cuatro indicadores, la carga de la semana y lo que
-//   requiere su atencion).
-// - resumenSistema: lo que el superadministrador necesita ver (estado de
-//   cada sede, cuentas por rol y configuracion incompleta).
-// Solo lectura. Sin ingresos ni facturacion (fuera del alcance).
+// Consultas de los paneles de inicio.
 const { pool } = require('../config/db');
 
 // La semana va de lunes a domingo, en la hora local del servidor.

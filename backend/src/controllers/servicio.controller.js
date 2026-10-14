@@ -20,7 +20,7 @@ function precioValido(precio) {
   return Number.isInteger(precio) && precio >= 0;
 }
 
-// Duracion estimada (informativa, ver database/incremento_4b_agendamiento.sql):
+// Duracion estimada (informativa):
 // minutos enteros entre 5 y 480 (8 horas).
 function duracionValida(duracion) {
   return Number.isInteger(duracion) && duracion >= 5 && duracion <= 480;

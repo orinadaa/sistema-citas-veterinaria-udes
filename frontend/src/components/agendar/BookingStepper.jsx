@@ -1,13 +1,5 @@
 // components/agendar/BookingStepper.jsx
-// Los 5 hitos del flujo de agendamiento. El contenido se agrupa en 3
-// paginas (1: mascota+servicio, 2: sede+fecha/hora, 3: confirmacion):
-// todos los hitos de la pagina activa se resaltan juntos (decision
-// confirmada con la usuaria -- el mockup resaltaba solo el primero) y
-// los de paginas ya completadas muestran check.
-//
-// Ambas variantes (horizontal y lateral) son navegables: cada hito al que
-// se puede ir (`puedeIrAHito`, decidido por AgendarCitaPage) es un boton
-// que llama a `onIrAHito`; los demas se muestran sin interaccion.
+// Los 5 hitos del flujo de agendamiento.
 import { IconoCheck } from '../icons';
 
 const HITOS = [
@@ -124,7 +116,7 @@ export function BookingStepperLateral({ paginaActual, puedeIrAHito = () => false
       aria-label="Progreso de la cita"
       className="invisible fixed top-1/2 z-30 hidden -translate-y-1/2 [opacity:clamp(0,calc((var(--flow,0)_-_0.7)_/_0.3),1)] motion-reduce:[opacity:1] lg:block left-[26px] min-[1424px]:left-[calc(((100vw-80rem)/2+24px)/2-12px)] [[data-topbar-decima='7']_&]:visible [[data-topbar-decima='8']_&]:visible [[data-topbar-decima='9']_&]:visible [[data-topbar-decima='10']_&]:visible"
       // Corrido 12px a la derecha del centro del margen libre a la izquierda
-      // del contenido (pedido de Oriana; 48px de
+      // del contenido (; 48px de
       // ancho): entre lg y 1423px ese margen son los 88px que reserva
       // <main>; desde 1424px es el margen de max-w-7xl (80rem) + 24px.
     >

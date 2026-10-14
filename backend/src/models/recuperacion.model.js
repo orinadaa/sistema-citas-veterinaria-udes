@@ -1,6 +1,6 @@
 // models/recuperacion.model.js
 // Consultas SQL de la tabla "codigo_recuperacion" (recuperacion de clave
-// por codigo, ver database/incremento_3g_recuperacion_clave.sql).
+// por codigo).
 const { pool } = require('../config/db');
 
 // Un solo codigo activo por usuario: pedir uno nuevo reemplaza el anterior

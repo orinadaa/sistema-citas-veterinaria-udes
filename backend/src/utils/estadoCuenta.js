@@ -1,13 +1,7 @@
 // utils/estadoCuenta.js
 // Estado vigente de una cuenta, leido de la base en cada peticion con sesion
-// (auth.middleware.js): si esta activa, su rol y sede de AHORA, y desde
-// cuando valen sus sesiones.
-// - Antes solo se revisaba "activo" y el rol salia del token: a quien se le
-//   cambiaba el rol o la sede conservaba los permisos viejos hasta 8 horas.
-// - sesiones_validas_desde: se actualiza al cambiar la contraseña; los tokens
-//   emitidos antes dejan de servir (una sesion robada no sobrevive al cambio).
-// La respuesta se recuerda 30 segundos para no consultar en cada peticion;
-// los cambios hechos desde este mismo servidor la olvidan al instante.
+// (auth.middleware.js): si esta activa, su rol y sede de AHORA, y desde cuando
+// valen sus sesiones.
 const { pool } = require('../config/db');
 
 const SEGUNDOS_CACHE = 30;

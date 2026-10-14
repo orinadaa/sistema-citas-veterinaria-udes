@@ -1,14 +1,5 @@
 // components/agendar/PaginaConfirmacion.jsx
 // Pagina 3 del flujo de agendamiento (hito 5): la cita ya quedo creada.
-// Muestra el codigo visible (CV-{sede}-{año}-{consecutivo}), el medico
-// asignado automaticamente y el ciclo de vida de notificaciones:
-//   - Confirmacion por correo: real (se envia al agendar, RF-17 parcial).
-//     Si el SMTP fallo, se dice tal cual y se ofrece reintentar.
-//   - Recordatorio 24 h antes (RF-18): queda "pendiente" -- el envio
-//     automatico es del incremento 5 (notificaciones), no se marca como
-//     hecho antes de que exista.
-//   - Asiste a tu cita: pendiente hasta el dia de la cita.
-// Materiales vetUI: superficies de vidrio blanco (texto oscuro).
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { reenviarConfirmacionCita } from '../../api/client';
@@ -123,10 +114,10 @@ export function PaginaConfirmacion({ cita, correoEnviado: correoEnviadoInicial, 
         </div>
       </Superficie>
 
-      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[minmax(0,1fr)_320px]">
         <Superficie tono="blanco">
           <h3 className="text-lg font-bold text-brand-navy">Resumen de la cita</h3>
-          <div className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+          <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-5 sm:grid-cols-2">
             <Dato icono={IconoPata} etiqueta="Mascota" valor={cita.mascota_nombre} detalle={especieYRaza(mascota)} />
             <Dato
               icono={IconoEstetoscopio}

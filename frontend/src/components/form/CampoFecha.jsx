@@ -1,23 +1,6 @@
 // components/form/CampoFecha.jsx
-// Campo de fecha estandar del sistema: reemplaza a <input type="date">
-// (el calendario del navegador) en todos los formularios. Se ve como un
-// campo mas (fecha escrita + icono) y al pulsarlo despliega debajo el
-// mismo calendario del flujo de agendar (DatePickerCalendar).
-//
-// valor / onChange trabajan con "YYYY-MM-DD" ('' = sin fecha), igual que
-// el input nativo que reemplaza, asi quien lo usa no cambia su estado.
-// - minimo / maximo: se pasan al calendario (ver ahi).
-// - requerido: asterisco en la etiqueta; sin el, el desplegable ofrece
-//   "Borrar fecha". La validacion al enviar la hace cada formulario.
-// - alinear="derecha": el desplegable se ancla al borde derecho del campo
-//   (campos en la columna derecha de una grilla).
-// El desplegable se pinta en <body> (portal) con position: fixed, pegado
-// al campo: asi queda siempre encima de todo (tarjetas de vidrio vecinas,
-// paneles laterales, que crean su propio contexto de apilamiento) y no
-// lo recorta el scroll del contenedor. Se abre hacia abajo, o hacia
-// arriba si abajo no cabe, y sigue al campo al hacer scroll.
-// - etiqueta (opcional): si el formulario ya pinta la suya, pasar
-//   etiquetaAccesible para lectores de pantalla.
+// Campo de fecha estandar del sistema: reemplaza a <input type="date"> (el
+// calendario del navegador) en todos los formularios.
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DatePickerCalendar } from '../agendar/DatePickerCalendar';

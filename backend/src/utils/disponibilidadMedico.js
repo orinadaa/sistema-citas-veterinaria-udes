@@ -1,14 +1,5 @@
 // utils/disponibilidadMedico.js
-// Logica pura (sin base de datos) de la disponibilidad propia del medico
-// (opcion A: horario por medico y sede + bloqueos). Las franjas siguen
-// saliendo del horario de la sede (utils/franjas.js); esto solo decide
-// si UN medico atiende en una franja concreta:
-// - Sin horario propio configurado: atiende siempre (en su sede), como
-//   funcionaba antes -- la sede ya se filtro en la consulta de medicos.
-// - Con horario propio: debe tener fila ese dia EN ESA SEDE, la franja
-//   debe caber completa dentro de su rango y no cruzarse con su pausa.
-// - En cualquier caso, un bloqueo (dia completo, o rango de horas) que
-//   cubra esa fecha y se cruce con la franja la deja fuera.
+// Logica pura (sin base de datos) de la disponibilidad propia del medico.
 const { DURACION_SLOT_MINUTOS } = require('./franjas');
 
 function aMinutos(hora) {

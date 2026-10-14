@@ -1,5 +1,5 @@
 // pages/NoEncontradaPage.jsx
-// Direccion que no existe en el sitio (antes se veia una pagina en blanco).
+// Direccion que no existe en el sitio.
 // Mismo marco de las pantallas de sesion.
 import { Link } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';

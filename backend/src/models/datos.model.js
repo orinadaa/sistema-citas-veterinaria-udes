@@ -1,13 +1,5 @@
 // models/datos.model.js
 // Modulo "Datos" del superadministrador.
-//
-// 1. Explorador de SOLO LECTURA. Cada entidad se describe en ENTIDADES: de
-//    que tablas sale, que columnas se muestran (con nombres legibles en vez
-//    de ids), por cuales se busca, se ordena y se filtra. Todo lo que llega
-//    del navegador (entidad, columna de orden, filtros) se valida contra esa
-//    descripcion: nunca se arma SQL con texto libre. Las contraseñas y los
-//    codigos de recuperacion no estan en ninguna lista de columnas.
-// 2. Correcciones puntuales, cada una con sus reglas (ver el controlador).
 const { pool } = require('../config/db');
 
 const SI_NO = [

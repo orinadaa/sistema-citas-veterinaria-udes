@@ -2,7 +2,7 @@
 
 Estado de cada observación de `docs/auditoria_sistema_2026-10-11.pdf` después de las correcciones del mismo día. Los identificadores son los del informe.
 
-Verificación: 431 pruebas del servidor pasan (24 nuevas en `backend/tests/correccionesAuditoria.test.js` y `cita.controller.test.js`), las consultas nuevas se probaron contra la base real en modo lectura, y las páginas públicas y la vista del médico se revisaron en el navegador con axe-core.
+Verificación: al cierre de ese día pasaban las 431 pruebas del servidor (24 nuevas en `backend/tests/correccionesAuditoria.test.js` y `cita.controller.test.js`); el resultado actual se obtiene con `cd backend && npm test`. Además, las consultas nuevas se probaron contra la base real en modo lectura, y las páginas públicas y la vista del médico se revisaron en el navegador con axe-core.
 
 Las pantallas del administrador de sede y del superadministrador se revisaron después, el mismo día, solo mirando (sin guardar, cancelar ni borrar; la base quedó idéntica): Médicos > Horario, la franja de módulos en celular y tableta, el detalle de una cita con la confirmación de cancelar, el horario de atención, y en el superadministrador Inicio, Sedes, Usuarios, Servicios, Página web, Catálogos, Datos (con la copia de seguridad) y Reportes. axe-core encontró 12 botones sin nombre que la auditoría no había visto (filtros desplegables, flechas de semana y accesos de las tarjetas del inicio); quedaron corregidos y ninguna de esas pantallas tiene ya observaciones. **Falta guardar algo desde ellas**: el botón "Guardar horario", "Agregar bloqueo", "Sí, cancelar la cita" y "Descargar copia de seguridad" no se pulsaron.
 
@@ -93,3 +93,37 @@ Sin cambio: ACC-08 (la descripción de cada foto de la portada ya se anuncia en 
 - **Horario de atención:** solo horas en punto o y media.
 - **Copia de seguridad:** pide la contraseña.
 - **Base de datos:** se aplicó `database/incremento_13a_seguridad_auditoria.sql` en la base local (dos columnas nuevas en `usuario` y cinco índices; no modifica datos) y `database/incremento_13b_verificacion_correo.sql` (una tabla nueva, `registro_pendiente`).
+
+## Revisión del 13 de octubre de 2026
+
+Una segunda revisión del código encontró seis fallos que la auditoría anterior no había visto. Todos se corrigieron y tienen prueba automatizada; para reproducir la verificación: `cd backend && npm test`.
+
+| Hallazgo | Corrección | Prueba |
+|---|---|---|
+| Un administrador de sede podía consultar pacientes y citas de otra sede enviando otro `sedeId`. | La sede sale de la sesión, no de la petición. El detalle de un paciente solo responde si tiene citas en esa sede, y solo muestra las de esa sede. | `administracion.controller.test.js` |
+| Dos reservas simultáneas con médicos distintos podían dejar a la misma mascota en dos citas cruzadas. | Al agendar se toma un candado por médico y otro por mascota, y los cruces de ambos se comprueban dentro de la transacción. | `cita.model.test.js` |
+| Reprogramar validaba y luego actualizaba sin transacción. | La validación y el cambio de fecha van en una transacción con los mismos candados. | `cita.model.test.js`, `cita.controller.test.js` |
+| Un recordatorio quedaba marcado como enviado aunque fallara. | Si no se pudo avisar, la cita vuelve a la cola y se reintenta en la siguiente revisión. El correo se reintenta tres veces. | `notificaciones.test.js` |
+| Un médico podía buscar a cualquier cliente del sistema. | La búsqueda devuelve solo sus pacientes. | `medico.controller.test.js` |
+| La cita no guardaba su duración: se calculaba con la duración actual del servicio. | La cita guarda la duración con la que se agendó y los cruces se calculan con ella. | `cita.model.test.js`, `cita.controller.test.js` |
+
+Cuatro mitigaciones de seguridad de la misma revisión:
+
+| Riesgo | Mitigación | Prueba |
+|---|---|---|
+| Las fotos de mascotas se servían a cualquiera que tuviera la dirección. | La carpeta de mascotas ya no es pública: cada foto se entrega solo con un enlace firmado que vence en unas doce horas (`utils/fotoPrivada.js`). La API firma esas rutas en sus respuestas; en la base se sigue guardando la ruta sin firma. Las fotos de la página pública no cambian. | `fotoPrivada.test.js` |
+| Una celda del CSV podía abrirse como fórmula si el signo iba tras espacios o caracteres de control. | La comprobación ignora esos caracteres iniciales y cubre también tabulación y retorno de carro. Los números de la base no se alteran. | `datos.controller.test.js` |
+| Los correos con código no tenían tope por destinatario. | Además del tope por conexión, hay uno diario por correo: seis para registro y reenvío, cinco para recuperación de contraseña. | `topeCorreos.test.js` |
+| El superadministrador podía crearse con una contraseña que el resto del sistema rechaza. | El script usa la misma validación que el registro y el cambio de contraseña. | — |
+
+Lo que queda abierto de esta revisión:
+
+- **Fotos de mascotas:** quien reciba un enlace firmado puede abrir esa foto hasta que venza. Para atarla a la sesión haría falta enviar la sesión en una cookie.
+- **CSV:** la salida se verificó con pruebas automatizadas; falta abrirla en Excel y en LibreOffice.
+- **Tope de correos:** vive en la memoria del servidor, como los demás límites, y no hay monitoreo ni cuota del servicio de correo.
+- **Superadministrador:** no se le obliga a cambiar la contraseña en el primer ingreso, porque el mecanismo actual de clave temporal vence a las 72 horas y podría dejar la cuenta principal sin acceso.
+
+- **Base de datos ya creada:** hay que ejecutar `database/incremento_15a_duracion_cita.sql`, que completa la duración en las citas anteriores.
+- **Recordatorios:** si el servidor se detiene justo entre marcar una cita y avisar, ese recordatorio no se reintenta. Resolverlo del todo requiere un estado intermedio en la tabla.
+- **Concurrencia:** las pruebas simulan la base. Falta una prueba con dos reservas reales a la vez contra una base de pruebas (ver COD-06).
+- **Interfaz sin pruebas automatizadas** y **componentes grandes** (`Navbar.jsx`, `PanelDatos.jsx`, `PanelMiPerfilMedico.jsx`): siguen pendientes.

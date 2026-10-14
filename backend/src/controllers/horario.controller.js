@@ -47,8 +47,8 @@ async function actualizarDia(req, res, next) {
     if (!DIA_VALIDO(diaSemana)) {
       return res.status(400).json({ mensaje: 'diaSemana debe ser un número entre 0 (domingo) y 6 (sábado).' });
     }
-    // Formato HH:MM y comparacion en minutos (antes se comparaban como
-    // texto: "9:00" quedaba despues de "17:00").
+    // Formato HH:MM y comparacion en minutos: como texto, "9:00" quedaria
+    // despues de "17:00".
     if (!esHora(horaInicio) || !esHora(horaFin)) {
       return res.status(400).json({ mensaje: 'Las horas deben tener el formato HH:MM, por ejemplo 08:00.' });
     }

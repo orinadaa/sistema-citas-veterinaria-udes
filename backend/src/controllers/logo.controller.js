@@ -1,9 +1,6 @@
 // controllers/logo.controller.js
 // Logotipos de la clinica (Pagina web > Logotipos). Leerlos es publico: los
-// usa toda la pagina. Cambiarlos, solo el superadministrador, subiendo un
-// archivo (nunca un enlace); queda en la bitacora.
-// La respuesta trae, por cada logotipo, la ruta del archivo subido o null si
-// se usa el original que viene con el sistema.
+// usa toda la pagina.
 const logoModel = require('../models/logo.model');
 const { archivosLogos } = require('../middlewares/subirFoto.middleware');
 

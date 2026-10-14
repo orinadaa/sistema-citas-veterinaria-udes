@@ -2,24 +2,6 @@
 // Especie + raza (ambas obligatorias) para crear/editar una mascota,
 // compartido por el cliente (FormularioMascotaPanel) y el admin
 // (PanelPacientes, MascotaSelector del calendario).
-//
-// Especie: botones tipo tarjeta, altos y angostos, con el icono del animal
-// arriba y el nombre abajo (pedido de Oriana; reemplaza al <select>). Son
-// pocas opciones fijas, asi que se ven todas de una vez y se eligen con un
-// solo clic. Accesibilidad:
-// - es un grupo de opciones (radiogroup): Tab entra a la elegida y las
-//   flechas cambian de especie, como en cualquier grupo de radio;
-// - la elegida no se distingue solo por el color: lleva un check, el icono
-//   relleno y el texto en negrita;
-// - cada boton mide al menos 44px de ancho y 96px de alto (maximo 84px
-//   de ancho: siempre queda mas alto que ancho).
-//
-// Especies y razas salen del catalogo que gestiona el superadministrador
-// (Catalogos > Especies y razas; ver useCatalogoEspecies): solo las activas.
-// Raza: lista que depende de la especie; si la especie no tiene razas (como
-// "Otro") es un campo de texto. Si una mascota tiene una especie o una raza
-// que ya no esta en el catalogo (escrita a mano, o desactivada despues), se
-// conserva como opcion extra para no perderla al editar.
 import { useRef } from 'react';
 import { useCatalogoEspecies } from '../../hooks/useCatalogoEspecies';
 import { IconoAve, IconoCheck, IconoGato, IconoPata, IconoPerro } from '../icons';

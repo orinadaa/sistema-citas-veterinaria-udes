@@ -1,8 +1,6 @@
 // components/agendar/DialogoSalirAgendar.jsx
-// Confirmacion antes de salir del flujo de agendamiento cuando ya hay
-// datos elegidos: "Cancelar" no debe borrar el progreso sin avisar.
-// Usa el Dialogo de vetUI (cristal fuerte centrado): Escape o clic en el
-// velo = seguir agendando; el foco arranca en la opcion segura.
+// Confirmacion antes de salir del flujo de agendamiento cuando ya hay datos
+// elegidos: "Cancelar" no debe borrar el progreso sin avisar.
 import { Boton, Dialogo } from '../vetui';
 
 export function DialogoSalirAgendar({ abierto, onSeguir, onSalir }) {

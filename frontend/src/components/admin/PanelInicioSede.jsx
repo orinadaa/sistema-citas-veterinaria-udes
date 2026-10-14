@@ -1,14 +1,6 @@
 // components/admin/PanelInicioSede.jsx
-// Inicio del administrador de sede: responde "¿que tengo que atender hoy?"
-// al abrir el sistema. Todo es de SU sede (el servidor la toma de su cuenta).
-// - Cuatro indicadores: citas de hoy, pendientes por atender, citas de la
-//   semana y canceladas de la semana.
-// - Citas de hoy, en orden, con la proxima destacada.
-// - Requiere tu atencion: configuracion que impide agendar (ver
-//   AvisosAtencion), con acceso al modulo donde se resuelve.
-// - Carga de la semana: citas por dia, para ver los dias mas llenos.
-// Sin ingresos ni facturacion (fuera del alcance del proyecto).
-// onIr(modulo): cambia de modulo en el menu lateral.
+// Inicio del administrador de sede: responde "¿que tengo que atender hoy?" al
+// abrir el sistema.
 import { useEffect, useState } from 'react';
 import { obtenerClientes, obtenerHorarios, obtenerServicios, obtenerTableroSede } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -126,7 +118,7 @@ export function PanelInicioSede({ onIr }) {
         <KPICard icon={IconoX} color="red" value={indicadores.canceladas_semana} label="Canceladas esta semana" />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-heading text-base font-semibold text-brand-navy">Citas de hoy</h2>

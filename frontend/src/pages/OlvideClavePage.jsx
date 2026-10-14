@@ -1,10 +1,7 @@
 // pages/OlvideClavePage.jsx
-// Recuperacion de contraseña por codigo, para cualquier rol. Dos pasos en
-// la misma pantalla: 1) pedir el codigo por correo, 2) confirmarlo junto
-// con la nueva contraseña. El codigo se escribe en CampoCodigo (un recuadro
-// por digito); si es incorrecto los recuadros se ponen en rojo, se vacian y
-// el foco vuelve al primero. "Reenviar código" espera el mismo minuto que
-// exige el servidor entre envios.
+// Recuperacion de contraseña por codigo, para cualquier rol. Dos pasos en la
+// misma pantalla: 1) pedir el codigo por correo, 2) confirmarlo junto con la
+// nueva contraseña.
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';

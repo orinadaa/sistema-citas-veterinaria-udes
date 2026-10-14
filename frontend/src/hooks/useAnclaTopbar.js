@@ -1,26 +1,5 @@
 // hooks/useAnclaTopbar.js
 // Scroll en dos posiciones para el arranque de una pagina con <Navbar/>.
-// Lo usan todas las que no son el landing (/agendar, /panel, /vetui); el
-// landing tiene su propio paginado por secciones (usePaginadoPorRueda).
-// Es como ese paginado pero con una sola parada:
-// - arriba de todo (scroll 0): topbar transparente y stepper superior;
-// - el "ancla": la pildora de la topbar ya formada y el contenido marcado
-//   con data-ancla-topbar justo debajo de ella (respeta su scroll-margin-top,
-//   asi la pildora no tapa las tarjetas).
-// Entre las dos no se puede quedar: un gesto de rueda hacia abajo desde
-// arriba lleva directo al ancla, y uno hacia arriba desde el ancla vuelve
-// arriba. Asi nunca se ve la transicion de la topbar a medio camino. Del
-// ancla hacia abajo el scroll es el normal del navegador.
-//
-// Solo desde lg (computadoras con mouse); Ctrl + rueda (zoom) no se toca,
-// ni la rueda sobre un elemento con scroll propio (paneles laterales,
-// listas). Las teclas de scroll (flechas, Av/Re Pag, espacio) hacen el
-// mismo salto, salvo cuando el foco esta en un campo o control que las
-// usa. El landing resuelve el teclado con scroll-snap de CSS, pero aca no
-// sirve: obligaria a engancharse siempre a una de las dos posiciones, y
-// del ancla hacia abajo el scroll tiene que ser libre.
-// Si se llega a la zona intermedia por otro medio (barra de scroll), al
-// terminar el scroll se completa el salto en el sentido en que se venia.
 import { useEffect } from 'react';
 
 // Scroll con el que la topbar termina de formarse (DISTANCIA_FLOW_PX en

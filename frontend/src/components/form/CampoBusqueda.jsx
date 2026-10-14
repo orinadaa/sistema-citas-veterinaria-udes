@@ -1,11 +1,5 @@
 // components/form/CampoBusqueda.jsx
-// Buscador de vetUI: reemplaza al <input type="search"> suelto. Es un
-// `campo` mas, con la lupa a la izquierda (se reconoce como buscador sin
-// leer el texto de ayuda) y, cuando hay algo escrito, una X propia para
-// borrar (la X que agrega el navegador se oculta en vetui.css).
-//
-// Se usa igual que el input que reemplaza: value, onChange (evento con
-// target.value) y placeholder. `className` va al contenedor (ej. flex-1).
+// Buscador de vetUI: reemplaza al <input type="search"> suelto.
 import { IconoBuscar, IconoX } from '../icons';
 
 export function CampoBusqueda({ value, onChange, placeholder = 'Buscar...', className = '', 'aria-label': ariaLabel, ...resto }) {

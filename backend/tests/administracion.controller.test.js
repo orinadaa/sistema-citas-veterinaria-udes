@@ -338,6 +338,19 @@ describe('GET /api/administracion/pacientes', () => {
     expect(respuesta.body.pacientes).toHaveLength(1);
     expect(respuesta.body.citasDelMes).toBe(5);
   });
+
+  test('usa la sede de la sesion aunque la peticion pida otra', async () => {
+    pacienteModel.listarClientes.mockResolvedValue([]);
+    pacienteModel.contarCitasDelMes.mockResolvedValue(0);
+
+    await request(app)
+      .get('/api/administracion/pacientes?sedeId=otra-sede&busqueda=ana')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    const sedeDelAdministrador = jwt.decode(TOKEN_ADMIN).sedeId;
+    expect(pacienteModel.listarClientes).toHaveBeenCalledWith({ sedeId: sedeDelAdministrador, busqueda: 'ana' });
+    expect(pacienteModel.contarCitasDelMes).toHaveBeenCalledWith(sedeDelAdministrador);
+  });
 });
 
 describe('GET /api/administracion/pacientes/:id', () => {
@@ -353,10 +366,23 @@ describe('GET /api/administracion/pacientes/:id', () => {
     expect(respuesta.status).toBe(404);
   });
 
-  test('devuelve el cliente con sus mascotas y citas', async () => {
+  test('responde 404 si el cliente no tiene citas en la sede del administrador', async () => {
+    usuarioModel.buscarPorId.mockResolvedValue({ id: 'cliente-1', rol: 'cliente', nombre_completo: 'Oriana Duran' });
+    citaModel.listarPorClienteEnSede.mockResolvedValue([]);
+
+    const respuesta = await request(app)
+      .get('/api/administracion/pacientes/cliente-1')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+
+    expect(respuesta.status).toBe(404);
+    expect(citaModel.listarPorClienteEnSede).toHaveBeenCalledWith('cliente-1', jwt.decode(TOKEN_ADMIN).sedeId);
+    expect(mascotaModel.listarPorCliente).not.toHaveBeenCalled();
+  });
+
+  test('devuelve el cliente con sus mascotas y sus citas en la sede', async () => {
     usuarioModel.buscarPorId.mockResolvedValue({ id: 'cliente-1', rol: 'cliente', nombre_completo: 'Oriana Duran' });
     mascotaModel.listarPorCliente.mockResolvedValue([{ id: 'm1', nombre: 'Luna' }]);
-    citaModel.listarPorCliente.mockResolvedValue([{ id: 'c1', estado: 'agendada' }]);
+    citaModel.listarPorClienteEnSede.mockResolvedValue([{ id: 'c1', estado: 'agendada' }]);
 
     const respuesta = await request(app)
       .get('/api/administracion/pacientes/cliente-1')

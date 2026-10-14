@@ -1,21 +1,24 @@
 // services/notificaciones.service.js
 // Crea los avisos de la campana cuando pasa algo que a alguien le importa:
-// cita agendada, reprogramada o cancelada, mascota registrada, recordatorio
-// creado por el medico y recordatorio automatico previo a la cita (RF-18).
-//
-// Reglas:
-// - Nunca hace fallar la accion que lo origina: si un aviso no se puede
-//   guardar, se anota en la consola y la cita (o la mascota) queda igual.
-// - No se avisa a quien hizo la accion de lo que el mismo acaba de hacer,
-//   salvo al cliente, que siempre ve el registro de sus citas y mascotas.
-// - Destinatarios de una cita: el cliente y el medico que la atiende. Los
-//   administradores y el superadministrador NO reciben notificaciones
-//   (decision de Oriana): ven las citas en su panel.
-// - En las pruebas automaticas no escribe (los modelos estan simulados).
+// cita agendada, reprogramada o cancelada, mascota registrada.
 const notificacionModel = require('../models/notificacion.model');
 const correoService = require('./correo.service');
 
 const HORAS_ANTES = 24;
+const INTENTOS_CORREO = 3;
+const ESPERA_ENTRE_INTENTOS_MS = process.env.NODE_ENV === 'test' ? 0 : 3000;
+
+// Ejecuta la tarea hasta `intentos` veces, esperando un poco mas en cada fallo.
+async function conReintentos(tarea, intentos = INTENTOS_CORREO) {
+  for (let intento = 1; ; intento++) {
+    try {
+      return await tarea();
+    } catch (error) {
+      if (intento >= intentos) throw error;
+      await new Promise((resolver) => setTimeout(resolver, ESPERA_ENTRE_INTENTOS_MS * intento));
+    }
+  }
+}
 // Los datos de ejemplo y de prueba usan correos que no existen: a esos no
 // se les envia el correo del recordatorio (el aviso de la campana si).
 const DOMINIOS_SIN_CORREO = ['demo.udes.co', 'prueba.invalid'];
@@ -136,26 +139,39 @@ async function horarioDelMedicoCambio(medicoId, titulo, mensaje) {
 // Devuelve cuantas citas se recordaron.
 async function recordarCitasProximas() {
   const ids = await notificacionModel.tomarCitasParaRecordar(HORAS_ANTES);
+  let recordadas = 0;
   for (const id of ids) {
-    const cita = await notificacionModel.detalleCita(id);
-    if (!cita) continue;
-    await enviar([
-      {
+    let cita;
+    try {
+      cita = await notificacionModel.detalleCita(id);
+      if (!cita) continue;
+      await notificacionModel.crear({
         usuarioId: cita.cliente_id,
         tipo: 'recordatorio_cita',
         titulo: 'Tu cita se acerca',
-        mensaje: `${cita.mascota_nombre} tiene ${cita.servicio_nombre} el ${cuando(cita.fecha_hora)} en ${cita.sede_nombre}, con ${cita.medico_nombre}. Te recomendamos llegar 10 minutos antes.`,
+        mensaje: `${cita.mascota_nombre} tiene ${cita.servicio_nombre} el ${cuando(cita.fecha_hora)} en ${cita.sede_nombre}, con ${cita.medico_nombre}. Te recomendamos llegar 10 minutos antes.`.replace(/\.\.(\s|$)/g, '.$1'),
         enlace: '/panel?tab=citas',
-      },
-    ]);
+      });
+    } catch (error) {
+      // No se aviso a nadie: la cita vuelve a la cola y se reintenta en la proxima revision.
+      console.error(`No se pudo recordar la cita ${id}; se reintentara:`, error.message);
+      try {
+        await notificacionModel.liberarRecordatorio(id);
+      } catch (fallo) {
+        console.error('No se pudo liberar el recordatorio:', fallo.message);
+      }
+      continue;
+    }
+    recordadas++;
     const dominio = String(cita.cliente_correo).split('@')[1];
     if (!DOMINIOS_SIN_CORREO.includes(dominio)) {
-      await correoService
-        .enviarRecordatorioCita({ ...cita, fechaTexto: cuando(cita.fecha_hora) })
-        .catch((error) => console.error(`No se pudo enviar el correo de recordatorio de la cita ${cita.codigo}:`, error.message));
+      // El aviso de la campana ya quedo: el correo se reintenta aqui mismo para no duplicar ese aviso.
+      await conReintentos(() => correoService.enviarRecordatorioCita({ ...cita, fechaTexto: cuando(cita.fecha_hora) })).catch((error) =>
+        console.error(`No se pudo enviar el correo de recordatorio de la cita ${cita.codigo} tras ${INTENTOS_CORREO} intentos:`, error.message)
+      );
     }
   }
-  return ids.length;
+  return recordadas;
 }
 
 // Revisa al arrancar y luego cada 10 minutos. Solo lo llama server.js.

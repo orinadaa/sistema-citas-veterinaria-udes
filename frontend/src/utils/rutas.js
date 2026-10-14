@@ -1,12 +1,6 @@
 // utils/rutas.js
 // `servicioId` (opcional) preselecciona el servicio en el flujo de
 // agendamiento (/agendar) -- lo usan las tarjetas de servicio del landing.
-// Un invitado (sin sesion) se manda primero a Registrarse, no a
-// Iniciar sesion: la mayoria de quienes agendan por primera vez no
-// tienen cuenta todavia, y RegistroPage ya tiene un link a "Inicia
-// sesión" (con este mismo "next") para quien si la tiene.
-// servicioId / sedeId (opcionales): llegan a /agendar ya preseleccionados
-// (tarjetas de Servicios y de Horarios del landing).
 export function rutaAgendarCita(estaAutenticado, servicioId, sedeId) {
   const parametros = new URLSearchParams();
   if (servicioId) parametros.set('servicioId', servicioId);

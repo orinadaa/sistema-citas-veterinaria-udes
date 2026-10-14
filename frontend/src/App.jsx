@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { createBrowserRouter, RouterProvider, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -52,8 +52,28 @@ function Cargando() {
   return <div role="status" aria-label="Cargando" className="min-h-[100dvh] bg-brand-blue-800" />;
 }
 
+// Aviso breve al llegar redirigido (ej. al abrir un panel de otro perfil).
+function AvisoDeRuta({ texto }) {
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const temporizador = setTimeout(() => setVisible(false), 8000);
+    return () => clearTimeout(temporizador);
+  }, []);
+  if (!visible) return null;
+  return (
+    <div className="pointer-events-none fixed inset-x-3 bottom-4 z-[75] flex justify-center">
+      <p role="status" className="cristal-fuerte pointer-events-auto flex max-w-md items-center gap-3 rounded-tarjeta px-4 py-3 text-sm font-medium text-slate-800">
+        {texto}
+        <button type="button" onClick={() => setVisible(false)} className="boton-texto shrink-0 rounded-boton px-2 py-1 text-sm font-semibold text-brand-blue-700">
+          Entendido
+        </button>
+      </p>
+    </div>
+  );
+}
+
 function Rutas() {
-  const { pathname } = useLocation();
+  const { pathname, state, key } = useLocation();
   useEffect(() => {
     document.title = tituloDe(pathname);
   }, [pathname]);
@@ -70,6 +90,7 @@ function Rutas() {
 
   return (
     <>
+    {state?.aviso && <AvisoDeRuta key={key} texto={state.aviso} />}
     <div role="region" aria-label="Atajo de teclado">
       <button
         type="button"

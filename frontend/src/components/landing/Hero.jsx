@@ -1,9 +1,6 @@
 // components/landing/Hero.jsx
-// Sin fondo propio: el degradado base es continuo con Servicios y vive en
-// el contenedor que envuelve a ambos (LandingPage.jsx). Aca solo van los
-// halos del Hero (FondoAmbientalHero.jsx).
-// En la columna derecha va la galeria de fotos reales de la clinica
-// (HeroGaleria.jsx), fundida con el fondo por una mascara radial.
+// Sin fondo propio: el degradado base es continuo con Servicios y vive en el
+// contenedor que envuelve a ambos (LandingPage.jsx).
 import { useNavigate } from 'react-router-dom';
 import { HeroGaleria } from './HeroGaleria';
 import { FondoAmbientalHero } from './FondoAmbientalHero';
@@ -29,7 +26,7 @@ export function Hero() {
   return (
     <section data-slide className="relative pt-24 lg:flex lg:min-h-svh lg:snap-start lg:snap-always lg:flex-col lg:justify-center">
       <FondoAmbientalHero />
-      <div className="slide-sale relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-10">
+      <div className="slide-sale relative mx-auto grid grid-cols-[minmax(0,1fr)] w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-10">
         <div className="max-w-xl">
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
             Cuidamos de quienes hacen parte de <span className="text-brand-amber">tu familia</span>

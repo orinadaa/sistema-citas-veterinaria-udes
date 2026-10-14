@@ -1,22 +1,5 @@
 // components/icons.jsx
-// Iconos del sistema: Phosphor Icons (@phosphor-icons/react, MIT),
-// elegida por Oriana porque trae los iconos de veterinaria (huella,
-// jeringa, estetoscopio, diente...) y varios pesos del mismo dibujo.
-// Reemplaza al set de linea dibujado a mano que habia antes.
-//
-// Este archivo es la UNICA puerta de entrada: el resto del sistema sigue
-// importando IconoReloj, IconoPata, etc. desde aca, con la misma interfaz
-// de siempre (className para tamaño y color; el color es el del texto).
-// Para un icono nuevo: importarlo de Phosphor y exportarlo igual que los demas.
-//
-// `peso` elige la variante del dibujo:
-// - "regular" (por defecto): linea. Botones, menus, topbar, campos.
-// - "duotone": linea + relleno suave del mismo color. Solo para iconos
-//   ilustrativos: servicios, tarjetas de indicadores y estados vacios.
-// - "bold" / "fill": casos puntuales que necesitan mas peso.
-//
-// Cada icono se importa por su propio archivo (dist/csr/...), no desde la
-// raiz del paquete: asi Vite no tiene que procesar los ~1500 iconos.
+// Iconos del sistema: Phosphor Icons (@phosphor-icons/react, licencia MIT).
 import { ArrowClockwiseIcon } from '@phosphor-icons/react/dist/csr/ArrowClockwise';
 import { ArrowRightIcon } from '@phosphor-icons/react/dist/csr/ArrowRight';
 import { BellIcon } from '@phosphor-icons/react/dist/csr/Bell';

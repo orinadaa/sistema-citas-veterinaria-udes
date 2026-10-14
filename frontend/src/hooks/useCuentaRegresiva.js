@@ -1,9 +1,5 @@
 // hooks/useCuentaRegresiva.js
-// Cuenta regresiva en segundos para "Reenviar codigo en 00:42". El servidor
-// no reenvia un codigo antes de un minuto: el contador le dice a la persona
-// cuanto falta en vez de dejarla pulsar un boton que no haria nada.
-// iniciar() arranca (o reinicia) la cuenta; `restantes` llega a 0 al terminar
-// y `texto` la da en formato mm:ss.
+// Cuenta regresiva en segundos para "Reenviar codigo en 00:42".
 import { useEffect, useState } from 'react';
 
 export function useCuentaRegresiva(segundos = 60) {

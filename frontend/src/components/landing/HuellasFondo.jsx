@@ -1,13 +1,5 @@
 // components/landing/HuellasFondo.jsx
-// Huellas grandes y muy tenues repartidas por todo el fondo del landing
-// (pedido de Oriana: la huella que estaba solo en Horarios, ahora en todo
-// el fondo y en lugares que parezcan al azar). Son adorno: estaticas, no
-// reciben el mouse y van detras de todas las secciones. Las posiciones son
-// fijas (porcentajes del alto total del fondo, que abarca las cinco
-// secciones), elegidas a mano para que no sigan un patron ni caigan dos
-// juntas; al ser fijas no cambian entre visitas ni saltan al recargar.
-// En celular se muestran solo algunas, para no ensuciar una pantalla chica.
-// Las pantallas de sesion (AuthLayout) usan su propia lista (denso).
+// Huellas grandes y muy tenues repartidas por todo el fondo del landing.
 import { IconoPata } from '../icons';
 
 const HUELLAS = [

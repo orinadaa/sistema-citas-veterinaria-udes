@@ -1,14 +1,6 @@
 // components/citas/PieCancelarCita.jsx
 // Pie del detalle de una cita para el personal (administrador de la sede y
-// medico): permite cancelarla y reprogramarla. Antes solo el cliente podia
-// hacerlo: si un medico no podia atender, nadie de la sede podia mover sus
-// citas. El servidor decide quien puede (la sede de la cita o el medico que
-// la atiende) y avisa al cliente por la campana; al cancelar, tambien por
-// correo.
-// Sigue el estandar de acciones destructivas (docs/vetui.md): boton de texto
-// rojo a la izquierda; la confirmacion reemplaza al pie y ofrece primero la
-// opcion segura. Reprogramar abre la misma ventana que usa el cliente
-// (ReprogramarCitaModal): conserva el medico y solo ofrece sus horas libres.
+// medico): permite cancelarla y reprogramarla.
 import { useCallback, useEffect, useState } from 'react';
 import { cancelarCita, obtenerHorarios, reprogramarCita } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -86,7 +78,7 @@ export function PieCancelarCita({ cita, onCancelada, onReprogramada, children })
   }
 
   if (!sePuedeCancelar(cita)) {
-    return children ? <div className="flex items-center justify-end gap-3">{children}</div> : null;
+    return children ? <div className="flex flex-wrap items-center justify-end gap-3">{children}</div> : null;
   }
 
   if (confirmando) {
@@ -124,22 +116,22 @@ export function PieCancelarCita({ cita, onCancelada, onReprogramada, children })
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <button
           type="button"
           onClick={() => {
             setError('');
             setCitaConfirmando(cita.id);
           }}
-          className="boton-texto rounded-boton px-1 py-2 text-sm font-semibold text-red-700"
+          className="boton-texto min-h-11 whitespace-nowrap rounded-boton px-1 py-2 text-sm font-semibold text-red-700"
         >
           Cancelar cita
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-3 gap-y-2">
           <button
             type="button"
             onClick={abrirReprogramar}
-            className="rounded-boton border border-slate-400 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-white/60"
+            className="min-h-11 whitespace-nowrap rounded-boton border border-slate-400 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-white/60"
           >
             Reprogramar
           </button>

@@ -1,9 +1,7 @@
 // components/citas/CalendarioSemanal.jsx
 // Grid de calendario por franjas de 30 min (7:00 a 19:00), extraido de
 // PanelCitasSeguimiento.jsx para compartirlo entre el calendario del
-// administrador y "Mis citas" del medico. `dias` define las columnas:
-// 6 dias (vista Semana, lunes a sabado) o 1 dia (vista Dia). Cada cita
-// se pinta con el color de su categoria de servicio (guardado en la BD).
+// administrador y "Mis citas" del medico.
 import { Fragment, useMemo } from 'react';
 import { esMismoDia, formatearHora } from '../../utils/fecha';
 import { COLORES_CATEGORIA } from '../ui/CategoryBadge';

@@ -1,10 +1,6 @@
 // components/admin/PanelCitasSeguimiento.jsx
-// RF-12: seguimiento de citas programadas, como vista de calendario
-// semanal (reemplaza la tabla anterior). El administrador ademas puede
-// agendar citas en nombre de un cliente ("+ Nueva cita", en una ventana
-// centrada: NuevaCitaModal). Al hacer clic en una cita se abre su detalle
-// (DetalleCitaMedicoPanel, el mismo del medico); desde su pie la sede y el
-// medico pueden cancelarla o reprogramarla (RF-08/RF-09, PieCancelarCita).
+// RF-12: seguimiento de citas programadas, como vista de calendario semanal
+// (reemplaza la tabla anterior).
 import { useEffect, useMemo, useState } from 'react';
 import {
   obtenerCitasAdministracion,

@@ -1,15 +1,9 @@
 // components/vetui/Superpuestos.jsx
-// Lo que se abre encima de la página, en cristal fuerte sobre un velo
-// azul difuminado:
-//   PanelLateral  formularios y detalles. Flota a 12px de los bordes, con
-//                 esquinas redondeadas (no pegado al borde de la ventana).
-//                 `footer` fija las acciones abajo, fuera del scroll.
-//   Dialogo       confirmación de una sola pregunta, centrado.
-// Ambos: Escape o clic en el velo cierran; z-50 (encima de la topbar,
-// z-40). Quien los abre marca su contenido `inert` mientras están
-// abiertos, para que el teclado no llegue a lo de atrás.
+// Lo que se abre encima de la página, en cristal fuerte sobre un velo azul
+// difuminado: PanelLateral formularios y detalles.
 import { useEffect, useRef } from 'react';
 import { IconoX } from '../icons';
+import { useFocoDialogo } from '../../hooks/useFocoDialogo';
 
 function useCerrarConEscape(abierto, onCerrar) {
   useEffect(() => {
@@ -24,6 +18,8 @@ function useCerrarConEscape(abierto, onCerrar) {
 
 export function PanelLateral({ isOpen, onClose, title, children, footer }) {
   useCerrarConEscape(isOpen, onClose);
+  const panelRef = useRef(null);
+  useFocoDialogo(isOpen, panelRef);
   return (
     <>
       <div
@@ -34,6 +30,8 @@ export function PanelLateral({ isOpen, onClose, title, children, footer }) {
         }`}
       />
       <div
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label={title}

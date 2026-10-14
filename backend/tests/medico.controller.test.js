@@ -39,11 +39,11 @@ describe('GET /api/medico/clientes', () => {
     expect(usuarioModel.buscarClientes).not.toHaveBeenCalled();
   });
 
-  test('busca clientes por el termino indicado', async () => {
+  test('busca solo entre los pacientes del medico que inicio sesion', async () => {
     usuarioModel.buscarClientes.mockResolvedValue([{ id: 'c1', nombre_completo: 'Ana' }]);
     const respuesta = await request(app).get('/api/medico/clientes?busqueda=ana').set('Authorization', `Bearer ${TOKEN_VET}`);
     expect(respuesta.status).toBe(200);
-    expect(usuarioModel.buscarClientes).toHaveBeenCalledWith('ana');
+    expect(usuarioModel.buscarClientes).toHaveBeenCalledWith('ana', 'vet-1');
   });
 });
 

@@ -1,9 +1,6 @@
 // pages/RegistroPage.jsx
-// RF-01: registro autoservicio de clientes. Dos pasos en la misma pantalla:
-// 1) datos de la cuenta; 2) codigo de 6 digitos que llega al correo. La
-// cuenta se crea solo cuando el codigo es correcto, asi el correo de toda
-// cuenta es de quien la creo. El codigo se escribe en CampoCodigo, igual que
-// en la recuperacion de contraseña (OlvideClavePage).
+// RF-01: registro autoservicio de clientes. Dos pasos en la misma pantalla: 1)
+// datos de la cuenta; 2) codigo de 6 digitos que llega al correo.
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';

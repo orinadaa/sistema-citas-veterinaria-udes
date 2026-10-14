@@ -1,26 +1,6 @@
 // components/landing/Horarios.jsx
-// RF-03/RF-13: horario de atencion detallado por sede (dia por dia), con
-// el mismo dato real que RF-13 configura (horario_atencion).
-//
-// Rediseño (referencia de Oriana): cada sede es una tarjeta con
-// - la foto de la sede arriba (sede.foto_url, la misma del admin y de la
-//   seccion Sedes), fundida hacia el color de la sede, con un circulo con
-//   el icono de sede y el nombre y la ciudad en grande sobre la foto;
-// - un dia por fila, en un bloque centrado dentro de la tarjeta: abreviatura
-//   en una pildora del color de la sede y la hora pegada a su lado; los dias
-//   sin atencion llevan "Cerrado" en rojo;
-// - al final, "Agendar cita" como un boton de vidrio que se llena de ambar, de
-//   izquierda a derecha, al pasar el cursor; lleva a agendar con esa sede
-//   ya elegida (/agendar?sedeId=...).
-// De fondo, motivos muy tenues (linea punteada, reloj).
-//
-// El color se asigna por orden (la primera azul, la segunda ambar, y se
-// repite), no por nombre de ciudad: el sistema soporta sedes nuevas
-// (RF-13 ampliado). Hoy eso deja Bucaramanga azul y Valledupar ambar.
-//
-// En computador la seccion ocupa una pantalla (landing paginado): en
-// pantallas bajas la foto se achica y los dias pasan a dos columnas para
-// que la tarjeta entre completa.
+// RF-03/RF-13: horario de atencion detallado por sede (dia por dia), con el
+// mismo dato real que RF-13 configura (horario_atencion).
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { obtenerSedes, obtenerHorarios } from '../../api/client';
@@ -152,6 +132,7 @@ export function Horarios() {
   const [estado, setEstado] = useState(ESTADOS.CARGANDO);
   const [sedes, setSedes] = useState([]);
   const [horariosPorSede, setHorariosPorSede] = useState({});
+  const [intento, setIntento] = useState(0);
 
   useEffect(() => {
     obtenerSedes()
@@ -164,7 +145,7 @@ export function Horarios() {
         setEstado(ESTADOS.LISTO);
       })
       .catch(() => setEstado(ESTADOS.ERROR));
-  }, []);
+  }, [intento]);
 
   return (
     // Sin fondo propio: va sobre el degradado continuo del landing.
@@ -181,7 +162,7 @@ export function Horarios() {
 
           <div className="mx-auto mt-8 w-full max-w-5xl lg:mt-6">
             {estado === ESTADOS.CARGANDO && (
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
                 {[0, 1].map((clave) => (
                   <div key={clave} className="h-80 animate-pulse rounded-tarjeta bg-white/10" />
                 ))}
@@ -189,15 +170,21 @@ export function Horarios() {
             )}
 
             {estado === ESTADOS.ERROR && (
-              <div className="flex items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
+              <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl bg-amber-50 p-4 text-amber-800 ring-1 ring-amber-200">
                 <IconoAlerta className="h-5 w-5 shrink-0" />
                 <p className="text-sm">No pudimos cargar los horarios en este momento.</p>
+              <button type="button" onClick={() => {
+                  setEstado(ESTADOS.CARGANDO);
+                  setIntento((v) => v + 1);
+                }} className="ml-auto shrink-0 rounded-boton border border-amber-400 px-3 py-1.5 text-sm font-semibold text-amber-900 transition hover:bg-amber-100">
+                Reintentar
+              </button>
               </div>
             )}
 
             {estado === ESTADOS.LISTO && (
               // En celular y tableta chica las tarjetas se apilan.
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
                 {sedes.map((sede, indice) => (
                   <TarjetaSede key={sede.id} sede={sede} horario={horariosPorSede[sede.id]} acento={ACENTOS[indice % ACENTOS.length]} />
                 ))}

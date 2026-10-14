@@ -1,10 +1,7 @@
 // components/admin/PanelLogos.jsx
-// Pagina web > Logotipos (superadministrador; pedido de Oriana): todos los
-// logotipos de la clinica que usa el sistema, incluidos los de la animacion
-// de la barra superior, con un lugar para ver cada uno, subir otro archivo y
-// volver al original.
-// Por defecto cada uno muestra el archivo que viene con el sistema. Subir un
-// archivo lo reemplaza en toda la pagina al instante (useLogos).
+// Pagina web > Logotipos: todos los logotipos de la clinica que usa el
+// sistema, incluidos los de la animacion de la barra superior, con un lugar
+// para ver cada uno.
 import { useRef, useState } from 'react';
 import { restaurarLogo, subirLogo } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -189,7 +186,7 @@ export function PanelLogos() {
         </p>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2 xl:grid-cols-3">
         {LOGOS.map((logo) => (
           <TarjetaLogo
             key={logo.clave}

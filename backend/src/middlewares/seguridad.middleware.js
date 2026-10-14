@@ -1,14 +1,6 @@
 // middlewares/seguridad.middleware.js
-// Endurecimiento del servidor (auditoria de seguridad, RNF-04). Sin librerias
-// nuevas: son pocas reglas y asi el stack del proyecto no cambia.
-// - cabecerasSeguridad: cabeceras HTTP que le dicen al navegador que no
-//   adivine tipos de archivo, no deje incrustar el sitio en otro (clickjacking)
-//   y, en produccion, que use siempre HTTPS.
-// - origenesPermitidos: lista de sitios que pueden llamar a la API desde un
-//   navegador (CORS). Antes se aceptaba cualquiera.
-// - limitarIntentos: tope de peticiones por direccion IP en una ventana de
-//   tiempo, para frenar la fuerza bruta contra el inicio de sesion, el
-//   registro masivo y el abuso de los codigos por correo.
+// Endurecimiento del servidor. Sin librerias nuevas: son pocas reglas y asi el
+// stack del proyecto no cambia.
 
 const ES_PRODUCCION = process.env.NODE_ENV === 'production';
 

@@ -1,15 +1,6 @@
 // components/cliente/FotoMascotaModal.jsx
-// Editor "Foto de la mascota". Es el UNICO modal centrado del sistema
-// (excepcion explicita pedida por la usuaria): todo lo demas sigue
-// siendo <SidePanel/>. No reutilizar este patron para otros flujos.
-//
-// Pasos: Subir foto (arrastrar/seleccionar JPG o PNG de max. 5 MB, o
-// elegir una foto de otra de sus mascotas) -> Ajustar (arrastrar para
-// encuadrar, zoom, rotar) -> Vista previa. El recorte se hace aqui, en
-// un <canvas>, y al guardar se entrega un JPEG cuadrado de 400x400: el
-// backend recibe la imagen final (POST /api/mascotas/:id/foto).
-//
-// z-[60]: por encima del SidePanel (z-50) desde el que se abre.
+// Editor "Foto de la mascota". Es el UNICO modal centrado del sistema: todo lo
+// demas sigue siendo <SidePanel/>.
 import { useEffect, useRef, useState } from 'react';
 import { IconoCheck, IconoImagen, IconoRotar, IconoX } from '../icons';
 
@@ -260,7 +251,7 @@ export function FotoMascotaModal({
           </button>
         </div>
 
-        <div className="grid flex-1 gap-6 overflow-y-auto p-6 md:grid-cols-[170px_minmax(0,1fr)_230px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] flex-1 gap-6 overflow-y-auto p-6 md:grid-cols-[170px_minmax(0,1fr)_230px]">
           {/* Pasos */}
           <nav className="flex gap-2 md:flex-col" aria-label="Pasos">
             {PASOS.map((p, indice) => {

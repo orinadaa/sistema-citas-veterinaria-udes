@@ -1,9 +1,6 @@
 // components/vetui/Estados.jsx
-// Estados de una vista, todos para fondo oscuro (vidrio o fondo):
-//   Aviso         mensaje en línea. tono: info | ok | alerta | error.
-//   EstadoVacio   no hay elementos todavía (lista vacía).
-//   EstadoError   falló la carga, con botón Reintentar.
-//   Esqueleto     marcador de carga (bloques que pulsan).
+// Estados de una vista, todos para fondo oscuro (vidrio o fondo): Aviso
+// mensaje en línea. tono: info | ok | alerta | error.
 import { IconoAlerta, IconoCheck } from '../icons';
 import { Boton } from './Boton';
 
@@ -40,7 +37,7 @@ export function EstadoVacio({ children, accion }) {
 
 export function EstadoError({ mensaje, onReintentar }) {
   return (
-    <div className="vidrio flex flex-col items-center gap-3 rounded-superficie p-8 text-center">
+    <div role="alert" className="vidrio flex flex-col items-center gap-3 rounded-superficie p-8 text-center">
       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500/20 text-red-100">
         <IconoAlerta className="h-6 w-6" peso="duotone" />
       </span>

@@ -1,9 +1,5 @@
 // models/catalogo.model.js
-// Catalogos que el superadministrador gestiona sin programar:
-// - categorias de servicio (son tambien las especialidades de los medicos);
-// - especies y razas de las mascotas.
-// Regla comun: nada se elimina, solo se desactiva. Lo desactivado deja de
-// ofrecerse en registros nuevos; lo que ya lo usa lo conserva.
+// Catalogos que el superadministrador gestiona sin programar.
 const { pool } = require('../config/db');
 
 // ------------------------------------------------------------ categorias

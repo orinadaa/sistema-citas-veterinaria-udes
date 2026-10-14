@@ -1,12 +1,5 @@
 // components/agendar/PaginaSedeFecha.jsx
 // Pagina 2 del flujo de agendamiento (hitos 3 y 4): sede + fecha y hora.
-//
-// Mapa: sin mapa interactivo embebido (seria una integracion externa
-// nueva con API key, fuera del alcance documentado del proyecto). El
-// recuadro de ubicacion muestra la direccion y dos hipervinculos de
-// salida a Google Maps ("Cómo llegar" / "Ver en Google Maps"), armados
-// con la direccion de la sede -- no hay intercambio de datos, solo abre
-// una pestaña nueva.
 import { Seccion } from './Seccion';
 import { SedeListCard } from './SedeListCard';
 import { DatePickerCalendar } from './DatePickerCalendar';
@@ -68,7 +61,7 @@ export function PaginaSedeFecha({
   return (
     <div className="flex flex-col gap-6">
       <Seccion numero={3} titulo="Selecciona la sede" descripcion="¿Dónde quieres que atiendan a tu mascota?">
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_240px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,1fr)_240px]">
           <div className="flex flex-col gap-3">
             {sedes.map((s) => (
               <SedeListCard
@@ -88,7 +81,7 @@ export function PaginaSedeFecha({
         {!sede ? (
           <p className="text-sm text-slate-700">Selecciona primero una sede.</p>
         ) : (
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-2">
             <DatePickerCalendar valor={fecha} onChange={onSeleccionarFecha} diasAbiertos={diasAbiertos} />
             <div>
               <p className="mb-4 font-heading text-base font-semibold text-brand-navy">Horarios disponibles</p>

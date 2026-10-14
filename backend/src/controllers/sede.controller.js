@@ -1,12 +1,7 @@
 // controllers/sede.controller.js
-// RF-03: informacion accesible sin autenticacion (aqui, listado de
-// sedes); RF-13 (ampliacion): gestion de sedes exclusiva del
-// administrador, sin restriccion de "mi propia sede" (mismo criterio
-// que ya tenian los horarios de atencion).
-//
-// Incremento 4 (flujo de agendamiento): codigo corto de la sede (se usa
-// en el consecutivo de la cita, CV-BGA-2026-00045), sede principal y
-// amenidades (parqueadero, sala de espera pet friendly).
+// RF-03: informacion accesible sin autenticacion (aqui, listado de sedes);
+// RF-13 (ampliacion): gestion de sedes exclusiva del administrador, sin
+// restriccion de "mi propia sede"
 const sedeModel = require('../models/sede.model');
 const { fotosSedes } = require('../middlewares/subirFoto.middleware');
 

@@ -1,24 +1,12 @@
 // components/ui/SidePanel.jsx
-// Panel lateral derecho, usado por todos los formularios/detalles del
-// sistema. Lleva overlay oscuro de fondo (cambio pedido por la usuaria,
-// reemplaza la regla anterior de "sin overlay"): oscurece el contenido
-// de atras y un clic sobre el, o la tecla Escape, cierra el panel. El
-// padre sigue marcando su contenido principal `inert` mientras esta
-// abierto (ver cualquier PanelXxx.jsx que lo use) para que tampoco se
-// pueda llegar a el con el teclado.
-// Material vetUI: velo azul detras y el panel en cristal fuerte, flotando
-// con margen y esquinas redondeadas (no pegado al borde de la ventana).
-// `footer` (opcional) fija los botones de accion abajo, fuera del
-// scroll del cuerpo -- si no se pasa, el panel queda sin pie fijo.
-// z-50: mas alto que el navbar publico (Navbar.jsx, sticky z-40) -- con
-// z-30 el navbar tapaba el encabezado del panel (titulo + boton de
-// cerrar) en /panel y en el landing, porque ambos arrancan en y=0. El
-// overlay tambien es z-50 pero va antes en el DOM, asi queda debajo
-// del panel y encima del navbar.
-import { useEffect } from 'react';
+// Panel lateral derecho, usado por todos los formularios/detalles del sistema.
+import { useEffect, useRef } from 'react';
 import { IconoX } from '../icons';
+import { useFocoDialogo } from '../../hooks/useFocoDialogo';
 
 export function SidePanel({ isOpen, onClose, title, children, footer }) {
+  const panelRef = useRef(null);
+  useFocoDialogo(isOpen, panelRef);
   useEffect(() => {
     if (!isOpen) return undefined;
     function alPresionarTecla(evento) {
@@ -38,6 +26,8 @@ export function SidePanel({ isOpen, onClose, title, children, footer }) {
       }`}
     />
     <div
+      ref={panelRef}
+      tabIndex={-1}
       className={`cristal-fuerte fixed inset-y-3 right-3 z-50 flex w-[calc(100%-1.5rem)] max-w-[480px] flex-col overflow-hidden rounded-superficie transition-transform duration-200 ${
         isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'
       }`}

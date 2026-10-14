@@ -1,14 +1,12 @@
 // pages/PanelClientePage.jsx
-// Panel del cliente autenticado (Incremento 4, modulo de Clientes):
-// "Mis citas" (RF-06/RF-08/RF-09/RF-15) y "Mis mascotas" (RF-14),
-// con vetUI (floating glass): fondo de marca, encabezado con la foto del
-// Hero, indicadores en vidrio blanco (TarjetaDato), pestañas de vidrio y la
-// accion primaria "Agendar nueva cita" en ambar.
+// Panel del cliente autenticado: "Mis citas" (RF-06/RF-08/RF-09/RF-15) y "Mis
+// mascotas" (RF-14), con vetUI (floating glass): fondo de marca, encabezado
+// con la foto del Hero.
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
-import { Boton, EncabezadoPagina, FondoVetui, Pestanas, TarjetaDato } from '../components/vetui';
+import { Boton, EncabezadoPagina, EstadoError, FondoVetui, Pestanas, TarjetaDato } from '../components/vetui';
 import { PanelMisCitas } from '../components/cliente/PanelMisCitas';
 import { PanelMisMascotas } from '../components/cliente/PanelMisMascotas';
 import { PanelMiPerfilCliente } from '../components/cliente/PanelMiPerfilCliente';
@@ -43,12 +41,16 @@ export function PanelClientePage({ seccion = 'inicio' }) {
 
   const [citas, setCitas] = useState([]);
   const [cargandoCitas, setCargandoCitas] = useState(true);
+  // Si la lista no carga, se dice: no debe parecer una cuenta sin citas.
+  const [errorCitas, setErrorCitas] = useState('');
   const [mascotas, setMascotas] = useState([]);
 
   const cargarCitas = useCallback(() => {
     setCargandoCitas(true);
+    setErrorCitas('');
     obtenerMisCitas(token)
       .then((datos) => setCitas(datos.citas))
+      .catch((err) => setErrorCitas(err.message))
       .finally(() => setCargandoCitas(false));
   }, [token]);
 
@@ -88,7 +90,7 @@ export function PanelClientePage({ seccion = 'inicio' }) {
         }
         className="py-6"
         // Saludo e ilustracion forman un solo bloque centrado en la pagina
-        // (pedido de Oriana): el texto queda un poco corrido a la derecha y
+        // : el texto queda un poco corrido a la derecha y
         // la ilustracion, grande, a su lado. El margen vertical negativo
         // deja que la imagen crezca sin empujar tanto las tarjetas de abajo.
         agrupado
@@ -123,7 +125,7 @@ export function PanelClientePage({ seccion = 'inicio' }) {
           <TarjetaDato
             icono={IconoCalendario}
             tono="azul"
-            valor={proximaCita ? formatearFechaLarga(proximaCita.fecha_hora) : 'Sin citas próximas'}
+            valor={proximaCita ? formatearFechaLarga(proximaCita.fecha_hora) : errorCitas ? 'Sin datos' : 'Sin citas próximas'}
             detalle={proximaCita ? formatearHora(proximaCita.fecha_hora) : undefined}
             etiqueta="Próxima cita"
             onClick={() => setPestana('citas')}
@@ -155,7 +157,9 @@ export function PanelClientePage({ seccion = 'inicio' }) {
         </div>
 
         <div className="mt-6">
-          {pestana === 'citas' ? (
+          {pestana === 'citas' && errorCitas ? (
+            <EstadoError mensaje={errorCitas} onReintentar={cargarCitas} />
+          ) : pestana === 'citas' ? (
             <PanelMisCitas
               citas={citas}
               cargando={cargandoCitas}

@@ -1,6 +1,5 @@
 // models/galeria.model.js
-// Fotos de la galeria del inicio (Hero del landing), ver
-// database/incremento_6a_galeria.sql.
+// Fotos de la galeria del inicio (Hero del landing).
 const { pool } = require('../config/db');
 
 const CAMPOS = 'id, foto_url, descripcion, foco_x, foco_y, orden, activo';

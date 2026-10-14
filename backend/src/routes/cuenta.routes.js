@@ -10,22 +10,16 @@ const { verificarToken, verificarRol } = require('../middlewares/auth.middleware
 const router = express.Router();
 router.use(verificarToken, verificarRol('cliente'));
 
-// GET /api/cuenta/perfil
 router.get('/perfil', obtenerPerfil);
 
-// PUT /api/cuenta/perfil
 router.put('/perfil', actualizarPerfil);
 
-// POST /api/cuenta/correo — { correoNuevo }: envia el codigo al correo nuevo
 router.post('/correo', solicitarCambioCorreo);
 
-// POST /api/cuenta/correo/confirmar — { codigo }
 router.post('/correo/confirmar', confirmarCambioCorreo);
 
-// POST /api/cuenta/contrasena/codigo — envia el codigo al correo de la cuenta
 router.post('/contrasena/codigo', solicitarCodigoContrasena);
 
-// PUT /api/cuenta/contrasena — { codigo, contrasenaNueva }
 router.put('/contrasena', cambiarContrasena);
 
 module.exports = router;

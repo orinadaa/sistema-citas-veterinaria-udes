@@ -13,8 +13,7 @@ const ENLACES_RAPIDOS = [
   { href: '#horarios', etiqueta: 'Horarios' },
 ];
 
-// Compacto a proposito (pedido de Oriana). Despues de Horarios viene directo
-// el footer (la banda "¿Tu mascota necesita una cita?" se quito): es el
+// Compacto a proposito. Despues de Horarios viene directo el footer: es el
 // ultimo punto del landing paginado (data-slide + snap), asi la rueda baja
 // hasta el y no rebota de vuelta a Horarios.
 export function Footer() {
@@ -22,7 +21,7 @@ export function Footer() {
   const canales = canalesDe(useInfoClinica());
   return (
     <footer data-slide className="text-slate-300 lg:snap-start lg:snap-always" style={{ backgroundColor: '#0E172C' }}>
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-7 sm:px-6 md:grid-cols-3 md:gap-10">
+      <div className="mx-auto grid grid-cols-[minmax(0,1fr)] max-w-7xl gap-6 px-4 py-7 sm:px-6 md:grid-cols-3 md:gap-10">
         <div>
           {/* Mismo logotipo que el grande de la topbar (completo, blanco). */}
           <img src={logos.principal_blanco} alt="Clínica Veterinaria UDES" width="120" height="80" loading="lazy" className="h-20 w-auto" />

@@ -1,12 +1,7 @@
 // components/medico/DetalleCitaMedicoPanel.jsx
 // Detalle de una cita en el panel del medico: mascota con su perfil e
-// informacion medica que escribio el dueño, datos de la cita y contacto
-// del dueño. Desde el pie el medico puede cancelar o reprogramar la cita
-// (RF-08/RF-09, PieCancelarCita). `acciones` (opcional) agrega botones al
-// pie (ej. "Crear recordatorio").
-// Tambien lo usa el calendario del administrador de sede, con
-// `mostrarMedico` (la sede ve citas de varios medicos) y sin la informacion
-// medica (`mostrarInfoMedica={false}`), que es solo para el medico.
+// informacion medica que escribio el dueño, datos de la cita y contacto del
+// dueño.
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { edadYPeso } from '../../utils/mascota';
 import { SidePanel } from '../ui/SidePanel';

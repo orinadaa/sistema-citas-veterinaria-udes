@@ -1,15 +1,9 @@
 // components/admin/DetalleRegistroDatos.jsx
 // Como se ve un registro abierto en Datos > Explorar (superadministrador).
-// Cada entidad tiene su propia ficha, con los mismos recursos del resto del
-// panel: avatar e insignias en la cabecera, filas con icono (como el detalle
-// de una cita) y tarjetas de dato corto (como la ficha de un paciente).
-// - DetalleRegistro: la ficha segun la entidad (usuarios, mascotas, citas,
-//   servicios, sedes; cualquier otra cae en una ficha generica).
-// - FilaRelacionada: una fila de "Sus mascotas" / "Sus citas".
-// Solo dibuja: no consulta ni cambia nada.
 import { ETIQUETA_SEXO } from '../../utils/sexo';
 import { ROLES_DATOS, edadDesde, formatearDato } from '../../utils/datos';
 import { iniciales } from '../../utils/texto';
+import { iconoDeServicio } from '../../utils/iconoServicio';
 import { AvatarMascota } from '../cliente/AvatarMascota';
 import { Insignia } from '../vetui';
 import { IconoSexo } from '../ui/EtiquetaSexo';
@@ -18,7 +12,6 @@ import {
   IconoCorreo,
   IconoDocumento,
   IconoEstetoscopio,
-  IconoJeringa,
   IconoPata,
   IconoPersona,
   IconoReloj,
@@ -189,7 +182,7 @@ function FichaCita({ r }) {
         <Fila icono={IconoPersona} etiqueta="Cliente" valor={r.cliente} />
       </Seccion>
       <Seccion titulo="Atención">
-        <Fila icono={IconoJeringa} etiqueta="Servicio" valor={r.servicio} />
+        <Fila icono={iconoDeServicio(r.servicio ?? '')} etiqueta="Servicio" valor={r.servicio} />
         <Fila icono={IconoEstetoscopio} etiqueta="Médico veterinario" valor={r.medico} />
         <Fila icono={IconoSede} etiqueta="Sede" valor={r.sede} />
         <Fila icono={IconoDocumento} etiqueta="Motivo" valor={r.motivo} />
@@ -202,7 +195,7 @@ function FichaCita({ r }) {
 function FichaServicio({ r }) {
   return (
     <>
-      <Cabecera avatar={<ChipIcono icono={IconoJeringa} />} titulo={r.nombre} subtitulo={r.categoria}>
+      <Cabecera avatar={<ChipIcono icono={iconoDeServicio(r.nombre ?? '')} />} titulo={r.nombre} subtitulo={r.categoria}>
         <InsigniaActivo activo={r.activo} />
       </Cabecera>
       <div className="grid grid-cols-2 gap-3">

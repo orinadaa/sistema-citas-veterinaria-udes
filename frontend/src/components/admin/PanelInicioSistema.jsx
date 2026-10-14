@@ -1,12 +1,6 @@
 // components/admin/PanelInicioSistema.jsx
-// Inicio del superadministrador: el estado del sistema completo de un
-// vistazo, sin entrar a operar el dia a dia de ninguna sede.
-// - Indicadores: sedes activas, personal (administradores + medicos),
-//   clientes registrados y servicios activos.
-// - Sedes: una tarjeta por sede con su administrador, medicos, dias con
-//   horario y citas del mes.
-// - Requiere tu atencion: configuracion incompleta (ver AvisosAtencion).
-// onIr(modulo): cambia de modulo en el menu lateral.
+// Inicio del superadministrador: el estado del sistema completo de un vistazo,
+// sin entrar a operar el dia a dia de ninguna sede.
 import { useEffect, useState } from 'react';
 import { obtenerResumenSistema } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -89,7 +83,7 @@ export function PanelInicioSistema({ onIr }) {
         <KPICard icon={IconoJeringa} color="amber" value={servicios.activos} label="Servicios activos" onClick={() => onIr('servicios')} />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <section className="flex flex-col gap-4">
           <h2 className="font-heading text-base font-semibold text-white">Sedes</h2>
           {sedes.map((sede) => (

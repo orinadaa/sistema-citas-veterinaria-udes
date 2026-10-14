@@ -1,13 +1,6 @@
 // pages/PanelAdminPage.jsx
 // Panel interno (/admin). Dos roles, cada uno con sus modulos (el menu
-// lateral, AdminSidebar, muestra los mismos). El medico veterinario ya no
-// entra aca: tiene su propia vista en /medico (PanelMedicoPage).
-// - Superadministrador: administra el sistema completo sin programar
-//   (sedes, cuentas, catalogo de servicios, pagina web, catalogos, datos y
-//   reportes de todas las sedes). No opera citas.
-// - Administrador de sede: el dia a dia de SU sede (inicio, citas, medicos,
-//   pacientes, horario, reportes de su sede; los servicios, solo consulta).
-// Los permisos reales los impone el servidor; aca solo se decide que mostrar.
+// lateral, AdminSidebar, muestra los mismos).
 import { useState } from 'react';
 import { AdminSidebar, AdminNavMovil } from '../components/layout/AdminSidebar';
 import { AdminHeader } from '../components/layout/AdminHeader';
@@ -56,7 +49,7 @@ export function PanelAdminPage() {
   // hoja en el marco de los paneles laterales (position: fixed) y quedarian
   // recortados dentro de ella.
   return (
-    <FondoVetui variante="panel" className="flex h-screen gap-3 overflow-hidden p-3">
+    <FondoVetui variante="panel" className="flex h-dvh gap-3 overflow-hidden p-3 [@media(max-height:32rem)]:h-auto [@media(max-height:32rem)]:min-h-dvh [@media(max-height:32rem)]:overflow-visible">
       <AdminSidebar activo={pestana} onCambiar={irA} />
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -65,7 +58,7 @@ export function PanelAdminPage() {
 
         <div className="relative min-h-0 flex-1">
           <div aria-hidden="true" className="vidrio vidrio-hoja absolute inset-0 rounded-superficie" />
-          <main className="hoja-panel relative h-full overflow-y-auto rounded-superficie px-4 py-6 text-white sm:px-8 sm:py-8">
+          <main className="hoja-panel relative h-full overflow-y-auto rounded-superficie px-4 py-6 text-white sm:px-8 sm:py-8 [@media(max-height:32rem)]:h-auto [@media(max-height:32rem)]:overflow-visible">
             {/* Mi cuenta: se abre desde el menu del avatar, no desde el menu lateral. */}
             {pestana === 'cuenta' && <PanelMiCuenta />}
 

@@ -1,22 +1,6 @@
 // components/form/CampoCodigo.jsx
-// Codigo de verificacion de un solo uso (el que llega por correo): un
-// recuadro por digito, en dos grupos de tres separados por un guion
-// (diseño elegido por Oriana: seis digitos seguidos cuestan de leer; en
-// dos grupos se copian sin perderse). Cada recuadro es un `campo` de
-// vetUI: mismo borde, radio y foco ambar que el resto de los campos.
-//
-// Comportamiento:
-// - escribir un digito pasa el foco al recuadro siguiente; Retroceso en un
-//   recuadro vacio vuelve al anterior y lo borra; las flechas mueven el foco;
-// - pegar el codigo completo lo reparte solo en los recuadros (sirve
-//   tambien para el autocompletado del celular: autocomplete one-time-code);
-// - solo acepta digitos;
-// - `error`: los recuadros se pintan en rojo (aria-invalid). Quien lo usa
-//   decide cuando vaciarlo; al quedar vacio con `enfocar` cambia, el foco
-//   vuelve al primer recuadro.
-//
-// Se usa como un campo de texto: `valor` es la cadena de digitos y
-// onChange recibe la cadena nueva.
+// Codigo de verificacion de un solo uso (el que llega por correo): un recuadro
+// por digito, en dos grupos de tres separados por un guion.
 import { useEffect, useRef } from 'react';
 
 export function CampoCodigo({ id, etiqueta = 'Código de seguridad', valor, onChange, longitud = 6, error = false, disabled = false, enfocar = 0 }) {

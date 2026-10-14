@@ -1,7 +1,6 @@
 // models/registroPendiente.model.js
 // Consultas SQL de la tabla "registro_pendiente": quien se registro y aun no
-// confirma su correo con el codigo (ver
-// database/incremento_13b_verificacion_correo.sql).
+// confirma su correo con el codigo.
 const { pool } = require('../config/db');
 
 // Una sola solicitud por correo: registrarse de nuevo reemplaza los datos y

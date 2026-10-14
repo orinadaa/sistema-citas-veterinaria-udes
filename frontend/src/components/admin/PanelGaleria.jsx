@@ -1,10 +1,6 @@
 // components/admin/PanelGaleria.jsx
 // Configuracion > Galeria: las fotos que rotan en la portada (Hero) de la
-// pagina publica. El administrador las sube como archivo (ZonaImagen),
-// las describe, elige que parte debe quedar al centro (encuadre), las
-// ordena, las oculta o las elimina. El Hero las lee de GET /api/galeria
-// (ver landing/HeroGaleria.jsx); si no hay ninguna visible, el Hero usa
-// las fotos de ejemplo que vienen con el sistema.
+// pagina publica.
 import { useEffect, useState } from 'react';
 import {
   obtenerGaleriaAdmin,

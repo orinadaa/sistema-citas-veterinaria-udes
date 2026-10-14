@@ -379,6 +379,8 @@ describe('POST /api/mascotas/:id/foto', () => {
     mascotaModel.actualizarFoto.mockImplementation((id, fotoUrl) => ({ mascota: { id, foto_url: fotoUrl }, fotoAnterior: null }));
     const respuesta = await subir(TOKEN_CLIENTE);
     expect(respuesta.status).toBe(200);
-    expect(respuesta.body.mascota.foto_url).toMatch(/^\/uploads\/mascotas\/[0-9a-f-]+\.png$/);
+    // La base guarda la ruta; la respuesta la entrega con el enlace firmado.
+    expect(mascotaModel.actualizarFoto.mock.calls[0][1]).toMatch(/^\/uploads\/mascotas\/[0-9a-f-]+\.png$/);
+    expect(respuesta.body.mascota.foto_url).toMatch(/^\/uploads\/mascotas\/[0-9a-f-]+\.png\?e=\d+&f=[0-9a-f]{32}$/);
   });
 });

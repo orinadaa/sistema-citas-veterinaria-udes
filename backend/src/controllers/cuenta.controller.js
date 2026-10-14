@@ -1,11 +1,5 @@
 // controllers/cuenta.controller.js
-// "Mi perfil" del cliente (/api/cuenta). Decisiones de Oriana:
-// - Edita sus datos personales: nombre, telefono, documento y direccion.
-// - El correo se cambia confirmando un codigo enviado AL CORREO NUEVO (los
-//   mismos manejadores del perfil del medico, perfilMedico.controller.js).
-// - La contraseña se cambia confirmando un codigo de 6 digitos enviado a SU
-//   CORREO ACTUAL: asi se comprueba que quien la cambia es el dueño de la
-//   cuenta, aunque alguien mas tenga la sesion abierta.
+// "Mi perfil" del cliente (/api/cuenta).
 const bcrypt = require('bcryptjs');
 const cuentaModel = require('../models/cuenta.model');
 const usuarioModel = require('../models/usuario.model');

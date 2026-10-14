@@ -1,9 +1,5 @@
 // components/ui/KPICard.jsx
 // Tarjeta de indicador: icono en circulo de color, numero grande, etiqueta.
-// `detalle` (opcional) agrega una segunda linea chica bajo el valor (ej.
-// la hora de la proxima cita, debajo de su fecha). `onClick` (opcional)
-// agrega un boton circular de flecha para navegar al detalle -- ninguno
-// de los dos cambia el comportamiento de los paneles que no los pasan.
 import { IconoFlechaDerecha } from '../icons';
 
 const COLORES = {

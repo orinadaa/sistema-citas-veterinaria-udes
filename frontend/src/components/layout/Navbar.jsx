@@ -1,34 +1,6 @@
 // components/layout/Navbar.jsx
-// Topbar publica (landing, /agendar y /panel del cliente): texto blanco
-// y el boton "Agendar cita" en ambar (brand.amber, texto slate-900).
-// Cada pagina que la usa empieza con un banner en degradado azul que
-// pasa por detras de ella (-mt-24 pt-24): el Hero en la landing y el
-// banner de encabezado en /agendar y /panel.
-//
-// Topbar tipo pildora, con 2 estados:
-// - Estado 1 (scroll = 0): fondo transparente, sin borde, sin sombra y
-//   sin blur. El banner pasa por detras (-mt-24), asi que lo que se ve es
-//   su propio degradado continuo: no hay un bloque "topbar" que delimitar.
-//   Solo el contenido (enlaces, logo grande, botones) flota encima.
-// - Estado 2: se despega 12px del borde, se angosta (maximo ~68rem,
-//   centrado) y baja a 64px de alto, azul profundo translucido con blur
-//   y sombra. Radio fijo de 32px en todo el recorrido (= mitad del alto
-//   final, asi que al llegar es una capsula exacta).
-// El paso entre ambos es progresivo: `t` va de 0 a 1 en los primeros
-// DISTANCIA_FLOW_PX de scroll y se aplica directo al estilo (via ref,
-// dentro de requestAnimationFrame) sin re-renderizar React. El <header>
-// mide siempre 96px (el banner se mete por debajo con -mt-24) y es
-// pointer-events-none: solo la pildora recibe clicks, asi el espacio
-// transparente alrededor no bloquea el contenido que pasa por detras.
-//
-// Layout en 3 columnas (grid 1fr | auto | 1fr): enlaces de seccion a la
-// izquierda, logo al centro y acciones a la derecha. Al ser las dos
-// columnas laterales 1fr, el logo queda centrado respecto al ancho total
-// de la barra aunque ambos grupos midan distinto. El logo arranca
-// grande (logoblanco.png, el que antes estaba en el Hero) y con
-// el scroll se cruza con el logo corto: ambos leen la variable CSS
-// --flow (0..1) que escribe aplicarFlow, asi que no hay un segundo
-// listener de scroll.
+// Topbar publica (landing, /agendar y /panel del cliente): texto blanco y el
+// boton "Agendar cita" en ambar (brand.amber, texto slate-900).
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLogos } from '../../hooks/useLogos';
@@ -111,7 +83,7 @@ function aplicarFlow(elemento, t, material) {
   // ambos grupos + logo quepan con el texto en 16px sin descentrar el logo).
   estilo.left = `calc(${t} * max(16px, (100% - 68rem) / 2))`;
   estilo.right = estilo.left;
-  // Radio fijo de 32px en todo el recorrido (decision de Oriana): no
+  // Radio fijo de 32px en todo el recorrido: no
   // cambia con el scroll. Al llegar a 64px de alto coincide con la mitad
   // del alto, asi que el estado final es una capsula exacta; durante la
   // transicion (barra mas alta) los extremos se ven un poco menos
@@ -143,7 +115,7 @@ export function Navbar({ onAgendar } = {}) {
   const esCliente = usuario?.rol === 'cliente';
   // Medico veterinario: la misma pildora, con accesos a SU trabajo en vez de
   // los enlaces publicos, "Mi perfil" en el menu del avatar y "Agendar cita"
-  // que abre su panel de agendar (decisiones de Oriana).
+  // que abre su panel de agendar.
   const esMedico = usuario?.rol === 'veterinario';
   const barraRef = useRef(null);
   const headerRef = useRef(null);
@@ -155,7 +127,7 @@ export function Navbar({ onAgendar } = {}) {
   const grupoDerechoRef = useRef(null);
   const logoRef = useRef(null);
 
-  // Equilibrio del logo (regla de Oriana: en todos los estados de la
+  // Equilibrio del logo (en todos los estados de la
   // topbar el logo va en la mitad entre los enlaces de la izquierda y los
   // componentes de la derecha, a la misma distancia de ambos). Su columna
   // esta en el centro exacto de la barra, pero como los enlaces van
@@ -351,7 +323,7 @@ export function Navbar({ onAgendar } = {}) {
   return (
     <header ref={headerRef} className="pointer-events-none sticky top-0 z-40 h-24">
       <div ref={barraRef} className="pointer-events-auto absolute inset-0">
-        <div ref={filaRef} className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:w-fit md:gap-x-10 lg:gap-x-12">
+        <div ref={filaRef} className="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 whitespace-nowrap md:w-fit md:gap-x-6 lg:gap-x-12">
           {/* La columna izquierda siempre existe (aunque el nav se oculte en
               movil) para que el grid no corra el logo hacia la izquierda.
               Desde md la fila mide lo que su contenido (w-fit) y va centrada:
@@ -363,7 +335,7 @@ export function Navbar({ onAgendar } = {}) {
           <div className="justify-self-start md:justify-self-stretch">
             {/* Por debajo de md los enlaces no caben: van en el menu. */}
             <MenuMovil estaAutenticado={estaAutenticado} usuario={usuario} onSalir={salir} />
-            <nav ref={navRef} className="hidden items-center justify-center gap-8 text-base font-medium text-white/90 md:flex">
+            <nav ref={navRef} className="hidden items-center justify-center gap-5 text-base lg:gap-8 font-medium text-white/90 md:flex">
               {/* Link (no <a>) para que funcionen desde cualquier pagina, no
                   solo desde el landing: si el usuario esta en /panel, primero
                   navega a "/" y LandingPage.jsx hace scroll al hash una vez

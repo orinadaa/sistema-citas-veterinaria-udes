@@ -1,11 +1,6 @@
 // components/medico/PanelDisponibilidadMedico.jsx
 // "Mi perfil > Mi horario": el medico CONSULTA su horario de trabajo y sus
-// bloqueos. No los edita: desde el 11 oct 2026 (decision de la usuaria) los
-// define el administrador de su sede en Medicos > Horario
-// (admin/HorarioMedicoPanel.jsx).
-// - Horario semanal: dias, horas y pausa. Sin horario propio, atiende con
-//   el horario de atencion de su sede.
-// - Bloqueos vigentes: vacaciones, permisos u horas puntuales sin atencion.
+// bloqueos.
 import { useEffect, useState } from 'react';
 import { obtenerDisponibilidadMedico } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -91,7 +86,7 @@ export function PanelDisponibilidadMedico() {
   const hoy = new Date().getDay();
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="flex flex-col gap-6">
         <Tarjeta
           titulo="Mi horario de trabajo"

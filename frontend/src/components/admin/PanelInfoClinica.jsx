@@ -1,10 +1,6 @@
 // components/admin/PanelInfoClinica.jsx
 // Pagina web > Informacion de la clinica (RF-23, superadministrador): lo que
 // la pagina publica muestra de la clinica y que se cambia sin programar.
-// - WhatsApp: un solo numero para toda la clinica. Con el interruptor
-//   encendido, el landing muestra la burbuja flotante que abre el chat.
-// - Redes sociales: las que tengan enlace salen como iconos en el pie de
-//   pagina; las vacias no aparecen.
 import { useEffect, useState } from 'react';
 import { actualizarInfoClinica, obtenerInfoClinicaAdmin } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -77,7 +73,7 @@ export function PanelInfoClinica() {
     <form onSubmit={guardar} className="flex flex-col gap-6" noValidate>
       <p className="max-w-2xl text-sm text-white/90">Datos de contacto que ve cualquier visitante en la página pública.</p>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
         <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
           <h2 className="flex items-center gap-2 font-heading text-base font-semibold text-brand-navy">
             <IconoWhatsapp className="h-5 w-5 text-[#128C7E]" peso="fill" />

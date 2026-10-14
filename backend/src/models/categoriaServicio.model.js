@@ -1,7 +1,7 @@
 // models/categoriaServicio.model.js
 // Catalogo compartido de categorias (servicios) / especialidades
 // (medicos) del sistema de diseno: cada nombre tiene un color de la
-// paleta "category" (ver database/incremento_3b_servicios_categoria_precio.sql).
+// paleta "category".
 const { pool } = require('../config/db');
 
 // Todas, con su estado: los selectores ofrecen solo las activas, pero

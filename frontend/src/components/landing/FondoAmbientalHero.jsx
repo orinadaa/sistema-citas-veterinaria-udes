@@ -1,25 +1,5 @@
 // components/landing/FondoAmbientalHero.jsx
-// Halos del Hero, mismo lenguaje que FondoAmbientalServicios. La base no
-// va aca: Hero y Servicios comparten un solo degradado continuo
-// (brand-blue-500 arriba -> brand-blue-800 al final de Servicios) en el
-// contenedor que los envuelve (LandingPage.jsx). Estos halos se extienden
-// por debajo del borde inferior del Hero (-bottom-[30%]) para mezclarse
-// con los de Servicios sin dejar un corte.
-//
-// La composicion cambia entre movil y desktop porque el Hero cambia: en
-// movil el texto va arriba y la ilustracion abajo; desde lg el texto va a
-// la izquierda y la ilustracion a la derecha.
-//   1. Halo brand-blue-400 detras de la ilustracion, con la misma deriva
-//      lenta que el halo central de Servicios.
-//   2. Profundidad brand-blue-800 detras del titulo, el parrafo y los
-//      botones: el fondo arranca en el azul claro de marca y sin esta capa
-//      el texto blanco no llegaria a contraste AA.
-//   3. Ambar brand-amber detras de la base de la ilustracion y en la
-//      esquina superior derecha (solo desde lg, lejos del texto).
-//   4. Halo brand-blue-400 abajo a la derecha, cruzando hacia Servicios
-//      (a la derecha para no aclarar el encabezado de Servicios, que va a
-//      la izquierda).
-//   + Onda organica difuminada (solo desde md).
+// Halos del Hero, mismo lenguaje que FondoAmbientalServicios.
 const color = (token, porcentaje) => `color-mix(in oklab, var(--color-${token}) ${porcentaje}%, transparent)`;
 
 const MOVIL = {

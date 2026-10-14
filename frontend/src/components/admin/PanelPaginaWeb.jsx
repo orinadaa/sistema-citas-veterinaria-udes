@@ -1,6 +1,6 @@
 // components/admin/PanelPaginaWeb.jsx
 // Pagina web (superadministrador): lo que ve cualquier visitante en la pagina
-// publica. Pestañas (pedido de Oriana) para no tener que bajar hasta la
+// publica. Pestañas para no tener que bajar hasta la
 // galeria: Galeria del inicio, Informacion de la clinica (RF-23) y Logotipos.
 import { useState } from 'react';
 import { PageHeader } from '../ui/PageHeader';

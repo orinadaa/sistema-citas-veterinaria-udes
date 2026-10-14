@@ -1,8 +1,6 @@
 // components/ui/EtiquetaSexo.jsx
 // Sexo de la mascota con su icono (Phosphor), en vez de los caracteres de
 // texto que algunos equipos dibujan como emoji.
-// - IconoSexo: solo el icono.
-// - EtiquetaSexo: icono + "Hembra" / "Macho". Sin sexo conocido no dibuja nada.
 import { IconoHembra, IconoMacho } from '../icons';
 
 import { ETIQUETA_SEXO } from '../../utils/sexo';

@@ -1,21 +1,5 @@
 // components/citas/ReprogramarCitaModal.jsx
-// Ventana "Reprogramar cita" (RF-08). Se abre desde el boton Reprogramar
-// del detalle de la cita, centrada sobre el panel lateral (pedido de
-// Oriana): antes el calendario se desplegaba DENTRO del panel, apretado
-// entre los datos de la cita, y habia que desplazarse para ver las horas.
-// Aca el calendario y las horas disponibles se ven juntos, lado a lado.
-//
-// Usa el mismo calendario de mes y selector de horas del flujo de agendar
-// (DatePickerCalendar + TimeSlotPicker), filtrados al medico de la cita:
-// reprogramar no cambia de medico.
-//
-// El estado (fecha y hora elegidas) vive en DetalleCitaPanel; esta ventana
-// solo lo muestra. Cancelar, la X, Escape o un clic afuera la cierran sin
-// cambiar la cita; el detalle queda abierto detras.
-//
-// z-[60]: por encima del panel lateral (z-50). Se monta en <body>
-// (portal) porque el panel usa transform, y un ancestro con transform
-// encerraria el position:fixed de la ventana dentro de el.
+// Ventana "Reprogramar cita" (RF-08).
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
@@ -86,7 +70,7 @@ export function ReprogramarCitaModal({
           </button>
         </div>
 
-        <div className="grid flex-1 gap-6 overflow-y-auto px-6 py-5 md:grid-cols-[minmax(0,21rem)_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] flex-1 gap-6 overflow-y-auto px-6 py-5 md:grid-cols-[minmax(0,21rem)_minmax(0,1fr)]">
           <div>
             <p className="mb-3 text-sm font-semibold text-brand-navy">1. Elige el día</p>
             <DatePickerCalendar

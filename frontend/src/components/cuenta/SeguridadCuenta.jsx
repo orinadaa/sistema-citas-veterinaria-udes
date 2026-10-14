@@ -1,14 +1,6 @@
 // components/cuenta/SeguridadCuenta.jsx
 // Las dos tarjetas de seguridad de una cuenta, compartidas por "Mi perfil" del
-// cliente y "Mi cuenta" del administrador y del superadministrador:
-// - CambioCorreo: se cambia confirmando un codigo enviado AL CORREO NUEVO (asi
-//   se comprueba que existe y que es suyo).
-// - CambioContrasena: se cambia confirmando un codigo enviado al CORREO ACTUAL
-//   de la cuenta. Con `pideActual` (administradores) antes de enviar el codigo
-//   se exige ademas la contraseña actual.
-// Cada pantalla pasa sus propias llamadas al servidor en `api`.
-// Los codigos se escriben en CampoCodigo (un recuadro por digito) con la
-// cuenta regresiva para reenviar, igual que al recuperar la contraseña.
+// cliente y "Mi cuenta" del administrador y del superadministrador.
 import { useState } from 'react';
 import { useCuentaRegresiva } from '../../hooks/useCuentaRegresiva';
 import { Boton } from '../vetui';
@@ -277,7 +269,7 @@ export function CambioContrasena({ correo, api, pideActual = false }) {
               enfocar={enfocar}
             />
             <ReenviarCodigo cuenta={cuenta} onReenviar={() => pedirCodigo()} disabled={enviando} className="-mt-1 self-center" />
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <Campo id="contrasena-nueva-perfil" label="Nueva contraseña" type="password" autoComplete="new-password" value={nueva} onChange={(e) => setNueva(e.target.value)} required />
               <Campo id="contrasena-confirmar-perfil" label="Repite la contraseña" type="password" autoComplete="new-password" value={confirmacion} onChange={(e) => setConfirmacion(e.target.value)} required />
             </div>

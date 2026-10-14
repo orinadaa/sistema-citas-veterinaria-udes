@@ -1,10 +1,6 @@
 // components/layout/AuthLayout.jsx
-// Envoltorio compartido por las pantallas de login, registro y
-// recuperacion de clave. Mismo material que las pantallas del cliente
-// (vetUI): fondo de marca con pocos toques ambar (FondoVetui variante
-// "sesion"), muchas huellas tenues como las del landing y el formulario en una
-// tarjeta de vidrio blanco flotante (texto oscuro: AA sobre el vidrio). El
-// enlace de abajo va directo sobre el fondo: por eso textoDirecto.
+// Envoltorio compartido por las pantallas de login, registro y recuperacion de
+// clave.
 import { Link } from 'react-router-dom';
 import { FondoVetui } from '../vetui';
 import { HuellasFondo } from '../landing/HuellasFondo';

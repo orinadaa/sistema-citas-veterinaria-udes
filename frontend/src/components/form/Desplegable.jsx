@@ -1,33 +1,6 @@
 // components/form/Desplegable.jsx
-// Lista desplegable de vetUI: reemplaza al <select> del navegador en todo
-// el sistema. El <select> nativo abre una lista que dibuja el sistema
-// operativo (gris, con otra fuente, distinta en cada navegador) y no se
-// puede adaptar a la marca; esta se ve igual en todos lados: el campo es
-// un `campo` mas (mismo borde, radio y foco ambar) y la lista es una
-// tarjeta flotante con las opciones en Raleway, la elegida en azul de
-// marca con un check.
-//
-// Se usa igual que un <select>, para que migrar sea solo cambiar la
-// etiqueta: recibe <option value="..."> como hijos y llama a onChange con
-// un evento de forma { target: { value } }.
-//
-//   <Desplegable id="sede" value={sedeId} onChange={(e) => setSedeId(e.target.value)}>
-//     <option value="">Todas las sedes</option>
-//     {sedes.map((s) => <option key={s.id} value={s.id}>{s.nombre}</option>)}
-//   </Desplegable>
-//
-// Accesibilidad (patron "select-only combobox" de WAI-ARIA):
-// - el campo es un boton con role="combobox"; un <label htmlFor> lo nombra
-//   y un clic en la etiqueta lo enfoca;
-// - teclado: Enter, Espacio o las flechas abren; flechas, Inicio y Fin
-//   recorren; Enter o Espacio eligen; Escape cierra sin cambiar; Tab
-//   elige la opcion activa y sigue; escribir letras salta a la opcion que
-//   empieza asi;
-// - el foco no sale del campo (aria-activedescendant marca la opcion).
-//
-// La lista se dibuja en <body> (portal) con posicion fija: asi no la
-// recorta el scroll de un panel lateral, y se abre hacia arriba si abajo
-// no hay espacio. z-[70]: sobre paneles (z-50) y ventanas (z-60).
+// Lista desplegable de vetUI: reemplaza al <select> del navegador en todo el
+// sistema.
 import { Children, isValidElement, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { IconoCheck, IconoChevronAbajo } from '../icons';

@@ -1,13 +1,6 @@
 // components/form/ZonaImagen.jsx
-// Zona de subida para fotos RECTANGULARES (foto de sede, galeria del
-// inicio): la version apaisada de ZonaFoto. Rectangulo punteado con icono
-// y "Subir foto" cuando esta vacio (clic o arrastrar el archivo), o la
-// foto cuando ya hay una, con "Cambiar foto" debajo.
-//
-// Reemplaza a los campos donde antes se pegaba un enlace: la foto siempre
-// se sube como archivo. Valida y reduce la imagen (utils/imagen.js) y
-// entrega el resultado por onElegir(blob); quien la usa decide cuando
-// subirla. Las fotos circulares (mascota, medico) usan ZonaFoto.
+// Zona de subida para fotos RECTANGULARES (foto de sede, galeria del inicio):
+// la version apaisada de ZonaFoto.
 import { useRef, useState } from 'react';
 import { IconoImagen } from '../icons';
 import { prepararImagen, PESO_MAXIMO_ORIGINAL_MB } from '../../utils/imagen';

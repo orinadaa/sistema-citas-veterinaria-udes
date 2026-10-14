@@ -1,16 +1,5 @@
 // components/medico/PanelMiPerfilMedico.jsx
-// "Mi perfil" del medico veterinario (/medico/perfil). Presentacion vetUI,
-// como la vista del cliente: secciones en el control segmentado de vidrio
-// (Pestanas) y cada bloque en una tarjeta de vidrio blanco. Secciones:
-// - Informacion personal: resumen con foto (editor de foto reutilizado
-//   del de mascotas), datos personales editables, cambio de correo con
-//   codigo de verificacion enviado al correo nuevo, cambio de contraseña,
-//   sedes asignadas y resumen de actividad.
-// - Informacion profesional: titulos, registro, años de experiencia y
-//   biografia editables; especialidades y servicios de SOLO LECTURA
-//   (los asigna el administrador). Sin formacion academica,
-//   certificaciones ni documentos (fuera de este incremento).
-// - Mi horario (solo consulta): ver PanelDisponibilidadMedico.
+// "Mi perfil" del medico veterinario (/medico/perfil).
 import { useEffect, useState } from 'react';
 import {
   actualizarPerfilMedico,
@@ -340,7 +329,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
         <Pestanas items={TABS} activo={pestana} onCambiar={setPestana} etiqueta="Secciones de mi perfil" />
 
         {pestana === 'personal' && (
-          <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_260px]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[260px_minmax(0,1fr)_260px]">
             <Tarjeta>
               <div className="flex flex-col items-center text-center">
                 {/* Zona de foto estandar del sistema; el clic abre el editor. */}
@@ -397,9 +386,11 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                       actualizarSesion({ correo });
                     }}
                   />
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                     <Campo
                       id="perfil-telefono"
+                      inputMode="tel"
+                      autoComplete="tel"
                       label="Teléfono"
                       value={personal.telefono}
                       onChange={(e) => setPersonal({ ...personal, telefono: e.target.value })}
@@ -423,7 +414,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                     value={personal.direccion}
                     onChange={(e) => setPersonal({ ...personal, direccion: e.target.value })}
                   />
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                     <div className="flex flex-col gap-1.5">
                       <span className="text-sm font-medium text-slate-700">Sede principal</span>
                       <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">{perfil.sede_nombre || 'Sin sede'}</p>
@@ -458,7 +449,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                     onChange={(e) => setClaves({ ...claves, actual: e.target.value })}
                     required
                   />
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                     <Campo
                       id="clave-nueva"
                       label="Nueva contraseña"
@@ -532,7 +523,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
         )}
 
         {pestana === 'profesional' && (
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
             <Tarjeta titulo="Información profesional">
               <form
                 onSubmit={(e) => {
@@ -549,7 +540,7 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                   onChange={(e) => setProfesional({ ...profesional, titulosProfesionales: e.target.value })}
                   placeholder="Ej. Médico Veterinario Zootecnista, Universidad de Santander"
                 />
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                   <Campo
                     id="perfil-registro"
                     label="Número de registro profesional"

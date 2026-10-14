@@ -1,16 +1,6 @@
 // controllers/cita.controller.js
-// RF-06 (agendar), RF-07 (disponibilidad), RF-08 (reprogramar),
-// RF-09 (cancelar): historias de usuario HU-05 a HU-08.
-// Agendan el cliente (para si mismo), el administrador de sede y el medico
-// (a nombre de un cliente). Reprograman y cancelan el cliente dueño, el
-// administrador de la sede de la cita y el medico que la atiende.
-// Una cita ocupa tantas franjas de 30 minutos como dure su servicio.
-//
-// La disponibilidad de una franja depende de que al menos un medico que
-// preste ese servicio en esa sede este libre. En el flujo de
-// agendamiento del cliente (incremento 4) el medico se asigna
-// automaticamente al confirmar; el calendario del administrador sigue
-// eligiendolo explicitamente.
+// RF-06 (agendar), RF-07 (disponibilidad), RF-08 (reprogramar), RF-09
+// (cancelar): historias de usuario HU-05 a HU-08.
 
 const citaModel = require('../models/cita.model');
 const sedeModel = require('../models/sede.model');
@@ -68,9 +58,7 @@ function medicoLibreDurante(medicoId, inicio, duracionMinutos, { franjasDeLaSede
 }
 
 // Quien puede cancelar o reprogramar una cita: el cliente dueño, el
-// administrador de la sede donde es la cita y el medico que la atiende
-// (antes solo el cliente: si un medico no podia atender, nadie de la sede
-// podia mover sus citas).
+// administrador de la sede donde es la cita y el medico que la atiende.
 function puedeGestionarCita(usuario, cita) {
   if (usuario.rol === 'cliente') return cita.cliente_id === usuario.id;
   if (usuario.rol === 'administrador') return cita.sede_id === usuario.sedeId;
@@ -123,7 +111,7 @@ async function consultarDisponibilidad(req, res, next) {
     if (!sede) return res.status(404).json({ mensaje: 'La sede indicada no existe.' });
     if (!servicio) return res.status(404).json({ mensaje: 'El servicio indicado no existe.' });
 
-    // Fecha real: 2026-02-31 antes se tomaba como 3 de marzo.
+    // Fecha real: se rechazan dias que no existen, como un 31 de febrero.
     if (!esFechaReal(fecha)) {
       return res.status(400).json({ mensaje: 'La fecha debe ser un día que exista, con el formato YYYY-MM-DD.' });
     }
@@ -228,8 +216,7 @@ async function consultarMedicosDisponibles(req, res, next) {
   }
 }
 
-// Asignacion automatica de medico (flujo de agendamiento del cliente,
-// decision registrada en docs/incremento_4_pruebas.md): entre los
+// Asignacion automatica de medico en el agendamiento del cliente: entre los
 // medicos activos de la sede que prestan el servicio y estan libres en
 // esa franja, primero el que tenga menos citas activas ese dia;
 // desempate por nombre para que el resultado sea estable/predecible.
@@ -290,7 +277,7 @@ async function crear(req, res, next) {
   try {
     const esAdmin = req.usuario.rol === 'administrador';
     // El medico agenda a nombre de un cliente, en SU sede y con EL MISMO
-    // como medico (decision de la usuaria): no se aceptan otros valores.
+    // como medico: no se aceptan otros valores.
     const esMedico = req.usuario.rol === 'veterinario';
     const agendaPersonal = esAdmin || esMedico;
     const { servicioId, fechaHora, mascotaId, motivo, clienteId: clienteIdBody } = req.body;
@@ -405,6 +392,9 @@ async function crear(req, res, next) {
         });
         break;
       } catch (error) {
+        if (error.code === 'MASCOTA_OCUPADA') {
+          return res.status(409).json({ mensaje: 'Esa mascota ya tiene una cita a esa hora.' });
+        }
         if (error.code !== '23505') throw error;
       }
     }
@@ -479,7 +469,10 @@ async function reprogramarCita(req, res, next) {
     if (new Date(cita.fecha_hora) <= new Date()) {
       return res.status(409).json({ mensaje: 'Esa cita ya pasó: no se puede reprogramar.' });
     }
-    const duracion = duracionDe(await servicioModel.buscarPorId(cita.servicio_id));
+    // La cita conserva la duracion con la que se agendo; el servicio solo se consulta si falta ese dato.
+    const duracion = cita.duracion_minutos
+      ? Math.max(DURACION_SLOT_MINUTOS, Number(cita.duracion_minutos))
+      : duracionDe(await servicioModel.buscarPorId(cita.servicio_id));
 
     const fecha = parsearFechaISO(nuevaFechaHora);
     if (!fecha) {
@@ -512,6 +505,9 @@ async function reprogramarCita(req, res, next) {
   } catch (error) {
     if (error.code === '23505') {
       return res.status(409).json({ mensaje: 'El médico ya tiene una cita en esa franja. Elige otra.' });
+    }
+    if (error.code === 'MASCOTA_OCUPADA') {
+      return res.status(409).json({ mensaje: 'Esa mascota ya tiene otra cita a esa hora.' });
     }
     next(error);
   }

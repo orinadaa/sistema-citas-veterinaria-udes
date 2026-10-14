@@ -1,8 +1,7 @@
 // components/form/ReenviarCodigo.jsx
 // Pie del campo de codigo (CampoCodigo): mientras corre la cuenta regresiva
 // muestra "Reenviar código en 00:42" como texto (no es clicable, asi que no
-// reacciona al cursor); al terminar aparece el boton "Reenviar código".
-// `cuenta` es lo que devuelve useCuentaRegresiva.
+// reacciona al cursor)
 export function ReenviarCodigo({ cuenta, onReenviar, disabled = false, className = '' }) {
   if (cuenta.restantes > 0) {
     return (

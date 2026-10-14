@@ -1,5 +1,5 @@
 // tests/disponibilidadMedico.test.js
-// Logica pura de disponibilidad propia del medico (opcion A).
+// Logica pura de disponibilidad propia del medico.
 const { medicoAtiende } = require('../src/utils/disponibilidadMedico');
 
 const SEDE = 'sede-1';

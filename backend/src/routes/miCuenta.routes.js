@@ -1,13 +1,7 @@
 // routes/miCuenta.routes.js
 // "Mi cuenta" del administrador de sede y del superadministrador
-// (/api/mi-cuenta): cambiar su correo y su contraseña.
-// Decision de Oriana para la contraseña: contraseña actual + codigo por
-// correo. Primero se comprueba la contraseña actual; solo entonces se envia
-// el codigo de 6 digitos al correo de la cuenta, y con ese codigo se guarda
-// la nueva.
-// El correo se cambia confirmando un codigo enviado AL CORREO NUEVO (mismos
-// manejadores del medico y del cliente): asi una cuenta cuyo correo no existe
-// puede pasar a uno real y, desde ahi, recibir los codigos.
+// (/api/mi-cuenta): cambiar su correo y su contraseña. para la contraseña:
+// contraseña actual + codigo por correo.
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const usuarioModel = require('../models/usuario.model');
@@ -34,7 +28,6 @@ async function exigirContrasenaActual(req, res, next) {
   }
 }
 
-// GET /api/mi-cuenta — datos basicos de la propia cuenta
 router.get('/', async (req, res, next) => {
   try {
     const usuario = await usuarioModel.buscarPorId(req.usuario.id);
@@ -45,16 +38,12 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// POST /api/mi-cuenta/correo — { correoNuevo }
 router.post('/correo', solicitarCambioCorreo);
 
-// POST /api/mi-cuenta/correo/confirmar — { codigo }
 router.post('/correo/confirmar', auditar('Cambiar su correo', 'usuario'), confirmarCambioCorreo);
 
-// POST /api/mi-cuenta/contrasena/codigo — { contrasenaActual }
 router.post('/contrasena/codigo', exigirContrasenaActual, solicitarCodigoContrasena);
 
-// PUT /api/mi-cuenta/contrasena — { codigo, contrasenaNueva }
 router.put('/contrasena', auditar('Cambiar su contraseña', 'usuario'), cambiarContrasena);
 
 module.exports = router;

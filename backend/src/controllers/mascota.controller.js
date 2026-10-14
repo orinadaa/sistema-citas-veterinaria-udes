@@ -14,7 +14,7 @@ const { errorLongitud, esFechaReal } = require('../utils/validacion');
 
 const SEXOS_VALIDOS = ['macho', 'hembra'];
 
-// Limites de las columnas de texto (database/incremento_3f, 4 y 4d) y la
+// Limites de las columnas de texto y la
 // fecha de nacimiento: se revisan aqui para responder un mensaje claro.
 const LIMITES_TEXTO = { nombre: 100, especie: 50, raza: 80, color: 50, caracteristicas: 1000, alergias: 1000, medicamentos: 1000, condicionesMedicas: 1000, observaciones: 1000 };
 const ETIQUETAS_TEXTO = { nombre: 'El nombre', especie: 'La especie', raza: 'La raza', color: 'El color', caracteristicas: 'Las características', alergias: 'Las alergias', medicamentos: 'Los medicamentos', condicionesMedicas: 'Las condiciones médicas', observaciones: 'Las observaciones' };
@@ -55,7 +55,7 @@ function textoVacio(valor) {
   return typeof valor !== 'string' || valor.trim() === '';
 }
 
-// Especie y raza son obligatorias (decision de la usuaria). Al crear se
+// Especie y raza son obligatorias. Al crear se
 // exigen; al editar, si vienen, no pueden quedar vacias. La lista de
 // razas es un catalogo del frontend (utils/razas.js): aqui se guarda
 // el texto tal cual, igual que antes.

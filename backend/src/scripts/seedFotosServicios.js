@@ -1,12 +1,6 @@
 // scripts/seedFotosServicios.js
 // Carga las fotos predeterminadas de los servicios (las que ya mostraba la
-// pagina publica): copia las de frontend/src/assets/servicios-foto a
-// backend/uploads/servicios y las asigna al servicio del mismo nombre,
-// con su descripcion, encuadre y nivel de oscurecido. Solo toca servicios
-// que aun NO tienen foto: nunca pisa una que el administrador ya subio
-// desde Servicios > Editar.
-//
-// Uso: npm run seed:fotos-servicios   (requiere database/incremento_6b_servicio_foto.sql)
+// pagina publica)
 
 require('dotenv').config();
 const path = require('path');

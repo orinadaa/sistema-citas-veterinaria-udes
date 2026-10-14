@@ -1,10 +1,5 @@
 // components/agendar/BookingSummarySidebar.jsx
-// Resumen lateral pegajoso (sticky) del flujo de agendamiento. Cada
-// fila tiene "Cambiar", que regresa a la pagina donde se elige ese dato
-// sin perder las demas selecciones (el estado vive en AgendarCitaPage).
-// top-24: el Navbar publico es sticky (h ~ 4.5rem, z-40), el resumen
-// queda debajo de el en vez de pasar por detras.
-// Material: Superficie de vidrio blanco de vetUI (texto oscuro).
+// Resumen lateral pegajoso (sticky) del flujo de agendamiento.
 import { Superficie } from '../vetui';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
 import { especieYRaza } from '../../utils/mascota';
@@ -38,7 +33,7 @@ function Fila({ icono: Icono, fotoUrl, etiqueta, valor, detalle, placeholder, on
         <button
           type="button"
           onClick={onCambiar}
-          className="shrink-0 text-xs font-semibold text-brand-blue-700 underline underline-offset-2"
+          className="-my-2 shrink-0 px-1 py-3 text-xs font-semibold text-brand-blue-700 underline underline-offset-2"
         >
           Cambiar
         </button>

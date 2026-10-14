@@ -1,9 +1,6 @@
 // components/landing/canales.js
 // Canales de contacto de la clinica (RF-23) que muestra la pagina publica: el
-// boton flotante de contacto y el pie de pagina. Solo salen los que el
-// superadministrador configuro (Pagina web > Informacion de la clinica).
-// `color` es el del canal para su boton redondo: todos dan al menos 3:1 de
-// contraste con el icono blanco.
+// boton flotante de contacto y el pie de pagina.
 import { IconoFacebook, IconoInstagram, IconoTiktok, IconoWhatsapp, IconoYoutube } from '../icons';
 
 const REDES = [

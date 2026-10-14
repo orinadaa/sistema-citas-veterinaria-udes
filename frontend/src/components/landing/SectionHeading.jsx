@@ -1,8 +1,6 @@
 // components/landing/SectionHeading.jsx
-// Encabezado de seccion del landing publico: titulo + AccentBar de dos
-// tonos (azul+ambar) debajo + subtitulo opcional. Se repite en
-// Servicios, Sedes y Horarios; `accion` permite el enlace opcional a
-// la derecha del titulo (ej. "Ver todos los servicios →").
+// Encabezado de seccion del landing publico: titulo + AccentBar de dos tonos
+// (azul+ambar) debajo + subtitulo opcional.
 import { AccentBar } from '../AccentBar';
 
 // `sobreFondoOscuro`: version para secciones con fondo azul oscuro (ej.

@@ -1,14 +1,6 @@
 // components/form/CampoHora.jsx
-// Campo de hora de vetUI: reemplaza al <input type="time"> del navegador,
-// cuyo selector de hora lo dibuja el sistema operativo y no sigue la
-// marca. Es un Desplegable con las horas del dia cada 30 minutos (el paso
-// con que trabaja la agenda), escritas como en el resto del sistema
-// ("8:00 a. m.").
-//
-// Se usa igual que el input que reemplaza: value es "HH:MM" (24 horas) y
-// onChange recibe un evento de forma { target: { value: "HH:MM" } }. Si el
-// valor guardado no cae en el paso (ej. 08:15), se agrega a la lista para
-// no perderlo.
+// Campo de hora de vetUI: reemplaza al <input type="time"> del navegador, cuyo
+// selector de hora lo dibuja el sistema operativo y no sigue la marca.
 import { Desplegable } from './Desplegable';
 
 const formatoHora = new Intl.DateTimeFormat('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true });

@@ -1,11 +1,6 @@
 // scripts/seedGaleria.js
-// Carga las fotos de ejemplo de la galeria del inicio (Hero): copia las
-// de frontend/src/assets/galeria (version liviana de las fotos reales de
-// identidadmarca/galeria) a backend/uploads/galeria y las registra en
-// foto_galeria. Solo actua si la galeria esta vacia: nunca pisa lo que
-// el administrador ya configuro desde Configuracion > Galeria.
-//
-// Uso: npm run seed:galeria   (requiere database/incremento_6a_galeria.sql)
+// Carga las fotos de ejemplo de la galeria del inicio (Hero): copia las de
+// frontend/src/assets/galeria.
 
 require('dotenv').config();
 const path = require('path');

@@ -1,11 +1,7 @@
 // hooks/useCatalogoEspecies.js
-// Especies y razas que ofrecen los formularios de mascota. Vienen del
-// catalogo que el superadministrador gestiona (Catalogos > Especies y
-// razas): solo las activas. Se piden una vez por visita y se comparten entre
-// todos los formularios (cache en memoria).
-// Mientras carga, o si el servidor no responde, se usa la lista que venia
-// en el codigo (utils/razas.js), para que el formulario nunca quede vacio.
-// Devuelve [{ nombre, icono, razas: [nombres] }].
+// Especies y razas que ofrecen los formularios de mascota. Vienen del catalogo
+// que el superadministrador gestiona (Catalogos > Especies y razas): solo las
+// activas.
 import { useEffect, useState } from 'react';
 import { obtenerEspecies } from '../api/client';
 import { ESPECIES, RAZAS_POR_ESPECIE } from '../utils/razas';

@@ -1,8 +1,6 @@
 // pages/GuiaVetuiPage.jsx
-// Guía visual viva de vetUI (ruta /vetui): cada fundamento y componente
-// del sistema de diseño renderizado con el código real, sobre el fondo
-// real. Sirve para revisar cambios del sistema en un solo lugar y como
-// referencia para construir pantallas nuevas. Documentación: docs/vetui.md.
+// Guía visual viva de vetUI (ruta /vetui): cada fundamento y componente del
+// sistema de diseño renderizado con el código real, sobre el fondo real.
 import { useState } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { useAnclaTopbar } from '../hooks/useAnclaTopbar';
@@ -92,7 +90,7 @@ export function GuiaVetuiPage() {
 
         <main data-ancla-topbar className="mx-auto flex max-w-7xl scroll-mt-28 flex-col gap-6 px-4 pb-20 sm:px-6">
           <Bloque titulo="Color" descripcion="Paleta de marca. El ámbar es único: acción principal y estado activo.">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {COLORES.map((c) => (
                 <Tarjeta key={c.nombre} className="flex items-center gap-3 p-3">
                   <span className="h-12 w-12 shrink-0 rounded-xl ring-1 ring-black/10" style={{ backgroundColor: c.valor }} />
@@ -117,7 +115,7 @@ export function GuiaVetuiPage() {
           </Bloque>
 
           <Bloque titulo="Materiales" descripcion="Cuatro capas: fondo, vidrio, cristal y cristal fuerte.">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3">
               <div className="vidrio rounded-tarjeta p-4">
                 <p className="font-semibold">Vidrio</p>
                 <p className="text-sm text-blue-100">Contenedores sobre el fondo. Texto blanco.</p>
@@ -197,7 +195,7 @@ export function GuiaVetuiPage() {
               vidrio real; anidado en otro vidrio usaria el relleno profundo. */}
           <section className="flex flex-col gap-4 py-2">
             <TituloSeccion titulo="Tarjetas" descripcion="Sobre el fondo: vidrio, como las secciones del landing. Dentro de un vidrio: cristal." />
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
               <Tarjeta material="vidrio" className="p-5">
                 <p className="font-semibold">Tarjeta de vidrio</p>
                 <p className="text-sm text-blue-100">Citas, mascotas, indicadores: van directo sobre el fondo.</p>
@@ -214,7 +212,7 @@ export function GuiaVetuiPage() {
           </section>
 
           <Bloque titulo="Tarjetas y selección" descripcion="Opciones elegibles dentro de un vidrio: cristal con anillo y check ámbar.">
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
               {[1, 2, 3].map((n) => (
                 <Tarjeta
                   key={n}
@@ -231,7 +229,7 @@ export function GuiaVetuiPage() {
                 </Tarjeta>
               ))}
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
               <TarjetaDato icono={IconoCalendario} valor="12 oct" detalle="9:00 a. m." etiqueta="Próxima cita" onClick={() => {}} />
               <TarjetaDato icono={IconoPata} tono="ambar" valor={3} etiqueta="Mascotas registradas" />
               <TarjetaDato icono={IconoCorazon} tono="rosa" valor={8} etiqueta="Citas realizadas" />
@@ -245,7 +243,7 @@ export function GuiaVetuiPage() {
           </Bloque>
 
           <Bloque titulo="Formularios" descripcion="Campos claros con etiqueta blanca; foco ámbar.">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
               <CampoTexto id="guia-nombre" etiqueta="Nombre de la mascota" requerido placeholder="Ej. Luna" />
               <AreaTexto id="guia-motivo" etiqueta="Motivo (opcional)" rows={2} placeholder="Ej. Revisión anual" />
             </div>
@@ -258,7 +256,7 @@ export function GuiaVetuiPage() {
               titulo="Fechas y fotos"
               descripcion="Toda fecha se elige con el calendario de agendar (CampoFecha). Toda foto se sube desde el círculo punteado (ZonaFoto), que abre el editor para encuadrarla."
             />
-            <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9rem]">
+            <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_9rem]">
               <CampoFecha id="guia-fecha" etiqueta="Fecha (no permite días pasados)" requerido valor={fechaCita} onChange={setFechaCita} />
               <CampoFecha
                 id="guia-nacimiento"
@@ -279,7 +277,7 @@ export function GuiaVetuiPage() {
               titulo="Campos de formulario"
               descripcion="Texto, número, lista desplegable, hora, buscador, área de texto, deslizador y casilla comparten borde, radio y foco. Ninguno usa el control del navegador."
             />
-            <div className="grid items-start gap-5 md:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 md:grid-cols-3">
               <Campo id="guia-campo-nombre" label="Nombre" value={campos.nombre} onChange={cambiar('nombre')} placeholder="Ej. Luna" required />
               <Campo id="guia-precio" label="Precio (COP)" type="number" min="0" step="1000" value={campos.precio} onChange={cambiar('precio')} />
               <Campo id="guia-error" label="Correo" type="email" value="correo-sin-arroba" onChange={() => {}} error="Escribe un correo válido." />
@@ -356,13 +354,13 @@ export function GuiaVetuiPage() {
           </Superficie>
 
           <Bloque titulo="Estados" descripcion="Avisos, vacío, error y carga.">
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2">
               <Aviso tono="info">Selecciona un día para ver los horarios.</Aviso>
               <Aviso tono="ok">Luna se agregó a tus mascotas.</Aviso>
               <Aviso tono="alerta">La foto no se pudo subir; inténtalo de nuevo.</Aviso>
               <Aviso tono="error">No se pudo agendar la cita.</Aviso>
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-3">
               <EstadoVacio>Aún no has registrado mascotas.</EstadoVacio>
               <EstadoError mensaje="No se pudieron cargar tus citas." onReintentar={() => {}} />
               <div className="flex flex-col gap-2">

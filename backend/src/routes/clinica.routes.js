@@ -9,13 +9,10 @@ const { auditar } = require('../middlewares/bitacora.middleware');
 const router = express.Router();
 const soloSuper = [verificarToken, verificarRol('superadministrador')];
 
-// GET /api/clinica — publico
 router.get('/', obtenerPublica);
 
-// GET /api/clinica/admin
 router.get('/admin', soloSuper, obtenerAdmin);
 
-// PUT /api/clinica
 router.put('/', soloSuper, auditar('Cambiar información de la clínica', 'clinica'), actualizar);
 
 module.exports = router;

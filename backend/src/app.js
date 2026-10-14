@@ -4,6 +4,7 @@
 
 const path = require('path');
 const express = require('express');
+const { exigirEnlaceFirmado, firmarFotosEnRespuestas } = require('./utils/fotoPrivada');
 const cors = require('cors');
 
 const healthRoutes = require('./routes/health.routes');
@@ -41,10 +42,14 @@ app.use(forzarHttps);
 app.use(cors(origenesPermitidos()));
 app.use(express.json({ limit: '100kb' }));
 
-// Fotos subidas (mascotas, medicos, sedes, galeria): archivos estaticos, ver subirFoto.middleware.js.
-// dotfiles ignore / index false: solo se sirven las fotos, nunca un listado
-// ni archivos ocultos.
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), { dotfiles: 'ignore', index: false, maxAge: '7d' }));
+// Fotos subidas. Las de mascotas son privadas: solo se entregan con un enlace
+// firmado y temporal (utils/fotoPrivada.js), que la API pone en sus respuestas.
+// El resto (galeria, sedes, servicios, logotipos, medicos) es contenido de la
+// pagina publica. Nunca se sirve un listado ni archivos ocultos.
+const opcionesFotos = { dotfiles: 'ignore', index: false };
+app.use('/uploads/mascotas', exigirEnlaceFirmado, express.static(path.join(__dirname, '..', 'uploads', 'mascotas'), opcionesFotos));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), { ...opcionesFotos, maxAge: '7d' }));
+app.use(firmarFotosEnRespuestas);
 
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);

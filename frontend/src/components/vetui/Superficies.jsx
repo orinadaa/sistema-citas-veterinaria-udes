@@ -1,29 +1,6 @@
 // components/vetui/Superficies.jsx
-// Las tres capas de material de vetUI como componentes.
-//
-// FondoVetui: fondo de página. Degradado de marca (brand-blue-600 arriba,
-// azul profundo desde ~32rem; arranca un tono más hondo que el Hero del
-// landing porque las pantallas de la app tienen texto chico arriba y sobre
-// brand-blue-500 no llega a AA) y halos de luz fijos (no se
-// desplazan con el scroll), que son lo que el vidrio deja ver difuminado.
-// Envuelve la página completa, incluida la topbar (transparente arriba).
-//
-// Superficie: contenedor sobre el fondo (secciones, resúmenes).
-//   tono="vidrio" (por defecto) vidrio claro, texto blanco (landing).
-//   tono="blanco"  vidrio blanco, texto oscuro (pantallas de la app: corta
-//                  el azul del fondo). Lo de adentro se adapta solo.
-//
-// Tarjeta: objeto o contenido. Regla de material (como el landing):
-//   material="vidrio"   tarjetas que van directo sobre el fondo (indicadores,
-//                       citas, mascotas): el mismo vidrio de las tarjetas de
-//                       seccion del landing, texto blanco, radio 28px.
-//   material="blanco"   igual pero en vidrio blanco (texto oscuro): las
-//                       tarjetas de Mis citas / Mis mascotas.
-//   material="cristal"  (por defecto) tarjetas DENTRO de una superficie de
-//                       vidrio (opciones de agendar, sedes): texto oscuro,
-//                       como las tarjetas de sedes/horarios del landing. `tono` celeste/crema, `seleccionada` (anillo ámbar +
-// check) e `interactiva` (hover que ilumina) para opciones elegibles;
-// `destacada` (anillo ámbar sin check) para resaltar sin indicar elección.
+// Las tres capas de material de vetUI como componentes. FondoVetui: fondo de
+// página.
 import { IconoCheck } from '../icons';
 
 const color = (token, porcentaje) => `color-mix(in oklab, var(--color-${token}) ${porcentaje}%, transparent)`;
@@ -36,7 +13,7 @@ const HALOS = [
   `radial-gradient(ellipse 30% 25% at 70% 60%, ${color('brand-blue-600', 50)} 0%, transparent 72%)`,
 ].join(', ');
 
-// Fondo del panel administrativo y del medico (pedido de Oriana): el azul
+// Fondo del panel administrativo y del medico: el azul
 // del Hero del landing (brand-blue-500 -> brand-blue-800) con mas toques
 // ambar y manchas de azul oscuro. Ahi nada va directo sobre el fondo: todo
 // vive en piezas de vidrio, que son las que garantizan el contraste.
@@ -53,7 +30,7 @@ const HALOS_PANEL = [
 ].join(', ');
 
 // Pantallas de sesion (iniciar sesion, registro, recuperar): el mismo azul
-// del panel, pero con menos ambar (pedido de Oriana): solo dos toques en
+// del panel, pero con menos ambar: solo dos toques en
 // esquinas opuestas, y las manchas de azul oscuro.
 const HALOS_SESION = [
   `radial-gradient(ellipse 34% 30% at 96% 4%, ${color('brand-amber', 55)} 0%, ${color('brand-amber', 18)} 50%, transparent 76%)`,
@@ -67,7 +44,7 @@ const DEGRADADO = 'bg-[linear-gradient(to_bottom,var(--color-brand-blue-600)_0,v
 const DEGRADADO_PANEL = 'bg-gradient-to-b from-brand-blue-500 to-brand-blue-800';
 
 // variante="panel": el fondo del panel administrativo / medico, que tambien
-// usan las paginas del cliente (pedido de Oriana: mismo fondo, mas ambar).
+// usan las paginas del cliente.
 // textoDirecto: la pagina tiene texto blanco directo sobre el fondo (las del
 // cliente); le da una sombra suave para que se lea sobre las manchas ambar.
 export function FondoVetui({ children, className = '', variante = 'app', textoDirecto = false }) {
@@ -79,7 +56,7 @@ export function FondoVetui({ children, className = '', variante = 'app', textoDi
     // de la página. overflow-clip (no hidden): recorta sin crear un
     // contenedor de scroll, así la topbar sticky sigue funcionando.
     <div
-      className={`relative isolate min-h-screen overflow-clip ${esPanel ? DEGRADADO_PANEL : DEGRADADO} ${textoDirecto ? 'fondo-texto-directo' : ''} ${className}`}
+      className={`area-segura relative isolate min-h-screen overflow-clip ${esPanel ? DEGRADADO_PANEL : DEGRADADO} ${textoDirecto ? 'fondo-texto-directo' : ''} ${className}`}
     >
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
         <div

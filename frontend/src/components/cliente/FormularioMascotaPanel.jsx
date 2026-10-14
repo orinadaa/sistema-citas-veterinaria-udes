@@ -1,20 +1,5 @@
 // components/cliente/FormularioMascotaPanel.jsx
-// SidePanel "Agregar mascota" / "Editar mascota" del cliente. Se
-// reutiliza en "Mis mascotas" y en el flujo de agendamiento (tarjeta
-// "+ Agregar mascota"): onGuardada recibe la mascota guardada, asi quien
-// lo abre puede seleccionarla sin recargar.
-//
-// - Foto: zona circular punteada (ZonaFoto, la misma del admin).
-//   El clic abre FotoMascotaModal (el unico modal centrado del sistema),
-//   que valida JPG/PNG de max. 5 MB y recorta. La foto recortada queda pendiente
-//   y se sube al guardar (POST /api/mascotas/:id/foto), asi "Cancelar"
-//   no deja fotos a medias.
-// - Obligatorios: nombre, especie y raza (lista segun la especie,
-//   SelectorEspecieRaza). Sexo (SelectorSexo, botones Hembra / Macho como
-//   en el admin), nacimiento, color y peso son opcionales.
-// - "Informacion medica (opcional)": texto libre que informa el dueño
-//   (alergias, medicamentos, condiciones, observaciones). No es
-//   historial clinico: sin registros por fecha ni diagnosticos.
+// SidePanel "Agregar mascota" / "Editar mascota" del cliente.
 import { useEffect, useState } from 'react';
 import { crearMascota, actualizarMascota, eliminarMascota, subirFotoMascota } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
