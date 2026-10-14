@@ -249,6 +249,16 @@ export function cerrarDiaHorario(sedeId, diaSemana, token) {
   return solicitar(`/horarios/${sedeId}/${diaSemana}`, { metodo: 'DELETE', token });
 }
 
+// Citas que quedarian fuera si se guarda ese horario (sin horas: si se cierra el dia).
+export function obtenerCitasAfectadasHorario({ sedeId, diaSemana, horaInicio, horaFin }, token) {
+  const parametros = new URLSearchParams({ sedeId, diaSemana });
+  if (horaInicio && horaFin) {
+    parametros.set('horaInicio', horaInicio);
+    parametros.set('horaFin', horaFin);
+  }
+  return solicitar(`/horarios/afectadas?${parametros}`, { token });
+}
+
 export function obtenerServiciosAdmin(token) {
   return solicitar('/servicios/admin', { token });
 }
@@ -451,6 +461,16 @@ export function obtenerDisponibilidadDeMedico(medicoId, token) {
 
 export function guardarHorarioDeMedico(medicoId, dias, token) {
   return solicitar(`/administracion/medicos/${medicoId}/disponibilidad/horario`, { metodo: 'PUT', cuerpo: { dias }, token });
+}
+
+// Citas que caerian dentro de un bloqueo, antes de guardarlo.
+export function obtenerCitasAfectadasBloqueo(medicoId, { fechaInicio, fechaFin, horaInicio, horaFin }, token) {
+  const parametros = new URLSearchParams({ fechaInicio, fechaFin });
+  if (horaInicio && horaFin) {
+    parametros.set('horaInicio', horaInicio);
+    parametros.set('horaFin', horaFin);
+  }
+  return solicitar(`/administracion/medicos/${medicoId}/disponibilidad/bloqueos/afectadas?${parametros}`, { token });
 }
 
 export function crearBloqueoDeMedico(medicoId, datos, token) {

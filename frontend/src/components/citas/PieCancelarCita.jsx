@@ -133,7 +133,7 @@ export function PieCancelarCita({ cita, onCancelada, onReprogramada, children })
             onClick={abrirReprogramar}
             className="min-h-11 whitespace-nowrap rounded-boton border border-slate-400 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-white/60"
           >
-            Reprogramar
+            {cita.estado === 'por_reagendar' ? 'Reagendar' : 'Reprogramar'}
           </button>
           {children}
         </div>

@@ -10,6 +10,7 @@ import { Boton, EncabezadoPagina, EstadoError, FondoVetui, Pestanas, TarjetaDato
 import { PanelMisCitas } from '../components/cliente/PanelMisCitas';
 import { PanelMisMascotas } from '../components/cliente/PanelMisMascotas';
 import { PanelMiPerfilCliente } from '../components/cliente/PanelMiPerfilCliente';
+import { AvisoCitasPorReagendar } from '../components/cliente/AvisoCitasPorReagendar';
 import { estadoDeCita } from '../components/citas/DetalleCitaPanel';
 import { obtenerMisCitas, obtenerMisMascotas } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -79,6 +80,7 @@ export function PanelClientePage({ seccion = 'inicio' }) {
   return (
     <FondoVetui variante="panel" textoDirecto>
       <Navbar />
+      <AvisoCitasPorReagendar onCambio={cargarCitas} />
 
       <EncabezadoPagina
         antetitulo={enPerfil ? 'Mi perfil' : 'Mi cuenta'}

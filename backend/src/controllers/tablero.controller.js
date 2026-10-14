@@ -20,6 +20,15 @@ async function obtenerTableroSede(req, res, next) {
     }
 
     const avisos = [];
+    const porReagendar = resumen.indicadores.por_reagendar || 0;
+    if (porReagendar > 0) {
+      avisos.push({
+        tipo: 'citas',
+        modulo: 'citas',
+        titulo: porReagendar === 1 ? '1 cita espera que el cliente la reagende' : `${porReagendar} citas esperan que sus clientes las reagenden`,
+        detalle: 'Quedaron fuera de la agenda por un cambio de horario o un bloqueo. Si un cliente llama, puedes reagendar su cita desde Citas.',
+      });
+    }
     if (resumen.diasAbiertos === 0) {
       avisos.push({
         tipo: 'horario',

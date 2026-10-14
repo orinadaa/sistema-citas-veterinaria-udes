@@ -32,7 +32,7 @@ const VISTAS = [
   { id: 'agenda', etiqueta: 'Agenda' },
 ];
 
-const COLOR_ESTADO = { proxima: 'bg-brand-blue', completada: 'bg-brand-green', cancelada: 'bg-brand-red' };
+const COLOR_ESTADO = { proxima: 'bg-brand-blue', completada: 'bg-brand-green', cancelada: 'bg-brand-red', por_reagendar: 'bg-amber-500' };
 
 function hoyAMedianoche() {
   const hoy = new Date();
@@ -327,6 +327,9 @@ function VistaAgenda({ dias, citas, onSeleccionar }) {
                     </span>
                     {cita.estado === 'cancelada' && (
                       <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">Cancelada</span>
+                    )}
+                    {cita.estado === 'por_reagendar' && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">Por reagendar</span>
                     )}
                   </button>
                 );

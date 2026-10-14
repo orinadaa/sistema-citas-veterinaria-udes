@@ -1,11 +1,12 @@
 // components/ui/StatusBadge.jsx
 // Pill de solo lectura para el estado de una cita en "Mis citas" del panel del
-// cliente: 3 estados (proxima/completada/cancelada), a diferencia de
+// cliente: 4 estados (proxima/completada/cancelada/por_reagendar), a diferencia de
 // StatusToggle.jsx.
 const CONFIG = {
   proxima: { texto: 'Próxima', className: 'bg-blue-50 text-brand-blue' },
   completada: { texto: 'Completada', className: 'bg-emerald-50 text-emerald-700' },
   cancelada: { texto: 'Cancelada', className: 'bg-red-50 text-brand-red' },
+  por_reagendar: { texto: 'Por reagendar', className: 'bg-amber-100 text-amber-800' },
 };
 
 export function StatusBadge({ status }) {

@@ -1,5 +1,7 @@
 // components/citas/ReprogramarCitaModal.jsx
-// Ventana "Reprogramar cita" (RF-08).
+// Ventana "Reprogramar cita" (RF-08). Con una cita por reagendar se titula
+// "Reagendar cita" y ofrece las horas de cualquier medico que preste el
+// servicio (el de la cita puede no estar disponible).
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { formatearFechaLarga, formatearHora } from '../../utils/fecha';
@@ -35,6 +37,7 @@ export function ReprogramarCitaModal({
   }, [abierto, onCerrar]);
 
   if (!abierto || !cita) return null;
+  const reagendar = cita.estado === 'por_reagendar';
 
   return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -50,14 +53,25 @@ export function ReprogramarCitaModal({
         <div className="flex items-start justify-between gap-4 border-b border-slate-900/10 px-6 py-5">
           <div>
             <h2 id="titulo-reprogramar-cita" className="text-lg font-bold text-brand-navy">
-              Reprogramar cita
+              {reagendar ? 'Reagendar cita' : 'Reprogramar cita'}
             </h2>
             <p id="detalle-reprogramar-cita" className="mt-0.5 text-sm text-slate-700">
               {/* Sin punto tras la hora: "a. m." ya termina en punto. */}
-              {cita.mascota_nombre} · {cita.servicio_nombre} con {cita.medico_nombre} (se mantiene el mismo médico).
-              <span className="block">
-                Cita actual: {formatearFechaLarga(cita.fecha_hora)}, {formatearHora(cita.fecha_hora)}
-              </span>
+              {reagendar ? (
+                <>
+                  {cita.mascota_nombre} · {cita.servicio_nombre}. Se muestran las horas de todos los médicos que prestan el servicio en {cita.sede_nombre || 'la sede'}.
+                  <span className="block">
+                    Fecha original: {formatearFechaLarga(cita.fecha_hora)}, {formatearHora(cita.fecha_hora)}
+                  </span>
+                </>
+              ) : (
+                <>
+                  {cita.mascota_nombre} · {cita.servicio_nombre} con {cita.medico_nombre} (se mantiene el mismo médico).
+                  <span className="block">
+                    Cita actual: {formatearFechaLarga(cita.fecha_hora)}, {formatearHora(cita.fecha_hora)}
+                  </span>
+                </>
+              )}
             </p>
           </div>
           <button
@@ -88,7 +102,7 @@ export function ReprogramarCitaModal({
             <TimeSlotPicker
               sedeId={cita.sede_id}
               servicioId={cita.servicio_id}
-              medicoId={cita.medico_id}
+              medicoId={reagendar ? undefined : cita.medico_id}
               fecha={fecha}
               valor={franja}
               onChange={onCambiarFranja}

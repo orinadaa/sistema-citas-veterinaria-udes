@@ -26,6 +26,7 @@ const TONO_ROL = { superadministrador: 'ambar', administrador: 'azul', veterinar
 // completada.
 function estadoCita(estado, fecha) {
   if (estado === 'cancelada') return 'cancelada';
+  if (estado === 'por_reagendar') return 'por_reagendar';
   return new Date(fecha) > new Date() ? 'proxima' : 'completada';
 }
 

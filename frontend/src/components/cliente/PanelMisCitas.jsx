@@ -14,12 +14,14 @@ const FILTROS = [
   { id: 'proxima', etiqueta: 'Próximas' },
   { id: 'completada', etiqueta: 'Completadas' },
   { id: 'cancelada', etiqueta: 'Canceladas' },
+  { id: 'por_reagendar', etiqueta: 'Por reagendar' },
 ];
 
 const LEYENDA = [
   { estado: 'proxima', etiqueta: 'Próxima', punto: 'bg-brand-blue-600' },
   { estado: 'completada', etiqueta: 'Completada', punto: 'bg-emerald-600' },
   { estado: 'cancelada', etiqueta: 'Cancelada', punto: 'bg-red-600' },
+  { estado: 'por_reagendar', etiqueta: 'Por reagendar', punto: 'bg-amber-500' },
 ];
 
 // La proxima cita mas cercana en el tiempo lleva fondo y borde de
@@ -40,7 +42,7 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
   const [dia, setDia] = useState('');
 
   const conteos = useMemo(() => {
-    const base = { todas: citas.length, proxima: 0, completada: 0, cancelada: 0 };
+    const base = { todas: citas.length, proxima: 0, completada: 0, cancelada: 0, por_reagendar: 0 };
     citas.forEach((cita) => {
       base[estadoDeCita(cita)] += 1;
     });
@@ -80,7 +82,8 @@ export function PanelMisCitas({ citas, cargando, onActualizada }) {
       </div>
 
       <Chips
-        items={FILTROS.map((f) => ({ ...f, conteo: conteos[f.id] }))}
+        // "Por reagendar" solo aparece cuando hay alguna.
+        items={FILTROS.filter((f) => f.id !== 'por_reagendar' || conteos.por_reagendar > 0).map((f) => ({ ...f, conteo: conteos[f.id] }))}
         activo={filtro}
         onCambiar={setFiltro}
       />

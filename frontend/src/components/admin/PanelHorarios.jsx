@@ -10,6 +10,7 @@ import {
   obtenerHorarios,
   actualizarHorario,
   cerrarDiaHorario,
+  obtenerCitasAfectadasHorario,
   subirFotoSede,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -22,6 +23,7 @@ import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
 import { IconoSede } from '../icons';
 import { EditorHorarioSemana } from './EditorHorarioSemana';
+import { ConfirmarCitasAfectadas } from './ConfirmarCitasAfectadas';
 
 const DIAS = [
   { numero: 1, letra: 'L', nombre: 'Lunes' },
@@ -79,6 +81,8 @@ export function PanelHorarios({ sedeFija = null }) {
   const [diasHorario, setDiasHorario] = useState(diasVacios());
   const [error, setError] = useState('');
   const [avisoCitas, setAvisoCitas] = useState('');
+  // Ventana con las citas que el cambio dejaria fuera (antes de guardarlo).
+  const [confirmacion, setConfirmacion] = useState(null);
   const [guardando, setGuardando] = useState(false);
   const [guardandoDia, setGuardandoDia] = useState(null);
   // Foto de la sede: se sube como archivo (ya no es un enlace). `foto` es
@@ -192,14 +196,39 @@ export function PanelHorarios({ sedeFija = null }) {
     }
   }
 
-  // Las citas ya agendadas no se mueven solas al cambiar el horario: el
-  // servidor dice cuantas quedaron fuera y aqui se avisa para reprogramarlas.
+  // Las citas que quedan fuera del horario nuevo pasan a "por reagendar" y
+  // cada cliente recibe aviso y correo para elegir otra fecha.
   function avisarCitasAfectadas(cantidad, motivo) {
     setAvisoCitas(
       cantidad > 0
-        ? `Horario guardado. Ojo: ${cantidad} ${cantidad === 1 ? 'cita ya agendada' : 'citas ya agendadas'} ${motivo}. No se cancelan solas: revísalas en Citas.`
+        ? `Horario guardado. ${cantidad} ${cantidad === 1 ? 'cita' : 'citas'} ${motivo} y ${cantidad === 1 ? 'quedó' : 'quedaron'} por reagendar: ${cantidad === 1 ? 'al cliente se le avisó' : 'a cada cliente se le avisó'} por la plataforma y por correo para que elija otra fecha.`
         : ''
     );
+  }
+
+  // Antes de guardar, si el cambio deja citas fuera, se muestran y se pide
+  // confirmar. Devuelve una promesa que se resuelve cuando la sede decide.
+  async function confirmarSiHayCitas(dia, cerrando) {
+    const { citas } = await obtenerCitasAfectadasHorario(
+      { sedeId: sedeEditando.id, diaSemana: dia.numero, horaInicio: cerrando ? null : dia.horaInicio, horaFin: cerrando ? null : dia.horaFin },
+      token
+    );
+    if (citas.length === 0) return true;
+    const n = citas.length;
+    return new Promise((resolver) =>
+      setConfirmacion({
+        titulo: `${n} ${n === 1 ? 'cita queda' : 'citas quedan'} fuera del horario`,
+        explicacion: `${cerrando ? `Si cierras el ${dia.nombre.toLowerCase()}` : 'Con este horario'}, ${n === 1 ? 'esta cita ya no se puede' : 'estas citas ya no se pueden'} atender. Al guardar, ${n === 1 ? 'quedará' : 'quedarán'} por reagendar y cada cliente recibirá un aviso y un correo para elegir otra fecha.`,
+        textoConfirmar: 'Guardar y pedir que reagenden',
+        citas,
+        resolver,
+      })
+    );
+  }
+
+  function responderConfirmacion(aceptar) {
+    confirmacion?.resolver(aceptar);
+    setConfirmacion(null);
   }
 
   async function guardarDia(dia) {
@@ -207,6 +236,7 @@ export function PanelHorarios({ sedeFija = null }) {
     setGuardandoDia(dia.numero);
     setError('');
     try {
+      if (!(await confirmarSiHayCitas(dia, false))) return false;
       const { citasAfectadas } = await actualizarHorario(
         { sedeId: sedeEditando.id, diaSemana: dia.numero, horaInicio: dia.horaInicio, horaFin: dia.horaFin },
         token
@@ -228,6 +258,7 @@ export function PanelHorarios({ sedeFija = null }) {
     setGuardandoDia(dia.numero);
     setError('');
     try {
+      if (!(await confirmarSiHayCitas(dia, true))) return false;
       const { citasAfectadas } = await cerrarDiaHorario(sedeEditando.id, dia.numero, token);
       avisarCitasAfectadas(citasAfectadas, 'quedaron en un día que ahora está cerrado');
       setDiasHorario((anterior) => anterior.map((d) => (d.numero === dia.numero ? { ...d, abierto: false } : d)));
@@ -435,6 +466,7 @@ export function PanelHorarios({ sedeFija = null }) {
           )}
         </form>
     </SidePanel>
+    <ConfirmarCitasAfectadas confirmacion={confirmacion} onConfirmar={() => responderConfirmacion(true)} onCancelar={() => responderConfirmacion(false)} />
     </>
   );
 }

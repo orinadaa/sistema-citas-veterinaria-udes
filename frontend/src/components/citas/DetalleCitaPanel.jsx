@@ -35,6 +35,7 @@ const RECOMENDACIONES = [
 
 export function estadoDeCita(cita) {
   if (cita.estado === 'cancelada') return 'cancelada';
+  if (cita.estado === 'por_reagendar') return 'por_reagendar';
   return new Date(cita.fecha_hora) > new Date() ? 'proxima' : 'completada';
 }
 
@@ -106,9 +107,10 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     };
   }, [modo, sedeId]);
 
-  // El calendario abre en el mes de la cita, con su dia ya elegido.
+  // El calendario abre en el mes de la cita, con su dia ya elegido (si la
+  // cita esta por reagendar, sin dia: su fecha original ya no sirve).
   function abrirReprogramar() {
-    setNuevaFecha(aFechaLocal(new Date(cita.fecha_hora)));
+    setNuevaFecha(cita.estado === 'por_reagendar' ? '' : aFechaLocal(new Date(cita.fecha_hora)));
     setNuevaFranja(null);
     setError('');
     setModo('reprogramar');
@@ -127,7 +129,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
     setError('');
     try {
       await reprogramarCita(cita.id, nuevaFranja, token);
-      onActualizada('Tu cita quedó reprogramada.');
+      onActualizada(cita.estado === 'por_reagendar' ? 'Tu cita quedó reagendada.' : 'Tu cita quedó reprogramada.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -148,7 +150,8 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
   }
 
   const estado = cita ? estadoDeCita(cita) : null;
-  const puedeGestionar = estado === 'proxima';
+  const porReagendar = estado === 'por_reagendar';
+  const puedeGestionar = estado === 'proxima' || porReagendar;
 
   // Pie fijo: solo "Cancelar cita" (Reprogramar vive en la fila de Fecha
   // y hora, y abre su propia ventana: ReprogramarCitaModal). Ocupa todo el ancho: con un unico boton, alineado a la
@@ -241,6 +244,24 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
             </div>
           </div>
 
+          {porReagendar && (
+            <div role="alert" className="rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-300">
+              <p className="font-heading text-sm font-semibold text-amber-900">Debes reagendar esta cita</p>
+              <p className="mt-1 text-sm text-amber-900">
+                {cita.motivo_reagendar || 'Por un cambio en el horario de la clínica'}, la cita ya no se puede atender en su fecha original.
+                {cita.reagendar_hasta && ` Elige una fecha nueva antes del ${formatearFechaLarga(cita.reagendar_hasta)}, ${formatearHora(cita.reagendar_hasta)}; si no, se cancelará.`}
+              </p>
+              <button
+                type="button"
+                onClick={abrirReprogramar}
+                className="mt-3 inline-flex items-center gap-2 rounded-boton bg-brand-amber px-4 py-2 text-sm font-semibold text-slate-900 transition hover:brightness-95"
+              >
+                <IconoCalendario className="h-4 w-4" />
+                Reagendar ahora
+              </button>
+            </div>
+          )}
+
           {/* 3. Numero de cita */}
           <div className="border-t border-slate-100 pt-5">
             <p className="font-heading text-base font-bold text-slate-900">Cita #{cita.codigo}</p>
@@ -259,7 +280,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
               accion={
                 puedeGestionar && (
                   <BotonFila icono={IconoCalendario} onClick={abrirReprogramar}>
-                    Reprogramar
+                    {porReagendar ? 'Reagendar' : 'Reprogramar'}
                   </BotonFila>
                 )
               }

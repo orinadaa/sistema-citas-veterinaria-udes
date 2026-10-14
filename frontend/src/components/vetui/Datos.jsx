@@ -38,6 +38,7 @@ const ESTADOS_CITA = {
   proxima: { texto: 'Próxima', tono: 'azul' },
   completada: { texto: 'Completada', tono: 'verde' },
   cancelada: { texto: 'Cancelada', tono: 'rojo' },
+  por_reagendar: { texto: 'Por reagendar', tono: 'ambar' },
 };
 
 const TONOS_INSIGNIA = {

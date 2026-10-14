@@ -6,6 +6,7 @@ import {
   crearBloqueoDeMedico,
   eliminarBloqueoDeMedico,
   guardarHorarioDeMedico,
+  obtenerCitasAfectadasBloqueo,
   obtenerDisponibilidadDeMedico,
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -16,6 +17,7 @@ import { CampoFecha } from '../form/CampoFecha';
 import { CampoHora } from '../form/CampoHora';
 import { IconoPapelera, IconoReloj } from '../icons';
 import { EditorHorarioMedico } from './EditorHorarioMedico';
+import { ConfirmarCitasAfectadas } from './ConfirmarCitasAfectadas';
 import { problemaDelDia } from '../../utils/horarioMedico';
 
 // Lunes primero (la BD guarda 0 = domingo).
@@ -82,6 +84,8 @@ export function HorarioMedicoPanel({ medico, onClose }) {
   const [datos, setDatos] = useState(null);
   const [errorCarga, setErrorCarga] = useState('');
   const [intento, setIntento] = useState(0);
+  // Bloqueo que deja citas dentro: se muestran y se pide confirmar.
+  const [confirmacion, setConfirmacion] = useState(null);
 
   const [personalizado, setPersonalizado] = useState(false);
   const [semana, setSemana] = useState({});
@@ -151,11 +155,12 @@ export function HorarioMedicoPanel({ medico, onClose }) {
     setGuardando(true);
     setEstadoHorario(null);
     try {
-      const { horario } = await guardarHorarioDeMedico(medicoId, dias, token);
+      const { horario, citasReasignadas = 0, citasPorReagendar = 0 } = await guardarHorarioDeMedico(medicoId, dias, token);
       setDatos((d) => ({ ...d, horario }));
       setSemana(semanaDesde(horario));
       setPersonalizado(horario.length > 0);
-      setEstadoHorario({ tipo: 'ok', texto: mensajeOk });
+      const resumen = resumenCitasMovidas(citasReasignadas, citasPorReagendar);
+      setEstadoHorario(resumen ? { tipo: 'alerta', texto: `${mensajeOk} ${resumen}` } : { tipo: 'ok', texto: mensajeOk });
     } catch (err) {
       setEstadoHorario({ tipo: 'error', texto: err.message });
     } finally {
@@ -189,8 +194,8 @@ export function HorarioMedicoPanel({ medico, onClose }) {
     guardarHorario(dias, 'Horario guardado. La agenda del médico ya usa este horario.');
   }
 
-  async function agregarBloqueo(evento) {
-    evento.preventDefault();
+  async function agregarBloqueo(evento, confirmado = false) {
+    evento?.preventDefault();
     setEstadoBloqueo(null);
     if (!bloqueo.fechaInicio) {
       setEstadoBloqueo({ tipo: 'error', texto: 'Elige desde qué fecha aplica el bloqueo.' });
@@ -200,25 +205,34 @@ export function HorarioMedicoPanel({ medico, onClose }) {
       setEstadoBloqueo({ tipo: 'error', texto: 'Elige la hora de inicio y la de fin del bloqueo.' });
       return;
     }
+    const datosBloqueo = {
+      fechaInicio: bloqueo.fechaInicio,
+      fechaFin: bloqueo.fechaFin || bloqueo.fechaInicio,
+      horaInicio: bloqueo.soloHoras ? bloqueo.horaInicio : null,
+      horaFin: bloqueo.soloHoras ? bloqueo.horaFin : null,
+      motivo: bloqueo.motivo,
+    };
     try {
-      const { citasAfectadas } = await crearBloqueoDeMedico(
-        medicoId,
-        {
-          fechaInicio: bloqueo.fechaInicio,
-          fechaFin: bloqueo.fechaFin || bloqueo.fechaInicio,
-          horaInicio: bloqueo.soloHoras ? bloqueo.horaInicio : null,
-          horaFin: bloqueo.soloHoras ? bloqueo.horaFin : null,
-          motivo: bloqueo.motivo,
-        },
-        token
-      );
+      if (!confirmado) {
+        const { citas } = await obtenerCitasAfectadasBloqueo(medicoId, datosBloqueo, token);
+        if (citas.length > 0) {
+          const n = citas.length;
+          setConfirmacion({
+            titulo: `${n} ${n === 1 ? 'cita queda' : 'citas quedan'} dentro del bloqueo`,
+            explicacion: `Al guardar, ${n === 1 ? 'la cita pasará' : 'cada cita pasará'} a otro médico que preste el servicio y esté libre a la misma hora. Si no hay, quedará por reagendar y el cliente recibirá un aviso y un correo para elegir otra fecha.`,
+            textoConfirmar: 'Guardar bloqueo',
+            citas,
+          });
+          return;
+        }
+      }
+      setConfirmacion(null);
+      const { citasReasignadas = 0, citasPorReagendar = 0 } = await crearBloqueoDeMedico(medicoId, datosBloqueo, token);
       setBloqueo(BLOQUEO_VACIO);
+      const resumen = resumenCitasMovidas(citasReasignadas, citasPorReagendar);
       setEstadoBloqueo(
-        citasAfectadas > 0
-          ? {
-              tipo: 'alerta',
-              texto: `Bloqueo guardado. El médico tiene ${citasAfectadas} ${citasAfectadas === 1 ? 'cita agendada' : 'citas agendadas'} en esas fechas; no se cancelan automáticamente.`,
-            }
+        resumen
+          ? { tipo: 'alerta', texto: `Bloqueo guardado. ${resumen}` }
           : { tipo: 'ok', texto: 'Bloqueo guardado. No se ofrecerán citas con el médico en ese periodo.' }
       );
       setIntento((n) => n + 1);
@@ -434,6 +448,15 @@ export function HorarioMedicoPanel({ medico, onClose }) {
           </section>
         </div>
       )}
+      <ConfirmarCitasAfectadas confirmacion={confirmacion} onConfirmar={() => agregarBloqueo(null, true)} onCancelar={() => setConfirmacion(null)} />
     </SidePanel>
   );
+}
+
+// Lo que paso con las citas que el cambio dejo fuera de la agenda del medico.
+function resumenCitasMovidas(reasignadas, porReagendar) {
+  const partes = [];
+  if (reasignadas > 0) partes.push(`${reasignadas} ${reasignadas === 1 ? 'cita pasó' : 'citas pasaron'} a otro médico a la misma hora`);
+  if (porReagendar > 0) partes.push(`${porReagendar} ${porReagendar === 1 ? 'quedó' : 'quedaron'} por reagendar (se avisó a cada cliente por la plataforma y por correo)`);
+  return partes.length ? `${partes.join(' y ')}.` : '';
 }

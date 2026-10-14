@@ -13,6 +13,7 @@ import { PaginaConfirmacion } from '../components/agendar/PaginaConfirmacion';
 import { DialogoSalirAgendar } from '../components/agendar/DialogoSalirAgendar';
 import { registrarGuardiaSalida } from '../utils/guardiaSalida';
 import { FormularioMascotaPanel } from '../components/cliente/FormularioMascotaPanel';
+import { AvisoCitasPorReagendar } from '../components/cliente/AvisoCitasPorReagendar';
 import {
   obtenerMisMascotas,
   obtenerServicios,
@@ -286,6 +287,7 @@ export function AgendarCitaPage() {
     // topbar), secciones de vidrio y tarjetas de cristal.
     <FondoVetui variante="panel" textoDirecto>
       <Navbar />
+      <AvisoCitasPorReagendar />
 
       <div inert={panelMascotaAbierto} aria-hidden={panelMascotaAbierto}>
         <EncabezadoPagina

@@ -13,7 +13,7 @@ import { NuevaCitaModal } from './NuevaCitaModal';
 import { IconoCalendario, IconoReloj, IconoGrafica, IconoX, IconoPata } from '../icons';
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-const MODULOS = { horarios: 'Ir a Horario', medicos: 'Ir a Médicos' };
+const MODULOS = { horarios: 'Ir a Horario', medicos: 'Ir a Médicos', citas: 'Ir a Citas' };
 
 function fechaDeHoy() {
   const texto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });

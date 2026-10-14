@@ -21,13 +21,15 @@ function etiquetaHora(slotIndex) {
 function TarjetaCita({ cita, mostrarMedico, onClick }) {
   const tono = COLORES_CATEGORIA[cita.categoria_color] ?? COLORES_CATEGORIA.blue;
   const cancelada = cita.estado === 'cancelada';
+  // Por reagendar: la hora es la original, que ya no vale; borde ambar punteado.
+  const porReagendar = cita.estado === 'por_reagendar';
   return (
     <button
       type="button"
       onClick={onClick}
       style={{ backgroundColor: tono.bg, color: tono.text }}
       className={`mb-1 flex w-full flex-col rounded-lg px-1.5 py-1 text-left text-xs leading-tight transition hover:brightness-95 ${
-        cancelada ? 'opacity-50 line-through' : ''
+        cancelada ? 'opacity-50 line-through' : porReagendar ? 'opacity-70 outline-2 outline-dashed outline-amber-500' : ''
       }`}
     >
       <span className="font-semibold">{formatearHora(cita.fecha_hora)}</span>
