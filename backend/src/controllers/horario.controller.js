@@ -5,6 +5,10 @@
 const horarioModel = require('../models/horario.model');
 const sedeModel = require('../models/sede.model');
 const { esHora, aMinutos } = require('../utils/validacion');
+const { atenderCitasAfectadas } = require('./cita.controller');
+
+// Lo que lee el cliente en el aviso y en el correo de la cita por reagendar.
+const MOTIVO_HORARIO_SEDE = 'Por un cambio en el horario de atención de la clínica';
 
 const DIA_VALIDO = (dia) => Number.isInteger(dia) && dia >= 0 && dia <= 6;
 
@@ -33,6 +37,30 @@ function puedeCambiarHorario(usuario, sedeId) {
   return usuario.rol === 'superadministrador' || usuario.sedeId === sedeId;
 }
 const MENSAJE_OTRA_SEDE = 'Solo puedes cambiar el horario de tu propia sede.';
+
+// GET /api/horarios/afectadas?sedeId&diaSemana[&horaInicio&horaFin] — citas
+// que quedarian fuera si se guarda ese horario (sin horas: si se cierra el
+// dia). La sede las ve y confirma antes de guardar.
+async function citasAfectadas(req, res, next) {
+  try {
+    const { sedeId, horaInicio, horaFin } = req.query;
+    const dia = Number(req.query.diaSemana);
+    if (!sedeId || !DIA_VALIDO(dia)) {
+      return res.status(400).json({ mensaje: 'sedeId y diaSemana (0 a 6) son obligatorios.' });
+    }
+    if (!puedeCambiarHorario(req.usuario, sedeId)) {
+      return res.status(403).json({ mensaje: MENSAJE_OTRA_SEDE });
+    }
+    const conHoras = Boolean(horaInicio || horaFin);
+    if (conHoras && (!esHora(horaInicio || '') || !esHora(horaFin || ''))) {
+      return res.status(400).json({ mensaje: 'Las horas deben tener el formato HH:MM, por ejemplo 08:00.' });
+    }
+    const citas = await horarioModel.listarCitasFueraDeHorario(sedeId, dia, conHoras ? horaInicio : null, conHoras ? horaFin : null);
+    return res.status(200).json({ citas });
+  } catch (error) {
+    next(error);
+  }
+}
 
 // PUT /api/horarios (superadministrador, o administrador en su sede)
 async function actualizarDia(req, res, next) {
@@ -66,10 +94,11 @@ async function actualizarDia(req, res, next) {
     }
 
     const dia = await horarioModel.upsertDia(sedeId, diaSemana, horaInicio, horaFin);
-    // Citas ya agendadas que quedaron fuera del horario nuevo: no se mueven
-    // solas, se avisa para que la sede las reprograme.
-    const citasAfectadas = await horarioModel.contarCitasFueraDeHorario(sedeId, diaSemana, horaInicio, horaFin);
-    return res.status(200).json({ dia, citasAfectadas: citasAfectadas || 0 });
+    // Citas ya agendadas que quedaron fuera del horario nuevo: pasan a "por
+    // reagendar" y cada cliente recibe aviso y correo para elegir otra fecha.
+    const afectadas = await horarioModel.listarCitasFueraDeHorario(sedeId, diaSemana, horaInicio, horaFin);
+    const { porReagendar } = await atenderCitasAfectadas(afectadas, { motivo: MOTIVO_HORARIO_SEDE, actorId: req.usuario.id });
+    return res.status(200).json({ dia, citasAfectadas: porReagendar });
   } catch (error) {
     next(error);
   }
@@ -88,11 +117,12 @@ async function cerrarDia(req, res, next) {
     }
 
     await horarioModel.cerrarDia(sedeId, dia);
-    const citasAfectadas = await horarioModel.contarCitasFueraDeHorario(sedeId, dia);
-    return res.status(200).json({ citasAfectadas: citasAfectadas || 0 });
+    const afectadas = await horarioModel.listarCitasFueraDeHorario(sedeId, dia);
+    const { porReagendar } = await atenderCitasAfectadas(afectadas, { motivo: MOTIVO_HORARIO_SEDE, actorId: req.usuario.id });
+    return res.status(200).json({ citasAfectadas: porReagendar });
   } catch (error) {
     next(error);
   }
 }
 
-module.exports = { listar, actualizarDia, cerrarDia };
+module.exports = { listar, citasAfectadas, actualizarDia, cerrarDia };

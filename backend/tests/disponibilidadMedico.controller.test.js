@@ -5,6 +5,8 @@ jest.mock('../src/models/disponibilidadMedico.model');
 jest.mock('../src/models/sede.model');
 jest.mock('../src/models/horario.model');
 jest.mock('../src/models/usuario.model');
+// Sin otros medicos: las citas dentro de un bloqueo quedan por reagendar.
+jest.mock('../src/models/medico.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
@@ -30,6 +32,8 @@ beforeEach(() => {
   horarioModel.listarPorSede.mockResolvedValue([]);
   disponibilidadModel.listarHorario.mockResolvedValue([]);
   disponibilidadModel.listarBloqueos.mockResolvedValue([]);
+  disponibilidadModel.listarCitasFuturas.mockResolvedValue([]);
+  disponibilidadModel.listarCitasEnBloqueo.mockResolvedValue([]);
 });
 
 function guardar(dias, token = TOKEN_ADMIN) {
@@ -113,7 +117,10 @@ describe('Bloqueos', () => {
 
   test('crea el bloqueo y avisa cuantas citas quedan dentro', async () => {
     disponibilidadModel.crearBloqueo.mockResolvedValue({ id: 'b1' });
-    disponibilidadModel.contarCitasEnRango.mockResolvedValue(2);
+    const cita = { sede_id: 'sede-1', servicio_id: 's1', medico_id: 'vet-1', fecha_hora: new Date(), duracion_minutos: 30 };
+    disponibilidadModel.listarCitasEnBloqueo.mockResolvedValue([{ ...cita, id: 'c1' }, { ...cita, id: 'c2' }]);
+    require('../src/models/medico.model').listarPorSedeYServicio.mockResolvedValue([]);
+    jest.spyOn(require('../src/models/cita.model'), 'marcarPorReagendar').mockResolvedValue(['c1', 'c2']);
     const r = await post({ fechaInicio: futuro, fechaFin: futuro, motivo: 'Vacaciones' });
     expect(r.status).toBe(201);
     expect(r.body.citasAfectadas).toBe(2);

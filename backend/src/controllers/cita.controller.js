@@ -448,7 +448,71 @@ async function misCitas(req, res, next) {
   }
 }
 
-// PATCH /api/citas/:id/reprogramar
+// Citas que un cambio de la sede dejo sin poder atenderse (horario de la
+// sede, bloqueo u horario del medico). Con buscarOtroMedico, cada una se
+// intenta pasar primero a otro medico libre a la misma hora; las demas
+// quedan por reagendar y el cliente recibe aviso y correo.
+// citas: filas con id, sede_id, servicio_id, medico_id, fecha_hora, duracion_minutos.
+async function atenderCitasAfectadas(citas, { motivo, actorId, buscarOtroMedico = false }) {
+  let reasignadas = 0;
+  const sinMedico = [];
+  for (const cita of citas) {
+    let movida = null;
+    if (buscarOtroMedico) {
+      const duracion = Math.max(DURACION_SLOT_MINUTOS, Number(cita.duracion_minutos) || DURACION_SLOT_MINUTOS);
+      const candidatos = await candidatosParaFranja(cita.sede_id, cita.servicio_id, new Date(cita.fecha_hora), duracion);
+      for (const medicoId of candidatos.filter((id) => id !== cita.medico_id)) {
+        try {
+          movida = await citaModel.reasignarMedico(cita.id, medicoId);
+        } catch (error) {
+          // Otro movimiento ocupo a ese medico en este instante: se prueba el siguiente.
+          if (error.code === '23505' || error.code === 'MASCOTA_OCUPADA') continue;
+          throw error;
+        }
+        break;
+      }
+    }
+    if (movida) {
+      reasignadas++;
+      await notificaciones.citaReasignada(cita.id, actorId, cita.medico_id);
+    } else {
+      sinMedico.push(cita.id);
+    }
+  }
+  const marcadas = await citaModel.marcarPorReagendar(sinMedico, motivo);
+  for (const id of marcadas) await notificaciones.citaPorReagendar(id, actorId);
+  return { reasignadas, porReagendar: marcadas.length };
+}
+
+// Reagendar una cita por reagendar: cualquier medico de la sede que preste
+// el servicio y este libre (se prefiere el que tenia la cita).
+async function reagendarCita(req, res, cita, fecha) {
+  const duracion = Math.max(DURACION_SLOT_MINUTOS, Number(cita.duracion_minutos) || DURACION_SLOT_MINUTOS);
+  if (!(await esFranjaValida(cita.sede_id, fecha, duracion))) {
+    return res.status(409).json({ mensaje: 'La hora seleccionada no coincide con una franja de atención válida.' });
+  }
+  if (await citaModel.mascotaOcupada(cita.mascota_id, fecha, duracion, cita.id)) {
+    return res.status(409).json({ mensaje: 'Esa mascota ya tiene otra cita a esa hora.' });
+  }
+  const candidatos = await candidatosParaFranja(cita.sede_id, cita.servicio_id, fecha, duracion);
+  const orden = candidatos.includes(cita.medico_id) ? [cita.medico_id, ...candidatos.filter((id) => id !== cita.medico_id)] : candidatos;
+  for (const medicoId of orden) {
+    let actualizada;
+    try {
+      actualizada = await citaModel.reagendar(cita.id, fecha, medicoId);
+    } catch (error) {
+      if (error.code === '23505') continue;
+      if (error.code === 'MASCOTA_OCUPADA') return res.status(409).json({ mensaje: 'Esa mascota ya tiene otra cita a esa hora.' });
+      throw error;
+    }
+    if (!actualizada) return res.status(409).json({ mensaje: 'Esta cita ya no está por reagendar.' });
+    await notificaciones.citaReprogramada(cita.id, req.usuario.id, cita.fecha_hora);
+    return res.status(200).json({ cita: actualizada });
+  }
+  return res.status(409).json({ mensaje: 'Ya no hay médicos libres a esa hora. Elige otra.' });
+}
+
+// PATCH /api/citas/:id/reprogramar (tambien reagenda las citas por reagendar)
 async function reprogramarCita(req, res, next) {
   try {
     const { id } = req.params;
@@ -461,6 +525,12 @@ async function reprogramarCita(req, res, next) {
     if (!cita) return res.status(404).json({ mensaje: 'Cita no encontrada.' });
     if (!puedeGestionarCita(req.usuario, cita)) {
       return res.status(403).json({ mensaje: 'No puedes modificar una cita que no es tuya.' });
+    }
+    if (cita.estado === 'por_reagendar') {
+      const fecha = parsearFechaISO(nuevaFechaHora);
+      if (!fecha) return res.status(400).json({ mensaje: 'nuevaFechaHora no es una fecha válida.' });
+      if (fecha <= new Date()) return res.status(409).json({ mensaje: 'No se puede reagendar a una fecha en el pasado.' });
+      return await reagendarCita(req, res, cita, fecha);
     }
     if (cita.estado !== 'agendada') {
       return res.status(400).json({ mensaje: 'Solo se pueden reprogramar citas activas.' });
@@ -523,11 +593,12 @@ async function cancelarCita(req, res, next) {
     if (!puedeGestionarCita(req.usuario, cita)) {
       return res.status(403).json({ mensaje: 'No puedes cancelar una cita que no es tuya.' });
     }
-    if (cita.estado !== 'agendada') {
+    if (cita.estado === 'cancelada') {
       return res.status(400).json({ mensaje: 'La cita ya está cancelada.' });
     }
-    // Una cita que ya ocurrio no se cancela: alteraria el historial y los reportes.
-    if (new Date(cita.fecha_hora) <= new Date()) {
+    // Una cita que ya ocurrio no se cancela: alteraria el historial y los
+    // reportes. La que esta por reagendar si, aunque su fecha original ya paso.
+    if (cita.estado === 'agendada' && new Date(cita.fecha_hora) <= new Date()) {
       return res.status(409).json({ mensaje: 'Esa cita ya pasó: no se puede cancelar.' });
     }
 
@@ -547,4 +618,6 @@ module.exports = {
   misCitas,
   reprogramarCita,
   cancelarCita,
+  atenderCitasAfectadas,
+  medicoAtiendeEnFranja,
 };

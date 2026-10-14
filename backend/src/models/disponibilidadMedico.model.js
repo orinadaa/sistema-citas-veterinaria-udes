@@ -110,16 +110,30 @@ async function eliminarBloqueo(medicoId, bloqueoId) {
   return resultado.rowCount > 0;
 }
 
-// Citas activas futuras que quedarian fuera de un bloqueo nuevo: se
-// avisan (no se cancelan solas; las gestiona el cliente o el admin).
-async function contarCitasEnRango(medicoId, fechaInicio, fechaFin) {
+// Citas activas futuras del medico que caen dentro de un bloqueo (entre
+// las dos fechas y, si el bloqueo tiene horas, cruzandose con esas horas).
+async function listarCitasEnBloqueo(medicoId, { fechaInicio, fechaFin, horaInicio = null, horaFin = null }) {
+  const { SELECT_AFECTADA, FIN_DE_LA_CITA } = require('./horario.model');
   const resultado = await pool.query(
-    `SELECT COUNT(*)::int AS total FROM cita
-     WHERE medico_id = $1 AND estado = 'agendada' AND fecha_hora > NOW()
-       AND fecha_hora::date BETWEEN $2::date AND $3::date`,
-    [medicoId, fechaInicio, fechaFin]
+    `${SELECT_AFECTADA}
+     WHERE c.medico_id = $1 AND c.estado = 'agendada' AND c.fecha_hora > NOW()
+       AND c.fecha_hora::date BETWEEN $2::date AND $3::date
+       AND ($4::time IS NULL OR (c.fecha_hora::time < $5::time AND ${FIN_DE_LA_CITA}::time > $4::time))
+     ORDER BY c.fecha_hora`,
+    [medicoId, fechaInicio, fechaFin, horaInicio, horaFin]
   );
-  return resultado.rows[0].total;
+  return resultado.rows;
+}
+
+// Todas las citas activas futuras del medico (al cambiar su horario se
+// revisa cuales quedaron fuera).
+async function listarCitasFuturas(medicoId) {
+  const { SELECT_AFECTADA } = require('./horario.model');
+  const resultado = await pool.query(
+    `${SELECT_AFECTADA} WHERE c.medico_id = $1 AND c.estado = 'agendada' AND c.fecha_hora > NOW() ORDER BY c.fecha_hora`,
+    [medicoId]
+  );
+  return resultado.rows;
 }
 
 module.exports = {
@@ -130,5 +144,6 @@ module.exports = {
   listarBloqueos,
   crearBloqueo,
   eliminarBloqueo,
-  contarCitasEnRango,
+  listarCitasEnBloqueo,
+  listarCitasFuturas,
 };

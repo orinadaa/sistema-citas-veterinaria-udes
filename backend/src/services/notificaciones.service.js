@@ -1,7 +1,9 @@
 // services/notificaciones.service.js
 // Crea los avisos de la campana cuando pasa algo que a alguien le importa:
-// cita agendada, reprogramada o cancelada, mascota registrada.
+// cita agendada, reprogramada o cancelada, cita por reagendar o pasada a
+// otro medico, mascota registrada.
 const notificacionModel = require('../models/notificacion.model');
+const citaModel = require('../models/cita.model');
 const correoService = require('./correo.service');
 
 const HORAS_ANTES = 24;
@@ -48,7 +50,7 @@ async function avisarCita(citaId, actorId, textos) {
     const porElCliente = actorId === cita.cliente_id;
     const t = textos(cita, porElCliente);
     const avisos = [{ usuarioId: cita.cliente_id, tipo: t.tipo, titulo: t.titulo, mensaje: t.cliente, enlace: '/panel?tab=citas' }];
-    if (cita.medico_id !== actorId) {
+    if (cita.medico_id !== actorId && t.personal) {
       avisos.push({ usuarioId: cita.medico_id, tipo: t.tipo, titulo: t.tituloPersonal, mensaje: t.personal, enlace: '/medico' });
     }
     await enviar(avisos);
@@ -97,6 +99,43 @@ function citaCancelada(citaId, actorId) {
     personal: `${porElCliente ? c.cliente_nombre : 'La sede'} canceló la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)}.`,
     correoAsunto: 'Tu cita fue cancelada',
   }));
+}
+
+// La sede cambio su horario o el medico no estara: la cita queda por
+// reagendar. Siempre lleva correo, aunque el cambio lo haya pedido el sistema.
+function citaPorReagendar(citaId, actorId) {
+  return avisarCita(citaId, actorId, (c) => ({
+    tipo: 'cita_por_reagendar',
+    titulo: 'Debes reagendar tu cita',
+    cliente: `${c.motivo_reagendar || 'Por cambios en el horario de la clínica'}, la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)} ya no se puede atender. Elige una nueva fecha en Mis citas antes del ${cuando(c.reagendar_hasta)}; si no, la cita se cancelará.`,
+    tituloPersonal: 'Cita por reagendar',
+    personal: `La cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)} quedó por reagendar: ${c.cliente_nombre} debe elegir otra fecha.`,
+    correoAsunto: 'Debes reagendar tu cita',
+  }));
+}
+
+// La cita sigue a la misma hora, con otro medico (bloqueo del medico original).
+async function citaReasignada(citaId, actorId, medicoAnteriorId) {
+  await avisarCita(citaId, actorId, (c) => ({
+    tipo: 'cita_reasignada',
+    titulo: 'Tu cita tiene otro médico',
+    cliente: `La cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)} la atenderá ${c.medico_nombre}. La fecha y la hora no cambian.`,
+    tituloPersonal: 'Nueva cita asignada',
+    personal: `La sede te asignó la cita de ${c.mascota_nombre} (${c.servicio_nombre}) del ${cuando(c.fecha_hora)}, con ${c.cliente_nombre}.`,
+    correoAsunto: 'Tu cita tiene otro médico',
+  }));
+  if (!activo() || !medicoAnteriorId) return;
+  const cita = await notificacionModel.detalleCita(citaId).catch(() => null);
+  if (!cita) return;
+  await enviar([
+    {
+      usuarioId: medicoAnteriorId,
+      tipo: 'cita_reasignada',
+      titulo: 'Cita pasada a otro médico',
+      mensaje: `La cita de ${cita.mascota_nombre} (${cita.servicio_nombre}) del ${cuando(cita.fecha_hora)} la atenderá ${cita.medico_nombre}, porque no estarás disponible.`,
+      enlace: '/medico',
+    },
+  ]);
 }
 
 // mascota: { nombre, cliente_id }
@@ -174,11 +213,52 @@ async function recordarCitasProximas() {
   return recordadas;
 }
 
+// Citas por reagendar: recordatorio cuando quedan 24 horas de plazo y
+// cancelacion cuando el plazo vence (con aviso y correo al cliente).
+async function revisarCitasPorReagendar() {
+  const porRecordar = await citaModel.tomarPorReagendarParaRecordar(HORAS_ANTES);
+  for (const id of porRecordar) {
+    await avisarCita(id, null, (c) => ({
+      tipo: 'cita_por_reagendar',
+      titulo: 'Tu cita sigue por reagendar',
+      cliente: `La cita de ${c.mascota_nombre} (${c.servicio_nombre}) todavía no tiene fecha nueva. Si no la reagendas antes del ${cuando(c.reagendar_hasta)}, se cancelará.`,
+      correoAsunto: 'Recuerda reagendar tu cita',
+    }));
+  }
+  const vencidas = await citaModel.cancelarPorReagendarVencidas();
+  for (const id of vencidas) {
+    await avisarCita(id, null, (c) => ({
+      tipo: 'cita_cancelada',
+      titulo: 'Cita cancelada',
+      cliente: `La cita de ${c.mascota_nombre} (${c.servicio_nombre}) se canceló porque no se reagendó a tiempo. Puedes agendar otra cuando quieras.`,
+      tituloPersonal: 'Cita cancelada',
+      personal: `La cita de ${c.mascota_nombre} (${c.servicio_nombre}) se canceló: el cliente no la reagendó a tiempo.`,
+      correoAsunto: 'Tu cita fue cancelada',
+    }));
+  }
+  return { recordadas: porRecordar.length, canceladas: vencidas.length };
+}
+
 // Revisa al arrancar y luego cada 10 minutos. Solo lo llama server.js.
 function iniciarRecordatorios(minutos = 10) {
-  const revisar = () => recordarCitasProximas().catch((error) => console.error('No se pudieron revisar los recordatorios de citas:', error.message));
+  const revisar = () => {
+    recordarCitasProximas().catch((error) => console.error('No se pudieron revisar los recordatorios de citas:', error.message));
+    revisarCitasPorReagendar().catch((error) => console.error('No se pudieron revisar las citas por reagendar:', error.message));
+  };
   revisar();
   return setInterval(revisar, minutos * 60 * 1000);
 }
 
-module.exports = { citaAgendada, citaReprogramada, citaCancelada, mascotaRegistrada, recordatorioDelMedico, horarioDelMedicoCambio, recordarCitasProximas, iniciarRecordatorios };
+module.exports = {
+  citaAgendada,
+  citaReprogramada,
+  citaCancelada,
+  citaPorReagendar,
+  citaReasignada,
+  mascotaRegistrada,
+  recordatorioDelMedico,
+  horarioDelMedicoCambio,
+  recordarCitasProximas,
+  revisarCitasPorReagendar,
+  iniciarRecordatorios,
+};

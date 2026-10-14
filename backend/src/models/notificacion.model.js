@@ -37,7 +37,7 @@ async function marcarTodasLeidas(usuarioId) {
 // --- datos para armar los avisos ---------------------------------------
 async function detalleCita(citaId) {
   const resultado = await pool.query(
-    `SELECT c.id, c.codigo, c.fecha_hora, c.cliente_id, c.medico_id, c.sede_id,
+    `SELECT c.id, c.codigo, c.fecha_hora, c.cliente_id, c.medico_id, c.sede_id, c.motivo_reagendar, c.reagendar_hasta,
             s.nombre AS sede_nombre, sv.nombre AS servicio_nombre, mc.nombre AS mascota_nombre,
             cl.nombre_completo AS cliente_nombre, cl.correo AS cliente_correo, m.nombre_completo AS medico_nombre
      FROM cita c

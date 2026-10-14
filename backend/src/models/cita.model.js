@@ -234,14 +234,116 @@ async function reprogramar(id, nuevaFechaHora) {
   }
 }
 
+// Una cita por reagendar tambien se puede cancelar (el cliente decide no volver).
 async function cancelar(id) {
   const resultado = await pool.query(
     `UPDATE cita SET estado = 'cancelada', actualizado_en = NOW()
-     WHERE id = $1 AND estado = 'agendada'
+     WHERE id = $1 AND estado IN ('agendada', 'por_reagendar')
      RETURNING *`,
     [id]
   );
   return resultado.rows[0] || null;
+}
+
+// --- Citas por reagendar --------------------------------------------------
+// Plazo para reagendar: hasta la fecha original de la cita, y nunca menos de
+// tres dias desde el aviso (una cita de mañana no deja al cliente sin tiempo).
+const PLAZO_REAGENDAR = "GREATEST(fecha_hora, NOW() + INTERVAL '3 days')";
+
+// Pasa a "por_reagendar" las citas indicadas que sigan agendadas. La franja
+// queda libre de inmediato: la disponibilidad solo cuenta las agendadas.
+async function marcarPorReagendar(ids, motivo) {
+  if (ids.length === 0) return [];
+  const resultado = await pool.query(
+    `UPDATE cita SET estado = 'por_reagendar', motivo_reagendar = $2, reagendar_hasta = ${PLAZO_REAGENDAR},
+            recordatorio_reagendar_en = NULL, recordatorio_enviado_en = NULL, actualizado_en = NOW()
+     WHERE id = ANY($1::uuid[]) AND estado = 'agendada'
+     RETURNING id`,
+    [ids, String(motivo).slice(0, 200)]
+  );
+  return resultado.rows.map((fila) => fila.id);
+}
+
+// Pasa la cita a otro medico a la misma hora (bloqueo del medico original),
+// con los mismos candados y cruces que al agendar. null si ya no esta agendada.
+async function reasignarMedico(id, nuevoMedicoId) {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query('BEGIN');
+    const actual = await cliente.query("SELECT mascota_id, fecha_hora, duracion_minutos FROM cita WHERE id = $1 AND estado = 'agendada' FOR UPDATE", [id]);
+    if (actual.rowCount === 0) {
+      await cliente.query('ROLLBACK');
+      return null;
+    }
+    const { mascota_id: mascotaId, fecha_hora: fechaHora, duracion_minutos: duracionMinutos } = actual.rows[0];
+    await bloquearAgenda(cliente, nuevoMedicoId, mascotaId);
+    await comprobarCruces(cliente, { medicoId: nuevoMedicoId, mascotaId, fechaHora, duracionMinutos, exceptoCitaId: id });
+    const resultado = await cliente.query(
+      "UPDATE cita SET medico_id = $2, actualizado_en = NOW() WHERE id = $1 AND estado = 'agendada' RETURNING *",
+      [id, nuevoMedicoId]
+    );
+    await cliente.query('COMMIT');
+    return resultado.rows[0] || null;
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+    throw error;
+  } finally {
+    cliente.release();
+  }
+}
+
+// El cliente (o la sede) elige la fecha nueva de una cita por reagendar: la
+// cita vuelve a "agendada" con el medico que quedo libre a esa hora.
+async function reagendar(id, nuevaFechaHora, medicoId) {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query('BEGIN');
+    const actual = await cliente.query("SELECT mascota_id, duracion_minutos FROM cita WHERE id = $1 AND estado = 'por_reagendar' FOR UPDATE", [id]);
+    if (actual.rowCount === 0) {
+      await cliente.query('ROLLBACK');
+      return null;
+    }
+    const { mascota_id: mascotaId, duracion_minutos: duracionMinutos } = actual.rows[0];
+    await bloquearAgenda(cliente, medicoId, mascotaId);
+    await comprobarCruces(cliente, { medicoId, mascotaId, fechaHora: nuevaFechaHora, duracionMinutos, exceptoCitaId: id });
+    const resultado = await cliente.query(
+      `UPDATE cita SET estado = 'agendada', fecha_hora = $2, medico_id = $3, motivo_reagendar = NULL, reagendar_hasta = NULL,
+              recordatorio_reagendar_en = NULL, recordatorio_enviado_en = NULL, actualizado_en = NOW()
+       WHERE id = $1 AND estado = 'por_reagendar'
+       RETURNING *`,
+      [id, nuevaFechaHora, medicoId]
+    );
+    await cliente.query('COMMIT');
+    return resultado.rows[0] || null;
+  } catch (error) {
+    await cliente.query('ROLLBACK');
+    throw error;
+  } finally {
+    cliente.release();
+  }
+}
+
+// Citas por reagendar cuyo plazo vencio: se cancelan (el temporizador avisa).
+async function cancelarPorReagendarVencidas() {
+  const resultado = await pool.query(
+    `UPDATE cita SET estado = 'cancelada', actualizado_en = NOW()
+     WHERE estado = 'por_reagendar' AND reagendar_hasta <= NOW()
+     RETURNING id`
+  );
+  return resultado.rows.map((fila) => fila.id);
+}
+
+// Citas por reagendar a las que les quedan menos de `horas` de plazo y aun no
+// tienen recordatorio: se marcan en la misma consulta (un solo recordatorio).
+async function tomarPorReagendarParaRecordar(horas) {
+  const resultado = await pool.query(
+    `UPDATE cita SET recordatorio_reagendar_en = NOW()
+     WHERE estado = 'por_reagendar' AND recordatorio_reagendar_en IS NULL
+       AND reagendar_hasta > NOW() AND reagendar_hasta <= NOW() + ($1 || ' hours')::interval
+     RETURNING id`,
+    [horas]
+  );
+  return resultado.rows.map((fila) => fila.id);
 }
 
 module.exports = {
@@ -258,4 +360,9 @@ module.exports = {
   buscarPorId,
   reprogramar,
   cancelar,
+  marcarPorReagendar,
+  reasignarMedico,
+  reagendar,
+  cancelarPorReagendarVencidas,
+  tomarPorReagendarParaRecordar,
 };

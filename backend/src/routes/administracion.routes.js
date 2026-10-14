@@ -16,6 +16,7 @@ const {
   obtenerDisponibilidadDeMedico,
   guardarHorarioDeMedico,
   crearBloqueoDeMedico,
+  citasAfectadasPorBloqueo,
   eliminarBloqueoDeMedico,
 } = require('../controllers/disponibilidadMedico.controller');
 const { obtenerReporte } = require('../controllers/reportes.controller');
@@ -48,6 +49,7 @@ router.put('/medicos/:id/especialidades', verificarRol('administrador'), auditar
 // El medico los consulta en /api/medico/disponibilidad, no los edita.
 router.get('/medicos/:id/disponibilidad', verificarRol('administrador'), obtenerDisponibilidadDeMedico);
 router.put('/medicos/:id/disponibilidad/horario', verificarRol('administrador'), auditar('Cambiar horario de un médico', 'usuario'), guardarHorarioDeMedico);
+router.get('/medicos/:id/disponibilidad/bloqueos/afectadas', verificarRol('administrador'), citasAfectadasPorBloqueo);
 router.post('/medicos/:id/disponibilidad/bloqueos', verificarRol('administrador'), auditar('Agregar bloqueo a un médico', 'usuario'), crearBloqueoDeMedico);
 router.delete('/medicos/:id/disponibilidad/bloqueos/:bloqueoId', verificarRol('administrador'), auditar('Quitar bloqueo de un médico', 'usuario'), eliminarBloqueoDeMedico);
 

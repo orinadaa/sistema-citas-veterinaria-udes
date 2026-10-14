@@ -27,7 +27,8 @@ async function resumenSede(sedeId) {
          COUNT(*) FILTER (WHERE estado = 'agendada' AND fecha_hora::date = CURRENT_DATE)::int AS citas_hoy,
          COUNT(*) FILTER (WHERE estado = 'agendada' AND fecha_hora::date = CURRENT_DATE AND fecha_hora >= NOW())::int AS pendientes_hoy,
          COUNT(*) FILTER (WHERE estado = 'agendada' AND fecha_hora >= ${INICIO_SEMANA} AND fecha_hora < ${INICIO_SEMANA} + INTERVAL '7 days')::int AS citas_semana,
-         COUNT(*) FILTER (WHERE estado = 'cancelada' AND fecha_hora >= ${INICIO_SEMANA} AND fecha_hora < ${INICIO_SEMANA} + INTERVAL '7 days')::int AS canceladas_semana
+         COUNT(*) FILTER (WHERE estado = 'cancelada' AND fecha_hora >= ${INICIO_SEMANA} AND fecha_hora < ${INICIO_SEMANA} + INTERVAL '7 days')::int AS canceladas_semana,
+         COUNT(*) FILTER (WHERE estado = 'por_reagendar')::int AS por_reagendar
        FROM cita WHERE sede_id = $1`,
       [sedeId]
     ),

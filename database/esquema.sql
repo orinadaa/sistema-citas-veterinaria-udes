@@ -112,7 +112,10 @@ CREATE TABLE public.cita (
     mascota_id uuid NOT NULL,
     codigo character varying(20) NOT NULL,
     recordatorio_enviado_en timestamp without time zone,
-    CONSTRAINT cita_estado_check CHECK (((estado)::text = ANY ((ARRAY['agendada'::character varying, 'cancelada'::character varying])::text[])))
+    motivo_reagendar character varying(200),
+    reagendar_hasta timestamp without time zone,
+    recordatorio_reagendar_en timestamp without time zone,
+    CONSTRAINT cita_estado_check CHECK (((estado)::text = ANY ((ARRAY['agendada'::character varying, 'cancelada'::character varying, 'por_reagendar'::character varying])::text[])))
 );
 
 
@@ -741,6 +744,13 @@ CREATE INDEX idx_bloqueo_medico_fechas ON public.bloqueo_medico USING btree (med
 --
 
 CREATE INDEX idx_cita_cliente_id ON public.cita USING btree (cliente_id);
+
+
+--
+-- Name: idx_cita_franja_unica_medico; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_cita_por_reagendar ON public.cita USING btree (cliente_id) WHERE ((estado)::text = 'por_reagendar'::text);
 
 
 --

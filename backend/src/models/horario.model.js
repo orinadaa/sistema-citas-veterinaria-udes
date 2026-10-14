@@ -35,18 +35,34 @@ async function cerrarDia(sedeId, diaSemana) {
   await pool.query('DELETE FROM horario_atencion WHERE sede_id = $1 AND dia_semana = $2', [sedeId, diaSemana]);
 }
 
+// Datos de una cita afectada por un cambio de agenda: los que necesita la
+// ventana de confirmacion de la sede y el proceso que las reasigna o las
+// deja por reagendar. Tambien los usa disponibilidadMedico.model.
+const SELECT_AFECTADA = `
+  SELECT c.id, c.codigo, c.fecha_hora, c.duracion_minutos, c.sede_id, c.servicio_id, c.medico_id,
+         mc.nombre AS mascota_nombre, cl.nombre_completo AS cliente_nombre, sv.nombre AS servicio_nombre,
+         m.nombre_completo AS medico_nombre
+  FROM cita c
+  JOIN mascota mc ON mc.id = c.mascota_id
+  JOIN usuario cl ON cl.id = c.cliente_id
+  JOIN servicio sv ON sv.id = c.servicio_id
+  JOIN usuario m ON m.id = c.medico_id`;
+const FIN_DE_LA_CITA = "(c.fecha_hora + GREATEST(c.duracion_minutos, 30) * INTERVAL '1 minute')";
+
 // Citas agendadas y por atender de esa sede en ese dia de la semana que
-// quedarian FUERA del horario [horaInicio, horaFin). Sin horas: todas las
-// de ese dia (se va a cerrar). No se cancelan solas: se avisa.
-async function contarCitasFueraDeHorario(sedeId, diaSemana, horaInicio = null, horaFin = null) {
+// quedarian FUERA del horario [horaInicio, horaFin), contando lo que dura
+// cada una. Sin horas: todas las de ese dia (se va a cerrar).
+async function listarCitasFueraDeHorario(sedeId, diaSemana, horaInicio = null, horaFin = null) {
   const resultado = await pool.query(
-    `SELECT COUNT(*)::int AS total FROM cita
-     WHERE sede_id = $1 AND estado = 'agendada' AND fecha_hora > NOW()
-       AND EXTRACT(DOW FROM fecha_hora) = $2
-       AND ($3::time IS NULL OR fecha_hora::time < $3::time OR fecha_hora::time >= $4::time)`,
+    `${SELECT_AFECTADA}
+     WHERE c.sede_id = $1 AND c.estado = 'agendada' AND c.fecha_hora > NOW()
+       AND EXTRACT(DOW FROM c.fecha_hora) = $2
+       AND ($3::time IS NULL OR c.fecha_hora::time < $3::time OR ${FIN_DE_LA_CITA}::time > $4::time
+            OR ${FIN_DE_LA_CITA}::date > c.fecha_hora::date)
+     ORDER BY c.fecha_hora`,
     [sedeId, diaSemana, horaInicio, horaFin]
   );
-  return resultado.rows[0].total;
+  return resultado.rows;
 }
 
-module.exports = { listarPorSede, buscarDia, upsertDia, cerrarDia, contarCitasFueraDeHorario };
+module.exports = { listarPorSede, buscarDia, upsertDia, cerrarDia, listarCitasFueraDeHorario, SELECT_AFECTADA, FIN_DE_LA_CITA };

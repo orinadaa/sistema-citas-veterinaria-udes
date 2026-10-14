@@ -17,6 +17,9 @@ const TOKEN_ADMIN_OTRA_SEDE = jwt.sign({ id: 'admin-2', rol: 'administrador', se
 const TOKEN_SUPER = jwt.sign({ id: 'super-1', rol: 'superadministrador' }, process.env.JWT_SECRET);
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
 
+// Sin citas afectadas por defecto (el flujo de las afectadas: citasPorReagendar.test.js).
+beforeEach(() => horarioModel.listarCitasFueraDeHorario.mockResolvedValue([]));
+
 describe('GET /api/horarios', () => {
   beforeEach(() => jest.clearAllMocks());
 

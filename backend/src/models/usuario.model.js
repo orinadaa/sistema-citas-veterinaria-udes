@@ -127,10 +127,10 @@ async function buscarConHashPorId(id) {
   return resultado.rows[0] || null;
 }
 
-// Citas agendadas que todavia no ocurren, donde la cuenta es el medico o el cliente.
+// Citas agendadas que todavia no ocurren (o por reagendar), donde la cuenta es el medico o el cliente.
 async function contarCitasFuturasDeCuenta(id) {
   const resultado = await pool.query(
-    "SELECT COUNT(*)::int AS total FROM cita WHERE estado = 'agendada' AND fecha_hora > NOW() AND (medico_id = $1 OR cliente_id = $1)",
+    "SELECT COUNT(*)::int AS total FROM cita WHERE (estado = 'por_reagendar' OR (estado = 'agendada' AND fecha_hora > NOW())) AND (medico_id = $1 OR cliente_id = $1)",
     [id]
   );
   return resultado.rows[0].total;

@@ -7,6 +7,10 @@ const horarioModel = require('../models/horario.model');
 const usuarioModel = require('../models/usuario.model');
 const notificaciones = require('../services/notificaciones.service');
 const { aMinutos, fechaLocalISO } = require('../utils/disponibilidadMedico');
+const { atenderCitasAfectadas, medicoAtiendeEnFranja } = require('./cita.controller');
+
+// Lo que lee el cliente en el aviso y en el correo de la cita por reagendar.
+const MOTIVO_AGENDA_MEDICO = 'Por un cambio en la agenda de la clínica';
 
 const PATRON_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 const PATRON_FECHA = /^\d{4}-\d{2}-\d{2}$/;
@@ -114,44 +118,84 @@ async function guardarHorarioDeMedico(req, res, next) {
     await disponibilidadModel.reemplazarHorario(medico.id, dias);
     const horario = await disponibilidadModel.listarHorario(medico.id);
     notificaciones.horarioDelMedicoCambio(medico.id, 'Tu horario de trabajo cambió', 'El administrador de tu sede actualizó tu horario de trabajo.');
-    return res.status(200).json({ horario });
+    // Citas que el horario nuevo deja fuera: pasan a otro medico libre a la
+    // misma hora o quedan por reagendar.
+    const futuras = await disponibilidadModel.listarCitasFuturas(medico.id);
+    const fuera = [];
+    for (const cita of futuras) {
+      const duracion = Math.max(30, Number(cita.duracion_minutos) || 30);
+      if (!(await medicoAtiendeEnFranja(medico.id, cita.sede_id, new Date(cita.fecha_hora), duracion))) fuera.push(cita);
+    }
+    const resultado = await atenderCitasAfectadas(fuera, { motivo: MOTIVO_AGENDA_MEDICO, actorId: req.usuario.id, buscarOtroMedico: true });
+    return res.status(200).json({ horario, citasReasignadas: resultado.reasignadas, citasPorReagendar: resultado.porReagendar });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Valida las fechas y horas de un bloqueo. Devuelve { error } o el bloqueo limpio.
+function leerBloqueo({ fechaInicio, fechaFin, horaInicio, horaFin, motivo }) {
+  if (!PATRON_FECHA.test(fechaInicio || '') || !PATRON_FECHA.test(fechaFin || '') || fechaInicio > fechaFin) {
+    return { error: 'Revisa las fechas: la de inicio debe ser igual o anterior a la final.' };
+  }
+  if (fechaFin < fechaLocalISO(new Date())) {
+    return { error: 'El bloqueo debe incluir hoy o fechas futuras.' };
+  }
+  const conHoras = Boolean(horaInicio || horaFin);
+  if (conHoras && (!PATRON_HORA.test(horaInicio || '') || !PATRON_HORA.test(horaFin || '') || aMinutos(horaInicio) >= aMinutos(horaFin))) {
+    return { error: 'Revisa las horas del bloqueo: el inicio debe ser antes del fin.' };
+  }
+  if (motivo && String(motivo).length > 150) {
+    return { error: 'El motivo no puede superar los 150 caracteres.' };
+  }
+  return {
+    bloqueo: {
+      fechaInicio,
+      fechaFin,
+      horaInicio: conHoras ? horaInicio : null,
+      horaFin: conHoras ? horaFin : null,
+      motivo: motivo ? String(motivo).trim() : null,
+    },
+  };
+}
+
+// GET /api/administracion/medicos/:id/disponibilidad/bloqueos/afectadas?
+// fechaInicio&fechaFin[&horaInicio&horaFin] — citas que caerian dentro del
+// bloqueo. La sede las ve y confirma antes de guardarlo.
+async function citasAfectadasPorBloqueo(req, res, next) {
+  try {
+    const medico = await medicoDeLaSede(req, res);
+    if (!medico) return undefined;
+    const { error, bloqueo } = leerBloqueo(req.query);
+    if (error) return res.status(400).json({ mensaje: error });
+    const citas = await disponibilidadModel.listarCitasEnBloqueo(medico.id, bloqueo);
+    return res.status(200).json({ citas });
   } catch (error) {
     next(error);
   }
 }
 
 // POST /api/administracion/medicos/:id/disponibilidad/bloqueos — {
-// fechaInicio, fechaFin, horaInicio?, horaFin?, motivo? }. Avisa cuantas
-// citas ya agendadas quedan dentro del bloqueo (no se cancelan solas).
+// fechaInicio, fechaFin, horaInicio?, horaFin?, motivo? }. Las citas que
+// caen dentro pasan a otro medico libre a la misma hora o, si no hay,
+// quedan por reagendar (el cliente recibe aviso y correo).
 async function crearBloqueoDeMedico(req, res, next) {
   try {
     const medico = await medicoDeLaSede(req, res);
     if (!medico) return undefined;
-    const { fechaInicio, fechaFin, horaInicio, horaFin, motivo } = req.body;
-    if (!PATRON_FECHA.test(fechaInicio || '') || !PATRON_FECHA.test(fechaFin || '') || fechaInicio > fechaFin) {
-      return res.status(400).json({ mensaje: 'Revisa las fechas: la de inicio debe ser igual o anterior a la final.' });
-    }
-    if (fechaFin < fechaLocalISO(new Date())) {
-      return res.status(400).json({ mensaje: 'El bloqueo debe incluir hoy o fechas futuras.' });
-    }
-    const conHoras = Boolean(horaInicio || horaFin);
-    if (conHoras && (!PATRON_HORA.test(horaInicio || '') || !PATRON_HORA.test(horaFin || '') || aMinutos(horaInicio) >= aMinutos(horaFin))) {
-      return res.status(400).json({ mensaje: 'Revisa las horas del bloqueo: el inicio debe ser antes del fin.' });
-    }
-    if (motivo && String(motivo).length > 150) {
-      return res.status(400).json({ mensaje: 'El motivo no puede superar los 150 caracteres.' });
-    }
+    const { error, bloqueo: datos } = leerBloqueo(req.body);
+    if (error) return res.status(400).json({ mensaje: error });
 
-    const bloqueo = await disponibilidadModel.crearBloqueo(medico.id, {
-      fechaInicio,
-      fechaFin,
-      horaInicio: conHoras ? horaInicio : null,
-      horaFin: conHoras ? horaFin : null,
-      motivo: motivo ? String(motivo).trim() : null,
-    });
-    const citasAfectadas = await disponibilidadModel.contarCitasEnRango(medico.id, fechaInicio, fechaFin);
+    const bloqueo = await disponibilidadModel.crearBloqueo(medico.id, datos);
+    const afectadas = await disponibilidadModel.listarCitasEnBloqueo(medico.id, datos);
+    const resultado = await atenderCitasAfectadas(afectadas, { motivo: MOTIVO_AGENDA_MEDICO, actorId: req.usuario.id, buscarOtroMedico: true });
     notificaciones.horarioDelMedicoCambio(medico.id, 'Nuevo bloqueo en tu agenda', 'El administrador de tu sede registró fechas en las que no atiendes.');
-    return res.status(201).json({ bloqueo, citasAfectadas });
+    return res.status(201).json({
+      bloqueo,
+      citasAfectadas: afectadas.length,
+      citasReasignadas: resultado.reasignadas,
+      citasPorReagendar: resultado.porReagendar,
+    });
   } catch (error) {
     next(error);
   }
@@ -176,6 +220,7 @@ module.exports = {
   obtenerDisponibilidad,
   obtenerDisponibilidadDeMedico,
   guardarHorarioDeMedico,
+  citasAfectadasPorBloqueo,
   crearBloqueoDeMedico,
   eliminarBloqueoDeMedico,
 };

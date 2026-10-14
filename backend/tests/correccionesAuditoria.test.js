@@ -161,10 +161,11 @@ describe('Horario de atencion', () => {
     expect(horarioModel.upsertDia).not.toHaveBeenCalled();
   });
 
-  test('al guardar avisa cuantas citas ya agendadas quedan fuera del horario nuevo', async () => {
+  test('al guardar avisa cuantas citas quedan fuera del horario nuevo (pasan a por reagendar)', async () => {
     sedeModel.buscarPorId.mockResolvedValue({ id: 'sede-1' });
     horarioModel.upsertDia.mockResolvedValue({ dia_semana: 1, hora_inicio: '09:00:00', hora_fin: '12:00:00' });
-    horarioModel.contarCitasFueraDeHorario.mockResolvedValue(3);
+    horarioModel.listarCitasFueraDeHorario.mockResolvedValue([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+    jest.spyOn(require('../src/models/cita.model'), 'marcarPorReagendar').mockResolvedValue(['a', 'b', 'c']);
     const respuesta = await guardar('09:00', '12:00');
     expect(respuesta.status).toBe(200);
     expect(respuesta.body.citasAfectadas).toBe(3);

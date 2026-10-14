@@ -110,11 +110,11 @@ async function actualizar(
   return resultado.rows[0] || null;
 }
 
-// Citas activas (agendadas y futuras) de la mascota: mientras tenga
+// Citas activas (agendadas y futuras, o por reagendar) de la mascota: mientras tenga
 // alguna, no se puede eliminar.
 async function contarCitasPendientes(id) {
   const resultado = await pool.query(
-    `SELECT COUNT(*)::int AS total FROM cita WHERE mascota_id = $1 AND estado = 'agendada' AND fecha_hora > NOW()`,
+    `SELECT COUNT(*)::int AS total FROM cita WHERE mascota_id = $1 AND (estado = 'por_reagendar' OR (estado = 'agendada' AND fecha_hora > NOW()))`,
     [id]
   );
   return resultado.rows[0].total;
