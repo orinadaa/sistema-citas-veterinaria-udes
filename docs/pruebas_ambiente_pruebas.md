@@ -4,6 +4,8 @@ Pruebas funcionales, de seguridad, de rendimiento y de interfaz ejecutadas el 14
 
 Resultado: **289 de 290 casos aprobados**. El único caso no aprobado (LH-08) depende de las fotos cargadas en la plataforma, no del código.
 
+**Alcance de la versión:** los 290 casos de este informe se ejecutaron sobre el commit `a364595`; sus resultados no se deben atribuir a revisiones posteriores. El 14 de octubre de 2026 se consultó por SSH y en modo de solo lectura el archivo `/srv/citas-udes/VERSION`; el valor fue `f5ac5f8`, igual al `HEAD` local. Las huellas SHA-256 de dos archivos del backend coincidieron exactamente y las de tres archivos del frontend coincidieron tras normalizar los finales de línea. Así se confirmó que AWS ya ejecuta la versión local `f5ac5f8`. Entre ambas revisiones se modificó el permiso de cancelación y reprogramación del médico; por tanto, el caso ME-16 de este informe es histórico y no describe el comportamiento final. La batería de 290 casos no se repitió completa sobre `f5ac5f8`.
+
 ## Cómo se probó
 
 - **Desde el equipo de la autora y contra el sitio publicado**, no contra el servidor local: cada petición pasó por internet, Nginx, HTTPS y el backend real, con la base de datos real del ambiente.

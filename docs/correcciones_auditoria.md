@@ -30,7 +30,7 @@ Las pantallas del administrador de sede y del superadministrador se revisaron de
 | LOG-04 | Una cita que ya pasó no se cancela ni se reprograma. |
 | LOG-05 | La misma mascota no puede tener dos citas a la vez; máximo 10 citas por atender por cliente cuando agenda él mismo. |
 | LOG-06 | No se agenda en una sede o servicio inactivos, ni a un cliente o con un médico inactivos. |
-| LOG-07 | El administrador de la sede y el médico pueden cancelar y reprogramar citas desde el detalle (`citas/PieCancelarCita.jsx`, con la misma ventana que usa el cliente; se agregó el 13 de octubre de 2026). El cliente recibe el aviso, y al cancelar también un correo. |
+| LOG-07 | La versión inicial permitió al administrador de sede y al médico cancelar y reprogramar citas desde el detalle. El 14 de octubre se cambió esa regla: el médico ya no puede hacerlo; la agenda y los cambios de horario quedan bajo responsabilidad del administrador de sede, mientras que el cliente conserva el control de sus citas. El servidor y la interfaz aplican esta autorización. |
 | LOG-09 | El horario de atención valida `HH:MM`, compara en minutos y exige horas en punto o y media. |
 | LOG-11 | La consulta de disponibilidad rechaza fechas que no existen. |
 | BD-01 | `database/esquema.sql`, `database/datos_iniciales.sql` y `docs/instalacion.md`. |
