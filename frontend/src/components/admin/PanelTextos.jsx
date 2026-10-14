@@ -7,37 +7,11 @@ import { actualizarTextosSitio, obtenerTextosSitioAdmin } from '../../api/client
 import { useAuth } from '../../context/AuthContext';
 import { olvidarTextosSitio } from '../../hooks/useTextosSitio';
 import { EstadoError } from '../ui/EstadoError';
-import { IconoEscudo, IconoPata, IconoRotar } from '../icons';
+import { IconoRotar } from '../icons';
+import { VistaPreviaPortada } from './VistaPreviaPortada';
 
 // Textos que caben en una linea: campo simple; los largos, area de texto.
 const LARGO_LINEA = 70;
-
-function VistaPreviaHero({ valores }) {
-  const vinetas = [
-    { Icono: IconoPata, texto: valores.hero_vineta_1 },
-    { Icono: IconoEscudo, texto: valores.hero_vineta_2 },
-  ].filter((v) => v.texto);
-  return (
-    <div aria-label="Vista previa de la portada" className="self-start rounded-2xl bg-gradient-to-br lg:sticky lg:top-4 from-brand-blue-500 to-brand-blue-800 p-6 text-white">
-      <p className="text-xs font-semibold uppercase tracking-wide text-white/80">Vista previa</p>
-      <p className="mt-3 font-heading text-2xl font-bold leading-tight">
-        {valores.hero_titulo}
-        {valores.hero_destacado && <> <span className="text-brand-amber">{valores.hero_destacado}</span></>}
-      </p>
-      <p className="mt-3 text-sm leading-relaxed text-blue-50">{valores.hero_descripcion}</p>
-      {vinetas.length > 0 && (
-        <div className="mt-4 flex flex-col gap-2 text-sm font-medium text-white/90">
-          {vinetas.map(({ Icono, texto }) => (
-            <span key={texto} className="flex items-center gap-2">
-              <Icono className="h-4 w-4 shrink-0" />
-              {texto}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export function PanelTextos() {
   const { token } = useAuth();
@@ -110,8 +84,8 @@ export function PanelTextos() {
       {secciones.map((seccion) => (
         <section key={seccion.nombre} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
           <h2 className="font-heading text-base font-semibold text-brand-navy">{seccion.nombre}</h2>
-          <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] gap-6 ${seccion.nombre === 'Portada' ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]' : ''}`}>
-            <div className="flex flex-col gap-5">
+          <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] gap-6 ${seccion.nombre === 'Portada' ? 'xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]' : ''}`}>
+            <div className="flex max-w-xl flex-col gap-5">
               {seccion.textos.map((t) => {
                 const valor = valores[t.clave] ?? '';
                 const esOriginal = valor === t.original;
@@ -151,7 +125,7 @@ export function PanelTextos() {
                 );
               })}
             </div>
-            {seccion.nombre === 'Portada' && <VistaPreviaHero valores={valores} />}
+            {seccion.nombre === 'Portada' && <VistaPreviaPortada valores={valores} />}
           </div>
         </section>
       ))}

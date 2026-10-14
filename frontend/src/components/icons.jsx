@@ -49,6 +49,11 @@ import { UserIcon } from '@phosphor-icons/react/dist/csr/User';
 import { UsersIcon } from '@phosphor-icons/react/dist/csr/Users';
 import { WarningIcon } from '@phosphor-icons/react/dist/csr/Warning';
 import { XIcon } from '@phosphor-icons/react/dist/csr/X';
+import { MonitorIcon } from '@phosphor-icons/react/dist/csr/Monitor';
+import { DeviceMobileIcon } from '@phosphor-icons/react/dist/csr/DeviceMobile';
+import { MinusIcon } from '@phosphor-icons/react/dist/csr/Minus';
+import { SquareIcon } from '@phosphor-icons/react/dist/csr/Square';
+import { LockSimpleIcon } from '@phosphor-icons/react/dist/csr/LockSimple';
 import { PhoneIcon } from '@phosphor-icons/react/dist/csr/Phone';
 import { ChatCircleDotsIcon } from '@phosphor-icons/react/dist/csr/ChatCircleDots';
 import { WhatsappLogoIcon } from '@phosphor-icons/react/dist/csr/WhatsappLogo';
@@ -164,6 +169,21 @@ export function IconoMenu(props) {
 }
 export function IconoX(props) {
   return <Icono de={XIcon} {...props} />;
+}
+export function IconoMonitor(props) {
+  return <Icono de={MonitorIcon} {...props} />;
+}
+export function IconoCelular(props) {
+  return <Icono de={DeviceMobileIcon} {...props} />;
+}
+export function IconoMinimizar(props) {
+  return <Icono de={MinusIcon} {...props} />;
+}
+export function IconoCuadro(props) {
+  return <Icono de={SquareIcon} {...props} />;
+}
+export function IconoCandado(props) {
+  return <Icono de={LockSimpleIcon} {...props} />;
 }
 export function IconoCheck(props) {
   return <Icono de={CheckIcon} {...props} />;
