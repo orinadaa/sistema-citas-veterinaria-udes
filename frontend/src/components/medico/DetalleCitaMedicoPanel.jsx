@@ -29,9 +29,11 @@ function Fila({ icono: Icono, etiqueta, valor, detalle }) {
   );
 }
 
+// gestionable: el administrador de la sede puede cancelar y reprogramar desde
+// aqui; el medico solo consulta (la agenda la maneja la sede).
 // onCancelada / onReprogramada: la cita se cancelo o cambio de fecha desde
 // este panel (recargar la agenda).
-export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada, onReprogramada, mostrarMedico = false, mostrarInfoMedica = true }) {
+export function DetalleCitaMedicoPanel({ cita, onClose, acciones, gestionable = false, onCancelada, onReprogramada, mostrarMedico = false, mostrarInfoMedica = true }) {
   const infoMedica = cita
     ? [
         ['Alergias', cita.mascota_alergias],
@@ -46,10 +48,12 @@ export function DetalleCitaMedicoPanel({ cita, onClose, acciones, onCancelada, o
 
   return (
     <SidePanel isOpen={Boolean(cita)} onClose={onClose} title="Detalle de la cita" footer={
-        cita ? (
+        !cita ? undefined : gestionable ? (
           <PieCancelarCita cita={cita} onCancelada={onCancelada} onReprogramada={onReprogramada}>
             {acciones ? acciones(cita) : null}
           </PieCancelarCita>
+        ) : acciones ? (
+          <div className="flex flex-wrap items-center justify-end gap-3">{acciones(cita)}</div>
         ) : undefined
       }
     >

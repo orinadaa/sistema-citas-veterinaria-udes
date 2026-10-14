@@ -33,10 +33,10 @@ router.post('/', verificarRol('cliente', 'administrador', 'veterinario'), limite
 
 router.post('/:id/reenviar-confirmacion', verificarRol('cliente'), limiteReenvio, reenviarConfirmacion);
 
-// PATCH /api/citas/:id/reprogramar y /cancelar — el cliente dueño, el
-// administrador de la sede de la cita o el medico que la atiende (el
-// controlador comprueba cual de los tres; ver puedeGestionarCita).
-const quienGestiona = verificarRol('cliente', 'administrador', 'veterinario');
+// PATCH /api/citas/:id/reprogramar y /cancelar — el cliente dueño o el
+// administrador de la sede de la cita (el controlador comprueba cual; ver
+// puedeGestionarCita). El medico no cancela ni reprograma.
+const quienGestiona = verificarRol('cliente', 'administrador');
 router.patch('/:id/reprogramar', quienGestiona, reprogramarCita);
 router.patch('/:id/cancelar', quienGestiona, cancelarCita);
 

@@ -57,12 +57,12 @@ function medicoLibreDurante(medicoId, inicio, duracionMinutos, { franjasDeLaSede
   });
 }
 
-// Quien puede cancelar o reprogramar una cita: el cliente dueño, el
-// administrador de la sede donde es la cita y el medico que la atiende.
+// Quien puede cancelar o reprogramar una cita: el cliente dueño y el
+// administrador de la sede donde es la cita. El medico no: la agenda la
+// maneja la sede (si no puede atender, el administrador le crea un bloqueo).
 function puedeGestionarCita(usuario, cita) {
   if (usuario.rol === 'cliente') return cita.cliente_id === usuario.id;
   if (usuario.rol === 'administrador') return cita.sede_id === usuario.sedeId;
-  if (usuario.rol === 'veterinario') return cita.medico_id === usuario.id;
   return false;
 }
 

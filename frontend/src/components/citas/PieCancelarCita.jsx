@@ -1,6 +1,6 @@
 // components/citas/PieCancelarCita.jsx
-// Pie del detalle de una cita para el personal (administrador de la sede y
-// medico): permite cancelarla y reprogramarla.
+// Pie del detalle de una cita para el administrador de la sede: permite
+// cancelarla y reprogramarla (el medico solo consulta su agenda).
 import { useCallback, useEffect, useState } from 'react';
 import { cancelarCita, obtenerHorarios, reprogramarCita } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -10,7 +10,7 @@ import { ReprogramarCitaModal } from './ReprogramarCitaModal';
 // `children`: las demas acciones del pie (van a la derecha).
 // `onReprogramada`: la cita cambio de fecha desde este pie (recargar la agenda).
 export function PieCancelarCita({ cita, onCancelada, onReprogramada, children }) {
-  const { token, usuario } = useAuth();
+  const { token } = useAuth();
   const [citaConfirmando, setCitaConfirmando] = useState(null);
   const [cancelando, setCancelando] = useState(false);
   const [error, setError] = useState('');
@@ -141,8 +141,7 @@ export function PieCancelarCita({ cita, onCancelada, onReprogramada, children })
 
       <ReprogramarCitaModal
         abierto={reprogramarAbierto}
-        // La agenda del medico no trae su propio nombre en cada cita.
-        cita={{ ...cita, medico_nombre: cita.medico_nombre || usuario?.nombreCompleto }}
+        cita={cita}
         onCerrar={cerrarReprogramar}
         onConfirmar={confirmarReprogramacion}
         fecha={nuevaFecha}

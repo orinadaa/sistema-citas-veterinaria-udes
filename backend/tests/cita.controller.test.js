@@ -743,11 +743,8 @@ describe('PATCH /api/citas/:id/reprogramar', () => {
     expect(respuesta.body.mensaje).toMatch(/mascota/i);
   });
 
-  // La sede y el medico reprograman desde el detalle de la cita de su panel.
-  test.each([
-    ['el administrador de la sede de la cita', TOKEN_ADMIN],
-    ['el medico que atiende la cita', jwt.sign({ id: ID_MEDICO, rol: 'veterinario', sedeId: ID_SEDE }, process.env.JWT_SECRET)],
-  ])('%s puede reprogramarla', async (_quien, token) => {
+  // La sede reprograma desde el detalle de la cita de su panel.
+  test.each([['el administrador de la sede de la cita', TOKEN_ADMIN]])('%s puede reprogramarla', async (_quien, token) => {
     const nuevaFranja = proximaFranjaValida(15);
     citaModel.buscarPorId.mockResolvedValue({
       id: 'cita-1',
@@ -876,7 +873,7 @@ describe('Control de acceso del modulo de citas', () => {
     expect(respuesta.status).toBe(403);
   });
 
-  // La sede y el medico tambien pueden cancelar y reprogramar.
+  // La sede tambien puede cancelar y reprogramar; el medico no.
   const CITA_FUTURA = { id: 'cita-1', cliente_id: ID_CLIENTE, medico_id: ID_MEDICO, sede_id: ID_SEDE, servicio_id: ID_SERVICIO, mascota_id: ID_MASCOTA, estado: 'agendada', fecha_hora: proximaFranjaValida(5) };
   const TOKEN_MEDICO = jwt.sign({ id: ID_MEDICO, rol: 'veterinario', sedeId: ID_SEDE }, process.env.JWT_SECRET);
   const cancelarCon = (token) => request(app).patch('/api/citas/cita-1/cancelar').set('Authorization', `Bearer ${token}`);
@@ -900,12 +897,16 @@ describe('Control de acceso del modulo de citas', () => {
     expect(respuesta.body.cita.estado).toBe('cancelada');
   });
 
-  test('el medico cancela sus citas, no las de otro medico', async () => {
+  test('el medico no cancela ni reprograma, ni siquiera sus propias citas', async () => {
     citaModel.buscarPorId.mockResolvedValue(CITA_FUTURA);
-    citaModel.cancelar.mockResolvedValue({ ...CITA_FUTURA, estado: 'cancelada' });
-    expect((await cancelarCon(TOKEN_MEDICO)).status).toBe(200);
-    citaModel.buscarPorId.mockResolvedValue({ ...CITA_FUTURA, medico_id: 'otro-medico' });
     expect((await cancelarCon(TOKEN_MEDICO)).status).toBe(403);
+    const reprogramar = await request(app)
+      .patch('/api/citas/cita-1/reprogramar')
+      .set('Authorization', `Bearer ${TOKEN_MEDICO}`)
+      .send({ nuevaFechaHora: proximaFranjaValida(15).toISOString() });
+    expect(reprogramar.status).toBe(403);
+    expect(citaModel.cancelar).not.toHaveBeenCalled();
+    expect(citaModel.reprogramar).not.toHaveBeenCalled();
   });
 
   test('una cita que ya paso no se puede cancelar ni reprogramar', async () => {

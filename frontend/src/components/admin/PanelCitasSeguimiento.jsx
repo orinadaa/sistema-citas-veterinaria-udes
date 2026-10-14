@@ -230,6 +230,7 @@ export function PanelCitasSeguimiento() {
         onClose={() => setCitaDetalle(null)}
         mostrarMedico={esAdmin}
         mostrarInfoMedica={!esAdmin}
+        gestionable={esAdmin}
         onCancelada={() => {
           setCitaDetalle(null);
           cargarCitas();

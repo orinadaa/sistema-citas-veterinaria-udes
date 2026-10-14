@@ -254,14 +254,6 @@ export function PanelMisCitasMedico({ senalAgendar = 0 }) {
       <DetalleCitaMedicoPanel
         cita={citaDetalle}
         onClose={() => setCitaDetalle(null)}
-        onCancelada={() => {
-          setCitaDetalle(null);
-          cargar();
-        }}
-        onReprogramada={() => {
-          setCitaDetalle(null);
-          cargar();
-        }}
         acciones={(cita) => (
           <button
             type="button"
