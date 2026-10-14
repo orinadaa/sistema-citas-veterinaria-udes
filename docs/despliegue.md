@@ -1,6 +1,6 @@
 # Llevar el sistema a producción
 
-El alcance del proyecto es entrega en entorno local. Esta guía reúne lo que habría que hacer el día que se publique en internet con personas reales. Sale de la auditoría del 11 de octubre de 2026 (`docs/auditoria_sistema_2026-10-11.pdf`).
+El alcance del proyecto es entrega en entorno local. La puesta en producción corresponde a la Vicerrectoría de Extensión y al área TIC de la universidad. Esta guía reúne lo que habría que hacer el día que se publique en internet con personas reales. Siguiéndola se montó, el 13 de octubre de 2026, un ambiente de pruebas en Amazon EC2 (ver "Ambiente de pruebas" y `docs/pruebas_ambiente_pruebas.md`). Sale de la auditoría del 11 de octubre de 2026 (`docs/auditoria_sistema_2026-10-11.pdf`).
 
 ## Antes de publicar
 
@@ -66,6 +66,14 @@ Referrer-Policy: strict-origin-when-cross-origin
 ```
 
 `img-src https:` hace falta mientras las fotos de las sedes vengan de otros sitios. Con fotos propias se puede quitar.
+
+Tres ajustes de Nginx que el ambiente de pruebas mostró necesarios (`docs/pruebas_ambiente_pruebas.md`):
+
+- **Compresión:** en `nginx.conf`, activar `gzip_types text/css application/javascript application/json text/plain`. Sin esto solo se comprime el HTML; el JavaScript principal pasa de 377 KB a 115 KB.
+- **HTTP/2:** `listen 443 ssl http2;`. Con estas dos líneas, el rendimiento en móvil (Lighthouse) de la página de inicio pasó de 59 a 81 y el de inicio de sesión de 65 a 97.
+- **Versión oculta:** `server_tokens off;`, para que la cabecera `Server` no muestre la versión de Nginx.
+
+Las fotos pesan más que todo el código: la foto de una sede tomada de un periódico pesa 11 MB. Antes de publicar, subir fotos propias desde el panel, que las reduce a 1600 px.
 
 ## Ambiente de pruebas
 
