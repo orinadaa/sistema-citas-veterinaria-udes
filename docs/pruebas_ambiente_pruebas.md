@@ -26,6 +26,8 @@ Esta revisión es un smoke test de lectura y despliegue, no una repetición de l
 
 La compilación local de producción del frontend completó correctamente y transformó 1103 módulos; el bundle local no contiene el aviso destinado al ambiente AWS de pruebas. Vite emitió una advertencia no bloqueante por el tamaño de los paquetes de administración y ExcelJS, ambos superiores a 500 kB minificados. Los scripts del instalador de Windows pasaron la validación sintáctica de PowerShell; no se realizó una instalación de extremo a extremo en un equipo limpio.
 
+La copia local de PostgreSQL se respaldó antes de aplicar la migración aditiva `incremento_18a_festivos_colombia.sql`. Después se confirmó la tabla nueva y se realizó un smoke test con las cuatro cuentas ficticias locales: los cuatro inicios de sesión respondieron HTTP 200; cliente y médico recibieron HTTP 403 al consultar festivos, mientras los dos perfiles administrativos recibieron HTTP 200. La lista presentó 18 festivos nacionales de 2026, todos cerrados por defecto. El número de usuarios pasó de 27 a 31 por las cuatro cuentas de evaluación; las 28 mascotas y las 305 citas se conservaron. No se enviaron correos ni se crearon citas.
+
 ## Revisión de la versión final (14 de octubre de 2026)
 
 El 14 de octubre se repitieron comprobaciones de acceso, permisos, interfaz y disponibilidad sobre el servicio AWS, y se ejecutaron pruebas automatizadas en la copia local correspondiente a `f5ac5f8`. Esta revisión complementa el informe de 290 casos; no lo reemplaza ni se presenta como una repetición íntegra. La verificación del 15 de octubre se documenta en la sección anterior.
