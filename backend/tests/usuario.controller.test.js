@@ -74,6 +74,15 @@ describe('Rutas /api/usuarios (gestion de cuentas: superadministrador)', () => {
     expect(respuesta.status).toBe(400);
   });
 
+  test('POST /api/usuarios exige teléfono para crear personal', async () => {
+    const respuesta = await request(app)
+      .post('/api/usuarios')
+      .set('Authorization', `Bearer ${tokenPara('superadministrador')}`)
+      .send({ nombreCompleto: 'Vet Nuevo', correo: 'vet@correo.com', rol: 'veterinario', sedeId: 'sede1' });
+    expect(respuesta.status).toBe(400);
+    expect(respuesta.body.mensaje).toMatch(/teléfono/i);
+  });
+
   test('POST /api/usuarios crea personal veterinario con contraseña autogenerada y envia el correo de credenciales', async () => {
     usuarioModel.crearPersonal.mockResolvedValue({
       id: 'u3',
@@ -92,6 +101,7 @@ describe('Rutas /api/usuarios (gestion de cuentas: superadministrador)', () => {
         correo: 'vet@correo.com',
         rol: 'veterinario',
         sedeId: 'sede1',
+        telefono: '3001112233',
       });
 
     expect(respuesta.status).toBe(201);

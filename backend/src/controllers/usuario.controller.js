@@ -62,9 +62,9 @@ async function crearStaff(req, res, next) {
     const nombreCompleto = String(req.body.nombreCompleto ?? '').trim();
     const correo = normalizarCorreo(req.body.correo);
 
-    if (!nombreCompleto || !correo || !rol || !sedeId) {
+    if (!nombreCompleto || !correo || !rol || !sedeId || !telefono) {
       return res.status(400).json({
-        mensaje: 'Nombre completo, correo, rol y sede son obligatorios.',
+        mensaje: 'Nombre completo, correo, teléfono, rol y sede son obligatorios.',
       });
     }
     if (rol !== 'administrador' && rol !== 'veterinario') {

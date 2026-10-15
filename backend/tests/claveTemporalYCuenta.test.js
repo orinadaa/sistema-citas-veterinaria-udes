@@ -93,7 +93,7 @@ describe('Clave temporal: obliga a establecer una contraseña propia', () => {
     usuarioModel.crearPersonal.mockResolvedValue({ id: 'n1' });
     correoService.enviarCredenciales.mockResolvedValue();
     const respuesta = await con(request(app).post('/api/usuarios'), firmar({ id: 'su', rol: 'superadministrador' })).send({
-      nombreCompleto: 'Nuevo Admin', correo: 'nuevo@udes.edu.co', rol: 'administrador', sedeId: 's1',
+      nombreCompleto: 'Nuevo Admin', correo: 'nuevo@udes.edu.co', rol: 'administrador', sedeId: 's1', telefono: '3001112233',
     });
     expect(respuesta.status).toBe(201);
     expect(usuarioModel.crearPersonal).toHaveBeenCalledWith(expect.objectContaining({ claveTemporal: true }));

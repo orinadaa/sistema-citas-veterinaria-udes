@@ -446,6 +446,7 @@ export function PanelMedicos({ busquedaInicial }) {
             label="Teléfono"
             value={form.telefono}
             onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+            required={!medicoEditando}
           />
 
           {medicoEditando && (

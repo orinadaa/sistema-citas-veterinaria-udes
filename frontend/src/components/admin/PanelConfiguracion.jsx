@@ -376,7 +376,7 @@ export function PanelConfiguracion({ busquedaInicial }) {
             </Desplegable>
           </div>
 
-          <Campo id="telefono-usuario-config" type="tel" inputMode="numeric" pattern="[0-9]{10}" title="Ingresa exactamente 10 dígitos, sin espacios ni signos." maxLength={10} label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
+          <Campo id="telefono-usuario-config" type="tel" inputMode="numeric" pattern="[0-9]{10}" title="Ingresa exactamente 10 dígitos, sin espacios ni signos." maxLength={10} label="Teléfono" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} required={!usuarioEditando} />
 
           {usuarioEditando && (
             <StatusToggle

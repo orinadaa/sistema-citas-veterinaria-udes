@@ -80,6 +80,15 @@ describe('POST /api/administracion/medicos', () => {
     expect(respuesta.status).toBe(400);
   });
 
+  test('rechaza crear un médico sin teléfono', async () => {
+    const respuesta = await request(app)
+      .post('/api/administracion/medicos')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombreCompleto: 'Dra. Ejemplo', correo: 'ejemplo@udes.edu.co', documento: '123456' });
+    expect(respuesta.status).toBe(400);
+    expect(respuesta.body.mensaje).toMatch(/teléfono/i);
+  });
+
   test('rechaza documentos con letras y teléfonos que no tengan 10 dígitos', async () => {
     const documentoInvalido = await request(app)
       .post('/api/administracion/medicos')
@@ -100,7 +109,7 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'repetido@udes.edu.co', documento: '123456' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'repetido@udes.edu.co', documento: '123456', telefono: '3001112233' });
 
     expect(respuesta.status).toBe(409);
   });
@@ -113,7 +122,7 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', documento: '123456' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', documento: '123456', telefono: '3001112233' });
 
     expect(respuesta.status).toBe(201);
     expect(medicoModel.crear).toHaveBeenCalledWith(expect.objectContaining({ sedeId: ID_SEDE, documento: '123456' }));
@@ -133,7 +142,7 @@ describe('POST /api/administracion/medicos', () => {
     const respuesta = await request(app)
       .post('/api/administracion/medicos')
       .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
-      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', documento: '123456' });
+      .send({ nombreCompleto: 'Dr. Nuevo', correo: 'nuevo@udes.edu.co', documento: '123456', telefono: '3001112233' });
 
     expect(respuesta.status).toBe(201);
     expect(respuesta.body.correoEnviado).toBe(false);

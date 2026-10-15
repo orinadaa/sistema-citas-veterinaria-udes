@@ -35,8 +35,8 @@ async function crearMedico(req, res, next) {
     const nombreCompleto = String(req.body.nombreCompleto ?? '').trim();
     const correo = normalizarCorreo(req.body.correo);
 
-    if (!nombreCompleto || !correo || !documento) {
-      return res.status(400).json({ mensaje: 'Nombre completo, correo y documento de identidad son obligatorios.' });
+    if (!nombreCompleto || !correo || !documento || !telefono) {
+      return res.status(400).json({ mensaje: 'Nombre completo, correo, teléfono y documento de identidad son obligatorios.' });
     }
     const problema =
       errorNombre(nombreCompleto) || errorCorreo(correo) || errorDocumento(documento) || errorTelefono(telefono);
