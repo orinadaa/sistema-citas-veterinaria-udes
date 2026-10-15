@@ -8,6 +8,7 @@ const recuperacionModel = require('../models/recuperacion.model');
 const correoService = require('../services/correo.service');
 const { generarCodigoRecuperacion, errorContrasena } = require('../utils/contrasena.util');
 const { generarToken } = require('../utils/token');
+const { errorTelefono, errorDocumento } = require('../utils/validacion');
 
 const RONDAS_SAL = 10;
 const MINUTOS_VIGENCIA_CODIGO = 15;
@@ -33,7 +34,8 @@ async function actualizarPerfil(req, res, next) {
     const campos = {};
     for (const clave of Object.keys(LIMITES)) {
       if (req.body[clave] === undefined) continue;
-      const valor = req.body[clave] === null ? '' : String(req.body[clave]).trim();
+      const conservarFormato = clave === 'telefono' || clave === 'documento';
+      const valor = req.body[clave] === null ? '' : conservarFormato ? String(req.body[clave]) : String(req.body[clave]).trim();
       if (valor.length > LIMITES[clave]) {
         return res.status(400).json({ mensaje: `El campo ${clave} supera los ${LIMITES[clave]} caracteres.` });
       }
@@ -42,12 +44,8 @@ async function actualizarPerfil(req, res, next) {
     if (campos.nombreCompleto !== undefined && !campos.nombreCompleto) {
       return res.status(400).json({ mensaje: 'El nombre es obligatorio.' });
     }
-    if (campos.telefono && !/^[0-9+\s-]{7,20}$/.test(campos.telefono)) {
-      return res.status(400).json({ mensaje: 'El teléfono solo admite números, espacios, + y -.' });
-    }
-    if (campos.documento && !/^[0-9A-Za-z.-]{4,20}$/.test(campos.documento)) {
-      return res.status(400).json({ mensaje: 'El documento solo admite letras, números, puntos y guiones.' });
-    }
+    const problemaContacto = errorTelefono(campos.telefono) || errorDocumento(campos.documento);
+    if (problemaContacto) return res.status(400).json({ mensaje: problemaContacto });
     if (Object.keys(campos).length === 0) {
       return res.status(400).json({ mensaje: 'Indica al menos un dato para actualizar.' });
     }

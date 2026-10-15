@@ -11,7 +11,7 @@ const mascotaModel = require('../models/mascota.model');
 const pacienteModel = require('../models/paciente.model');
 const perfilMedicoModel = require('../models/perfilMedico.model');
 const correoService = require('../services/correo.service');
-const { normalizarCorreo, errorCorreo, errorNombre, errorTelefono, errorLongitud } = require('../utils/validacion');
+const { normalizarCorreo, errorCorreo, errorNombre, errorTelefono, errorDocumento } = require('../utils/validacion');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 const { generarContrasenaTemporal } = require('../utils/contrasena.util');
 
@@ -39,7 +39,7 @@ async function crearMedico(req, res, next) {
       return res.status(400).json({ mensaje: 'Nombre completo, correo y documento de identidad son obligatorios.' });
     }
     const problema =
-      errorNombre(nombreCompleto) || errorCorreo(correo) || errorTelefono(telefono) || errorLongitud({ documento }, { documento: 20 }, { documento: 'El documento' });
+      errorNombre(nombreCompleto) || errorCorreo(correo) || errorDocumento(documento) || errorTelefono(telefono);
     if (problema) {
       return res.status(400).json({ mensaje: problema });
     }
@@ -100,6 +100,10 @@ async function actualizarMedico(req, res, next) {
     if (activo !== undefined && activo !== medico.activo) {
       return res.status(403).json({ mensaje: 'Solo el superadministrador puede activar o desactivar cuentas.' });
     }
+
+    const problema =
+      (nombreCompleto !== undefined && errorNombre(nombreCompleto)) || errorDocumento(documento) || errorTelefono(telefono);
+    if (problema) return res.status(400).json({ mensaje: problema });
 
     await medicoModel.actualizar(id, { nombreCompleto, telefono, documento, biografia });
     const medicos = await medicoModel.listarConServicios(req.usuario.sedeId);

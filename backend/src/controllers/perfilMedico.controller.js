@@ -7,6 +7,7 @@ const perfilModel = require('../models/perfilMedico.model');
 const correoService = require('../services/correo.service');
 const { generarCodigoRecuperacion, errorContrasena } = require('../utils/contrasena.util');
 const { generarToken } = require('../utils/token');
+const { errorTelefono } = require('../utils/validacion');
 const { fotosUsuarios } = require('../middlewares/subirFoto.middleware');
 
 const CORREO_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,7 +36,7 @@ async function actualizarPerfil(req, res, next) {
     const campos = {};
     for (const clave of Object.keys(LIMITES).concat('aniosExperiencia')) {
       if (req.body[clave] === undefined) continue;
-      const valor = req.body[clave] === null ? '' : String(req.body[clave]).trim();
+      const valor = req.body[clave] === null ? '' : clave === 'telefono' ? String(req.body[clave]) : String(req.body[clave]).trim();
       if (LIMITES[clave] && valor.length > LIMITES[clave]) {
         return res.status(400).json({ mensaje: `El campo ${clave} supera los ${LIMITES[clave]} caracteres.` });
       }
@@ -47,6 +48,8 @@ async function actualizarPerfil(req, res, next) {
     if (campos.telefono !== undefined && !campos.telefono) {
       return res.status(400).json({ mensaje: 'El teléfono es obligatorio.' });
     }
+    const problemaTelefono = errorTelefono(campos.telefono);
+    if (problemaTelefono) return res.status(400).json({ mensaje: problemaTelefono });
     if (campos.aniosExperiencia && !ANIOS_EXPERIENCIA.includes(campos.aniosExperiencia)) {
       return res.status(400).json({ mensaje: 'Elige un rango de años de experiencia válido.' });
     }

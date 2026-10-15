@@ -317,7 +317,7 @@ export function DetalleCitaPanel({ cita, onClose, onActualizada }) {
               )}
             </div>
 
-            <FilaInfo icono={IconoPersona} etiqueta="Médico veterinario" valor={cita.medico_nombre} detalle={cita.medico_especialidad} />
+            <FilaInfo icono={IconoPersona} etiqueta="Médico veterinario" valor={cita.medico_nombre} detalle={cita.medico_especialidad || 'General'} />
           </div>
 
           {/* 5. Motivo (las "notas adicionales" no existen en el sistema: no se muestran) */}

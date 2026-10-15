@@ -25,7 +25,7 @@ describe('PUT /api/medico/perfil', () => {
   });
 
   test('no deja vaciar el nombre ni el telefono', async () => {
-    for (const cuerpo of [{ nombreCompleto: '  ' }, { telefono: '' }]) {
+    for (const cuerpo of [{ nombreCompleto: '  ' }, { telefono: '' }, { telefono: '300 111 2233' }, { telefono: '123' }]) {
       const r = await request(app).put('/api/medico/perfil').set('Authorization', `Bearer ${TOKEN_VET}`).send(cuerpo);
       expect(r.status).toBe(400);
     }

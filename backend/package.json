@@ -10,6 +10,7 @@
     "crear:superadmin": "node src/scripts/crearSuperadmin.js",
     "demo:cargar": "node src/scripts/datosDemo.js cargar",
     "demo:quitar": "node src/scripts/datosDemo.js quitar",
+    "demo:usuarios-evaluacion": "node src/scripts/seedUsuariosEvaluacion.js",
     "seed:veterinarios": "node src/scripts/seedVeterinarios.js",
     "seed:galeria": "node src/scripts/seedGaleria.js",
     "seed:fotos-servicios": "node src/scripts/seedFotosServicios.js",

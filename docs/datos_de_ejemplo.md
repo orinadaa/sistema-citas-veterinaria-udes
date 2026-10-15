@@ -42,6 +42,24 @@ contraseña `Demo12345`. Por ejemplo:
 - Las contraseñas de ejemplo son conocidas: quitar estos datos antes de usar
   el sistema con clientes reales.
 
+## Cuentas para evaluación local
+
+Para abrir el panel de cada perfil sin mezclar estas cuentas con los datos de
+demostración, ejecuta `npm run demo:usuarios-evaluacion` desde `backend/`.
+Solo funciona con PostgreSQL en `localhost`, `127.0.0.1` o `::1`, y rechaza
+`NODE_ENV=production`.
+
+| Perfil | Correo |
+|---|---|
+| Cliente | clienteprueba@demo.udes.co |
+| Médico veterinario | medicoprueba@demo.udes.co |
+| Administrador de sede | adminprueba@demo.udes.co |
+| Superadministrador | superadminprueba@demo.udes.co |
+
+Las cuatro cuentas usan `1234`. Son ficticias, no reciben correos y deben
+usarse únicamente para evaluación local; no se deben cargar en AWS ni en un
+servidor institucional.
+
 ## Pruebas
 
 | Descripción | Entrada | Resultado esperado | Resultado obtenido |

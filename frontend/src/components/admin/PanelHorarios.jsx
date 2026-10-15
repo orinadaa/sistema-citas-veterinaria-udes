@@ -24,6 +24,7 @@ import { EstadoError } from '../ui/EstadoError';
 import { IconoSede } from '../icons';
 import { EditorHorarioSemana } from './EditorHorarioSemana';
 import { ConfirmarCitasAfectadas } from './ConfirmarCitasAfectadas';
+import { PanelFestivosSede } from './PanelFestivosSede';
 
 const DIAS = [
   { numero: 1, letra: 'L', nombre: 'Lunes' },
@@ -460,6 +461,7 @@ export function PanelHorarios({ sedeFija = null }) {
                 onGuardar={guardarDia}
                 onCerrar={cerrarDia}
               />
+              <PanelFestivosSede sedeId={sedeEditando.id} token={token} onAviso={setAvisoCitas} />
             </div>
           ) : (
             <p className="text-xs text-slate-400">Guarda la sede primero para configurar su horario de atención.</p>

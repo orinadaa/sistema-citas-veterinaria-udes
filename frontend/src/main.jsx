@@ -9,6 +9,9 @@ import '@fontsource/raleway/600.css'
 import '@fontsource/raleway/700.css'
 import './index.css'
 import App from './App.jsx'
+import { instalarValidacionFormularios } from './utils/validacionFormularios.js'
+
+instalarValidacionFormularios(document)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

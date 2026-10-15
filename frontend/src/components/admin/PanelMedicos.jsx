@@ -414,6 +414,10 @@ export function PanelMedicos({ busquedaInicial }) {
           <Campo
             id="documento-medico"
             label="Documento de identidad"
+            inputMode="numeric"
+            pattern="[0-9]{1,20}"
+            title="Ingresa solo dígitos, hasta 20."
+            maxLength={20}
             value={form.documento}
             onChange={(e) => setForm({ ...form, documento: e.target.value })}
             required={!medicoEditando}
@@ -434,7 +438,11 @@ export function PanelMedicos({ busquedaInicial }) {
           )}
           <Campo
             id="telefono-medico"
-            inputMode="tel"
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]{10}"
+            title="Ingresa exactamente 10 dígitos, sin espacios ni signos."
+            maxLength={10}
             label="Teléfono"
             value={form.telefono}
             onChange={(e) => setForm({ ...form, telefono: e.target.value })}

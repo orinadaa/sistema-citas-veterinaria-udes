@@ -12,6 +12,29 @@ input[type="password"]::-ms-clear {
   display: none;
 }
 
+/* Retroalimentación por campo compartida en los formularios del sistema. */
+.campo[aria-invalid="true"],
+.campo-vetui[aria-invalid="true"],
+input[aria-invalid="true"],
+textarea[aria-invalid="true"],
+select[aria-invalid="true"] {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 2px rgb(220 38 38 / 18%) !important;
+}
+.mensaje-validacion-campo,
+.resumen-validacion-formulario {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+.resumen-validacion-formulario {
+  border-radius: 0.5rem;
+  background: #fef2f2;
+  padding: 0.625rem 0.75rem;
+  font-weight: 600;
+}
+
 /* ---------------------------------------------------------------------
    Landing paginado (LandingPage.jsx agrega la clase snap-landing a
    <html> mientras esta montado). Solo desde lg (computadoras con mouse):

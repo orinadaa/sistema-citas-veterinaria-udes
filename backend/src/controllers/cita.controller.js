@@ -80,7 +80,7 @@ function parsearFechaISO(valor) {
 // RF-13: el horario de atencion es configurable por sede. Si la sede no
 // tiene fila para ese dia de la semana, esta cerrada ese dia.
 async function franjasDelDiaParaSede(sedeId, fecha) {
-  const dia = await horarioModel.buscarDia(sedeId, fecha.getDay());
+  const dia = await horarioModel.buscarHorarioParaFecha(sedeId, fecha);
   if (!dia) return [];
   return generarFranjasEntreHoras(fecha, dia.hora_inicio, dia.hora_fin);
 }

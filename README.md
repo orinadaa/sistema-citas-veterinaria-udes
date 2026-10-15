@@ -2,7 +2,9 @@
 
 Plataforma web para la gestión de citas de la Clínica Veterinaria de la Universidad de Santander (UDES), sedes Bucaramanga y Valledupar. Proyecto de grado de Ingeniería de Software.
 
-Los propietarios de mascotas agendan, reprograman y cancelan sus citas en línea; cada sede administra su agenda, sus médicos y sus horarios; y un perfil de administración general gestiona sedes, cuentas, servicios y el contenido de la página pública.
+Los propietarios de mascotas agendan, reprograman y cancelan sus citas en línea; cada sede administra su agenda, sus médicos, sus horarios y la apertura excepcional de festivos nacionales; y un perfil de administración general gestiona sedes, cuentas, servicios y el contenido de la página pública.
+
+Para una instalación local en Windows, revisa [la guía de instalación](docs/instalacion.md) y ejecuta `instalador/Instalar-CitasUDES.bat`. El instalador crea la configuración privada `.env` en el equipo, no en el repositorio, y prepara cuentas ficticias solo para evaluación local.
 
 ## Perfiles
 

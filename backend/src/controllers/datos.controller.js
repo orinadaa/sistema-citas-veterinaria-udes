@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const usuarioModel = require('../models/usuario.model');
 const datosModel = require('../models/datos.model');
 const bitacoraModel = require('../models/bitacora.model');
+const { errorTelefono } = require('../utils/validacion');
 
 const POR_PAGINA = 25;
 const MAXIMO_EXPORTAR = 5000;
@@ -185,10 +186,11 @@ async function corregirUsuario(req, res, next) {
     }
     const nombreCompleto = req.body.nombreCompleto === undefined ? undefined : String(req.body.nombreCompleto).trim();
     const correo = req.body.correo === undefined ? undefined : String(req.body.correo).trim().toLowerCase();
-    const telefono = req.body.telefono === undefined ? undefined : String(req.body.telefono).trim();
+    const telefono = req.body.telefono === undefined ? undefined : String(req.body.telefono);
     if (nombreCompleto === '') return res.status(400).json({ mensaje: 'El nombre no puede quedar vacío.' });
     if (correo !== undefined && !CORREO_VALIDO.test(correo)) return res.status(400).json({ mensaje: 'El correo no tiene un formato válido.' });
-    if (telefono && !/^[0-9+\s-]{7,20}$/.test(telefono)) return res.status(400).json({ mensaje: 'El teléfono solo admite números, espacios, + y -.' });
+    const problemaTelefono = errorTelefono(telefono);
+    if (problemaTelefono) return res.status(400).json({ mensaje: problemaTelefono });
     if (nombreCompleto === undefined && correo === undefined && telefono === undefined) {
       return res.status(400).json({ mensaje: 'Indica al menos un dato para corregir.' });
     }

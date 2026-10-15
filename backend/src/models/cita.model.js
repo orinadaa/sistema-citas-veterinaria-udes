@@ -102,10 +102,10 @@ const SELECT_DETALLE = `
          sv.nombre AS servicio_nombre, sv.descripcion AS servicio_descripcion, sv.precio AS servicio_precio,
          sv.duracion_minutos AS servicio_duracion_minutos,
          m.nombre_completo AS medico_nombre,
-         (SELECT string_agg(cs.nombre, ', ' ORDER BY cs.nombre)
+         COALESCE((SELECT string_agg(cs.nombre, ', ' ORDER BY cs.nombre)
           FROM usuario_especialidad ue
           JOIN categoria_servicio cs ON cs.id = ue.categoria_id
-          WHERE ue.usuario_id = c.medico_id) AS medico_especialidad,
+          WHERE ue.usuario_id = c.medico_id), 'General') AS medico_especialidad,
          mc.nombre AS mascota_nombre, mc.especie AS mascota_especie, mc.raza AS mascota_raza,
          mc.sexo AS mascota_sexo, mc.peso_kg AS mascota_peso_kg, mc.color AS mascota_color,
          mc.fecha_nacimiento AS mascota_fecha_nacimiento, mc.foto_url AS mascota_foto_url,

@@ -259,6 +259,28 @@ export function obtenerCitasAfectadasHorario({ sedeId, diaSemana, horaInicio, ho
   return solicitar(`/horarios/afectadas?${parametros}`, { token });
 }
 
+export function obtenerFestivosSede(sedeId, anio, token) {
+  const parametros = new URLSearchParams({ sedeId, anio });
+  return solicitar(`/horarios/festivos?${parametros}`, { token });
+}
+
+export function obtenerCitasAfectadasFestivo({ sedeId, fecha, horaInicio, horaFin }, token) {
+  const parametros = new URLSearchParams({ sedeId, fecha });
+  if (horaInicio && horaFin) {
+    parametros.set('horaInicio', horaInicio);
+    parametros.set('horaFin', horaFin);
+  }
+  return solicitar(`/horarios/festivos/afectadas?${parametros}`, { token });
+}
+
+export function abrirFestivoSede(datos, token) {
+  return solicitar('/horarios/festivos', { metodo: 'PUT', cuerpo: datos, token });
+}
+
+export function cerrarFestivoSede(sedeId, fecha, token) {
+  return solicitar(`/horarios/festivos/${sedeId}/${fecha}`, { metodo: 'DELETE', token });
+}
+
 export function obtenerServiciosAdmin(token) {
   return solicitar('/servicios/admin', { token });
 }

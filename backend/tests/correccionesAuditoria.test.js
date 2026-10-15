@@ -30,7 +30,7 @@ const firmar = (datos, opciones) => jwt.sign(datos, process.env.JWT_SECRET, opci
 const TOKEN_VET = firmar({ id: 'vet-1', rol: 'veterinario', sedeId: 'sede-1' });
 const TOKEN_ADMIN = firmar({ id: 'admin-1', rol: 'administrador', sedeId: 'sede-1' });
 const TOKEN_SUPER = firmar({ id: 'super-1', rol: 'superadministrador' });
-const REGISTRO = { nombreCompleto: 'Ana Pérez', correo: 'Ana@Correo.com', contrasena: 'UnaFraseLarga9', autorizaTratamiento: true };
+const REGISTRO = { nombreCompleto: 'Ana Pérez', correo: 'Ana@Correo.com', contrasena: 'UnaFraseLarga9', telefono: '3001234567', autorizaTratamiento: true };
 
 beforeEach(() => jest.clearAllMocks());
 afterEach(() => {
@@ -53,7 +53,7 @@ describe('Registro', () => {
       correo: 'ana@correo.com',
       nombre_completo: 'Ana Pérez',
       contrasena_hash: 'hash',
-      telefono: null,
+      telefono: '3001234567',
       codigo_hash: await bcrypt.hash('123456', 4),
       intentos: 0,
       expira_en: new Date(Date.now() + 60000),

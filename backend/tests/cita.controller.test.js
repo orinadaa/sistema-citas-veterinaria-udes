@@ -60,7 +60,7 @@ function mockearEntidadesBasicas() {
   servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO, nombre: 'Consulta médica' });
   usuarioModel.buscarPorId.mockResolvedValue({ id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE });
   medicoModel.ofreceServicio.mockResolvedValue(true);
-  horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+  horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
   mascotaModel.perteneceACliente.mockResolvedValue(true);
 }
 
@@ -90,7 +90,7 @@ describe('GET /api/citas/disponibilidad', () => {
     sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     medicoModel.listarPorSedeYServicio.mockResolvedValue([]);
-    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
 
     const respuesta = await request(app)
       .get('/api/citas/disponibilidad')
@@ -106,7 +106,7 @@ describe('GET /api/citas/disponibilidad', () => {
     sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     medicoModel.listarPorSedeYServicio.mockResolvedValue([MEDICO_EJEMPLO]);
-    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
     const franja = proximaFranjaValida();
     medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: ID_MEDICO, fecha_hora: franja }]);
 
@@ -130,7 +130,7 @@ describe('GET /api/citas/disponibilidad con medicoId (usado al reprogramar)', ()
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     usuarioModel.buscarPorId.mockResolvedValue({ id: ID_MEDICO, rol: 'veterinario', sede_id: ID_SEDE });
     medicoModel.ofreceServicio.mockResolvedValue(true);
-    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
     const franja = proximaFranjaValida();
     medicoModel.listarFranjasOcupadas.mockResolvedValue([{ medico_id: ID_MEDICO, fecha_hora: franja }]);
 
@@ -370,7 +370,7 @@ describe('POST /api/citas (administrador agenda en nombre de un cliente)', () =>
     );
     mascotaModel.perteneceACliente.mockResolvedValue(true);
     medicoModel.ofreceServicio.mockResolvedValue(true);
-    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
     citaModel.existeConflicto.mockResolvedValue(false);
     const franja = proximaFranjaValida();
     citaModel.crear.mockResolvedValue({ id: 'cita-1', cliente_id: ID_CLIENTE, sede_id: ID_SEDE, estado: 'agendada' });
@@ -554,7 +554,7 @@ describe('POST /api/citas (medico agenda a nombre de un cliente)', () => {
     );
     mascotaModel.perteneceACliente.mockResolvedValue(true);
     medicoModel.ofreceServicio.mockResolvedValue(true);
-    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
     citaModel.existeConflicto.mockResolvedValue(false);
     citaModel.crear.mockResolvedValue({ id: 'cita-1', estado: 'agendada' });
     citaModel.buscarDetallePorId.mockResolvedValue(null);
@@ -587,7 +587,7 @@ describe('Disponibilidad propia del medico en citas', () => {
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     medicoModel.listarPorSedeYServicio.mockResolvedValue([MEDICO_EJEMPLO]);
     medicoModel.listarFranjasOcupadas.mockResolvedValue([]);
-    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
     disponibilidadModel.cargarContexto.mockResolvedValueOnce({
       sedeId: ID_SEDE,
       conHorarioPropio: new Set([ID_MEDICO]),
@@ -926,7 +926,7 @@ describe('Control de acceso del modulo de citas', () => {
     sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
     servicioModel.buscarPorId.mockResolvedValue({ id: ID_SERVICIO });
     medicoModel.listarPorSedeYServicio.mockResolvedValue([]);
-    horarioModel.buscarDia.mockResolvedValue(HORARIO_ABIERTO);
+    horarioModel.buscarHorarioParaFecha.mockResolvedValue(HORARIO_ABIERTO);
 
     const respuesta = await request(app)
       .get('/api/citas/disponibilidad')

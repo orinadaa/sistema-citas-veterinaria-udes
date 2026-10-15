@@ -1,6 +1,6 @@
 -- database/esquema.sql
--- Esquema COMPLETO de la base de datos (estructura, sin datos), generado con
--- pg_dump el 11 de octubre de 2026. Equivale a ejecutar en orden todos los
+-- Esquema COMPLETO de la base de datos (estructura, sin datos), actualizado
+-- el 15 de octubre de 2026. Equivale a ejecutar en orden todos los
 -- archivos incremento_*.sql de esta carpeta, que se conservan como historial.
 --
 -- Para instalar el sistema desde cero basta este archivo (ver
@@ -1095,6 +1095,23 @@ CREATE TABLE public.texto_sitio (
 );
 
 CREATE INDEX idx_texto_sitio_actualizado_por ON public.texto_sitio USING btree (actualizado_por);
+
+-- incremento_18a_festivos_colombia.sql: apertura excepcional de festivos por sede.
+-- Sin fila el festivo nacional queda cerrado; el administrador puede abrirlo.
+CREATE TABLE public.horario_excepcion_sede (
+    sede_id uuid NOT NULL,
+    fecha date NOT NULL,
+    hora_inicio time without time zone NOT NULL,
+    hora_fin time without time zone NOT NULL,
+    actualizado_por uuid,
+    actualizado_en timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT horario_excepcion_sede_pkey PRIMARY KEY (sede_id, fecha),
+    CONSTRAINT horario_excepcion_sede_horas_check CHECK (hora_inicio < hora_fin),
+    CONSTRAINT horario_excepcion_sede_sede_id_fkey FOREIGN KEY (sede_id) REFERENCES public.sede(id) ON DELETE CASCADE,
+    CONSTRAINT horario_excepcion_sede_actualizado_por_fkey FOREIGN KEY (actualizado_por) REFERENCES public.usuario(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_horario_excepcion_fecha ON public.horario_excepcion_sede USING btree (fecha);
 
 
 --

@@ -62,8 +62,8 @@ function DatosPersonales({ perfil, token, onGuardado }) {
       <form onSubmit={guardar} className="flex flex-col gap-4" noValidate>
         <Campo id="perfil-nombre" label="Nombre completo" value={form.nombreCompleto} maxLength={150} onChange={cambiar('nombreCompleto')} required />
         <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
-          <Campo id="perfil-telefono" label="Teléfono (opcional)" inputMode="tel" value={form.telefono} maxLength={20} onChange={cambiar('telefono')} />
-          <Campo id="perfil-documento" label="Documento de identidad (opcional)" value={form.documento} maxLength={20} onChange={cambiar('documento')} />
+          <Campo id="perfil-telefono" label="Teléfono (opcional)" type="tel" inputMode="numeric" pattern="[0-9]{10}" title="Ingresa exactamente 10 dígitos, sin espacios ni signos." value={form.telefono} maxLength={10} onChange={cambiar('telefono')} />
+          <Campo id="perfil-documento" label="Documento de identidad (opcional)" inputMode="numeric" pattern="[0-9]{1,20}" title="Ingresa solo dígitos, hasta 20." value={form.documento} maxLength={20} onChange={cambiar('documento')} />
         </div>
         <Campo id="perfil-direccion" label="Dirección (opcional)" value={form.direccion} maxLength={200} onChange={cambiar('direccion')} />
         <Mensaje estado={estado} />

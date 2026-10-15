@@ -4,12 +4,14 @@
 
 jest.mock('../src/models/horario.model');
 jest.mock('../src/models/sede.model');
+jest.mock('../src/models/cita.model');
 
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const horarioModel = require('../src/models/horario.model');
 const sedeModel = require('../src/models/sede.model');
+const citaModel = require('../src/models/cita.model');
 
 const ID_SEDE = 'sede-1';
 const TOKEN_ADMIN = jwt.sign({ id: 'admin-1', rol: 'administrador', sedeId: ID_SEDE }, process.env.JWT_SECRET);
@@ -18,7 +20,10 @@ const TOKEN_SUPER = jwt.sign({ id: 'super-1', rol: 'superadministrador' }, proce
 const TOKEN_CLIENTE = jwt.sign({ id: 'cliente-1', rol: 'cliente' }, process.env.JWT_SECRET);
 
 // Sin citas afectadas por defecto (el flujo de las afectadas: citasPorReagendar.test.js).
-beforeEach(() => horarioModel.listarCitasFueraDeHorario.mockResolvedValue([]));
+beforeEach(() => {
+  horarioModel.listarCitasFueraDeHorario.mockResolvedValue([]);
+  citaModel.marcarPorReagendar.mockResolvedValue([]);
+});
 
 describe('GET /api/horarios', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -140,5 +145,55 @@ describe('Horarios: cada administrador solo cambia los de su sede', () => {
     horarioModel.upsertDia.mockResolvedValue({ dia_semana: 1 });
     const respuesta = await request(app).put('/api/horarios').set('Authorization', 'Bearer ' + TOKEN_SUPER).send(DIA);
     expect(respuesta.status).toBe(200);
+  });
+});
+
+describe('Festivos nacionales de Colombia por sede', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('lista los festivos del año y deja los no configurados cerrados', async () => {
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    horarioModel.listarExcepcionesFestivos.mockResolvedValue([]);
+    const respuesta = await request(app)
+      .get('/api/horarios/festivos')
+      .query({ sedeId: ID_SEDE, anio: new Date().getFullYear() })
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`);
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.festivos.length).toBeGreaterThanOrEqual(18);
+    expect(respuesta.body.festivos.every((festivo) => festivo.abierto === false)).toBe(true);
+  });
+
+  test('un administrador no puede consultar festivos de otra sede', async () => {
+    const respuesta = await request(app)
+      .get('/api/horarios/festivos')
+      .query({ sedeId: ID_SEDE, anio: new Date().getFullYear() })
+      .set('Authorization', `Bearer ${TOKEN_ADMIN_OTRA_SEDE}`);
+    expect(respuesta.status).toBe(403);
+  });
+
+  test('rechaza abrir una fecha que no es festivo nacional', async () => {
+    const respuesta = await request(app)
+      .put('/api/horarios/festivos')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ sedeId: ID_SEDE, fecha: `${new Date().getFullYear()}-07-21`, horaInicio: '08:00', horaFin: '17:00' });
+    expect(respuesta.status).toBe(400);
+    expect(horarioModel.abrirFestivo).not.toHaveBeenCalled();
+  });
+
+  test('permite abrir un festivo con un horario válido', async () => {
+    const anio = new Date().getFullYear();
+    const fecha = `${anio}-07-20`;
+    sedeModel.buscarPorId.mockResolvedValue({ id: ID_SEDE });
+    horarioModel.abrirFestivo.mockResolvedValue({ fecha, hora_inicio: '08:00', hora_fin: '12:00' });
+    horarioModel.listarCitasFueraDeHorarioEnFecha.mockResolvedValue([]);
+    citaModel.marcarPorReagendar.mockResolvedValue([]);
+
+    const respuesta = await request(app)
+      .put('/api/horarios/festivos')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ sedeId: ID_SEDE, fecha, horaInicio: '08:00', horaFin: '12:00' });
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.body.horario.fecha).toBe(fecha);
+    expect(horarioModel.abrirFestivo).toHaveBeenCalledWith(ID_SEDE, fecha, '08:00', '12:00', 'admin-1');
   });
 });

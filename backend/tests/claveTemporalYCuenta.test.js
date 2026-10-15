@@ -118,15 +118,17 @@ describe('Mi perfil del cliente (/api/cuenta)', () => {
 
   test('actualiza solo los datos personales enviados, limpiando espacios', async () => {
     cuentaModel.actualizar.mockResolvedValue({ id: 'c1' });
-    const respuesta = await con(request(app).put('/api/cuenta/perfil'), TOKEN_CLIENTE).send({ nombreCompleto: ' Luis Gómez ', telefono: '300 111 2233', rol: 'administrador', activo: false });
+    const respuesta = await con(request(app).put('/api/cuenta/perfil'), TOKEN_CLIENTE).send({ nombreCompleto: ' Luis Gómez ', telefono: '3001112233', rol: 'administrador', activo: false });
     expect(respuesta.status).toBe(200);
-    expect(cuentaModel.actualizar).toHaveBeenCalledWith('c1', { nombreCompleto: 'Luis Gómez', telefono: '300 111 2233' });
+    expect(cuentaModel.actualizar).toHaveBeenCalledWith('c1', { nombreCompleto: 'Luis Gómez', telefono: '3001112233' });
   });
 
   test('valida nombre, telefono, documento y peticion vacia', async () => {
     const enviar = (cuerpo) => con(request(app).put('/api/cuenta/perfil'), TOKEN_CLIENTE).send(cuerpo);
     expect((await enviar({ nombreCompleto: '  ' })).status).toBe(400);
     expect((await enviar({ telefono: 'abc' })).status).toBe(400);
+    expect((await enviar({ telefono: '300 111 2233' })).status).toBe(400);
+    expect((await enviar({ telefono: '300111223' })).status).toBe(400);
     expect((await enviar({ documento: '<script>' })).status).toBe(400);
     expect((await enviar({})).status).toBe(400);
     expect(cuentaModel.actualizar).not.toHaveBeenCalled();

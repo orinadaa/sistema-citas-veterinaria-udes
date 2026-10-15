@@ -80,6 +80,20 @@ describe('POST /api/administracion/medicos', () => {
     expect(respuesta.status).toBe(400);
   });
 
+  test('rechaza documentos con letras y teléfonos que no tengan 10 dígitos', async () => {
+    const documentoInvalido = await request(app)
+      .post('/api/administracion/medicos')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombreCompleto: 'Dra. Ejemplo', correo: 'ejemplo@udes.edu.co', documento: 'AB1234' });
+    expect(documentoInvalido.status).toBe(400);
+
+    const telefonoInvalido = await request(app)
+      .post('/api/administracion/medicos')
+      .set('Authorization', `Bearer ${TOKEN_ADMIN}`)
+      .send({ nombreCompleto: 'Dra. Ejemplo', correo: 'ejemplo@udes.edu.co', documento: '123456', telefono: '300 111 2233' });
+    expect(telefonoInvalido.status).toBe(400);
+  });
+
   test('responde 409 si el correo ya existe', async () => {
     medicoModel.crear.mockRejectedValue({ code: '23505' });
 

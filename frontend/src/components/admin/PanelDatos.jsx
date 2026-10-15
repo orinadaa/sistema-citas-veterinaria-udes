@@ -89,7 +89,7 @@ function CorregirUsuario({ registro, token, alTerminar }) {
       <p className="text-xs text-slate-700">Para un nombre, teléfono o correo mal escritos. El rol, la sede y el estado se cambian en Usuarios.</p>
       <Campo id="dato-nombre" label="Nombre completo" value={form.nombreCompleto} onChange={(e) => setForm({ ...form, nombreCompleto: e.target.value })} required />
       <Campo id="dato-correo" label="Correo" type="email" value={form.correo} onChange={(e) => setForm({ ...form, correo: e.target.value })} required />
-      <Campo id="dato-telefono" inputMode="tel" label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
+      <Campo id="dato-telefono" type="tel" inputMode="numeric" pattern="[0-9]{10}" title="Ingresa exactamente 10 dígitos, sin espacios ni signos." maxLength={10} label="Teléfono (opcional)" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
       <Mensaje estado={estado} />
       <button type="submit" disabled={guardando} className={`self-end ${CLASE_BOTON}`}>
         {guardando ? 'Guardando...' : 'Guardar corrección'}

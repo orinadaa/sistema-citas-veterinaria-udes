@@ -3,7 +3,8 @@
 // mensaje del problema (para responder 400) o null si el dato sirve.
 
 const CORREO_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const TELEFONO_REGEX = /^[0-9+\s()-]{7,20}$/;
+const TELEFONO_REGEX = /^\d{10}$/;
+const DOCUMENTO_REGEX = /^\d{1,20}$/;
 const PATRON_FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const PATRON_HORA = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/;
 
@@ -31,7 +32,12 @@ function errorNombre(nombre) {
 
 function errorTelefono(telefono) {
   if (telefono === undefined || telefono === null || telefono === '') return null;
-  return TELEFONO_REGEX.test(String(telefono)) ? null : 'El teléfono solo admite números, espacios, +, - y paréntesis (entre 7 y 20 caracteres).';
+  return TELEFONO_REGEX.test(String(telefono)) ? null : 'El teléfono debe contener exactamente 10 dígitos, sin espacios ni signos.';
+}
+
+function errorDocumento(documento) {
+  if (documento === undefined || documento === null || documento === '') return null;
+  return DOCUMENTO_REGEX.test(String(documento)) ? null : 'El documento de identidad debe contener solo dígitos (máximo 20).';
 }
 
 // limites: { campo: maximoDeCaracteres }. etiquetas: como se llama cada campo.
@@ -62,4 +68,4 @@ function aMinutos(hora) {
   return h * 60 + m;
 }
 
-module.exports = { normalizarCorreo, errorCorreo, errorNombre, errorTelefono, errorLongitud, esFechaReal, esHora, aMinutos };
+module.exports = { normalizarCorreo, errorCorreo, errorNombre, errorTelefono, errorDocumento, errorLongitud, esFechaReal, esHora, aMinutos };

@@ -389,7 +389,11 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                   <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                     <Campo
                       id="perfil-telefono"
-                      inputMode="tel"
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]{10}"
+                      title="Ingresa exactamente 10 dígitos, sin espacios ni signos."
+                      maxLength={10}
                       autoComplete="tel"
                       label="Teléfono"
                       value={personal.telefono}

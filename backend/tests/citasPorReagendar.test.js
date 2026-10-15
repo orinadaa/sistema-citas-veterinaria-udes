@@ -58,7 +58,7 @@ const citaAfectada = (id, extra = {}) => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
-  horarioModel.buscarDia.mockResolvedValue({ hora_inicio: '08:00:00', hora_fin: '17:00:00' });
+  horarioModel.buscarHorarioParaFecha.mockResolvedValue({ hora_inicio: '08:00:00', hora_fin: '17:00:00' });
   medicoModel.listarFranjasOcupadas.mockResolvedValue([]);
   medicoModel.contarCitasPorMedico.mockResolvedValue([]);
   citaModel.mascotaOcupada.mockResolvedValue(false);

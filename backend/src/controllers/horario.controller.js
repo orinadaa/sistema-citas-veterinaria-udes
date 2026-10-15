@@ -4,7 +4,8 @@
 // exclusiva del administrador.
 const horarioModel = require('../models/horario.model');
 const sedeModel = require('../models/sede.model');
-const { esHora, aMinutos } = require('../utils/validacion');
+const { esHora, esFechaReal, aMinutos } = require('../utils/validacion');
+const { festivosColombia, esFestivoColombiano } = require('../utils/festivosColombia');
 const { atenderCitasAfectadas } = require('./cita.controller');
 
 // Lo que lee el cliente en el aviso y en el correo de la cita por reagendar.
@@ -125,4 +126,101 @@ async function cerrarDia(req, res, next) {
   }
 }
 
-module.exports = { listar, citasAfectadas, actualizarDia, cerrarDia };
+function puedeConsultarFestivos(req, res, sedeId) {
+  if (!sedeId) {
+    res.status(400).json({ mensaje: 'sedeId es obligatorio.' });
+    return false;
+  }
+  if (!puedeCambiarHorario(req.usuario, sedeId)) {
+    res.status(403).json({ mensaje: MENSAJE_OTRA_SEDE });
+    return false;
+  }
+  return true;
+}
+
+async function listarFestivos(req, res, next) {
+  try {
+    const { sedeId } = req.query;
+    const anio = Number(req.query.anio);
+    if (!puedeConsultarFestivos(req, res, sedeId)) return;
+    if (!Number.isInteger(anio) || anio < new Date().getFullYear() || anio > new Date().getFullYear() + 5) {
+      return res.status(400).json({ mensaje: 'El año debe estar entre el actual y los cinco años siguientes.' });
+    }
+    if (!(await sedeModel.buscarPorId(sedeId))) return res.status(404).json({ mensaje: 'La sede indicada no existe.' });
+    const [festivos, excepciones] = await Promise.all([
+      Promise.resolve(festivosColombia(anio)),
+      horarioModel.listarExcepcionesFestivos(sedeId, anio),
+    ]);
+    const porFecha = new Map(excepciones.map((excepcion) => [excepcion.fecha, excepcion]));
+    return res.status(200).json({
+      sedeId,
+      anio,
+      festivos: festivos.map((festivo) => {
+        const horario = porFecha.get(festivo.fecha);
+        return { ...festivo, abierto: Boolean(horario), hora_inicio: horario?.hora_inicio || null, hora_fin: horario?.hora_fin || null };
+      }),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function citasAfectadasFestivo(req, res, next) {
+  try {
+    const { sedeId, fecha, horaInicio, horaFin } = req.query;
+    if (!puedeConsultarFestivos(req, res, sedeId)) return;
+    if (!esFechaReal(fecha) || !esFestivoColombiano(fecha)) {
+      return res.status(400).json({ mensaje: 'La fecha debe ser un festivo nacional de Colombia en formato YYYY-MM-DD.' });
+    }
+    const conHoras = Boolean(horaInicio || horaFin);
+    if (conHoras && (!esHora(horaInicio || '') || !esHora(horaFin || '') || aMinutos(horaInicio) >= aMinutos(horaFin))) {
+      return res.status(400).json({ mensaje: 'Indica una hora inicial y una final válidas, con la inicial antes de la final.' });
+    }
+    const citas = await horarioModel.listarCitasFueraDeHorarioEnFecha(sedeId, fecha, conHoras ? horaInicio : null, conHoras ? horaFin : null);
+    return res.status(200).json({ citas });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function actualizarFestivo(req, res, next) {
+  try {
+    const { sedeId, fecha, horaInicio, horaFin } = req.body;
+    if (!puedeConsultarFestivos(req, res, sedeId)) return;
+    if (!esFechaReal(fecha) || !esFestivoColombiano(fecha)) {
+      return res.status(400).json({ mensaje: 'La fecha debe ser un festivo nacional de Colombia en formato YYYY-MM-DD.' });
+    }
+    if (!esHora(horaInicio || '') || !esHora(horaFin || '') || aMinutos(horaInicio) >= aMinutos(horaFin)) {
+      return res.status(400).json({ mensaje: 'Indica un horario válido y una hora inicial anterior a la final.' });
+    }
+    if (aMinutos(horaInicio) % 30 !== 0 || aMinutos(horaFin) % 30 !== 0) {
+      return res.status(400).json({ mensaje: 'El horario debe empezar y terminar en punto o a la media hora.' });
+    }
+    if (!(await sedeModel.buscarPorId(sedeId))) return res.status(404).json({ mensaje: 'La sede indicada no existe.' });
+
+    const horario = await horarioModel.abrirFestivo(sedeId, fecha, horaInicio, horaFin, req.usuario.id);
+    const citas = await horarioModel.listarCitasFueraDeHorarioEnFecha(sedeId, fecha, horaInicio, horaFin);
+    const { porReagendar } = await atenderCitasAfectadas(citas, { motivo: MOTIVO_HORARIO_SEDE, actorId: req.usuario.id });
+    return res.status(200).json({ horario, citasAfectadas: porReagendar });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function cerrarFestivo(req, res, next) {
+  try {
+    const { sedeId, fecha } = req.params;
+    if (!puedeConsultarFestivos(req, res, sedeId)) return;
+    if (!esFechaReal(fecha) || !esFestivoColombiano(fecha)) {
+      return res.status(400).json({ mensaje: 'La fecha debe ser un festivo nacional de Colombia en formato YYYY-MM-DD.' });
+    }
+    const citas = await horarioModel.listarCitasFueraDeHorarioEnFecha(sedeId, fecha);
+    await horarioModel.cerrarFestivo(sedeId, fecha);
+    const { porReagendar } = await atenderCitasAfectadas(citas, { motivo: MOTIVO_HORARIO_SEDE, actorId: req.usuario.id });
+    return res.status(200).json({ citasAfectadas: porReagendar });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { listar, citasAfectadas, actualizarDia, cerrarDia, listarFestivos, citasAfectadasFestivo, actualizarFestivo, cerrarFestivo };

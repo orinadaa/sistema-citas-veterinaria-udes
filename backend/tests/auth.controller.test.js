@@ -15,7 +15,7 @@ const recuperacionModel = require('../src/models/recuperacion.model');
 const registroPendienteModel = require('../src/models/registroPendiente.model');
 const correoService = require('../src/services/correo.service');
 
-const DATOS_REGISTRO = { nombreCompleto: 'Juan Perez', correo: 'juan@correo.com', contrasena: 'password123', autorizaTratamiento: true };
+const DATOS_REGISTRO = { nombreCompleto: 'Juan Perez', correo: 'juan@correo.com', contrasena: 'password123', telefono: '3001234567', autorizaTratamiento: true };
 
 describe('POST /api/auth/registro', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -24,6 +24,15 @@ describe('POST /api/auth/registro', () => {
     const respuesta = await request(app).post('/api/auth/registro').send({ correo: 'a@a.com' });
 
     expect(respuesta.status).toBe(400);
+  });
+
+  test('exige un teléfono colombiano de 10 dígitos para registrarse', async () => {
+    for (const telefono of [undefined, '300 123 4567', '300123456']) {
+      const datos = { ...DATOS_REGISTRO };
+      if (telefono === undefined) delete datos.telefono;
+      else datos.telefono = telefono;
+      expect((await request(app).post('/api/auth/registro').send(datos)).status).toBe(400);
+    }
   });
 
   test('rechaza un correo con formato invalido', async () => {
@@ -54,6 +63,7 @@ describe('POST /api/auth/registro', () => {
       nombreCompleto: 'Juan Perez',
       correo: 'juan@correo.com',
       contrasena: 'password123',
+      telefono: '3001234567',
       autorizaTratamiento: true,
     });
 

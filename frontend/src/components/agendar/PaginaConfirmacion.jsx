@@ -139,7 +139,7 @@ export function PaginaConfirmacion({ cita, correoEnviado: correoEnviadoInicial, 
               icono={IconoPersona}
               etiqueta="Médico veterinario"
               valor={cita.medico_nombre}
-              detalle={cita.medico_especialidad || 'Asignado según disponibilidad'}
+              detalle={cita.medico_especialidad || 'General'}
             />
             <Dato icono={IconoLapiz} etiqueta="Motivo" valor={cita.motivo || 'Sin motivo indicado'} />
           </div>

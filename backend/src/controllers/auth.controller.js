@@ -89,10 +89,10 @@ async function registrar(req, res, next) {
     const { contrasena, sitioWeb, autorizaTratamiento } = req.body;
     const nombreCompleto = String(req.body.nombreCompleto ?? '').trim();
     const correo = normalizarCorreo(req.body.correo);
-    const telefono = req.body.telefono ? String(req.body.telefono).trim() : null;
+    const telefono = req.body.telefono ? String(req.body.telefono) : null;
 
-    if (!nombreCompleto || !correo || !contrasena) {
-      return res.status(400).json({ mensaje: 'Nombre completo, correo y contraseña son obligatorios.' });
+    if (!nombreCompleto || !correo || !contrasena || !telefono) {
+      return res.status(400).json({ mensaje: 'Nombre completo, correo, teléfono y contraseña son obligatorios.' });
     }
     // Campo trampa: el formulario lo tiene oculto y una persona nunca lo
     // llena; un programa que rellena todos los campos si.

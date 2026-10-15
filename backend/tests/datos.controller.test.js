@@ -164,9 +164,9 @@ describe('Correccion de una cuenta', () => {
   test('corrige nombre, telefono y correo (en minusculas)', async () => {
     datosModel.buscarUsuario.mockResolvedValue(CLIENTE);
     datosModel.corregirUsuario.mockResolvedValue({ id: 'c1' });
-    const respuesta = await con(request(app).put('/api/datos/usuarios/c1/corregir')).send({ nombreCompleto: ' Ana María ', correo: 'ANA@Correo.com', telefono: '300 111 2233' });
+    const respuesta = await con(request(app).put('/api/datos/usuarios/c1/corregir')).send({ nombreCompleto: ' Ana María ', correo: 'ANA@Correo.com', telefono: '3001112233' });
     expect(respuesta.status).toBe(200);
-    expect(datosModel.corregirUsuario).toHaveBeenCalledWith('c1', { nombreCompleto: 'Ana María', telefono: '300 111 2233', correo: 'ana@correo.com' });
+    expect(datosModel.corregirUsuario).toHaveBeenCalledWith('c1', { nombreCompleto: 'Ana María', telefono: '3001112233', correo: 'ana@correo.com' });
   });
 
   test('rechaza correo invalido, nombre vacio, telefono con letras y peticion vacia', async () => {
@@ -175,6 +175,7 @@ describe('Correccion de una cuenta', () => {
     expect((await enviar({ correo: 'sin-arroba' })).status).toBe(400);
     expect((await enviar({ nombreCompleto: '  ' })).status).toBe(400);
     expect((await enviar({ telefono: 'abc' })).status).toBe(400);
+    expect((await enviar({ telefono: '300 111 2233' })).status).toBe(400);
     expect((await enviar({})).status).toBe(400);
     expect(datosModel.corregirUsuario).not.toHaveBeenCalled();
   });

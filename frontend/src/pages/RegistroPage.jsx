@@ -162,11 +162,16 @@ export function RegistroPage() {
           />
           <Campo
             id="telefono"
-            label="Teléfono (opcional)"
+            label="Teléfono"
             type="tel"
             autoComplete="tel"
+            inputMode="numeric"
+            maxLength={10}
+            pattern="[0-9]{10}"
+            title="Ingresa exactamente 10 dígitos, sin espacios ni signos."
             value={datos.telefono}
             onChange={actualizarCampo}
+            required
           />
           <Campo
             id="contrasena"
