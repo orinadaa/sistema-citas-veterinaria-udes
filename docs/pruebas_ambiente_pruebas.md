@@ -1,14 +1,30 @@
 # Pruebas en el ambiente de pruebas (AWS)
 
-Pruebas funcionales, de seguridad, de rendimiento y de interfaz ejecutadas el 14 de octubre de 2026 sobre el ambiente de pruebas publicado en `https://citas-veterinaria-udes.duckdns.org` (Amazon EC2 `t3.micro` en us-east-2, Ubuntu 24.04, PostgreSQL 18, Node.js 22 con PM2, Nginx con certificado de Let's Encrypt). Versión del código: commit `a364595`.
+El informe conserva el registro completo de 290 pruebas funcionales, de seguridad, rendimiento e interfaz ejecutadas el 14 de octubre de 2026 sobre el ambiente de pruebas publicado en `https://citas-veterinaria-udes.duckdns.org` (Amazon EC2 `t3.micro` en us-east-2, Ubuntu 24.04, PostgreSQL 18, Node.js 22 con PM2, Nginx con certificado de Let's Encrypt). Esa ejecución corresponde al commit `a364595`.
 
 Resultado: **289 de 290 casos aprobados**. El único caso no aprobado (LH-08) depende de las fotos cargadas en la plataforma, no del código.
 
-**Alcance de la versión:** los 290 casos de este informe se ejecutaron sobre el commit `a364595`; sus resultados no se deben atribuir a revisiones posteriores. El 14 de octubre de 2026 se consultó por SSH y en modo de solo lectura el archivo `/srv/citas-udes/VERSION`; el valor fue `f5ac5f8`, que corresponde a la última revisión de código de la copia local. Después se creó el commit `ea9d641`, que solo actualiza documentación. Las huellas SHA-256 de dos archivos del backend coincidieron exactamente y las de tres archivos del frontend coincidieron tras normalizar los finales de línea. Así se confirmó que AWS ejecuta el código de `f5ac5f8`. Entre ambas revisiones se modificó el permiso de cancelación y reprogramación del médico; por tanto, el caso ME-16 de este informe es histórico y no describe el comportamiento final. La batería completa de 290 casos no se repitió sobre `f5ac5f8`.
+**Alcance de la versión:** los 290 casos de este informe se ejecutaron sobre el commit `a364595`; sus resultados no se deben atribuir a revisiones posteriores. El 14 de octubre de 2026 se verificó por SSH y en modo de solo lectura que AWS indicaba `f5ac5f8`, la revisión local contrastada ese día. Entre las revisiones se modificó el permiso de cancelación y reprogramación del médico; por tanto, el caso ME-16 es histórico y no describe el comportamiento final. El 15 de octubre se publicó en AWS el commit `6390ab6`, que integra la validación de formularios y el calendario de festivos, y se ejecutaron comprobaciones acotadas de despliegue y salud descritas abajo. La batería completa de 290 casos no se repitió sobre `f5ac5f8` ni sobre `6390ab6`.
+
+## Verificación posterior al despliegue (15 de octubre de 2026)
+
+Se actualizó el ambiente de demostración AWS al commit `6390ab6`. Antes del cambio se generaron y verificaron un respaldo PostgreSQL en formato custom y un respaldo del código desplegado. Se aplicó la migración aditiva `incremento_18a_festivos_colombia.sql`; el backend volvió a quedar en línea tras el reinicio de PM2.
+
+| Comprobación de solo lectura | Resultado observado |
+|---|---|
+| Versión desplegada | `/srv/citas-udes/VERSION` indica `6390ab6`; proceso `citas-udes` en estado `online`. |
+| API y base de datos | `GET /api/health` devuelve `{"servidor":"ok","baseDeDatos":"ok"}`. |
+| Rutas públicas | Sedes, servicios, datos públicos de la clínica y horario de una sede existente responden HTTP 200. |
+| Permiso del calendario de festivos | `GET /api/horarios/festivos` sin sesión responde HTTP 401. |
+| Interfaz compilada | HTML, JavaScript principal y CSS responden HTTP 200; el bundle contiene el aviso «Ambiente de pruebas». |
+| Exclusión de buscadores | La página y la API envían `X-Robots-Tag: noindex, nofollow`; `robots.txt` indica `Disallow: /`. |
+| Migración e integridad | Existe la tabla `horario_excepcion_sede`; antes y después se mantienen 36 usuarios, 32 mascotas y 314 citas. No se crearon citas ni cuentas nuevas. |
+
+Esta revisión es un smoke test de lectura y despliegue, no una repetición de las pruebas funcionales de 290 casos, de las pruebas de correo, de Lighthouse ni de la inspección visual de 34 pantallas. Las 510 pruebas automatizadas se ejecutaron localmente sobre el mismo commit y usaron modelos simulados; no se ejecutaron contra la base de AWS.
 
 ## Revisión de la versión final (14 de octubre de 2026)
 
-Se repitieron comprobaciones de acceso, permisos, interfaz y disponibilidad sobre el servicio AWS, y se ejecutaron las pruebas automatizadas en la copia local correspondiente al código `f5ac5f8`. Esta revisión complementa el informe de 290 casos; no lo reemplaza ni se presenta como una repetición íntegra.
+El 14 de octubre se repitieron comprobaciones de acceso, permisos, interfaz y disponibilidad sobre el servicio AWS, y se ejecutaron pruebas automatizadas en la copia local correspondiente a `f5ac5f8`. Esta revisión complementa el informe de 290 casos; no lo reemplaza ni se presenta como una repetición íntegra. La verificación del 15 de octubre se documenta en la sección anterior.
 
 | Comprobación | Resultado observado |
 |---|---|
