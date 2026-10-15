@@ -60,6 +60,10 @@ Las cuatro cuentas usan `1234`. Son ficticias, no reciben correos y deben
 usarse únicamente para evaluación local; no se deben cargar en AWS ni en un
 servidor institucional.
 
+El médico y el administrador quedan en la sede de Bucaramanga. Al médico se le
+asignan los servicios activos del catálogo y usa el horario de la sede, de modo
+que el cliente de evaluación puede agendar desde la primera ejecución.
+
 ## Pruebas
 
 | Descripción | Entrada | Resultado esperado | Resultado obtenido |
