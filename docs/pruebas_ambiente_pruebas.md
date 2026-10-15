@@ -22,6 +22,10 @@ Se actualizó el ambiente de demostración AWS al commit `6390ab6`. Antes del ca
 
 Esta revisión es un smoke test de lectura y despliegue, no una repetición de las pruebas funcionales de 290 casos, de las pruebas de correo, de Lighthouse ni de la inspección visual de 34 pantallas. Las 510 pruebas automatizadas se ejecutaron localmente sobre el mismo commit y usaron modelos simulados; no se ejecutaron contra la base de AWS.
 
+## Compilación local e instalador (15 de octubre de 2026)
+
+La compilación local de producción del frontend completó correctamente y transformó 1103 módulos; el bundle local no contiene el aviso destinado al ambiente AWS de pruebas. Vite emitió una advertencia no bloqueante por el tamaño de los paquetes de administración y ExcelJS, ambos superiores a 500 kB minificados. Los scripts del instalador de Windows pasaron la validación sintáctica de PowerShell; no se realizó una instalación de extremo a extremo en un equipo limpio.
+
 ## Revisión de la versión final (14 de octubre de 2026)
 
 El 14 de octubre se repitieron comprobaciones de acceso, permisos, interfaz y disponibilidad sobre el servicio AWS, y se ejecutaron pruebas automatizadas en la copia local correspondiente a `f5ac5f8`. Esta revisión complementa el informe de 290 casos; no lo reemplaza ni se presenta como una repetición íntegra. La verificación del 15 de octubre se documenta en la sección anterior.
