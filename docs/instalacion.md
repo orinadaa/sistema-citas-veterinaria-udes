@@ -4,9 +4,11 @@ Pasos para dejar el sistema funcionando desde cero en un computador (entorno loc
 
 ## Instalador local de Windows
 
-El repositorio incluye `instalador/Instalar-CitasUDES.bat`. Al ejecutarlo, el asistente verifica Node.js y PostgreSQL, solicita las credenciales locales, crea el esquema y los catálogos si la base está vacía, instala las dependencias, compila la interfaz, prepara cuatro cuentas ficticias de evaluación y crea un acceso directo en el escritorio. Ese acceso abre el servidor y la interfaz local.
+El repositorio incluye `instalador/Instalar-CitasUDES.bat`. En Windows 10 u 11, el asistente instala Node.js LTS y PostgreSQL 18 desde WinGet cuando no encuentra versiones compatibles, solicita las credenciales locales, crea el esquema y los catálogos si la base está vacía, instala las dependencias fijadas en los dos archivos de bloqueo, compila la interfaz, prepara cuatro cuentas ficticias de evaluación y crea un acceso directo en el escritorio. Ese acceso inicia el servidor y la interfaz local.
 
-Requisitos previos: Node.js 20 o superior; PostgreSQL 17 o superior con `psql` en `PATH`; y Windows PowerShell. El instalador solo admite PostgreSQL en `localhost`, `127.0.0.1` o `::1` y no cambia bases que ya contengan tablas. Para instalar en otro computador, copia el repositorio completo y ejecuta el archivo `.bat` desde esa copia.
+Se requiere conexión a Internet, WinGet y autorización de administrador para instalar componentes del sistema. Si PostgreSQL no está instalado, WinGet instala la versión 18 y el asistente pide definir una contraseña nueva para el usuario local `postgres`; la contraseña predeterminada del paquete se cambia antes de crear la base del proyecto. Si ya hay PostgreSQL 17 o posterior, se reutiliza la instalación existente. Si solo hay una versión anterior, el asistente se detiene y solicita actualizarla; no instala otra versión en paralelo ni modifica sus bases.
+
+El frontend requiere Node.js 20.19 o superior en la rama 20, o 22.12 o superior. El instalador reconoce esas versiones; si no encuentra una compatible, instala Node.js LTS con WinGet. Instala las dependencias con `npm ci` en `backend/` y `frontend/`, por lo que usa las versiones fijadas en `package-lock.json`. El instalador solo admite PostgreSQL en `localhost`, `127.0.0.1` o `::1` y no cambia bases que ya contengan tablas. Para instalar en otro computador, copia el repositorio completo y ejecuta el archivo `.bat` desde esa copia.
 
 El archivo que almacena la configuración privada es `backend/.env` (dotenv), no `.var`. Contiene los datos de PostgreSQL, la clave de sesión y, si se configura, el acceso SMTP. El instalador lo genera localmente y no debe incluirse en el repositorio ni entregarse por correo. El `.env.example` es una plantilla sin secretos.
 
@@ -16,8 +18,8 @@ Si el correo SMTP se deja vacío, la plataforma abre y permite entrar con las cu
 
 ## Requisitos
 
-- Node.js 20 o superior.
-- PostgreSQL 17 o superior. Con una versión anterior, borra la línea `SET transaction_timeout = 0;` de `database/esquema.sql` antes de ejecutarlo.
+- Node.js 20.19 o superior de la rama 20, o 22.12 o superior.
+- PostgreSQL 17 o superior. La instalación automática de PostgreSQL 18 requiere WinGet y permisos de administrador.
 
 ## 1. Base de datos
 

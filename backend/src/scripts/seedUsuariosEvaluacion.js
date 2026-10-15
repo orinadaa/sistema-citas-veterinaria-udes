@@ -38,6 +38,21 @@ async function crearCuentasEvaluacion() {
         [cuenta.nombre, cuenta.correo, hash, cuenta.rol, cuenta.sede ? sede.id : null, cuenta.telefono]
       );
     }
+
+    // Sin servicios asignados el médico no tiene franjas libres y el evaluador
+    // no podría agendar: se le asignan los servicios activos del catálogo.
+    // Usa el horario de la sede porque no tiene horario propio.
+    await cliente.query(
+      `INSERT INTO servicio_medico (servicio_id, medico_id)
+       SELECT s.id, u.id
+         FROM servicio s
+         CROSS JOIN usuario u
+        WHERE u.correo = 'medicoprueba@demo.udes.co'
+          AND s.activo = TRUE
+          AND NOT EXISTS (
+            SELECT 1 FROM servicio_medico sm WHERE sm.servicio_id = s.id AND sm.medico_id = u.id
+          )`
+    );
     await cliente.query('COMMIT');
     console.log('Cuentas locales de evaluación disponibles:');
     for (const cuenta of CUENTAS) console.log(`- ${cuenta.rol}: ${cuenta.correo}`);
