@@ -20,6 +20,9 @@ GRANT CONNECT ON DATABASE clinica_veterinaria_udes TO citas_udes;
 GRANT USAGE ON SCHEMA public TO citas_udes;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO citas_udes;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO citas_udes;
+-- Tablas que creen las migraciones futuras (ejecutadas como postgres): mismos permisos.
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO citas_udes;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO citas_udes;
 ```
 
 En `backend/.env`: `DB_USER=citas_udes` y, si la base está en otro servidor, `DB_SSL=true`.

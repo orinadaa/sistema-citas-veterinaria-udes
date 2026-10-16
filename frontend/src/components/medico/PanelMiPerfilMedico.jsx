@@ -11,7 +11,7 @@ import {
 } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { EstadoError, Pestanas } from '../vetui';
-import { CategoryBadge } from '../ui/CategoryBadge';
+import { CategoryBadge, EspecialidadGeneral } from '../ui/CategoryBadge';
 import { Campo } from '../form/Campo';
 import { CampoContrasenaNueva } from '../form/CampoContrasenaNueva';
 import { errorContrasenaNueva } from '../../utils/contrasena';
@@ -597,7 +597,9 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
             <div className="flex flex-col gap-6">
               <Tarjeta titulo="Especialidades">
                 {perfil.especialidades.length === 0 ? (
-                  <p className="text-sm text-slate-400">Sin especialidades asignadas.</p>
+                  <div className="flex flex-wrap gap-2">
+                    <EspecialidadGeneral />
+                  </div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {perfil.especialidades.map((e) => (

@@ -19,7 +19,7 @@ import { ZonaFoto } from '../form/ZonaFoto';
 import { FotoMascotaModal } from '../cliente/FotoMascotaModal';
 import { PageHeader } from '../ui/PageHeader';
 import { KPICard } from '../ui/KPICard';
-import { CategoryBadge } from '../ui/CategoryBadge';
+import { CategoryBadge, EspecialidadGeneral } from '../ui/CategoryBadge';
 import { DataTable } from '../ui/DataTable';
 import { SidePanel } from '../ui/SidePanel';
 import { EstadoError } from '../ui/EstadoError';
@@ -104,7 +104,8 @@ export function PanelMedicos({ busquedaInicial }) {
     return medicos.filter((m) => {
       const coincideBusqueda = m.nombre_completo.toLowerCase().includes(busqueda.toLowerCase());
       const coincideEspecialidad =
-        !filtroEspecialidad || m.especialidades.some((e) => e.id === filtroEspecialidad);
+        !filtroEspecialidad ||
+        (filtroEspecialidad === 'general' ? m.especialidades.length === 0 : m.especialidades.some((e) => e.id === filtroEspecialidad));
       const coincideEstado = !filtroEstado || (filtroEstado === 'activo' ? m.activo : !m.activo);
       return coincideBusqueda && coincideEspecialidad && coincideEstado;
     });
@@ -273,6 +274,7 @@ export function PanelMedicos({ busquedaInicial }) {
           className="campo px-3 py-2 text-sm"
         >
           <option value="">Todas las especialidades</option>
+          <option value="general">General</option>
           {categorias.map((c) => (
             <option key={c.id} value={c.id}>
               {c.nombre}
@@ -327,7 +329,7 @@ export function PanelMedicos({ busquedaInicial }) {
               render: (m) => (
                 <div className="flex max-w-[220px] flex-wrap gap-1">
                   {m.especialidades.length === 0 ? (
-                    <span className="text-xs text-slate-400">Sin asignar</span>
+                    <EspecialidadGeneral />
                   ) : (
                     m.especialidades.map((e) => <CategoryBadge key={e.id} nombre={e.nombre} color={e.color} />)
                   )}

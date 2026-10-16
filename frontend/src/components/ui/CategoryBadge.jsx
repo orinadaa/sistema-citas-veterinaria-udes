@@ -9,7 +9,14 @@ export const COLORES_CATEGORIA = {
   pink: { bg: '#FDE6F0', text: '#B33A76', dot: '#F788BB' },
   cyan: { bg: '#E1F7FC', text: '#1A778D', dot: '#51CAEB' },
   orange: { bg: '#FBE9D8', text: '#95571D', dot: '#D98A3D' },
+  slate: { bg: '#EDF0F5', text: '#334155', dot: '#94A3B8' },
 };
+
+// Un medico sin especialidad asignada es medico general, en todas las vistas
+// (tambien el servidor responde 'General' en las citas: cita.model.js).
+export function EspecialidadGeneral() {
+  return <CategoryBadge nombre="General" color="slate" />;
+}
 
 export function CategoryBadge({ nombre, color }) {
   const tono = COLORES_CATEGORIA[color] ?? COLORES_CATEGORIA.blue;
