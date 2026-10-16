@@ -15,7 +15,7 @@ const recuperacionModel = require('../src/models/recuperacion.model');
 const registroPendienteModel = require('../src/models/registroPendiente.model');
 const correoService = require('../src/services/correo.service');
 
-const DATOS_REGISTRO = { nombreCompleto: 'Juan Perez', correo: 'juan@correo.com', contrasena: 'password123', telefono: '3001234567', autorizaTratamiento: true };
+const DATOS_REGISTRO = { nombreCompleto: 'Juan Perez', correo: 'juan@correo.com', contrasena: 'Password123!', telefono: '3001234567', autorizaTratamiento: true };
 
 describe('POST /api/auth/registro', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -39,7 +39,7 @@ describe('POST /api/auth/registro', () => {
     const respuesta = await request(app).post('/api/auth/registro').send({
       nombreCompleto: 'Juan Perez',
       correo: 'correo-sin-arroba',
-      contrasena: 'password123',
+      contrasena: 'Password123!',
       autorizaTratamiento: true,
     });
 
@@ -62,7 +62,7 @@ describe('POST /api/auth/registro', () => {
     const respuesta = await request(app).post('/api/auth/registro').send({
       nombreCompleto: 'Juan Perez',
       correo: 'juan@correo.com',
-      contrasena: 'password123',
+      contrasena: 'Password123!',
       telefono: '3001234567',
       autorizaTratamiento: true,
     });
@@ -418,7 +418,7 @@ describe('POST /api/auth/restablecer-clave', () => {
 
     const respuesta = await request(app)
       .post('/api/auth/restablecer-clave')
-      .send({ correo: 'nadie@correo.com', codigo: '123456', contrasenaNueva: 'nuevaClave123' });
+      .send({ correo: 'nadie@correo.com', codigo: '123456', contrasenaNueva: 'NuevaClave123!' });
 
     expect(respuesta.status).toBe(400);
   });
@@ -433,7 +433,7 @@ describe('POST /api/auth/restablecer-clave', () => {
 
     const respuesta = await request(app)
       .post('/api/auth/restablecer-clave')
-      .send({ correo: 'juan@correo.com', codigo: '123456', contrasenaNueva: 'nuevaClave123' });
+      .send({ correo: 'juan@correo.com', codigo: '123456', contrasenaNueva: 'NuevaClave123!' });
 
     expect(respuesta.status).toBe(400);
   });
@@ -448,7 +448,7 @@ describe('POST /api/auth/restablecer-clave', () => {
 
     const respuesta = await request(app)
       .post('/api/auth/restablecer-clave')
-      .send({ correo: 'juan@correo.com', codigo: '123456', contrasenaNueva: 'nuevaClave123' });
+      .send({ correo: 'juan@correo.com', codigo: '123456', contrasenaNueva: 'NuevaClave123!' });
 
     expect(respuesta.status).toBe(400);
   });
@@ -463,7 +463,7 @@ describe('POST /api/auth/restablecer-clave', () => {
 
     const respuesta = await request(app)
       .post('/api/auth/restablecer-clave')
-      .send({ correo: 'juan@correo.com', codigo: '999999', contrasenaNueva: 'nuevaClave123' });
+      .send({ correo: 'juan@correo.com', codigo: '999999', contrasenaNueva: 'NuevaClave123!' });
 
     expect(respuesta.status).toBe(400);
     expect(recuperacionModel.incrementarIntentos).toHaveBeenCalledWith('u1');
@@ -479,7 +479,7 @@ describe('POST /api/auth/restablecer-clave', () => {
 
     const respuesta = await request(app)
       .post('/api/auth/restablecer-clave')
-      .send({ correo: 'juan@correo.com', codigo: '123456', contrasenaNueva: 'nuevaClave123' });
+      .send({ correo: 'juan@correo.com', codigo: '123456', contrasenaNueva: 'NuevaClave123!' });
 
     expect(respuesta.status).toBe(200);
     expect(usuarioModel.actualizarContrasena).toHaveBeenCalledWith('u1', expect.any(String));

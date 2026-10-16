@@ -29,12 +29,23 @@ const CONTRASENAS_COMUNES = new Set([
   'abc12345', 'iloveyou', 'colombia', 'veterinaria', 'mascota123', 'asdfghjk', '1q2w3e4r', 'admin123', 'administrador',
 ]);
 
+// Reglas de una contraseña nueva. Son las mismas que muestra la interfaz
+// (frontend/src/utils/contrasena.js): si se cambia una, cambiar la otra.
+const REGLAS_CONTRASENA = [
+  { texto: 'al menos 8 caracteres', cumple: (clave) => clave.length >= 8 },
+  { texto: 'una letra minúscula', cumple: (clave) => /\p{Ll}/u.test(clave) },
+  { texto: 'una letra mayúscula', cumple: (clave) => /\p{Lu}/u.test(clave) },
+  { texto: 'un número', cumple: (clave) => /\d/.test(clave) },
+  { texto: 'un carácter especial, como ! # $ % o *', cumple: (clave) => /[^\p{L}\d\s]/u.test(clave) },
+];
+
 // Devuelve el mensaje del problema o null si la contraseña sirve.
-// - Minimo 8 caracteres; maximo 72 bytes (bcrypt ignora lo que pase de ahi).
+// - Las cinco reglas de arriba; maximo 72 bytes (bcrypt ignora lo que pase de ahi).
 // - No puede ser de las mas comunes, un solo caracter repetido ni el correo.
 function errorContrasena(contrasena, correo) {
   const clave = String(contrasena ?? '');
-  if (clave.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
+  const faltan = REGLAS_CONTRASENA.filter((regla) => !regla.cumple(clave));
+  if (faltan.length) return `La contraseña debe tener: ${faltan.map((regla) => regla.texto).join(', ')}.`;
   if (Buffer.byteLength(clave, 'utf8') > 72) return 'La contraseña no puede superar los 72 caracteres.';
   const minusculas = clave.toLowerCase();
   if (CONTRASENAS_COMUNES.has(minusculas) || /^(.)\1+$/.test(clave)) {

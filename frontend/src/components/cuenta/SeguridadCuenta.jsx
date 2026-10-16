@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useCuentaRegresiva } from '../../hooks/useCuentaRegresiva';
 import { Boton } from '../vetui';
 import { Campo } from '../form/Campo';
+import { CampoContrasenaNueva } from '../form/CampoContrasenaNueva';
+import { errorContrasenaNueva } from '../../utils/contrasena';
 import { CampoCodigo } from '../form/CampoCodigo';
 import { ReenviarCodigo } from '../form/ReenviarCodigo';
 import { IconoCorreo } from '../icons';
@@ -205,8 +207,9 @@ export function CambioContrasena({ correo, api, pideActual = false }) {
       setEstado({ tipo: 'error', texto: 'Escribe los 6 dígitos del código.' });
       return;
     }
-    if (nueva.length < 8) {
-      setEstado({ tipo: 'error', texto: 'La nueva contraseña debe tener al menos 8 caracteres.' });
+    const problema = errorContrasenaNueva(nueva);
+    if (problema) {
+      setEstado({ tipo: 'error', texto: problema });
       return;
     }
     if (nueva !== confirmacion) {
@@ -269,8 +272,8 @@ export function CambioContrasena({ correo, api, pideActual = false }) {
               enfocar={enfocar}
             />
             <ReenviarCodigo cuenta={cuenta} onReenviar={() => pedirCodigo()} disabled={enviando} className="-mt-1 self-center" />
-            <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
-              <Campo id="contrasena-nueva-perfil" label="Nueva contraseña" type="password" autoComplete="new-password" value={nueva} onChange={(e) => setNueva(e.target.value)} required />
+            <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 sm:grid-cols-2">
+              <CampoContrasenaNueva id="contrasena-nueva-perfil" label="Nueva contraseña" value={nueva} onChange={(e) => setNueva(e.target.value)} required />
               <Campo id="contrasena-confirmar-perfil" label="Repite la contraseña" type="password" autoComplete="new-password" value={confirmacion} onChange={(e) => setConfirmacion(e.target.value)} required />
             </div>
             <div className="flex flex-wrap justify-end gap-3">

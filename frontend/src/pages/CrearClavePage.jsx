@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Campo } from '../components/form/Campo';
+import { CampoContrasenaNueva } from '../components/form/CampoContrasenaNueva';
+import { errorContrasenaNueva } from '../utils/contrasena';
 import { establecerPrimeraClave } from '../api/client';
 import { useAuth, CLAVE_ALMACENAMIENTO } from '../context/AuthContext';
 import { rutaPanelPorRol } from '../utils/rutas';
@@ -23,8 +25,9 @@ export function CrearClavePage() {
   async function guardar(evento) {
     evento.preventDefault();
     setError('');
-    if (nueva.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres.');
+    const problema = errorContrasenaNueva(nueva);
+    if (problema) {
+      setError(problema);
       return;
     }
     if (nueva !== confirmacion) {
@@ -58,11 +61,9 @@ export function CrearClavePage() {
       }
     >
       <form onSubmit={guardar} className="flex flex-col gap-4" noValidate>
-        <Campo
+        <CampoContrasenaNueva
           id="contrasena-nueva"
           label="Nueva contraseña"
-          type="password"
-          autoComplete="new-password"
           value={nueva}
           onChange={(e) => setNueva(e.target.value)}
           required
@@ -76,7 +77,7 @@ export function CrearClavePage() {
           onChange={(e) => setConfirmacion(e.target.value)}
           required
         />
-        <p className="-mt-1 text-xs text-slate-700">Mínimo 8 caracteres y distinta a la temporal que recibiste por correo.</p>
+        <p className="-mt-1 text-xs text-slate-700">Debe cumplir los requisitos indicados y ser distinta a la temporal que recibiste por correo.</p>
 
         {error && (
           <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">

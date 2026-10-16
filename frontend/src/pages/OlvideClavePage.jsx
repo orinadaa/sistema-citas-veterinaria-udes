@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Campo } from '../components/form/Campo';
+import { CampoContrasenaNueva } from '../components/form/CampoContrasenaNueva';
+import { errorContrasenaNueva } from '../utils/contrasena';
 import { CampoCodigo } from '../components/form/CampoCodigo';
 import { ReenviarCodigo } from '../components/form/ReenviarCodigo';
 import { useCuentaRegresiva } from '../hooks/useCuentaRegresiva';
@@ -52,8 +54,9 @@ export function OlvideClavePage() {
       setError('Escribe los 6 dígitos del código.');
       return;
     }
-    if (contrasenaNueva.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres.');
+    const problema = errorContrasenaNueva(contrasenaNueva);
+    if (problema) {
+      setError(problema);
       return;
     }
     setEnviando(true);
@@ -129,14 +132,11 @@ export function OlvideClavePage() {
             enfocar={enfocarCodigo}
           />
           <ReenviarCodigo cuenta={cuenta} onReenviar={() => pedirCodigo()} disabled={enviando} className="-mt-1 self-center" />
-          <Campo
+          <CampoContrasenaNueva
             id="contrasenaNueva"
             label="Nueva contraseña"
-            type="password"
-            autoComplete="new-password"
             value={contrasenaNueva}
             onChange={(e) => setContrasenaNueva(e.target.value)}
-            minLength={8}
             required
           />
 

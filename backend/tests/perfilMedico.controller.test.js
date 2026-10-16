@@ -54,7 +54,7 @@ describe('PUT /api/medico/perfil/contrasena', () => {
     const r = await request(app)
       .put('/api/medico/perfil/contrasena')
       .set('Authorization', `Bearer ${TOKEN_VET}`)
-      .send({ actual: 'otra12345', nueva: 'nueva12345' });
+      .send({ actual: 'otra12345', nueva: 'Nueva12345!' });
     expect(r.status).toBe(400);
     expect(usuarioModel.actualizarContrasena).not.toHaveBeenCalled();
   });
@@ -64,7 +64,7 @@ describe('PUT /api/medico/perfil/contrasena', () => {
     const r = await request(app)
       .put('/api/medico/perfil/contrasena')
       .set('Authorization', `Bearer ${TOKEN_VET}`)
-      .send({ actual: 'correcta123', nueva: 'nueva12345' });
+      .send({ actual: 'correcta123', nueva: 'Nueva12345!' });
     expect(r.status).toBe(200);
     expect(usuarioModel.actualizarContrasena).toHaveBeenCalled();
   });

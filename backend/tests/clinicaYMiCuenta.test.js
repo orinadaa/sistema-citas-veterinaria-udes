@@ -127,9 +127,9 @@ describe('/api/mi-cuenta (administrador y superadministrador)', () => {
     const registro = { codigo_hash: await bcrypt.hash('123456', 4), intentos: 0, expira_en: new Date(Date.now() + 60000) };
     recuperacionModel.buscarPorUsuarioId.mockResolvedValue(registro);
     perfilModel.obtenerHashContrasena.mockResolvedValue(await bcrypt.hash('ClaveActual1', 4));
-    expect((await con(request(app).put('/api/mi-cuenta/contrasena'), SUPER).send({ codigo: '000000', contrasenaNueva: 'ClaveNueva12' })).status).toBe(400);
+    expect((await con(request(app).put('/api/mi-cuenta/contrasena'), SUPER).send({ codigo: '000000', contrasenaNueva: 'ClaveNueva12!' })).status).toBe(400);
     expect(usuarioModel.actualizarContrasena).not.toHaveBeenCalled();
-    expect((await con(request(app).put('/api/mi-cuenta/contrasena'), SUPER).send({ codigo: '123456', contrasenaNueva: 'ClaveNueva12' })).status).toBe(200);
+    expect((await con(request(app).put('/api/mi-cuenta/contrasena'), SUPER).send({ codigo: '123456', contrasenaNueva: 'ClaveNueva12!' })).status).toBe(200);
     expect(usuarioModel.actualizarContrasena).toHaveBeenCalledWith('su', expect.any(String));
   });
 });

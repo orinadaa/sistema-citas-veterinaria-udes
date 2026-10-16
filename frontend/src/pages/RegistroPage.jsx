@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Campo } from '../components/form/Campo';
+import { CampoContrasenaNueva } from '../components/form/CampoContrasenaNueva';
 import { CampoCodigo } from '../components/form/CampoCodigo';
 import { ReenviarCodigo } from '../components/form/ReenviarCodigo';
 import { useCuentaRegresiva } from '../hooks/useCuentaRegresiva';
@@ -173,14 +174,11 @@ export function RegistroPage() {
             onChange={actualizarCampo}
             required
           />
-          <Campo
+          <CampoContrasenaNueva
             id="contrasena"
             label="Contraseña"
-            type="password"
-            autoComplete="new-password"
             value={datos.contrasena}
             onChange={actualizarCampo}
-            minLength={8}
             required
           />
 

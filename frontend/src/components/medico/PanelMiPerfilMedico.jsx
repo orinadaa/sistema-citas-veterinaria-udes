@@ -13,6 +13,8 @@ import { useAuth } from '../../context/AuthContext';
 import { EstadoError, Pestanas } from '../vetui';
 import { CategoryBadge } from '../ui/CategoryBadge';
 import { Campo } from '../form/Campo';
+import { CampoContrasenaNueva } from '../form/CampoContrasenaNueva';
+import { errorContrasenaNueva } from '../../utils/contrasena';
 import { CampoCodigo } from '../form/CampoCodigo';
 import { ReenviarCodigo } from '../form/ReenviarCodigo';
 import { useCuentaRegresiva } from '../../hooks/useCuentaRegresiva';
@@ -284,6 +286,11 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
   async function cambiarClave(evento) {
     evento.preventDefault();
     setEstadoClave(null);
+    const problema = errorContrasenaNueva(claves.nueva);
+    if (problema) {
+      setEstadoClave({ tipo: 'error', texto: problema });
+      return;
+    }
     if (claves.nueva !== claves.confirmar) {
       setEstadoClave({ tipo: 'error', texto: 'La confirmación no coincide con la nueva contraseña.' });
       return;
@@ -453,13 +460,10 @@ export function PanelMiPerfilMedico({ pestanaInicial }) {
                     onChange={(e) => setClaves({ ...claves, actual: e.target.value })}
                     required
                   />
-                  <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
-                    <Campo
+                  <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-4 sm:grid-cols-2">
+                    <CampoContrasenaNueva
                       id="clave-nueva"
                       label="Nueva contraseña"
-                      type="password"
-                      autoComplete="new-password"
-                      minLength={8}
                       value={claves.nueva}
                       onChange={(e) => setClaves({ ...claves, nueva: e.target.value })}
                       required

@@ -64,10 +64,10 @@ describe('Clave temporal: obliga a establecer una contraseña propia', () => {
       id: 'm1', nombre_completo: 'Ana', correo: 'ana@udes.edu.co', rol: 'veterinario', sede_id: 's1', activo: true,
       contrasena_hash: await bcrypt.hash('Temporal123', 4), debe_cambiar_contrasena: true,
     });
-    const respuesta = await con(request(app).post('/api/auth/primera-clave'), TOKEN_TEMPORAL).send({ contrasenaNueva: 'MiClavePropia1' });
+    const respuesta = await con(request(app).post('/api/auth/primera-clave'), TOKEN_TEMPORAL).send({ contrasenaNueva: 'MiClavePropia1!' });
     expect(respuesta.status).toBe(200);
     expect(usuarioModel.actualizarContrasena).toHaveBeenCalledWith('m1', expect.any(String));
-    expect(await bcrypt.compare('MiClavePropia1', usuarioModel.actualizarContrasena.mock.calls[0][1])).toBe(true);
+    expect(await bcrypt.compare('MiClavePropia1!', usuarioModel.actualizarContrasena.mock.calls[0][1])).toBe(true);
     expect(respuesta.body.usuario.debeCambiarContrasena).toBe(false);
     expect(jwt.decode(respuesta.body.token).cambiarClave).toBeUndefined();
   });
@@ -81,12 +81,12 @@ describe('Clave temporal: obliga a establecer una contraseña propia', () => {
     expect((await enviar('corta')).status).toBe(400);
     expect((await enviar('Temporal123')).status).toBe(400);
     usuarioModel.buscarConHashPorId.mockResolvedValue({ ...cuenta, debe_cambiar_contrasena: false });
-    expect((await enviar('MiClavePropia1')).status).toBe(400);
+    expect((await enviar('MiClavePropia1!')).status).toBe(400);
     expect(usuarioModel.actualizarContrasena).not.toHaveBeenCalled();
   });
 
   test('sin token no se puede establecer la contraseña de nadie', async () => {
-    expect((await request(app).post('/api/auth/primera-clave').send({ contrasenaNueva: 'MiClavePropia1' })).status).toBe(401);
+    expect((await request(app).post('/api/auth/primera-clave').send({ contrasenaNueva: 'MiClavePropia1!' })).status).toBe(401);
   });
 
   test('el personal que crea el superadministrador nace con clave temporal', async () => {
@@ -159,7 +159,7 @@ describe('Mi perfil del cliente (/api/cuenta)', () => {
   test('cambia la contraseña con el codigo correcto y lo consume', async () => {
     recuperacionModel.buscarPorUsuarioId.mockResolvedValue({ codigo_hash: await bcrypt.hash('123456', 4), intentos: 0, expira_en: new Date(Date.now() + 60000) });
     perfilModel.obtenerHashContrasena.mockResolvedValue(await bcrypt.hash('ClaveVieja1', 4));
-    const respuesta = await con(request(app).put('/api/cuenta/contrasena'), TOKEN_CLIENTE).send({ codigo: '123456', contrasenaNueva: 'ClaveNueva12' });
+    const respuesta = await con(request(app).put('/api/cuenta/contrasena'), TOKEN_CLIENTE).send({ codigo: '123456', contrasenaNueva: 'ClaveNueva12!' });
     expect(respuesta.status).toBe(200);
     expect(usuarioModel.actualizarContrasena).toHaveBeenCalledWith('c1', expect.any(String));
     expect(recuperacionModel.eliminarPorUsuarioId).toHaveBeenCalledWith('c1');
@@ -167,7 +167,7 @@ describe('Mi perfil del cliente (/api/cuenta)', () => {
 
   test('codigo incorrecto: cuenta el intento y no cambia nada', async () => {
     recuperacionModel.buscarPorUsuarioId.mockResolvedValue({ codigo_hash: await bcrypt.hash('123456', 4), intentos: 0, expira_en: new Date(Date.now() + 60000) });
-    const respuesta = await con(request(app).put('/api/cuenta/contrasena'), TOKEN_CLIENTE).send({ codigo: '000000', contrasenaNueva: 'ClaveNueva12' });
+    const respuesta = await con(request(app).put('/api/cuenta/contrasena'), TOKEN_CLIENTE).send({ codigo: '000000', contrasenaNueva: 'ClaveNueva12!' });
     expect(respuesta.status).toBe(400);
     expect(recuperacionModel.incrementarIntentos).toHaveBeenCalledWith('c1');
     expect(usuarioModel.actualizarContrasena).not.toHaveBeenCalled();
@@ -175,14 +175,14 @@ describe('Mi perfil del cliente (/api/cuenta)', () => {
 
   test('rechaza codigo vencido, demasiados intentos, clave corta y la misma clave', async () => {
     const hash = await bcrypt.hash('123456', 4);
-    const enviar = (contrasenaNueva = 'ClaveNueva12') => con(request(app).put('/api/cuenta/contrasena'), TOKEN_CLIENTE).send({ codigo: '123456', contrasenaNueva });
+    const enviar = (contrasenaNueva = 'ClaveNueva12!') => con(request(app).put('/api/cuenta/contrasena'), TOKEN_CLIENTE).send({ codigo: '123456', contrasenaNueva });
     recuperacionModel.buscarPorUsuarioId.mockResolvedValue({ codigo_hash: hash, intentos: 0, expira_en: new Date(Date.now() - 1000) });
     expect((await enviar()).status).toBe(400);
     recuperacionModel.buscarPorUsuarioId.mockResolvedValue({ codigo_hash: hash, intentos: 5, expira_en: new Date(Date.now() + 60000) });
     expect((await enviar()).status).toBe(400);
     recuperacionModel.buscarPorUsuarioId.mockResolvedValue({ codigo_hash: hash, intentos: 0, expira_en: new Date(Date.now() + 60000) });
     expect((await enviar('corta')).status).toBe(400);
-    perfilModel.obtenerHashContrasena.mockResolvedValue(await bcrypt.hash('ClaveNueva12', 4));
+    perfilModel.obtenerHashContrasena.mockResolvedValue(await bcrypt.hash('ClaveNueva12!', 4));
     expect((await enviar()).status).toBe(400);
     expect(usuarioModel.actualizarContrasena).not.toHaveBeenCalled();
   });

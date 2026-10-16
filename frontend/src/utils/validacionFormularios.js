@@ -1,3 +1,5 @@
+import { errorContrasenaNueva } from './contrasena.js';
+
 const normalizar = (texto) => String(texto ?? '')
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
@@ -66,6 +68,12 @@ export function mensajeValidacionCampo(campo) {
       : `El campo «${nombre}» es obligatorio.`;
   }
   if (!recortado) return errorNativo(campo, nombre);
+
+  // Contraseña nueva: las cinco reglas de utils/contrasena.js (las mismas del servidor).
+  if (campo.dataset.contrasenaNueva === 'true') {
+    const problema = errorContrasenaNueva(valor);
+    if (problema) return problema;
+  }
 
   if (tipo === 'correo') {
     const valido = recortado.length <= 150 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recortado);

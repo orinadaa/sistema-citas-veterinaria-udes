@@ -30,7 +30,7 @@ const firmar = (datos, opciones) => jwt.sign(datos, process.env.JWT_SECRET, opci
 const TOKEN_VET = firmar({ id: 'vet-1', rol: 'veterinario', sedeId: 'sede-1' });
 const TOKEN_ADMIN = firmar({ id: 'admin-1', rol: 'administrador', sedeId: 'sede-1' });
 const TOKEN_SUPER = firmar({ id: 'super-1', rol: 'superadministrador' });
-const REGISTRO = { nombreCompleto: 'Ana Pérez', correo: 'Ana@Correo.com', contrasena: 'UnaFraseLarga9', telefono: '3001234567', autorizaTratamiento: true };
+const REGISTRO = { nombreCompleto: 'Ana Pérez', correo: 'Ana@Correo.com', contrasena: 'UnaFraseLarga9!', telefono: '3001234567', autorizaTratamiento: true };
 
 beforeEach(() => jest.clearAllMocks());
 afterEach(() => {
@@ -188,13 +188,17 @@ describe('Copia de seguridad', () => {
 });
 
 describe('Reglas sueltas', () => {
-  test('contraseñas: minimo 8, no comunes, no un solo caracter, no el correo, maximo 72 bytes', () => {
-    expect(errorContrasena('corta')).toMatch(/8 caracteres/);
-    expect(errorContrasena('password')).toMatch(/adivinar/);
-    expect(errorContrasena('aaaaaaaaaa')).toMatch(/adivinar/);
-    expect(errorContrasena('ana@correo.com', 'ana@correo.com')).toMatch(/correo/);
-    expect(errorContrasena('x'.repeat(80))).toMatch(/72/);
-    expect(errorContrasena('MiPerroSeLlamaTobi7')).toBeNull();
+  test('contraseñas: 8 caracteres, minuscula, mayuscula, numero y caracter especial; no el correo; maximo 72 bytes', () => {
+    expect(errorContrasena('Co1!')).toMatch(/8 caracteres/);
+    expect(errorContrasena('MAYUSCULAS1!')).toMatch(/minúscula/);
+    expect(errorContrasena('minusculas1!')).toMatch(/mayúscula/);
+    expect(errorContrasena('SinNumeros!')).toMatch(/número/);
+    expect(errorContrasena('SinEspecial1')).toMatch(/carácter especial/);
+    expect(errorContrasena('aaaaaaaaaa')).toMatch(/mayúscula.*número.*carácter especial/);
+    expect(errorContrasena('Ana.Perez1@correo.com', 'ana.perez1@correo.com')).toMatch(/correo/);
+    expect(errorContrasena(`Aa1!${'x'.repeat(80)}`)).toMatch(/72/);
+    expect(errorContrasena('MiPerroSeLlamaTobi7!')).toBeNull();
+    expect(errorContrasena('Ñandú#2026')).toBeNull();
   });
 
   test('fechas reales, correos normalizados y franjas segun la duracion', () => {
