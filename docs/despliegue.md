@@ -75,6 +75,7 @@ Tres ajustes de Nginx que el ambiente de pruebas mostró necesarios (`docs/prueb
 - **Compresión:** en `nginx.conf`, activar `gzip_types text/css application/javascript application/json text/plain`. Sin esto solo se comprime el HTML; el JavaScript principal pasa de 377 KB a 115 KB.
 - **HTTP/2:** `listen 443 ssl http2;`. Con estas dos líneas, el rendimiento en móvil (Lighthouse) de la página de inicio pasó de 59 a 81 y el de inicio de sesión de 65 a 97.
 - **Versión oculta:** `server_tokens off;`, para que la cabecera `Server` no muestre la versión de Nginx.
+- **Página principal sin caché:** en `location /`, agregar `expires epoch;`. Sin esto el navegador guarda `index.html` y, tras publicar una versión nueva, sigue mostrando la anterior. Los archivos de `/assets/` sí se guardan un año, porque su nombre cambia en cada compilación.
 
 Las fotos pesan más que todo el código: la foto de una sede tomada de un periódico pesa 11 MB. Antes de publicar, subir fotos propias desde el panel, que las reduce a 1600 px.
 
